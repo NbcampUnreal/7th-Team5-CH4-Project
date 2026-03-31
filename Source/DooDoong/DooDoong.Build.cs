@@ -10,9 +10,7 @@ public class DooDoong : ModuleRules
 		
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
-			"Core",
-			"CoreUObject",
-			"Engine",
+			"Core", "CoreUObject", "Engine",
 
 			"InputCore",
 			"EnhancedInput",
