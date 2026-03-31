@@ -89,7 +89,7 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 #Content Paid
-Content/Asset/Paid/*
+Content/Assets/Paid/*
 
 #Content TestSpace
 Content/TestSpace/*
