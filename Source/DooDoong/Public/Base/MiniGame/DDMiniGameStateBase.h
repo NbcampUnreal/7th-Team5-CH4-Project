@@ -2,16 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
-#include "MiniGameStateBase.generated.h"
+#include "DDMiniGameStateBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DOODOONG_API AMiniGameStateBase : public AGameStateBase
+class DOODOONG_API ADDMiniGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 	
 public:
-	AMiniGameStateBase();
+	ADDMiniGameStateBase();
 };

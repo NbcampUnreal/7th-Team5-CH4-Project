@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "MiniGameRuleSet.generated.h"
+#include "DDMiniGameRuleSet.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DOODOONG_API UMiniGameRuleSet : public UObject
+class DOODOONG_API UDDMiniGameRuleSet : public UObject
 {
 	GENERATED_BODY()
 };

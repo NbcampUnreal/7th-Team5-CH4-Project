@@ -2,18 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "MiniGameModeBase.generated.h"
+#include "DDMiniGameModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DOODOONG_API AMiniGameModeBase : public AGameModeBase
+class DOODOONG_API ADDMiniGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
 public:
-	AMiniGameModeBase();
+	ADDMiniGameModeBase();
 	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

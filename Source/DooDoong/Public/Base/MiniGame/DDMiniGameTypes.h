@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "MiniGameTypes.generated.h"
+#include "DDMiniGameTypes.generated.h"
 
 USTRUCT(BlueprintType)
 struct DOODOONG_API FMiniGameSetup

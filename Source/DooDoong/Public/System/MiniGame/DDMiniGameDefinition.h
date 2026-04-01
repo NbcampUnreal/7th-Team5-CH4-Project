@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "MiniGameDefinition.generated.h"
+#include "DDMiniGameDefinition.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DOODOONG_API UMiniGameDefinition : public UPrimaryDataAsset
+class DOODOONG_API UDDMiniGameDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	
