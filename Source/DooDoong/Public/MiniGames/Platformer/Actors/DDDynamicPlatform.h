@@ -25,6 +25,7 @@ public:
 	
 public:
 	void MovingPlatform(float DeltaTime);
+	void RotatingPlatform(float DeltaTime);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Components", meta = (AllowPrivateAccess = "true"))
@@ -39,6 +40,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Moving")
 	float MoveDistance;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Rotation")
+	FRotator RotationValue;
 	
 private:
 	FVector StartLocation;

@@ -31,6 +31,7 @@ void ADDDynamicPlatform::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 	MovingPlatform(DeltaTime);
+	RotatingPlatform(DeltaTime);
 }
 
 void ADDDynamicPlatform::MovingPlatform(float DeltaTime)
@@ -46,6 +47,12 @@ void ADDDynamicPlatform::MovingPlatform(float DeltaTime)
 		SetActorLocation(StartLocation);
 		MoveDirection *= -1;
 	}
+}
+
+void ADDDynamicPlatform::RotatingPlatform(float DeltaTime)
+{
+	FRotator CurrentRotation = GetActorRotation();
+	AddActorLocalRotation(RotationValue * DeltaTime);
 }
 
 
