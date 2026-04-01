@@ -1,4 +1,4 @@
-﻿#include "Base/Game/MiniGame/MiniGameModeBase.h"
+﻿#include "Base/MiniGame/MiniGameModeBase.h"
 
 AMiniGameModeBase::AMiniGameModeBase()
 {
