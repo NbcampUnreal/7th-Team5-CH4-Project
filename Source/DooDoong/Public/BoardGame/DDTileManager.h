@@ -2,11 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TileManager.generated.h"
+#include "DDTileManager.generated.h"
 
-class ATile;
+class ADDTile;
 UCLASS()
-class ATileManager : public AActor
+class ADDTileManager : public AActor
 {
 	GENERATED_BODY()
 protected:
@@ -14,7 +14,7 @@ protected:
 public:
 
 	UPROPERTY()
-	TMap<FName, ATile*> TileMap;
+	TMap<FName, ADDTile*> TileMap;
 
 	void InitializeTiles();
 };

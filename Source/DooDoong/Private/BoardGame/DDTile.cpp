@@ -1,7 +1,7 @@
-﻿#include "BoardGame/Tile.h"
-#include "Common/LogManager.h"
+﻿#include "BoardGame/DDTile.h"
+#include "Common/DDLogManager.h"
 
-ATile::ATile()
+ADDTile::ADDTile()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -18,18 +18,18 @@ ATile::ATile()
 	StandPoint->SetupAttachment(Root);
 }
 
-void ATile::BeginPlay()
+void ADDTile::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-FVector ATile::GetStandLocation() const
+FVector ADDTile::GetStandLocation() const
 {
 	return StandPoint->GetComponentLocation();
 }
 
-void ATile::LoadTileData()
+void ADDTile::LoadTileData()
 {
 	if (!TileDataTable || TileRowName.IsNone())
 	{
@@ -49,7 +49,7 @@ void ATile::LoadTileData()
 	}
 }
 
-void ATile::ResolveNextTiles(const TMap<FName, ATile*>& TileMap)
+void ADDTile::ResolveNextTiles(const TMap<FName, ADDTile*>& TileMap)
 {
 	// 기존 연결 초기화
 	NextTiles.Empty();
@@ -67,7 +67,7 @@ void ATile::ResolveNextTiles(const TMap<FName, ATile*>& TileMap)
 			continue;
 		}
 
-		ATile* FoundTile = TileMap.FindRef(NextName);
+		ADDTile* FoundTile = TileMap.FindRef(NextName);
 
 		if (FoundTile)
 		{

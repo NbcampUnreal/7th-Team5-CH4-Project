@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Engine/DataTable.h"
-#include "TileData.generated.h"
+#include "DDTileData.generated.h"
 
 UENUM(BlueprintType)
 enum class ETileType : uint8 {
