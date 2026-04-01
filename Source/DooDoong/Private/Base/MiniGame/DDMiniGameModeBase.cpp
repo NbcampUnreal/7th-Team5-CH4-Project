@@ -4,11 +4,12 @@
 #include "Base/MiniGame/DDMiniGameStateBase.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 #include "System/MiniGame/DDMiniGameManager.h"
+#include "TimerManager.h"
 
 ADDMiniGameModeBase::ADDMiniGameModeBase()
 {
 	GameStateClass = ADDMiniGameStateBase::StaticClass();
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void ADDMiniGameModeBase::BeginPlay()
@@ -37,17 +38,15 @@ void ADDMiniGameModeBase::BeginPlay()
 	MiniGameManager->NotifyMiniGameStarted();
 }
 
-void ADDMiniGameModeBase::Tick(float DeltaTime)
+void ADDMiniGameModeBase::UpdateMiniGameTime()
 {
-	Super::Tick(DeltaTime);
-	
 	if (!HasAuthority() || !bIsMiniGameStarted || bIsMiniGameFinished)
 	{
 		return;
 	}
 	
-	// 경과한 시간을 DeltaTime으로 갱신
-	ElapsedTimeSeconds += DeltaTime;
+	// 경과한 시간을 타이머 갱신 주기만큼 누적
+	ElapsedTimeSeconds += TimeUpdateIntervalSeconds;
 	
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
@@ -81,6 +80,11 @@ void ADDMiniGameModeBase::InitializeMiniGame(const FMiniGameSetup& InSetup,
 	bIsMiniGameStarted = false;
 	bIsMiniGameFinished = false;
 	ElapsedTimeSeconds = 0.f;
+
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(MiniGameTimerHandle);
+	}
 	
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
@@ -103,6 +107,11 @@ void ADDMiniGameModeBase::StartMiniGame()
 	{
 		MiniGameState->SetMiniGameState(DDMiniGameplayTags::State_Playing);
 		MiniGameState->SetRemainingTimeSeconds(ActiveSetup.TimeLimitSeconds);
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().SetTimer(MiniGameTimerHandle, this, &ADDMiniGameModeBase::UpdateMiniGameTime, TimeUpdateIntervalSeconds, true);
 	}
 }
 
@@ -169,10 +178,15 @@ void ADDMiniGameModeBase::FinishGame(FGameplayTag Reason)
 	}
 	
 	bIsMiniGameFinished = true;
+
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(MiniGameTimerHandle);
+	}
 	
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
-		// 게임이 종료되면 일단 게임ㅇ
+		// 게임이 종료된 상태로 갱신
 		MiniGameState->SetMiniGameState(DDMiniGameplayTags::State_Finishing);
 		
 		// RuleSet이 있다면 RuleSet의 규칙에 따라 랭킹 정리

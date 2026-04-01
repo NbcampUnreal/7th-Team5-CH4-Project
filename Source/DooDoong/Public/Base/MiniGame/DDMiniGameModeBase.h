@@ -7,6 +7,7 @@
 #include "DDMiniGameModeBase.generated.h"
 
 class UDDMiniGameRuleSet;
+struct FTimerHandle;
 /**
  * 
  */
@@ -19,7 +20,6 @@ public:
 	ADDMiniGameModeBase();
 	
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 	
 public:
 	/** 미니게임 데이터 Initialize */
@@ -56,6 +56,8 @@ protected:
 	TObjectPtr<ADDMiniGameStateBase> GetMiniGameState() const { return GetGameState<ADDMiniGameStateBase>(); }
 	/** RuleSet이 있는 경우 Initialize하는 헬퍼 */
 	void InitializeRuleSet();
+	/** 타이머 주기마다 미니게임 시간을 갱신하는 헬퍼 */
+	void UpdateMiniGameTime();
 	
 protected:
 	/** 런타임 미니게임 데이터 */
@@ -81,4 +83,11 @@ protected:
 	/** 경과 시간 체크 */
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "MiniGame")
 	float ElapsedTimeSeconds = 0.0f;
+
+	/** 시간 갱신용 타이머 핸들 */
+	FTimerHandle MiniGameTimerHandle;
+
+	/** 타이머 시간 갱신 간격 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MiniGame")
+	float TimeUpdateIntervalSeconds = 0.1f;
 };
