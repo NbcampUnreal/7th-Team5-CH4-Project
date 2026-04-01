@@ -168,6 +168,7 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 		if (UWorld* World = GetWorld())
 		{
 			// 미니게임이 끝나면 ServerTravel로 참가자 전원을 원래 맵으로 복귀시킴
+			// TODO 보드판이 준비되면 단순한 복귀가 아니라 보드칸의 정보를 확인해서 원래 플레이어가 서 있던 칸으로 복귀시켜야함.
 			World->ServerTravel(SavedReturnMapPackageName);
 		}
 	}
