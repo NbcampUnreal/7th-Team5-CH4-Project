@@ -13,7 +13,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Jump); 
 }
 
-namespace DDMiniGameSystemTags
+namespace DDMiniGameplayTags
 {
 	// 미니게임 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Idle);

@@ -12,7 +12,7 @@ namespace DDGameplayTags
 
 }
 
-namespace DDMiniGameGameplayTags
+namespace DDMiniGameplayTags
 {
 	// 미니게임 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Idle, "MiniGame.State.Idle", "미니게임 세션이 없고 대기 중인 상태");
