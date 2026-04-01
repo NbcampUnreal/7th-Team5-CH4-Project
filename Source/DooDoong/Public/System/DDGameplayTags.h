@@ -11,7 +11,8 @@ namespace DDGameplayTags
 	
 	// Ability Input Tags 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Jump); 
-	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_RollDice); 
+
 	// 미니게임 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Idle);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Preparing);
@@ -26,7 +27,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Genre_MiniGame_Competition);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Genre_MiniGame_Survival);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Genre_MiniGame_Race);
-
+	
 	// 미니게임 종료 조건 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(FinishReason_MiniGame_TimeOver);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(FinishReason_MiniGame_Completed);
