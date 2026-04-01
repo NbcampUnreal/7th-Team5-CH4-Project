@@ -1,22 +1,22 @@
-﻿#include "BoardGame/TileManager.h"
+﻿#include "BoardGame/DDTileManager.h"
 #include "EngineUtils.h"
-#include "BoardGame/Tile.h"
-#include "Common/LogManager.h"
+#include "BoardGame/DDTile.h"
+#include "Common/DDLogManager.h"
 
 
-void ATileManager::BeginPlay()
+void ADDTileManager::BeginPlay()
 {
 	Super::BeginPlay();
 
 	InitializeTiles();
 }
 
-void ATileManager::InitializeTiles()
+void ADDTileManager::InitializeTiles()
 {
 	// TileMap 구성
-	for (TActorIterator<ATile> It(GetWorld()); It; ++It)
+	for (TActorIterator<ADDTile> It(GetWorld()); It; ++It)
 	{
-		ATile* Tile = *It;
+		ADDTile* Tile = *It;
 		// 이름없는 타일 체크
 		if (Tile->TileRowName.IsNone())
 		{
@@ -45,4 +45,5 @@ void ATileManager::InitializeTiles()
 	{
 		Pair.Value->ResolveNextTiles(TileMap);
 	}
+	LOG_CYS(Warning, TEXT("[TM]TileMap loaded. Good!"));
 }

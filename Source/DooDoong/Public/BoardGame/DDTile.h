@@ -3,16 +3,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Engine/DataTable.h"
-#include "TileData.h"
-#include "Tile.generated.h"
+#include "DDTileData.h"
+#include "DDTile.generated.h"
 
 UCLASS()
-class DOODOONG_API ATile : public AActor
+class DOODOONG_API ADDTile : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	ATile();
+	ADDTile();
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,11 +43,11 @@ public:
 	FTileRowData TileData;
 
 	UPROPERTY(EditAnywhere, Category="Tile")
-	TArray<ATile*> NextTiles;
+	TArray<ADDTile*> NextTiles;
 
 	FVector GetStandLocation() const;
 	
 	void LoadTileData();
 	
-	void ResolveNextTiles(const TMap<FName, ATile*>& TileMap);
+	void ResolveNextTiles(const TMap<FName, ADDTile*>& TileMap);
 };
