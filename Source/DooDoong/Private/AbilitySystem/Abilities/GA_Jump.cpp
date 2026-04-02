@@ -4,11 +4,16 @@
 
 UGA_Jump::UGA_Jump()
 {
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor; 
+	
 	SetAssetTags(FGameplayTagContainer(DDGameplayTags::Input_Ability_Jump));
 }
 
-void UGA_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-                               const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UGA_Jump::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
@@ -18,4 +23,6 @@ void UGA_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	if (!Character) return;
 	
 	Character->Jump();
+	
+	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 }

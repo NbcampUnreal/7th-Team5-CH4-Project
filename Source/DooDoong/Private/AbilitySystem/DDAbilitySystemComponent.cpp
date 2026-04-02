@@ -9,8 +9,11 @@ void UDDAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Input
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
-			InputHeldSpecHandles.AddUnique(AbilitySpec.Handle);
+			if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTagExact(InputTag))
+			{
+				InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
+            	InputHeldSpecHandles.AddUnique(AbilitySpec.Handle);
+			}
 		}
 	}
 }
