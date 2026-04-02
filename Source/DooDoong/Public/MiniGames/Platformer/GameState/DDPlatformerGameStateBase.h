@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Base/Game/MiniGame/MiniGameStateBase.h"
+#include "Base/MiniGame/DDMiniGameStateBase.h"
 #include "DDPlatformerGameStateBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DOODOONG_API ADDPlatformerGameStateBase : public AMiniGameStateBase
+class DOODOONG_API ADDPlatformerGameStateBase : public ADDMiniGameStateBase
 {
 	GENERATED_BODY()
 public:
@@ -19,5 +19,5 @@ public:
 	virtual void BeginPlay() override;
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Platformer")
-	float WatingTime;
+	float WaitingTime;
 };

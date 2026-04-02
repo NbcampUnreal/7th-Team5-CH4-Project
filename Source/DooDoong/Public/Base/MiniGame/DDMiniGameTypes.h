@@ -50,7 +50,7 @@ struct DOODOONG_API FMiniGameSetup
 	GENERATED_BODY()
 	
 	FMiniGameSetup()
-	: Genre(DDMiniGameplayTags::Genre_None)
+	: Genre(DDGameplayTags::Genre_MiniGame_None)
 	{
 	}
 	
@@ -79,7 +79,7 @@ struct DOODOONG_API FMiniGameResult
 	GENERATED_BODY()
 
 	FMiniGameResult()
-		: FinishReason(DDMiniGameplayTags::FinishReason_TimeOver)
+		: FinishReason(DDGameplayTags::FinishReason_MiniGame_TimeOver)
 	{
 	}
 

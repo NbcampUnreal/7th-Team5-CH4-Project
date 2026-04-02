@@ -28,7 +28,7 @@ void UDDMiniGameManager::Deinitialize()
 
 bool UDDMiniGameManager::RequestStartMiniGame(FName MiniGameId, const TArray<APlayerState*>& Players)
 {
-	if (CurrentState != DDMiniGameplayTags::State_Idle || MiniGameId.IsNone())
+	if (CurrentState != DDGameplayTags::State_MiniGame_Idle || MiniGameId.IsNone())
 	{
 		return false;
 	}
@@ -55,11 +55,11 @@ bool UDDMiniGameManager::RequestStartMiniGame(FName MiniGameId, const TArray<APl
 	ReturnMapPackageName = World->GetPackage()->GetName();
 
 	// 상태를 준비 상태로 갱신
-	SetCurrentState(DDMiniGameplayTags::State_Preparing);
+	SetCurrentState(DDGameplayTags::State_MiniGame_Preparing);
 	OnMiniGamePreparing.Broadcast(ActiveSetup);
 
 	// 상태를 미니게임으로 이동하는 중으로 갱신 & 미니게임 맵으로 이동
-	SetCurrentState(DDMiniGameplayTags::State_Traveling);
+	SetCurrentState(DDGameplayTags::State_MiniGame_Traveling);
 	return TravelToMap(ActiveSetup.MiniGameMap);
 }
 
@@ -96,7 +96,7 @@ bool UDDMiniGameManager::RequestStartRandomMiniGame(const TArray<APlayerState*>&
 
 bool UDDMiniGameManager::RequestFinishMiniGame()
 {
-	if (CurrentState != DDMiniGameplayTags::State_Playing)
+	if (CurrentState != DDGameplayTags::State_MiniGame_Playing)
 	{
 		return false;
 	}
@@ -112,18 +112,18 @@ bool UDDMiniGameManager::RequestFinishMiniGame()
 	}
 
 	// 미니게임 종료 요청
-	StopActiveMiniGame(DDMiniGameplayTags::FinishReason_Completed);
+	StopActiveMiniGame(DDGameplayTags::FinishReason_MiniGame_Completed);
 	return true;
 }
 
 void UDDMiniGameManager::StopActiveMiniGame(FGameplayTag Reason)
 {
-	if (CurrentState == DDMiniGameplayTags::State_Idle)
+	if (CurrentState == DDGameplayTags::State_MiniGame_Idle)
 	{
 		return;
 	}
 
-	if (CurrentState == DDMiniGameplayTags::State_Playing)
+	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
 	{
 		if (UWorld* World = GetWorld())
 		{
@@ -144,18 +144,18 @@ void UDDMiniGameManager::StopActiveMiniGame(FGameplayTag Reason)
 
 void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 {
-	if (CurrentState == DDMiniGameplayTags::State_Idle)
+	if (CurrentState == DDGameplayTags::State_MiniGame_Idle)
 	{
 		return;
 	}
 
-	SetCurrentState(DDMiniGameplayTags::State_Finishing);
+	SetCurrentState(DDGameplayTags::State_MiniGame_Finishing);
 	OnMiniGameFinished.Broadcast(Result);
 
 	LastCommittedResult = Result;
 	bHasLastCommittedResult = true;
 
-	SetCurrentState(DDMiniGameplayTags::State_Completed);
+	SetCurrentState(DDGameplayTags::State_MiniGame_Completed);
 	OnMiniGameResultCommitted.Broadcast(Result);
 
 	const FString SavedReturnMapPackageName = ReturnMapPackageName;
@@ -163,7 +163,7 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 
 	if (!SavedReturnMapPackageName.IsEmpty())
 	{
-		SetCurrentState(DDMiniGameplayTags::State_Returning);
+		SetCurrentState(DDGameplayTags::State_MiniGame_Returning);
 
 		if (UWorld* World = GetWorld())
 		{
@@ -173,19 +173,19 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 		}
 	}
 
-	SetCurrentState(DDMiniGameplayTags::State_Idle);
+	SetCurrentState(DDGameplayTags::State_MiniGame_Idle);
 }
 
 void UDDMiniGameManager::NotifyMiniGameStarted()
 {
 	// 맵 이동 후에만 Playing 상태로 진입할 수 있어야 하기 때문에 Preparing, Traveling 상태가 아니라면 return
-	if (CurrentState != DDMiniGameplayTags::State_Preparing && CurrentState != DDMiniGameplayTags::State_Traveling)
+	if (CurrentState != DDGameplayTags::State_MiniGame_Preparing && CurrentState != DDGameplayTags::State_MiniGame_Traveling)
 	{
 		return;
 	}
 
 	OnMiniGameStarted.Broadcast();
-	SetCurrentState(DDMiniGameplayTags::State_Playing);
+	SetCurrentState(DDGameplayTags::State_MiniGame_Playing);
 }
 
 void UDDMiniGameManager::ClearLastCommittedResult()
@@ -298,7 +298,7 @@ bool UDDMiniGameManager::TravelToMap(const TSoftObjectPtr<UWorld>& MapAsset)
 	if (World == nullptr || World->GetNetMode() == NM_Client || !MapPath.IsValid())
 	{
 		ClearActiveSession();
-		SetCurrentState(DDMiniGameplayTags::State_Idle);
+		SetCurrentState(DDGameplayTags::State_MiniGame_Idle);
 		return false;
 	}
 
@@ -306,7 +306,7 @@ bool UDDMiniGameManager::TravelToMap(const TSoftObjectPtr<UWorld>& MapAsset)
 	if (TravelURL.IsEmpty())
 	{
 		ClearActiveSession();
-		SetCurrentState(DDMiniGameplayTags::State_Idle);
+		SetCurrentState(DDGameplayTags::State_MiniGame_Idle);
 		return false;
 	}
 

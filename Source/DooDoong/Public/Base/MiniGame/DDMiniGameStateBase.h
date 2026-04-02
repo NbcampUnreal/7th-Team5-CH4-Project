@@ -65,7 +65,7 @@ public:
 protected:
 	/** 현재 게임 상태 */
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.State"))
-	FGameplayTag CurrentState = DDMiniGameplayTags::State_Idle;
+	FGameplayTag CurrentState = DDGameplayTags::State_MiniGame_Idle;
 	
 	/** 남은 시간 */
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")

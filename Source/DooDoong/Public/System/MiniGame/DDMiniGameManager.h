@@ -126,7 +126,7 @@ protected:
 protected:
 	/** 현재 게임의 상태 */
 	UPROPERTY(VisibleInstanceOnly, Category="MiniGame", meta=(Categories="MiniGame.State"))
-	FGameplayTag CurrentState = DDMiniGameplayTags::State_Idle;
+	FGameplayTag CurrentState = DDGameplayTags::State_MiniGame_Idle;
 
 	/** 현재 실행중인 게임의 정보 */
 	UPROPERTY(VisibleInstanceOnly, Category="MiniGame")

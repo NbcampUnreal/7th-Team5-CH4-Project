@@ -61,14 +61,14 @@ void ADDMiniGameModeBase::UpdateMiniGameTime()
 	if (RuleSet != nullptr && RuleSet->ShouldFinishGame(GetMiniGameState()))
 	{
 		// 개별 룰셋이 종료 조건을 만족했다고 판단하면 남은 시간과 관계없이 즉시 종료
-		FinishGame(DDMiniGameplayTags::FinishReason_Completed);
+		FinishGame(DDGameplayTags::FinishReason_MiniGame_Completed);
 		return;
 	}
 	
 	// 제한 시간이 끝나면 게임을 TimeOver 태그에 의해 종료
 	if (ActiveSetup.TimeLimitSeconds > 0.f && ElapsedTimeSeconds >= ActiveSetup.TimeLimitSeconds)
 	{
-		FinishGame(DDMiniGameplayTags::FinishReason_TimeOver);
+		FinishGame(DDGameplayTags::FinishReason_MiniGame_TimeOver);
 	}
 }
 
@@ -91,7 +91,7 @@ void ADDMiniGameModeBase::InitializeMiniGame(const FMiniGameSetup& InSetup,
 		// 클라이언트가 확인할 초기 상태는 GameState에 복제 가능한 형태로 저장
 		MiniGameState->SetParticipants(ActiveParticipants);
 		MiniGameState->SetRemainingTimeSeconds(ActiveSetup.TimeLimitSeconds);
-		MiniGameState->SetMiniGameState(DDMiniGameplayTags::State_Preparing);
+		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 		MiniGameState->SetScoreBoard(TArray<FMiniGameScoreEntry>());
 	}
 }
@@ -105,7 +105,7 @@ void ADDMiniGameModeBase::StartMiniGame()
 	// GameState에서 시작 상태 태그를 갱신 & 게임의 남은 시간을 게임 데이터의 제한시간으로 갱신
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
-		MiniGameState->SetMiniGameState(DDMiniGameplayTags::State_Playing);
+		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Playing);
 		MiniGameState->SetRemainingTimeSeconds(ActiveSetup.TimeLimitSeconds);
 	}
 
@@ -118,7 +118,7 @@ void ADDMiniGameModeBase::StartMiniGame()
 void ADDMiniGameModeBase::FinishMiniGame()
 {
 	// 기본적으로 사용하는 종료 요청
-	FinishGame(DDMiniGameplayTags::FinishReason_Completed);
+	FinishGame(DDGameplayTags::FinishReason_MiniGame_Completed);
 }
 
 void ADDMiniGameModeBase::StopMiniGame(FGameplayTag Reason)
@@ -187,7 +187,7 @@ void ADDMiniGameModeBase::FinishGame(FGameplayTag Reason)
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
 		// 게임이 종료된 상태로 갱신
-		MiniGameState->SetMiniGameState(DDMiniGameplayTags::State_Finishing);
+		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Finishing);
 		
 		// RuleSet이 있다면 RuleSet의 규칙에 따라 랭킹 정리
 		if (RuleSet != nullptr)
@@ -196,7 +196,7 @@ void ADDMiniGameModeBase::FinishGame(FGameplayTag Reason)
 		}
 		
 		MiniGameState->SetRemainingTimeSeconds(0.f);
-		MiniGameState->SetMiniGameState(DDMiniGameplayTags::State_Completed);
+		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Completed);
 	}
 	
 	// 게임 결과를 생성

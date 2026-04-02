@@ -30,7 +30,7 @@ public:
 
 	/** 미니게임 장르 태그 : 기본값 None */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.Genre"))
-	FGameplayTag Genre = DDMiniGameplayTags::Genre_None;
+	FGameplayTag Genre = DDGameplayTags::Genre_MiniGame_None;
 
 	/** 미니게임 제한 시간 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
