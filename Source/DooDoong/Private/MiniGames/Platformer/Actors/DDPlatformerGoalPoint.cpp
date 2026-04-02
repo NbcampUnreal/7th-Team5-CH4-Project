@@ -3,7 +3,7 @@
 
 #include "MiniGames/Platformer/Actors/DDPlatformerGoalPoint.h"
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameModeBase.h"
-#include "Common/LogManager.h"
+#include "Common/DDLogManager.h"
 
 #include "Components/BoxComponent.h"
 

@@ -4,9 +4,8 @@
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameModeBase.h"
 #include "MiniGames/Platformer/GameState/DDPlatformerGameStateBase.h"
 #include "Base/Player/DDBasePlayerController.h"
-#include "Common/LogManager.h"
+#include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
-#include "Common/LogManager.h"
 
 void ADDPlatformerGameModeBase::OnPostLogin(AController* NewPlayer)
 {
