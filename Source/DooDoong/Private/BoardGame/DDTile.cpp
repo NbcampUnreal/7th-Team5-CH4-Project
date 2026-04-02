@@ -54,6 +54,8 @@ void ADDTile::LoadTileData()
 	if (Row)
 	{
 		TileData = *Row;
+		
+		ApplyTileMaterial();
 	}
 	else
 	{
@@ -91,5 +93,21 @@ void ADDTile::ResolveNextTiles(const TMap<FName, ADDTile*>& TileMap)
 				*TileRowName.ToString(),
 				*NextName.ToString());
 		}
+	}
+}
+
+void ADDTile::ApplyTileMaterial()
+{
+	if (!TileMesh) return;
+
+	UMaterialInterface** FoundMat = TileMaterialMap.Find(TileData.TileType);
+
+	if (FoundMat && *FoundMat)
+	{
+		TileMesh->SetMaterial(0, *FoundMat);
+	}
+	else
+	{
+		LOG_CYS(Warning, TEXT("[Tile] Material not found for TileType"));
 	}
 }

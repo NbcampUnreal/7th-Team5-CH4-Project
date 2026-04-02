@@ -8,6 +8,18 @@
 
 class ACharacter;
 
+// USTRUCT(BlueprintType)
+// struct FTileVisualData
+// {
+// 	GENERATED_BODY()
+//
+// 	UPROPERTY(EditAnywhere)
+// 	UMaterialInterface* Material;
+//
+// 	UPROPERTY(EditAnywhere)
+// 	UTexture2D* Icon;
+// };
+
 UCLASS()
 class DOODOONG_API ADDTile : public AActor
 {
@@ -47,9 +59,15 @@ public:
 	UPROPERTY(EditAnywhere, Category="Tile")
 	TArray<ADDTile*> NextTiles;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Tile")
+	TMap<ETileType, UMaterialInterface*> TileMaterialMap;
+	// TMap<ETileType, FTileVisualData> TileVisualMap;
+	
 	FVector GetStandLocation(ACharacter* Character) const;
 	
 	void LoadTileData();
 	
 	void ResolveNextTiles(const TMap<FName, ADDTile*>& TileMap);
+	
+	void ApplyTileMaterial();
 };
