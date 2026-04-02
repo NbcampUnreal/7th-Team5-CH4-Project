@@ -9,6 +9,7 @@ class UDDPointSet;
 class UDDAbilitySystemComponent;
 class UDDHealthSet;
 class UDDMovementSet;
+// class ADDTile; 
 
 UCLASS()
 class DOODOONG_API ADDBasePlayerState : public APlayerState, public IAbilitySystemInterface
@@ -20,16 +21,16 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	UDDHealthSet* GetHealthSet() const { return HealthSet; }
+	FORCEINLINE UDDHealthSet* GetHealthSet() const { return HealthSet; }
 	
-	UDDPointSet* GetPointSet() const { return PointSet; }
+	FORCEINLINE UDDPointSet* GetPointSet() const { return PointSet; }
 
-	UDDMovementSet* GetMovementSet() const { return MovementSet; }
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
-	TObjectPtr<UDDAbilitySystemComponent> AbilitySystemComponent;
+	FORCEINLINE UDDMovementSet* GetMovementSet() const { return MovementSet; }
 
 private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UDDAbilitySystemComponent> AbilitySystemComponent;
+	
 	UPROPERTY()
 	TObjectPtr<UDDHealthSet> HealthSet;
 	
@@ -38,5 +39,8 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UDDMovementSet> MovementSet;
-;
+	
+public:
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	// ADDTile* CurrentTile;
 };
