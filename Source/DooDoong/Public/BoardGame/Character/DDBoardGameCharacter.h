@@ -5,8 +5,10 @@
 #include "DDBoardGameCharacter.generated.h"
 
 class UDDBoardGameAttributeSet;
+class UDDHealthSet;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMoveFinished);
+ 
 
 UCLASS()
 class DOODOONG_API ADDBoardGameCharacter : public ADDBaseCharacter
@@ -39,5 +41,5 @@ private:
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attribute", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UDDBoardGameAttributeSet> AttributeSet;
+	TObjectPtr<UDDHealthSet> AttributeSet;
 };
