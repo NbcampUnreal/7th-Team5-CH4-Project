@@ -1,24 +1,24 @@
-﻿#include "BoardGame/Abilities/DDMoveTileStep.h"
+﻿#include "BoardGame/Abilities/DDMoveTileStepTask.h"
 #include "BoardGame/DDTile.h"
 #include "Base/Character/DDBaseCharacter.h"
 #include "Common/DDLogManager.h"
-UDDMoveTileStep* UDDMoveTileStep::MoveTile(UGameplayAbility* OwningAbility, int32 Steps)
+UDDMoveTileStepTask* UDDMoveTileStepTask::MoveTile(UGameplayAbility* OwningAbility, int32 Steps)
 {
 	LOG_CYS(Warning,TEXT("MOVE:%s"),*OwningAbility->GetName());
 	LOG_CYS(Warning,TEXT("Steps:%d"),Steps);
 	
-	auto Task = NewAbilityTask<UDDMoveTileStep>(OwningAbility);
+	auto Task = NewAbilityTask<UDDMoveTileStepTask>(OwningAbility);
 	Task->RemainingSteps = Steps;
 	return Task;
 }
 
-void UDDMoveTileStep::Activate()
+void UDDMoveTileStepTask::Activate()
 {
 	LOG_CYS(Warning,TEXT("Activate"));
 	MoveNext();
 }
 
-void UDDMoveTileStep::MoveNext()
+void UDDMoveTileStepTask::MoveNext()
 {
 	LOG_CYS(Warning,TEXT("MoveNext"));
 	
@@ -72,5 +72,5 @@ void UDDMoveTileStep::MoveNext()
 	RemainingSteps--;
 
 	// 다음 스텝
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UDDMoveTileStep::MoveNext);
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UDDMoveTileStepTask::MoveNext);
 }
