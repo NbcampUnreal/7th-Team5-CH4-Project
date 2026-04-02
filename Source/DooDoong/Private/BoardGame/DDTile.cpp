@@ -1,5 +1,7 @@
 ﻿#include "BoardGame/DDTile.h"
 #include "Common/DDLogManager.h"
+#include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 
 ADDTile::ADDTile()
 {
@@ -24,9 +26,19 @@ void ADDTile::BeginPlay()
 	
 }
 
-FVector ADDTile::GetStandLocation() const
+FVector ADDTile::GetStandLocation(ACharacter* Character) const
 {
-	return StandPoint->GetComponentLocation();
+	if (!StandPoint) return GetActorLocation();
+
+	FVector Location = StandPoint->GetComponentLocation();
+
+	if (Character)
+	{
+		float HalfHeight = Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		Location.Z += HalfHeight;
+	}
+
+	return Location;
 }
 
 void ADDTile::LoadTileData()
