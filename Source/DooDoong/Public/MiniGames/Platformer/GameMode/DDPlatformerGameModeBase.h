@@ -7,6 +7,10 @@
 #include "DDPlatformerGameModeBase.generated.h"
 
 class ADDPlatformerPlayerController;
+class ADDPlatformerGameStateBase;
+class ADDBasePlayerController;
+class UInputMappingContext;
+class UDDInputConfig;
 
 /**
  * 
@@ -20,15 +24,30 @@ public:
 	
 	virtual void BeginPlay() override;
 	
+public:
+	/*플레이어 준비완료 체크*/
+	void CheckReadyPlayers();
+	
+	/*대기시간 타이머 호출 함수*/
+	void WaitingTimerStart();
+	
+	/* 대기시간 타이머 종료 게임시작 */
+	void FinishedWaitingTimer();
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
 	TObjectPtr<UDDInputConfig> PlatformerInputConfig;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
 	TObjectPtr<UInputMappingContext> PlatformerIMC;
 	
-private:
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
 	TArray<ADDBasePlayerController*> AllPlayerControllers;
 	
-	int32 MaxPlayerControllers;
+private:
+	/* 타이머핸들러 */
+	FTimerHandle FinishedWaitingTimerHandle;
+	
+	/* 게임스테이트 변수 */
+	ADDPlatformerGameStateBase* PlatformerGameStateBase;
 };

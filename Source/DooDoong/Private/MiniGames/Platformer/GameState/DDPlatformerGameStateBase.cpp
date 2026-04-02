@@ -3,7 +3,7 @@
 
 #include "MiniGames/Platformer/GameState/DDPlatformerGameStateBase.h"
 
-#include "MiniGames/Platformer/Player/DDPlatformerPlayerController.h"
+#include "Base/Player/DDBasePlayerController.h"
 
 ADDPlatformerGameStateBase::ADDPlatformerGameStateBase()
 	: WaitingTime(10.f)
@@ -25,7 +25,7 @@ void ADDPlatformerGameStateBase::WaitingGame(APlayerController* LoginPlayer)
 		return;
 	}
 	
-	ADDPlatformerPlayerController* DDPlatformerPlayerController = Cast<ADDPlatformerPlayerController>(LoginPlayer);
+	ADDBasePlayerController* DDPlatformerPlayerController = Cast<ADDBasePlayerController>(LoginPlayer);
 	if (DDPlatformerPlayerController != nullptr)
 	{
 		FInputModeUIOnly UIMode;
