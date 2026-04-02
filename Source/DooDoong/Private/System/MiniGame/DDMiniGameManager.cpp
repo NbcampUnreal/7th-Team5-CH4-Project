@@ -252,7 +252,7 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 	}
 
 	ActiveSetup = FMiniGameSetup();
-	ActiveSetup.MiniGameID = Definition->MiniGameId;
+	ActiveSetup.MiniGameID = Definition->MiniGameID;
 	ActiveSetup.Genre = Definition->Genre;
 	ActiveSetup.TimeLimitSeconds = Definition->DefaultTimeLimitSeconds;
 	ActiveSetup.MiniGameTags = Definition->MiniGameTags;
@@ -330,11 +330,11 @@ void UDDMiniGameManager::CacheAvailableDefinitions()
 	{
 		// AssetData는 메타데이터이므로 실제 정의 객체로 캐스팅해서 사용.
 		UDDMiniGameDefinition* Definition = Cast<UDDMiniGameDefinition>(AssetData.GetAsset());
-		if (Definition == nullptr || Definition->MiniGameId.IsNone())
+		if (Definition == nullptr || Definition->MiniGameID.IsNone())
 		{
 			continue;
 		}
 
-		CachedDefinitions.Add(Definition->MiniGameId, Definition);
+		CachedDefinitions.Add(Definition->MiniGameID, Definition);
 	}
 }
