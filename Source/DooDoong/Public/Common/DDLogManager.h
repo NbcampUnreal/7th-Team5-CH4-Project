@@ -35,10 +35,10 @@ struct FLogCategoryEntry
     bool bEnabled;
 };
 
-class DOODOONG_API FLogManager
+class DOODOONG_API FDDLogManager
 {
 public:
-    static FLogManager& Get();
+    static FDDLogManager& Get();
 
     void Initialize();
 
@@ -53,7 +53,7 @@ public:
     void DumpStatus() const;
 
 private:
-    FLogManager() = default;
+    FDDLogManager() = default;
 
     TMap<ELogOwner, FLogCategoryEntry> CategoryMap;
     bool bInitialized = false;
@@ -63,29 +63,29 @@ private:
 // 매크로 래퍼
 // =============================
 #define LOG_JJH(Verbosity, Format, ...) \
-if (FLogManager::Get().IsEnabled(ELogOwner::JJH)) \
+if (FDDLogManager::Get().IsEnabled(ELogOwner::JJH)) \
 UE_LOG(LogJJH, Verbosity, Format, ##__VA_ARGS__)
 
 #define LOG_LSY(Verbosity, Format, ...) \
-if (FLogManager::Get().IsEnabled(ELogOwner::LSY)) \
+if (FDDLogManager::Get().IsEnabled(ELogOwner::LSY)) \
 UE_LOG(LogLSY, Verbosity, Format, ##__VA_ARGS__)
 
 #define LOG_KMS(Verbosity, Format, ...) \
-if (FLogManager::Get().IsEnabled(ELogOwner::KMS)) \
+if (FDDLogManager::Get().IsEnabled(ELogOwner::KMS)) \
 UE_LOG(LogKMS, Verbosity, Format, ##__VA_ARGS__)
 
 #define LOG_KSH(Verbosity, Format, ...) \
-if (FLogManager::Get().IsEnabled(ELogOwner::KSH)) \
+if (FDDLogManager::Get().IsEnabled(ELogOwner::KSH)) \
 UE_LOG(LogKSH, Verbosity, Format, ##__VA_ARGS__)
 
 #define LOG_PMJ(Verbosity, Format, ...) \
-if (FLogManager::Get().IsEnabled(ELogOwner::PMJ)) \
+if (FDDLogManager::Get().IsEnabled(ELogOwner::PMJ)) \
 UE_LOG(LogPMJ, Verbosity, Format, ##__VA_ARGS__)
 
 #define LOG_CYS(Verbosity, Format, ...) \
-if (FLogManager::Get().IsEnabled(ELogOwner::CYS)) \
+if (FDDLogManager::Get().IsEnabled(ELogOwner::CYS)) \
 UE_LOG(LogCYS, Verbosity, Format, ##__VA_ARGS__)
 
 #define LOG_CJH(Verbosity, Format, ...) \
-if (FLogManager::Get().IsEnabled(ELogOwner::CJH)) \
+if (FDDLogManager::Get().IsEnabled(ELogOwner::CJH)) \
 UE_LOG(LogCJH, Verbosity, Format, ##__VA_ARGS__)

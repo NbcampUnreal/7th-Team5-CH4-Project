@@ -9,6 +9,7 @@ namespace DDGameplayTags
 	
 	// Ability Input Tags 
 	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_Jump, "Input.Ability.Jump"); 
+	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_RollDice, "Input.Ability.RollDice"); 
 
 	// 미니게임 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_MiniGame_Idle, "State.MiniGame.Idle", "미니게임 세션이 없고 대기 중인 상태");
