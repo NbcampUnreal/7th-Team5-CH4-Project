@@ -22,15 +22,10 @@ public:
 	void ClearAbilityInput();
 	
 public:
-	void GiveDefaultAbilities();
+	void GiveAbilities(UDDAbilitySet* DefaultAbilitySet);
 	
 protected:
 	TArray<FGameplayAbilitySpecHandle> InputPressedSpecHandles;
 	TArray<FGameplayAbilitySpecHandle> InputReleasedSpecHandles;
 	TArray<FGameplayAbilitySpecHandle> InputHeldSpecHandles;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability | Default")
-	TObjectPtr<UDDAbilitySet> DefaultAbilitySet;
-	
-	
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Data/DDAbilitySet.h"
 #include "DDBaseCharacter.generated.h"
 
 class UDDAbilitySystemComponent;
@@ -17,6 +18,8 @@ class DOODOONG_API ADDBaseCharacter : public ACharacter, public IAbilitySystemIn
 public:
 	ADDBaseCharacter();
 
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -25,12 +28,15 @@ public:
 	
 	virtual void PossessedBy(AController* NewController) override;
 	
-public:
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
+	virtual void OnRep_PlayerState() override;
+	
+protected:
+	void InitializeAbilitySystem();
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDDAbilitySystemComponent> AbilitySystemComponent;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability | Default", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UDDAbilitySet> DefaultAbilitySet;
 };
