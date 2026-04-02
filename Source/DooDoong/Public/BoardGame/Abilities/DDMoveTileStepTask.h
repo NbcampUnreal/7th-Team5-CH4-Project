@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/Tasks/AbilityTask.h"
-#include "DDMoveTileStep.generated.h"
+#include "DDMoveTileStepTask.generated.h"
 
 class ADDTile;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMoveFinished);
 UCLASS()
-class DOODOONG_API UDDMoveTileStep : public UAbilityTask
+class DOODOONG_API UDDMoveTileStepTask : public UAbilityTask
 {
 	GENERATED_BODY()
 	
@@ -21,7 +21,7 @@ public:
 	// UPROPERTY(EditAnywhere)
 	// ADDTile* CurrentTile;
 	
-	static UDDMoveTileStep* MoveTile(
+	static UDDMoveTileStepTask* MoveTile(
 		UGameplayAbility* OwningAbility,
 		int32 Steps
 	);
