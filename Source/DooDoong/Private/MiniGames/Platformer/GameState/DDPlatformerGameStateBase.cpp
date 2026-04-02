@@ -4,7 +4,7 @@
 #include "MiniGames/Platformer/GameState/DDPlatformerGameStateBase.h"
 
 ADDPlatformerGameStateBase::ADDPlatformerGameStateBase()
-	: WatingTime(10.f)
+	: WaitingTime(10.f)
 {
 	
 }

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Base/Game/MiniGame/MiniGameModeBase.h"
+#include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "DDPlatformerGameModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DOODOONG_API ADDPlatformerGameModeBase : public AMiniGameModeBase
+class DOODOONG_API ADDPlatformerGameModeBase : public ADDMiniGameModeBase
 {
 	GENERATED_BODY()
 public:
