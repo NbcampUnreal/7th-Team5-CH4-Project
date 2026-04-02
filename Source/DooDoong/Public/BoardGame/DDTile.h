@@ -6,6 +6,8 @@
 #include "DDTileData.h"
 #include "DDTile.generated.h"
 
+class ACharacter;
+
 UCLASS()
 class DOODOONG_API ADDTile : public AActor
 {
@@ -45,7 +47,7 @@ public:
 	UPROPERTY(EditAnywhere, Category="Tile")
 	TArray<ADDTile*> NextTiles;
 
-	FVector GetStandLocation() const;
+	FVector GetStandLocation(ACharacter* Character) const;
 	
 	void LoadTileData();
 	
