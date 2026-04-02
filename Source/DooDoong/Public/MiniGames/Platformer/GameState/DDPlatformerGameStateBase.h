@@ -6,6 +6,8 @@
 #include "Base/MiniGame/DDMiniGameStateBase.h"
 #include "DDPlatformerGameStateBase.generated.h"
 
+class DDPlatformerPlayerController;
+
 /**
  * 
  */
@@ -17,7 +19,15 @@ public:
 	ADDPlatformerGameStateBase();
 public:
 	virtual void BeginPlay() override;
+	
+public:
+	/* 플레이어 게임 입장시 10초간 대기 */
+	void WaitingGame(APlayerController* LoginPlayer);
+	
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Platformer")
 	float WaitingTime;
+	
+	FTimerHandle WaitingTimerHandle;
+	
 };
