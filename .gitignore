@@ -7,6 +7,8 @@
 *.csproj
 *.sln.DotSettings
 *.sln.DotSettings.user
+*.uproject.DotSettings
+*.uproject.DotSettings.user
 
 #Rider IDE plugin
 Plugins/Developer/RiderLink/
