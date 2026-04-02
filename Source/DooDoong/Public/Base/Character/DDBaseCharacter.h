@@ -7,6 +7,8 @@
 #include "DDBaseCharacter.generated.h"
 
 class UDDAbilitySystemComponent;
+class UDDHealthSet;
+class UDDMovementSet;
 
 UCLASS()
 class DOODOONG_API ADDBaseCharacter : public ACharacter, public IAbilitySystemInterface
@@ -31,10 +33,21 @@ public:
 protected:
 	void InitializeAbilitySystem();
 
+public:
+	UDDHealthSet* GetHealthSet() const; 
+
+	UDDMovementSet* GetMovementSet() const;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDDAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability | Default", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDDAbilitySet> DefaultAbilitySet;
+
+	UPROPERTY()
+	TObjectPtr<UDDHealthSet> HealthSet;
+
+	UPROPERTY()
+	TObjectPtr<UDDMovementSet> MovementSet;
 };

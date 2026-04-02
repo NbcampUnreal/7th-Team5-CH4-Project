@@ -1,6 +1,8 @@
 #include "Base/Character/DDBaseCharacter.h"
 #include "AbilitySystem/DDAbilitySystemComponent.h"
 #include "Base/Player/DDBasePlayerState.h"
+#include "AbilitySystem/Attributes/DDHealthSet.h"
+#include "AbilitySystem/Attributes/DDMovementSet.h"
 
 ADDBaseCharacter::ADDBaseCharacter()
 {
@@ -63,5 +65,31 @@ void ADDBaseCharacter::InitializeAbilitySystem()
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
 	}
+	
+	HealthSet = PS->GetHealthSet();
+	MovementSet = PS->GetMovementSet();
+}
 
+UDDHealthSet* ADDBaseCharacter::GetHealthSet() const
+{
+	if (HealthSet) return HealthSet;
+	
+	if (ADDBasePlayerState* PS = GetPlayerState<ADDBasePlayerState>())
+	{
+		return PS->GetHealthSet();
+	}
+	
+	return nullptr;
+}
+
+UDDMovementSet* ADDBaseCharacter::GetMovementSet() const
+{
+	if (MovementSet) return MovementSet;
+	
+	if (ADDBasePlayerState* PS = GetPlayerState<ADDBasePlayerState>())
+	{
+		return PS->GetMovementSet();
+	}
+	
+	return nullptr;
 }
