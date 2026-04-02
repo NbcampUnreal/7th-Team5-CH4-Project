@@ -77,13 +77,14 @@ void UDDAbilitySystemComponent::ClearAbilityInput()
 	InputHeldSpecHandles.Reset();
 }
 
-void UDDAbilitySystemComponent::GiveDefaultAbilities()
+void UDDAbilitySystemComponent::GiveAbilities(UDDAbilitySet* DefaultAbilitySet)
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
-	if (!DefaultAbilitySet) return;
+	if (!IsOwnerActorAuthoritative()) return;
+	if (!DefaultAbilitySet) return; 
 	
 	for (const auto& AbilityClass : DefaultAbilitySet->GrantedAbilities)
 	{
 		GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, -1)); 
+		UE_LOG(LogTemp, Warning, TEXT("Ability Granted: %s"), *AbilityClass->GetName());
 	}
 }
