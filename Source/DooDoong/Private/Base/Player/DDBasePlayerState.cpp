@@ -9,7 +9,7 @@ ADDBasePlayerState::ADDBasePlayerState()
 	
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 	
-	AttributeSet = CreateDefaultSubobject<UDDBaseAttributeSet>(TEXT("AttributeSet"));
+	HealthSet = CreateDefaultSubobject<UDDHealthSet>(TEXT("HealthSet"));
 
 	SetNetUpdateFrequency(100.0f);
 }

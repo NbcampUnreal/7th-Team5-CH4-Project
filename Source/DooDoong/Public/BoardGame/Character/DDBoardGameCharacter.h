@@ -4,7 +4,7 @@
 #include "Base/Character/DDBaseCharacter.h"
 #include "DDBoardGameCharacter.generated.h"
 
-class UDDBaseAttributeSet; 
+class UDDHealthSet; 
 
 UCLASS()
 class DOODOONG_API ADDBoardGameCharacter : public ADDBaseCharacter
@@ -16,5 +16,5 @@ public:
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attribute", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UDDBaseAttributeSet> AttributeSet;
+	TObjectPtr<UDDHealthSet> AttributeSet;
 };

@@ -2,10 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
-#include "AbilitySystem/Attributes/DDBaseAttributeSet.h"
+#include "AbilitySystem/Attributes/DDHealthSet.h"
 #include "GameFramework/PlayerState.h"
 #include "DDBasePlayerState.generated.h"
-
 
 class UDDAbilitySystemComponent;
 
@@ -13,19 +12,18 @@ UCLASS()
 class DOODOONG_API ADDBasePlayerState : public APlayerState, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
-	
+
 public:
-	
-	ADDBasePlayerState(); 
-	
+	ADDBasePlayerState();
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	
-	UAttributeSet* GetAttributeSet() const { return AttributeSet;}
+
+	UDDHealthSet* GetHealthSet() const { return HealthSet; }
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TObjectPtr<UDDAbilitySystemComponent> AbilitySystemComponent;
-	
+
 	UPROPERTY()
-	TObjectPtr<UDDBaseAttributeSet> AttributeSet;
+	TObjectPtr<UDDHealthSet> HealthSet;
 };

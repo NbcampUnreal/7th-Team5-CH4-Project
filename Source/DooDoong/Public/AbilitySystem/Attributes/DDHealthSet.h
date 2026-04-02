@@ -2,18 +2,18 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
-#include "DDBaseAttributeSet.generated.h"
+#include "DDHealthSet.generated.h"
 
 UCLASS()
-class DOODOONG_API UDDBaseAttributeSet : public UAttributeSet
+class DOODOONG_API UDDHealthSet : public UAttributeSet
 {
 	GENERATED_BODY()
 	
 public:
-	UDDBaseAttributeSet();
+	UDDHealthSet();
 
-	ATTRIBUTE_ACCESSORS_BASIC(UDDBaseAttributeSet, Health); 
-	ATTRIBUTE_ACCESSORS_BASIC(UDDBaseAttributeSet, MaxHealth); 
+	ATTRIBUTE_ACCESSORS_BASIC(UDDHealthSet, Health); 
+	ATTRIBUTE_ACCESSORS_BASIC(UDDHealthSet, MaxHealth); 
 	
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
