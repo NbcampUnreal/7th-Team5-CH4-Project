@@ -61,6 +61,31 @@ void ADDBasePlayerController::SetupInputComponent()
 	}
 }
 
+void ADDBasePlayerController::SetInputConfig(UDDInputConfig* NewConfig)
+{
+	if (NewConfig)
+	{
+		InputConfig = NewConfig; 
+	}
+}
+
+void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIMC)
+{
+	if (auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	{
+		if (DefaultIMC)
+		{
+			Subsystem->RemoveMappingContext(DefaultIMC);
+		}
+		
+		DefaultIMC = NewIMC;
+		if (DefaultIMC)
+		{
+			Subsystem->AddMappingContext(DefaultIMC, 0);
+		}
+	}
+}
+
 void ADDBasePlayerController::Input_Move(const FInputActionValue& Value)
 {
 	APawn* ControlledPawn = GetPawn();
