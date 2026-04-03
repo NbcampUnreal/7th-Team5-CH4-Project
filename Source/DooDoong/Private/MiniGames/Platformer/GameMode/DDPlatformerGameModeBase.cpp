@@ -77,7 +77,7 @@ void ADDPlatformerGameModeBase::GameEnd()
 
 void ADDPlatformerGameModeBase::PlayeGameTimer()
 {
-	UE_LOG(LogPMJ, Log, TEXT("CheckPlayerMovedDistanceTimer"));
+	UE_LOG(LogPMJ, Log, TEXT("PlayeGameTimer"));
 	
 	for (int i = 0; i < DDAllPlayerCharacters.Num(); i++)
 	{
@@ -105,6 +105,7 @@ void ADDPlatformerGameModeBase::CheckGoalPlayerCharacter(AActor* GoalActor)
 
 void ADDPlatformerGameModeBase::PlayerRanking()
 {
+	UE_LOG(LogPMJ, Log, TEXT("PlayerRanking"));
 	for (int i = 0; i < PlayerGoalInArray.Num(); i++)
 	{
 		PlayerRankingArray.Add(PlayerGoalInArray[i]);
