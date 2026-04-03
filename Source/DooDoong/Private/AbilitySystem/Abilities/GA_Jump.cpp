@@ -9,6 +9,16 @@ UGA_Jump::UGA_Jump()
 	SetAssetTags(FGameplayTagContainer(DDGameplayTags::Input_Ability_Jump));
 }
 
+bool UGA_Jump::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags,
+	FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (!Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags)) return false;  
+	
+	ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
+	return Character && Character->CanJump(); 
+}
+
 void UGA_Jump::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle, 
 	const FGameplayAbilityActorInfo* ActorInfo,
