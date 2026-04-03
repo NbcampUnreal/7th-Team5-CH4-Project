@@ -21,6 +21,8 @@ class DOODOONG_API ADDPlatformerGameModeBase : public ADDMiniGameModeBase
 {
 	GENERATED_BODY()
 public:
+	ADDPlatformerGameModeBase();
+public:
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	
 	virtual void BeginPlay() override;
@@ -33,7 +35,11 @@ public:
 	void WaitingTimerStart();
 	
 	/* 플레이어 이동거리 체크 타이머 함수 */
-	void CheckPlayerMovedDistanceTimer();
+	void PlayeGameTimer();
+	
+	void CheckGoalPlayerCharacter(AActor* GoalActor);
+	
+	void PlayerRanking();
 	
 	/* 대기시간 타이머 종료 게임시작 */
 	void GameStart();
@@ -57,17 +63,30 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "PlatformerData")
 	float PlatformerPlayTime = 30.f;
 	
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
+	TArray<ADDBaseCharacter*> PlayerRankingArray;
+	
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
+	TArray<ADDBaseCharacter*> PlayerGoalInArray;
+	
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
+	TArray<float> DDPlayerMaxDistance;
+	
+	/* 게임스테이트 변수 */
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
+	ADDPlatformerGameStateBase* PlatformerGameStateBase;
+	
 private:
 	/* 타이머핸들러 */
 	FTimerHandle FinishedWaitingTimerHandle;
 	FTimerHandle CheckPlayerMovedDistanceTimerHandle;
 	FTimerHandle PlatformerPlayTimerHandle;
 	
-	/* 게임스테이트 변수 */
-	ADDPlatformerGameStateBase* PlatformerGameStateBase;
-	
 	/* 게임중인 플레이어 관련 변수 */
 	FVector StartLocation;
 	
-	TArray<float> DDPlayerMaxDistance;
+	
+	
+	/* 게임플레이 변수 */
+	int32 GamePlayTime = 0;
 };

@@ -6,6 +6,7 @@
 #include "Common/DDLogManager.h"
 
 #include "Components/BoxComponent.h"
+#include "Interfaces/IPluginManager.h"
 
 
 ADDPlatformerGoalPoint::ADDPlatformerGoalPoint()
@@ -46,6 +47,7 @@ void ADDPlatformerGoalPoint::OnComponentBeginOverlap(
 		ADDPlatformerGameModeBase* DDPlatformerGameModeBase = Cast<ADDPlatformerGameModeBase>(CurrentGameModeBase);
 		if (DDPlatformerGameModeBase != nullptr)
 		{
+			DDPlatformerGameModeBase->CheckGoalPlayerCharacter(OtherActor);
 			//TODO_@Minjae : 점수전달 로직 구현
 			UE_LOG(LogPMJ, Log, TEXT("점수 전달!"));
 		}
