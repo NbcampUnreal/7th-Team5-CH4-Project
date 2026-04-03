@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
-#include "DDPlatformerGameModeBase.generated.h"
+#include "DDPlatformerGameMode.generated.h"
 
 class ADDPlatformerPlayerController;
-class ADDPlatformerGameStateBase;
+class ADDPlatformerGameState;
 class ADDBasePlayerController;
 class ADDBaseCharacter;
 class UInputMappingContext;
@@ -17,7 +17,7 @@ class UDDInputConfig;
  * 
  */
 UCLASS()
-class DOODOONG_API ADDPlatformerGameModeBase : public ADDMiniGameModeBase
+class DOODOONG_API ADDPlatformerGameMode : public ADDMiniGameModeBase
 {
 	GENERATED_BODY()
 public:
@@ -47,43 +47,41 @@ public:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
-	TObjectPtr<UDDInputConfig> DDPlatformerInputConfig;
+	TObjectPtr<UDDInputConfig> PlatformerInputConfig;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
-	TObjectPtr<UInputMappingContext> DDPlatformerIMC;
+	TObjectPtr<UInputMappingContext> PlatformerIMC;
 	
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBasePlayerController*> DDAllPlayerControllers;
+	TArray<ADDBasePlayerController*> AllPlayerControllers;
 	
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBaseCharacter*> DDAllPlayerCharacters;
+	TArray<ADDBaseCharacter*> AllPlayerCharacters;
 	
 	UPROPERTY(EditAnywhere, Category = "PlatformerData")
 	float PlatformerPlayTime = 30.f;
 	
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBaseCharacter*> PlayerRankingArray;
+	TArray<ADDBaseCharacter*> PlayerRankingArrays;
 	
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBaseCharacter*> PlayerGoalInArray;
+	TArray<ADDBaseCharacter*> PlayerGoalInArrays;
 	
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<float> DDPlayerMaxDistance;
+	TArray<float> PlayerMaxDistances;
 	
 	/* 게임스테이트 변수 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	ADDPlatformerGameStateBase* PlatformerGameStateBase;
+	ADDPlatformerGameState* PlatformerGameStateBase;
 	
 private:
 	/* 타이머핸들러 */
 	FTimerHandle FinishedWaitingTimerHandle;
-	FTimerHandle CheckPlayerMovedDistanceTimerHandle;
+	FTimerHandle DistanceTimerHandle;
 	FTimerHandle PlatformerPlayTimerHandle;
 	
 	/* 게임중인 플레이어 관련 변수 */
 	FVector StartLocation;
-	
-	
 	
 	/* 게임플레이 변수 */
 	int32 GamePlayTime = 0;

@@ -2,7 +2,7 @@
 
 
 #include "MiniGames/Platformer/Actors/DDPlatformerGoalPoint.h"
-#include "MiniGames/Platformer/GameMode/DDPlatformerGameModeBase.h"
+#include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
 #include "Common/DDLogManager.h"
 
 #include "Components/BoxComponent.h"
@@ -44,10 +44,10 @@ void ADDPlatformerGoalPoint::OnComponentBeginOverlap(
 	AGameModeBase* CurrentGameModeBase = Cast<AGameModeBase>(GetWorld()->GetAuthGameMode());
 	if (CurrentGameModeBase != nullptr)
 	{
-		ADDPlatformerGameModeBase* DDPlatformerGameModeBase = Cast<ADDPlatformerGameModeBase>(CurrentGameModeBase);
-		if (DDPlatformerGameModeBase != nullptr)
+		ADDPlatformerGameMode* PlatformerGameModeBase = Cast<ADDPlatformerGameMode>(CurrentGameModeBase);
+		if (PlatformerGameModeBase != nullptr)
 		{
-			DDPlatformerGameModeBase->CheckGoalPlayerCharacter(OtherActor);
+			PlatformerGameModeBase->CheckGoalPlayerCharacter(OtherActor);
 			//TODO_@Minjae : 점수전달 로직 구현
 			UE_LOG(LogPMJ, Log, TEXT("점수 전달!"));
 		}
