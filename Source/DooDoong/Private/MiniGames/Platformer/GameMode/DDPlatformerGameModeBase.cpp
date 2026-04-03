@@ -3,6 +3,7 @@
 
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameModeBase.h"
 #include "MiniGames/Platformer/GameState/DDPlatformerGameStateBase.h"
+#include "Base/Character/DDBaseCharacter.h"
 #include "Base/Player/DDBasePlayerController.h"
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
@@ -14,7 +15,15 @@ void ADDPlatformerGameModeBase::OnPostLogin(AController* NewPlayer)
 	ADDBasePlayerController* DDPlayerController = Cast<ADDBasePlayerController>(NewPlayer);
 	if (IsValid(DDPlayerController) == true)
 	{
-		AllPlayerControllers.Add(DDPlayerController);
+		DDAllPlayerControllers.Add(DDPlayerController);
+		for (int i = 0; i < DDAllPlayerControllers.Num(); i++)
+		{
+			ADDBaseCharacter* DDPlayerCharacter = Cast<ADDBaseCharacter>(DDAllPlayerControllers[i]->GetPawn());
+			if (IsValid(DDPlayerCharacter) == true)
+			{
+				DDAllPlayerCharacters.Add(DDPlayerCharacter);
+			}
+		}
 		//TODO_@Minjae : Setter 함수 완성되면 DA랑 IMC 넘겨주기
 	}
 }
@@ -22,6 +31,12 @@ void ADDPlatformerGameModeBase::OnPostLogin(AController* NewPlayer)
 void ADDPlatformerGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	StartLocation = FVector(0.0f, 0.0f, 0.0f);
+	for (int i = 0; i < DDAllPlayerCharacters.Num(); i++)
+	{
+		DDPlayerMaxDistance[i] = 0.f;
+	}
 	
 	AGameStateBase* GameStateBase = Cast<AGameStateBase>(GetWorld()->GetGameState());
 	if (IsValid(GameStateBase) == true)
@@ -32,10 +47,46 @@ void ADDPlatformerGameModeBase::BeginPlay()
 	WaitingTimerStart();
 }
 
-void ADDPlatformerGameModeBase::FinishedWaitingTimer()
+void ADDPlatformerGameModeBase::GameStart()
 {
+	UE_LOG(LogPMJ, Log, TEXT("GameStart"));
 	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Playing);
-	UE_LOG(LogPMJ, Log, TEXT("FinishedWaitingTimer"));
+	GetWorldTimerManager().ClearTimer(FinishedWaitingTimerHandle);
+	GetWorldTimerManager().SetTimer(
+		PlatformerPlayTimerHandle,
+		this,
+		&ADDPlatformerGameModeBase::GameEnd,
+		10.f,
+		false,
+		PlatformerPlayTime);
+	
+	GetWorldTimerManager().SetTimer(
+		CheckPlayerMovedDistanceTimerHandle,
+		this,
+		&ADDPlatformerGameModeBase::CheckPlayerMovedDistanceTimer,
+		1.f,
+		true);
+}
+
+void ADDPlatformerGameModeBase::GameEnd()
+{
+	UE_LOG(LogPMJ, Log, TEXT("GameEnd"));
+	GetWorldTimerManager().ClearTimer(CheckPlayerMovedDistanceTimerHandle);
+	//TODO_@Minjae : 점수 계산해서 넘겨주는 로직 구현
+}
+
+void ADDPlatformerGameModeBase::CheckPlayerMovedDistanceTimer()
+{
+	UE_LOG(LogPMJ, Log, TEXT("CheckPlayerMovedDistanceTimer"));
+	
+	for (int i = 0; i < DDAllPlayerCharacters.Num(); i++)
+	{
+		float CurrentPlayerDistance = FVector::Dist(StartLocation, DDAllPlayerCharacters[i]->GetActorLocation());
+		if (DDPlayerMaxDistance[i] < CurrentPlayerDistance)
+		{
+			DDPlayerMaxDistance[i] = CurrentPlayerDistance;
+		}
+	}
 }
 
 void ADDPlatformerGameModeBase::WaitingTimerStart()
@@ -46,10 +97,10 @@ void ADDPlatformerGameModeBase::WaitingTimerStart()
 	GetWorld()->GetTimerManager().SetTimer(
 	FinishedWaitingTimerHandle,
 	this,
-	&ADDPlatformerGameModeBase::FinishedWaitingTimer,
+	&ADDPlatformerGameModeBase::GameStart,
 	10.f,
-	false
-	);
+	false,
+	10.f);
 }
 
 void ADDPlatformerGameModeBase::CheckReadyPlayers()
