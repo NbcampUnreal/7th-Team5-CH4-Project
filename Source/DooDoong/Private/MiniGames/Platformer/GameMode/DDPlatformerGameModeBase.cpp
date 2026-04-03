@@ -8,15 +8,6 @@
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
 
-ADDPlatformerGameModeBase::ADDPlatformerGameModeBase()
-{
-	AGameStateBase* GameStateBase = Cast<AGameStateBase>(GetWorld()->GetGameState());
-	if (IsValid(GameStateBase) == true)
-	{
-		PlatformerGameStateBase = Cast<ADDPlatformerGameStateBase>(GameStateBase);
-	}
-}
-
 void ADDPlatformerGameModeBase::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
@@ -42,6 +33,12 @@ void ADDPlatformerGameModeBase::BeginPlay()
 	for (int i = 0; i < DDAllPlayerCharacters.Num(); i++)
 	{
 		DDPlayerMaxDistance[i] = 0.0f;
+	}
+	
+	AGameStateBase* GameStateBase = Cast<AGameStateBase>(GetWorld()->GetGameState());
+	if (IsValid(GameStateBase) == true)
+	{
+		PlatformerGameStateBase = Cast<ADDPlatformerGameStateBase>(GameStateBase);
 	}
 	
 	WaitingTimerStart();

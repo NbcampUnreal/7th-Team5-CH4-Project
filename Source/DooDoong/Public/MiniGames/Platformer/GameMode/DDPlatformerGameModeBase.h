@@ -21,8 +21,6 @@ class DOODOONG_API ADDPlatformerGameModeBase : public ADDMiniGameModeBase
 {
 	GENERATED_BODY()
 public:
-	ADDPlatformerGameModeBase();
-public:
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	
 	virtual void BeginPlay() override;
