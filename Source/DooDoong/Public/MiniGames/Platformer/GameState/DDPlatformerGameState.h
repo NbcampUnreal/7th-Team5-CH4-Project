@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Base/MiniGame/DDMiniGameStateBase.h"
-#include "DDPlatformerGameStateBase.generated.h"
+#include "DDPlatformerGameState.generated.h"
 
 class DDPlatformerPlayerController;
 
@@ -12,11 +12,11 @@ class DDPlatformerPlayerController;
  * 
  */
 UCLASS()
-class DOODOONG_API ADDPlatformerGameStateBase : public ADDMiniGameStateBase
+class DOODOONG_API ADDPlatformerGameState : public ADDMiniGameStateBase
 {
 	GENERATED_BODY()
 public:
-	ADDPlatformerGameStateBase();
+	ADDPlatformerGameState();
 public:
 	virtual void BeginPlay() override;
 	
