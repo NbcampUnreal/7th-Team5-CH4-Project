@@ -15,7 +15,8 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Attack); 
 	
 	// Event Tags 
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Trace); 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_Start); 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_End); 
 	
 	// 미니게임 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Idle);
