@@ -28,15 +28,25 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 	
+	virtual void EndAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		bool bReplicateEndAbility, bool bWasCancelled
+	) override;
+	
 protected:
 	UFUNCTION()
 	void OnMontageCompleted(); 
 	
 	UFUNCTION()
-	void OnReceiveEvent(FGameplayEventData EventData);
+	void OnReceiveTraceStart(FGameplayEventData EventData);
+
+	UFUNCTION()
+	void OnReceiveTraceEnd(FGameplayEventData EventData);
 	
 	void PerformTrace();
-	
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Montage")
 	UAnimMontage* AttackMontage; 
@@ -51,19 +61,26 @@ public:
 	float DamageAmount = 5.f; 
 	
 protected:
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace")
 	FName TraceStartBone; 
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace")
 	float TraceRadius; 
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace | Debug")
+	bool bShowDebugTrace;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace | Debug")
+	float DebugDuration; 
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace | Debug")
 	FColor TraceColor;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace | Debug")
 	FColor HitColor; 
 	
 private:
 	ACharacter* CachedCharacter; 
+	
+	FTimerHandle TraceTimerHandle; 
 };

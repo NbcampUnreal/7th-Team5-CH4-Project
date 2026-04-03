@@ -44,11 +44,17 @@ void UGA_Attack::ActivateAbility(
 		return;
 	}
 	
-	UAbilityTask_WaitGameplayEvent* WaitEventTask = 
-		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, DDGameplayTags::Event_Montage_Trace); 
+	UAbilityTask_WaitGameplayEvent* WaitTraceStartTask = 
+		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, DDGameplayTags::Event_Trace_Start); 
 	
-	WaitEventTask->EventReceived.AddDynamic(this, &ThisClass::OnReceiveEvent);
-	WaitEventTask->ReadyForActivation(); 
+	WaitTraceStartTask->EventReceived.AddDynamic(this, &ThisClass::OnReceiveTraceStart);
+	WaitTraceStartTask->ReadyForActivation(); 
+	
+	UAbilityTask_WaitGameplayEvent* WaitTraceEndTask = 
+		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, DDGameplayTags::Event_Trace_End); 
+	
+	WaitTraceEndTask->EventReceived.AddDynamic(this, &ThisClass::OnReceiveTraceEnd);
+	WaitTraceEndTask->ReadyForActivation(); 
 	
 	UAbilityTask_PlayMontageAndWait* PlayMontageTask = 
 	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, AttackMontage); 
@@ -60,21 +66,45 @@ void UGA_Attack::ActivateAbility(
 	PlayMontageTask->ReadyForActivation(); 
 }
 
+void UGA_Attack::EndAbility(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility, bool bWasCancelled)
+{
+	GetWorld()->GetTimerManager().ClearTimer(TraceTimerHandle);
+	
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
 void UGA_Attack::OnMontageCompleted()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
-void UGA_Attack::OnReceiveEvent(FGameplayEventData EventData)
+void UGA_Attack::OnReceiveTraceStart(FGameplayEventData EventData)
 {
 	PerformTrace(); 
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		TraceTimerHandle,
+		this,
+		&ThisClass::PerformTrace,
+		0.1f, 
+		true
+		); 
+}
+
+void UGA_Attack::OnReceiveTraceEnd(FGameplayEventData EventData)
+{
+	GetWorld()->GetTimerManager().ClearTimer(TraceTimerHandle);
 }
 
 void UGA_Attack::PerformTrace()
 {
 	if (!CachedCharacter) return; 
 	
-	FVector StartLocation = CachedCharacter->GetMesh()->GetBoneLocation(TraceStartBone); 
+	FVector TraceLocation = CachedCharacter->GetMesh()->GetBoneLocation(TraceStartBone); 
 	
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(CachedCharacter);
@@ -82,8 +112,8 @@ void UGA_Attack::PerformTrace()
 	
 	bool bHit = GetWorld()->SweepSingleByChannel(
 		HitResult, 
-		StartLocation, 
-		StartLocation,
+		TraceLocation, 
+		TraceLocation,
 		FQuat::Identity,
 		ECC_Pawn,
 		FCollisionShape::MakeSphere(TraceRadius),
@@ -91,6 +121,19 @@ void UGA_Attack::PerformTrace()
 	); 
 	
 	if (!bHit) return;
+	
+	if (bShowDebugTrace)
+	{
+		DrawDebugSphere(
+			GetWorld(),
+			TraceLocation,
+			TraceRadius,
+			12,
+			bHit ? HitColor : TraceColor,
+			false,
+			DebugDuration
+		);
+	}
 	
 	IAbilitySystemInterface* OwnerASI = Cast<IAbilitySystemInterface>(CachedCharacter); 
 	IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(HitResult.GetActor());
