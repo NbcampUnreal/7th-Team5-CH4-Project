@@ -16,14 +16,20 @@ enum class EDDMatchState : uint8
 	End
 };
 
+class ADDTileManager;
+
 UCLASS()
 class ADDGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 
 public:
+	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
 	EDDMatchState MatchState = EDDMatchState::Waiting;
+	
+	UPROPERTY()
+	ADDTileManager* TileManager;
 };
