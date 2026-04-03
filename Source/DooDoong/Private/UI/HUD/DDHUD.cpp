@@ -1,25 +1,58 @@
 ﻿#include "UI/HUD/DDHUD.h"
 #include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 void ADDHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Widget 클래스 없으면 종료
-	if (!IsValid(MainWidgetClass)) return;
+	APlayerController* PC = GetOwningPlayerController();
+	if (!IsValid(PC)) return;
+
+	// 현재 맵 이름 가져오기
+	FString MapName = UGameplayStatics::GetCurrentLevelName(this);
+
+	TSubclassOf<UUserWidget> WidgetToCreate = nullptr;
+
+	// 맵 기준 분기
+	if (MapName.Contains("L_Lobby"))
+	{
+		WidgetToCreate = LobbyWidgetClass;
+	}
+	else if (MapName.Contains("L_BaseGame"))
+	{
+		WidgetToCreate = BaseGameWidgetClass;
+	}
+
+	// 생성
+	ShowWidget(WidgetToCreate);
+}
+
+void ADDHUD::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+	if (!IsValid(WidgetClass)) return;
 
 	APlayerController* PC = GetOwningPlayerController();
 	if (!IsValid(PC)) return;
 
-	MainWidgetInstance = CreateWidget<UUserWidget>(PC, MainWidgetClass);
+	// 기존 UI 제거
+	if (MainWidgetInstance)
+	{
+		MainWidgetInstance->RemoveFromParent();
+		MainWidgetInstance = nullptr;
+	}
 
-	if (IsValid(MainWidgetInstance))
+	// 새 UI 생성
+	MainWidgetInstance = CreateWidget<UUserWidget>(PC, WidgetClass);
+
+	if (MainWidgetInstance)
 	{
 		MainWidgetInstance->AddToViewport();
 
-		// 필요하면 UI 모드 (선택)
+		// 입력 모드 (필요할 때만)
 		FInputModeGameAndUI Mode;
 		Mode.SetWidgetToFocus(MainWidgetInstance->GetCachedWidget());
+
 		PC->SetInputMode(Mode);
 		PC->bShowMouseCursor = true;
 	}

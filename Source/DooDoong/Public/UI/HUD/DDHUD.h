@@ -12,12 +12,20 @@ class DOODOONG_API ADDHUD : public AHUD
 protected:
 	virtual void BeginPlay() override;
 
-protected:
-	// 에디터에서 넣을 위젯 클래스
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> MainWidgetClass;
+public:
+	// UI 교체용 (나중 확장)
+	void ShowWidget(TSubclassOf<class UUserWidget> WidgetClass);
 
-	// 생성된 위젯 인스턴스
+protected:
+	// 로비 UI
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> LobbyWidgetClass;
+
+	// 기본 게임 UI
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> BaseGameWidgetClass;
+
+	// 현재 위젯
 	UPROPERTY()
 	UUserWidget* MainWidgetInstance;
 };
