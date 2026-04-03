@@ -4,7 +4,11 @@ ADDBoardGameCharacter::ADDBoardGameCharacter()
 {
 	
 }
-
+void ADDBoardGameCharacter::InitLocation(ADDTile* TargetTile)
+{
+	if (!TargetTile) return;
+	SetActorLocation(TargetTile->GetStandLocation(this));
+}
 void ADDBoardGameCharacter::MoveToLocation(FVector TargetLocation)
 {
 	if (bIsMoving) return;
