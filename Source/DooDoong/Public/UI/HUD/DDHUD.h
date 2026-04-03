@@ -29,3 +29,4 @@ protected:
 	UPROPERTY()
 	UUserWidget* MainWidgetInstance;
 };
+

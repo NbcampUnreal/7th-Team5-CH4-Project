@@ -36,3 +36,5 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess, BindWidget))
 	TObjectPtr<UEditableText> NicknameEditableText;
 };
+
+
