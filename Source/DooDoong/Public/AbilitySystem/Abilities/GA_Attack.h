@@ -1,0 +1,69 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Abilities/GameplayAbility.h"
+#include "GA_Attack.generated.h"
+
+
+UCLASS()
+class DOODOONG_API UGA_Attack : public UGameplayAbility
+{
+	GENERATED_BODY()
+	
+public:
+	UGA_Attack(); 
+	
+	virtual bool CanActivateAbility(
+		const FGameplayAbilitySpecHandle Handle, 
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayTagContainer* SourceTags = nullptr, 
+		const FGameplayTagContainer* TargetTags = nullptr, 
+		FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
+	
+	virtual void ActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	) override;
+	
+protected:
+	UFUNCTION()
+	void OnMontageCompleted(); 
+	
+	UFUNCTION()
+	void OnReceiveEvent(FGameplayEventData EventData);
+	
+	void PerformTrace();
+	
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Montage")
+	UAnimMontage* AttackMontage; 
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	TSubclassOf<UGameplayEffect> DamageEffectClass; 
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	TArray<TSubclassOf<UGameplayEffect>> AdditionalEffectClasses;  
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	float DamageAmount = 5.f; 
+	
+protected:
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace")
+	FName TraceStartBone; 
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace")
+	float TraceRadius; 
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace")
+	FColor TraceColor;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace")
+	FColor HitColor; 
+	
+private:
+	ACharacter* CachedCharacter; 
+};

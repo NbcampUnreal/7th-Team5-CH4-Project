@@ -12,7 +12,11 @@ namespace DDGameplayTags
 	// Ability Input Tags 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Jump); 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_RollDice); 
-
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Attack); 
+	
+	// Event Tags 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Trace); 
+	
 	// 미니게임 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Idle);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Preparing);
