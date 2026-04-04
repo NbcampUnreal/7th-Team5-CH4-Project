@@ -2,10 +2,10 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "AN_SendGameplayTag.generated.h"
+#include "AN_SendGameplayEvent.generated.h"
 
 UCLASS()
-class DOODOONG_API UAN_SendGameplayTag : public UAnimNotify
+class DOODOONG_API UAN_SendGameplayEvent : public UAnimNotify
 {
 	GENERATED_BODY()
 	
