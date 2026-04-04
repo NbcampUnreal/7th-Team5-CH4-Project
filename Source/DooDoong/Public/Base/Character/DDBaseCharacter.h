@@ -39,9 +39,6 @@ public:
 
 	UDDMovementSet* GetMovementSet() const;
 
-	// Dump:임시 상태 // 나중에 지울 것
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ADDTile* StartTile;
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDDAbilitySystemComponent> AbilitySystemComponent;
