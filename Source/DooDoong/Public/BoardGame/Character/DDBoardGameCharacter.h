@@ -19,7 +19,7 @@ public:
 	ADDBoardGameCharacter();
 	
 	UFUNCTION()
-	void InitLocation(ADDTile* TargetTile);
+	void InitLocation();
 
 	UFUNCTION(BlueprintCallable)
 	void MoveToLocation(FVector TargetLocation);

@@ -1,14 +1,23 @@
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 
+#include "Base/Player/DDBasePlayerState.h"
+#include "Common/DDLogManager.h"
+
 ADDBoardGameCharacter::ADDBoardGameCharacter()
 {
-	
 }
-void ADDBoardGameCharacter::InitLocation(ADDTile* TargetTile)
+
+void ADDBoardGameCharacter::InitLocation()
 {
-	if (!TargetTile) return;
-	SetActorLocation(TargetTile->GetStandLocation(this));
+	ADDBasePlayerState* BasePlayerState = GetPlayerState<ADDBasePlayerState>();
+	if (!BasePlayerState) return;
+	if (BasePlayerState->CurrentTile)
+	{
+		LOG_CYS(Warning,TEXT("[BC]SetActorLocation"));
+		SetActorLocation(BasePlayerState->CurrentTile->GetStandLocation(this));
+	}
 }
+
 void ADDBoardGameCharacter::MoveToLocation(FVector TargetLocation)
 {
 	if (bIsMoving) return;
