@@ -7,8 +7,7 @@
 void ADDTileManager::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InitializeTiles();
+	
 }
 
 void ADDTileManager::InitializeTiles()
