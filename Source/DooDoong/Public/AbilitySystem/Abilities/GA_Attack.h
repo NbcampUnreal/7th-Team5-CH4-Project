@@ -5,6 +5,8 @@
 #include "GA_Attack.generated.h"
 
 
+class UCharacterMovementComponent;
+
 UCLASS()
 class DOODOONG_API UGA_Attack : public UGameplayAbility
 {
@@ -68,7 +70,7 @@ protected:
 	float TraceRadius; 
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace | Debug")
-	bool bShowDebugTrace;
+	bool bShowDebugTrace = true;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace | Debug")
 	float DebugDuration; 

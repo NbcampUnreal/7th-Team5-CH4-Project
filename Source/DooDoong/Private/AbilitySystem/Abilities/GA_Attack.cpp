@@ -4,11 +4,14 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "System/DDGameplayTags.h"
 
 UGA_Attack::UGA_Attack()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor; 
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
+	
 	SetAssetTags(FGameplayTagContainer(DDGameplayTags::Input_Ability_Attack)); 
 }
 
@@ -37,6 +40,7 @@ void UGA_Attack::ActivateAbility(
 	}
 	
 	CachedCharacter = Cast<ACharacter>(GetAvatarActorFromActorInfo());
+	CachedCharacter->GetCharacterMovement()->SetMovementMode(MOVE_None);
 	
 	if (!AttackMontage)
 	{
@@ -73,6 +77,7 @@ void UGA_Attack::EndAbility(
 	bool bReplicateEndAbility, bool bWasCancelled)
 {
 	GetWorld()->GetTimerManager().ClearTimer(TraceTimerHandle);
+	CachedCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -84,8 +89,7 @@ void UGA_Attack::OnMontageCompleted()
 
 void UGA_Attack::OnReceiveTraceStart(FGameplayEventData EventData)
 {
-	PerformTrace(); 
-	
+	UE_LOG(LogTemp,Warning, TEXT("[Attack] Receive TraceStartTag.")); 
 	GetWorld()->GetTimerManager().SetTimer(
 		TraceTimerHandle,
 		this,
@@ -97,6 +101,7 @@ void UGA_Attack::OnReceiveTraceStart(FGameplayEventData EventData)
 
 void UGA_Attack::OnReceiveTraceEnd(FGameplayEventData EventData)
 {
+	UE_LOG(LogTemp,Warning, TEXT("[Attack] Receive TraceEndTag.")); 
 	GetWorld()->GetTimerManager().ClearTimer(TraceTimerHandle);
 }
 
@@ -104,6 +109,7 @@ void UGA_Attack::PerformTrace()
 {
 	if (!CachedCharacter) return; 
 	
+	UE_LOG(LogTemp, Warning, TEXT("[Attack] Trace Perform.")); 
 	FVector TraceLocation = CachedCharacter->GetMesh()->GetBoneLocation(TraceStartBone); 
 	
 	FCollisionQueryParams QueryParams;
@@ -120,10 +126,9 @@ void UGA_Attack::PerformTrace()
 		QueryParams
 	); 
 	
-	if (!bHit) return;
-	
 	if (bShowDebugTrace)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[Attack] Debug Start."));
 		DrawDebugSphere(
 			GetWorld(),
 			TraceLocation,
@@ -134,6 +139,8 @@ void UGA_Attack::PerformTrace()
 			DebugDuration
 		);
 	}
+	
+	if (!bHit) return;
 	
 	IAbilitySystemInterface* OwnerASI = Cast<IAbilitySystemInterface>(CachedCharacter); 
 	IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(HitResult.GetActor());
@@ -148,10 +155,12 @@ void UGA_Attack::PerformTrace()
 		FGameplayEffectContextHandle Context = OwnerASC->MakeEffectContext();
 		Context.AddSourceObject(CachedCharacter);
 		
-		FGameplayEffectSpecHandle Spechandle =OwnerASC->MakeOutgoingSpec(DamageEffectClass, 1.f, Context); 
-		if (Spechandle.IsValid())
+		FGameplayEffectSpecHandle SpecHandle =OwnerASC->MakeOutgoingSpec(DamageEffectClass, 1.f, Context); 
+		if (SpecHandle.IsValid())
 		{
-			OwnerASC->ApplyGameplayEffectSpecToTarget(*Spechandle.Data.Get(), TargetASC);
+			SpecHandle.Data->SetSetByCallerMagnitude(DDGameplayTags::Data_Health_Damage, -DamageAmount);
+			
+			OwnerASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 		}
 	}
 	
