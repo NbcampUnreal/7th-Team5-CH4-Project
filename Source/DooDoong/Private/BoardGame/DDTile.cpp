@@ -2,6 +2,7 @@
 #include "Common/DDLogManager.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ADDTile::ADDTile()
 {
@@ -18,12 +19,13 @@ ADDTile::ADDTile()
 	// Stand Point
 	StandPoint = CreateDefaultSubobject<USceneComponent>(TEXT("StandPoint"));
 	StandPoint->SetupAttachment(Root);
+	
+	bReplicates = true;
 }
 
 void ADDTile::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 FVector ADDTile::GetStandLocation(ACharacter* Character) const
@@ -43,6 +45,7 @@ FVector ADDTile::GetStandLocation(ACharacter* Character) const
 
 void ADDTile::LoadTileData()
 {
+	if (!HasAuthority()) return;
 	if (!TileDataTable || TileRowName.IsNone())
 	{
 		LOG_CYS(Error, TEXT("[Tile]TileDataTable or RowName missing"));
@@ -54,7 +57,7 @@ void ADDTile::LoadTileData()
 	if (Row)
 	{
 		TileData = *Row;
-		
+
 		ApplyTileMaterial();
 	}
 	else
@@ -90,8 +93,8 @@ void ADDTile::ResolveNextTiles(const TMap<FName, ADDTile*>& TileMap)
 		else
 		{
 			LOG_CYS(Error, TEXT("[Tile][%s] NextTile not found: %s"),
-				*TileRowName.ToString(),
-				*NextName.ToString());
+			        *TileRowName.ToString(),
+			        *NextName.ToString());
 		}
 	}
 }
@@ -110,4 +113,17 @@ void ADDTile::ApplyTileMaterial()
 	{
 		LOG_CYS(Warning, TEXT("[Tile] Material not found for TileType"));
 	}
+}
+
+void ADDTile::OnRep_TileData()
+{
+	LOG_CYS(Warning, TEXT("[Tile] OnRep_TileData"));
+	ApplyTileMaterial();
+}
+
+void ADDTile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADDTile, TileData);
 }

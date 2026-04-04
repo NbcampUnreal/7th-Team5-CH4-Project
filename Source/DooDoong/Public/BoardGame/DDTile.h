@@ -53,7 +53,7 @@ public:
 	FName TileRowName;
 
 	// 실제 데이터
-	UPROPERTY(VisibleAnywhere, Category="Tile")
+	UPROPERTY(ReplicatedUsing = OnRep_TileData)
 	FTileRowData TileData;
 
 	UPROPERTY(EditAnywhere, Category="Tile")
@@ -70,4 +70,7 @@ public:
 	void ResolveNextTiles(const TMap<FName, ADDTile*>& TileMap);
 	
 	void ApplyTileMaterial();
+	
+	UFUNCTION()
+	void OnRep_TileData();
 };
