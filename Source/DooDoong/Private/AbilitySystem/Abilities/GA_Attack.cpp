@@ -1,8 +1,9 @@
 #include "AbilitySystem/Abilities/GA_Attack.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
-#include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
+#include "Abilities/Tasks/AbilityTask_WaitGameplayTag.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "System/DDGameplayTags.h"
@@ -39,26 +40,32 @@ void UGA_Attack::ActivateAbility(
 		return; 
 	}
 	
+	// 1. Cache Owner Info 
 	CachedCharacter = Cast<ACharacter>(GetAvatarActorFromActorInfo());
+	CachedAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(CachedCharacter);
+	
+	// 2. Block Movement 
 	CachedCharacter->GetCharacterMovement()->SetMovementMode(MOVE_None);
 	
+	// 3. Trace Task 
+	UAbilityTask_WaitGameplayTagAdded* WaitTraceStartTask = 
+		UAbilityTask_WaitGameplayTagAdded::WaitGameplayTagAdd(this, DDGameplayTags::Event_Trace_Start);
+	
+	WaitTraceStartTask->Added.AddDynamic(this, &ThisClass::OnReceiveTraceStart); 
+	WaitTraceStartTask->ReadyForActivation(); 
+	
+	UAbilityTask_WaitGameplayTagRemoved* WaitTraceEndTask = 
+		UAbilityTask_WaitGameplayTagRemoved::WaitGameplayTagRemove(this, DDGameplayTags::Event_Trace_Start); 
+	
+	WaitTraceEndTask->Removed.AddDynamic(this, &ThisClass::OnReceiveTraceEnd);
+	WaitTraceEndTask->ReadyForActivation(); 
+	
+	// 4. Montage Task 
 	if (!AttackMontage)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
-	
-	UAbilityTask_WaitGameplayEvent* WaitTraceStartTask = 
-		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, DDGameplayTags::Event_Trace_Start); 
-	
-	WaitTraceStartTask->EventReceived.AddDynamic(this, &ThisClass::OnReceiveTraceStart);
-	WaitTraceStartTask->ReadyForActivation(); 
-	
-	UAbilityTask_WaitGameplayEvent* WaitTraceEndTask = 
-		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, DDGameplayTags::Event_Trace_End); 
-	
-	WaitTraceEndTask->EventReceived.AddDynamic(this, &ThisClass::OnReceiveTraceEnd);
-	WaitTraceEndTask->ReadyForActivation(); 
 	
 	UAbilityTask_PlayMontageAndWait* PlayMontageTask = 
 	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, AttackMontage); 
@@ -87,9 +94,10 @@ void UGA_Attack::OnMontageCompleted()
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
-void UGA_Attack::OnReceiveTraceStart(FGameplayEventData EventData)
+void UGA_Attack::OnReceiveTraceStart()
 {
-	UE_LOG(LogTemp,Warning, TEXT("[Attack] Receive TraceStartTag.")); 
+	HitActors.Empty();
+	
 	GetWorld()->GetTimerManager().SetTimer(
 		TraceTimerHandle,
 		this,
@@ -99,9 +107,8 @@ void UGA_Attack::OnReceiveTraceStart(FGameplayEventData EventData)
 		); 
 }
 
-void UGA_Attack::OnReceiveTraceEnd(FGameplayEventData EventData)
+void UGA_Attack::OnReceiveTraceEnd()
 {
-	UE_LOG(LogTemp,Warning, TEXT("[Attack] Receive TraceEndTag.")); 
 	GetWorld()->GetTimerManager().ClearTimer(TraceTimerHandle);
 }
 
@@ -109,7 +116,7 @@ void UGA_Attack::PerformTrace()
 {
 	if (!CachedCharacter) return; 
 	
-	UE_LOG(LogTemp, Warning, TEXT("[Attack] Trace Perform.")); 
+	// 1. Trace 
 	FVector TraceLocation = CachedCharacter->GetMesh()->GetBoneLocation(TraceStartBone); 
 	
 	FCollisionQueryParams QueryParams;
@@ -126,9 +133,9 @@ void UGA_Attack::PerformTrace()
 		QueryParams
 	); 
 	
+	// 2. Debug 
 	if (bShowDebugTrace)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Attack] Debug Start."));
 		DrawDebugSphere(
 			GetWorld(),
 			TraceLocation,
@@ -140,39 +147,67 @@ void UGA_Attack::PerformTrace()
 		);
 	}
 	
-	if (!bHit) return;
+	// 3. Apply Effects To Target 
+	if (!bHit || HitActors.Contains(HitResult.GetActor())) return;
+	AActor* HitActor = HitResult.GetActor();
+	if (!HitActor) return;
+	HitActors.Add(HitActor);
 	
-	IAbilitySystemInterface* OwnerASI = Cast<IAbilitySystemInterface>(CachedCharacter); 
-	IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(HitResult.GetActor());
-	if (!OwnerASI || !TargetASI) return;
+	LaunchTarget(HitActor, KnockBackStrength);
+	
+	ApplyEffectsToTarget(HitActor);
+}
+
+void UGA_Attack::ApplyEffectsToTarget(AActor* TargetActor)
+{
+	IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(TargetActor);
+	if (!TargetASI) return;
 	
 	UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
-	UAbilitySystemComponent* OwnerASC = OwnerASI->GetAbilitySystemComponent();
-	if (!OwnerASC || !TargetASC) return;
+	if (!TargetASC) return;
 	
 	if (DamageEffectClass)
 	{
-		FGameplayEffectContextHandle Context = OwnerASC->MakeEffectContext();
+		FGameplayEffectContextHandle Context = CachedAbilitySystemComponent->MakeEffectContext();
 		Context.AddSourceObject(CachedCharacter);
 		
-		FGameplayEffectSpecHandle SpecHandle =OwnerASC->MakeOutgoingSpec(DamageEffectClass, 1.f, Context); 
+		FGameplayEffectSpecHandle SpecHandle =
+			CachedAbilitySystemComponent->MakeOutgoingSpec(DamageEffectClass, 1.f, Context); 
+		
 		if (SpecHandle.IsValid())
 		{
 			SpecHandle.Data->SetSetByCallerMagnitude(DDGameplayTags::Data_Health_Damage, -DamageAmount);
 			
-			OwnerASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+			CachedAbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 		}
 	}
 	
 	for (auto EffectClass : AdditionalEffectClasses)
 	{
-		FGameplayEffectContextHandle Context = OwnerASC->MakeEffectContext();
+		FGameplayEffectContextHandle Context = CachedAbilitySystemComponent->MakeEffectContext();
 		Context.AddSourceObject(CachedCharacter);
 		
-		FGameplayEffectSpecHandle Spechandle =OwnerASC->MakeOutgoingSpec(EffectClass, 1.f, Context); 
+		FGameplayEffectSpecHandle Spechandle = 
+			CachedAbilitySystemComponent->MakeOutgoingSpec(EffectClass, 1.f, Context); 
 		if (Spechandle.IsValid())
 		{
-			OwnerASC->ApplyGameplayEffectSpecToTarget(*Spechandle.Data.Get(), TargetASC);
+			CachedAbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*Spechandle.Data.Get(), TargetASC);
 		}
 	}
 }
+
+void UGA_Attack::LaunchTarget(AActor* TargetActor, float Strength)
+{
+	ACharacter* TargetCharacter = Cast<ACharacter>(TargetActor);
+	if (!TargetCharacter || !CachedCharacter) return;
+
+	FVector LaunchDirection = TargetCharacter->GetActorLocation() - CachedCharacter->GetActorLocation();
+	LaunchDirection.Z = 0.f;
+	LaunchDirection.Normalize();
+
+	FVector LaunchVelocity = LaunchDirection * Strength;
+	LaunchVelocity.Z = 200.f; 
+	
+	TargetCharacter->LaunchCharacter(LaunchVelocity, true, true);
+}
+

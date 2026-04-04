@@ -42,12 +42,16 @@ protected:
 	void OnMontageCompleted(); 
 	
 	UFUNCTION()
-	void OnReceiveTraceStart(FGameplayEventData EventData);
+	void OnReceiveTraceStart();
 
 	UFUNCTION()
-	void OnReceiveTraceEnd(FGameplayEventData EventData);
+	void OnReceiveTraceEnd();
 	
 	void PerformTrace();
+	
+	void ApplyEffectsToTarget(AActor* TargetActor); 
+	
+	void LaunchTarget(AActor* TargetActor, float Strength);
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Montage")
@@ -61,6 +65,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	float DamageAmount = 5.f; 
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	float KnockBackStrength = 500.f; 
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trace")
@@ -83,6 +90,10 @@ protected:
 	
 private:
 	ACharacter* CachedCharacter; 
+	
+	UAbilitySystemComponent* CachedAbilitySystemComponent;
+	
+	TSet<AActor*> HitActors; 
 	
 	FTimerHandle TraceTimerHandle; 
 };
