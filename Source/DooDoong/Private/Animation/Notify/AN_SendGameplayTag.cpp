@@ -1,4 +1,6 @@
 #include "Animation/Notify/AN_SendGameplayTag.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 
@@ -7,11 +9,14 @@ void UAN_SendGameplayTag::Notify(USkeletalMeshComponent* MeshComp, UAnimSequence
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 	
-	IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(MeshComp->GetOwner());
-	if (!ASI) return; 
+	AActor* Owner = MeshComp->GetOwner();
 	
-	UAbilitySystemComponent* ASC = ASI->GetAbilitySystemComponent();
-	if (!ASC) return;
+	FGameplayEventData EventData;
+	EventData.Instigator = Owner;
+	EventData.Target = Owner;
 	
-	ASC->AddLooseGameplayTags(Tags); 
+	for (const FGameplayTag& Tag : Tags)
+	{
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Owner, Tag, EventData);
+	}
 }
