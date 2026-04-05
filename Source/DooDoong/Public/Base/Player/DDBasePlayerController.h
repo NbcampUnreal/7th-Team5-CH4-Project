@@ -28,6 +28,10 @@ public:
 
 	void SetInputMappingContext(UInputMappingContext* NewIMC);
 	
+	/** 주현 : GameMode에서 곧바로 Set을 호출하는 것이 불가능해서 추가한 Client RPC */
+	UFUNCTION(Client, Reliable)
+	void Client_ApplyInput(UDDInputConfig* NewConfig, UInputMappingContext* NewIMC);
+	
 protected:
 	void Input_Move(const FInputActionValue& Value);
 

@@ -86,6 +86,12 @@ void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIM
 	}
 }
 
+void ADDBasePlayerController::Client_ApplyInput_Implementation(UDDInputConfig* NewConfig, UInputMappingContext* NewIMC)
+{
+	SetInputConfig(NewConfig);
+	SetInputMappingContext(NewIMC);
+}
+
 void ADDBasePlayerController::Input_Move(const FInputActionValue& Value)
 {
 	APawn* ControlledPawn = GetPawn();

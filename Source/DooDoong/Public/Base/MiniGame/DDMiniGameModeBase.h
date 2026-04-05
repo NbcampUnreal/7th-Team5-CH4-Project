@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "DDMiniGameModeBase.generated.h"
 
+class ADDBasePlayerController;
 class ADDMiniGameSpawnPoint;
 class UDDMiniGameRuleSet;
 struct FTimerHandle;
@@ -85,6 +86,9 @@ protected:
 protected:
 	/** MiniGameStateBase를 가져오는 헬퍼 */
 	TObjectPtr<ADDMiniGameStateBase> GetMiniGameState() const { return GetGameState<ADDMiniGameStateBase>(); }
+	
+	/** 미니게임에서 사용할 Input을 적용하는 헬퍼 */
+	void ApplyMiniGameInput(ADDBasePlayerController* PlayerController);
 	
 	/** RuleSet이 있는 경우 Initialize하는 헬퍼 */
 	void InitializeRuleSet();

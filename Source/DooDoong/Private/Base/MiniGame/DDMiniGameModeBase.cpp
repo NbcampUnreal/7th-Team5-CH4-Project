@@ -250,11 +250,17 @@ void ADDMiniGameModeBase::SpawnParticipantPawn(APlayerController* PlayerControll
 	SpawnParams.Owner = PlayerController;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	/// RestartPlayer 대신 직접 Spawn + Possess를 사용
+	// RestartPlayer 대신 직접 Spawn + Possess를 사용
 	APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, SpawnParams);
 	if (SpawnedPawn != nullptr)
 	{
 		PlayerController->Possess(SpawnedPawn);
+	}
+	
+	// MiniGame에서 사용할 InputConfig / IMC를 적용하는 시점
+	if (ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlayerController))
+	{
+		ApplyMiniGameInput(BasePlayerController);
 	}
 }
 
@@ -407,6 +413,25 @@ void ADDMiniGameModeBase::FinishGame(FGameplayTag Reason)
 			MiniGameManager->CommitMiniGameResult(Result);
 		}
 	}
+}
+
+void ADDMiniGameModeBase::ApplyMiniGameInput(ADDBasePlayerController* PlayerController)
+{
+	if (PlayerController == nullptr || GetGameInstance() == nullptr)
+	{
+		return;
+	}
+	
+	const UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>();
+	const UDDMiniGameDefinition* Definition = MiniGameManager != nullptr ? MiniGameManager->GetActiveDefinition() : nullptr;
+	
+	if (Definition == nullptr)
+	{
+		return;
+	}
+	
+	// Client RPC를 호출해서 Client에 적용
+	PlayerController->Client_ApplyInput(Definition->InputConfigClass, Definition->MappingContextClass);
 }
 
 void ADDMiniGameModeBase::InitializeRuleSet()
