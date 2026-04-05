@@ -4,12 +4,13 @@
 #include "MiniGames/Platformer/Actors/DDDynamicPlatform.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
-
-#include "MovieSceneSequenceID.h"
+#include "Common/DDLogManager.h"
+#include "Microsoft/AllowMicrosoftPlatformTypes.h"
 
 ADDDynamicPlatform::ADDDynamicPlatform()
+	: TimerRate(0.016f)
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	
 	RootScene = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SetRootComponent(RootScene);
@@ -24,20 +25,34 @@ void ADDDynamicPlatform::BeginPlay()
 	
 	StartLocation = GetActorLocation();
 	MoveDirection = PlatformVelocity.GetSafeNormal();
-}
-
-void ADDDynamicPlatform::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 	
-	MovingPlatform(DeltaTime);
-	RotatingPlatform(DeltaTime);
+	if (PlatformVelocity != FVector::ZeroVector)
+	{
+		GetWorldTimerManager().SetTimer(
+			DynamicPlatformTimerHandle,
+			this,
+			&ADDDynamicPlatform::MovingPlatform,
+			TimerRate,
+			true
+		);
+	}
+	else if (RotationValue != FRotator::ZeroRotator)
+	{
+		GetWorldTimerManager().SetTimer(
+			DynamicPlatformTimerHandle,
+			this,
+			&ADDDynamicPlatform::RotatingPlatform,
+			TimerRate,
+			true
+		);
+	}
 }
 
-void ADDDynamicPlatform::MovingPlatform(float DeltaTime)
+void ADDDynamicPlatform::MovingPlatform()
 {
+	UE_LOG(LogPMJ, Log, TEXT("MovingPlatform"))
 	FVector CurrentLocation = GetActorLocation();
-	CurrentLocation += MoveDirection * PlatformVelocity * DeltaTime;
+	CurrentLocation += MoveDirection * PlatformVelocity * TimerRate;
 	SetActorLocation(CurrentLocation);
 	float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation);
 	
@@ -49,10 +64,10 @@ void ADDDynamicPlatform::MovingPlatform(float DeltaTime)
 	}
 }
 
-void ADDDynamicPlatform::RotatingPlatform(float DeltaTime)
+void ADDDynamicPlatform::RotatingPlatform()
 {
 	FRotator CurrentRotation = GetActorRotation();
-	AddActorLocalRotation(RotationValue * DeltaTime);
+	AddActorLocalRotation(RotationValue * TimerRate);
 }
 
 
