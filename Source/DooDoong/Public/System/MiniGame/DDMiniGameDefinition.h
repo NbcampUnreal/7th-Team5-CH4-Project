@@ -51,11 +51,12 @@ public:
 	TSubclassOf<ADDMiniGameModeBase> GameModeClass;
 	
 	/** 필수 지정 : 미니게임 InputConfig */
-	TSubclassOf<UDDInputConfig> InputConfigClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
+	TObjectPtr<UDDInputConfig> InputConfigClass;
 	
 	/** 필수 지정 : 미니게임 IMC */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
-	TSubclassOf<UInputMappingContext> MappingContextClass;
+	TObjectPtr<UInputMappingContext> MappingContextClass;
 
 	/** 선택 지정 : 따로 미니게임 RuleSet이 있다면 RuleSet */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
