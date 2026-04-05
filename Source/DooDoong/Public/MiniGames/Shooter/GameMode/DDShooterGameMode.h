@@ -4,6 +4,7 @@
 #include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "DDShooterGameMode.generated.h"
 
+class ADDShotProjectile;
 /**
  * 
  */
