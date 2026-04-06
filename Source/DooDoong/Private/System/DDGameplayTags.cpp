@@ -13,6 +13,10 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_Attack, "Input.Ability.Attack");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Ability_Shot, "Input.Ability.Shot", "슈터 미니게임 전용 발사 어빌리티");
 	
+	// Character State Tags
+	UE_DEFINE_GAMEPLAY_TAG(State_Character_Death, "State.Character.Death");
+	UE_DEFINE_GAMEPLAY_TAG(State_Character_Stun, "State.Character.Stun");
+	
 	// Event Tags 
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_Start, "Event.Trace.Start");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_End, "Event.Trace.End");
