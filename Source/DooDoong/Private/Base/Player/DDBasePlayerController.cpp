@@ -3,6 +3,7 @@
 #include "AbilitySystemInterface.h"
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystem/DDAbilitySystemComponent.h"
+#include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
 #include "System/MiniGame/DDMiniGameManager.h"
@@ -82,6 +83,17 @@ void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIM
 void ADDBasePlayerController::Client_ApplyInput_Implementation(UInputMappingContext* NewIMC)
 {
 	SetInputMappingContext(NewIMC);
+}
+
+void ADDBasePlayerController::Server_SetMiniGameReady_Implementation(bool bReady)
+{
+	ADDMiniGameModeBase* MiniGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDMiniGameModeBase>() : nullptr;
+	if (MiniGameMode == nullptr)
+	{
+		return;
+	}
+
+	MiniGameMode->SetPlayerReady(PlayerState, bReady);
 }
 
 void ADDBasePlayerController::Input_Move(const FInputActionValue& Value)

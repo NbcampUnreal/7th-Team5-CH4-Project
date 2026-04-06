@@ -29,6 +29,10 @@ public:
 	/** 주현 : GameMode에서 곧바로 Set을 호출하는 것이 불가능해서 추가한 Client RPC */
 	UFUNCTION(Client, Reliable)
 	void Client_ApplyInput(UInputMappingContext* NewIMC);
+
+	/** 주현 : 준비완료 상태를 서버에서 호출시키기 위한 Server RPC */
+	UFUNCTION(Server, Reliable)
+	void Server_SetMiniGameReady(bool bReady);
 	
 protected:
 	void Input_Move(const FInputActionValue& Value);
