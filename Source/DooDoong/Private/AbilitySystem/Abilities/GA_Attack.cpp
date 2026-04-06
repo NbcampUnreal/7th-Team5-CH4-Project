@@ -44,10 +44,7 @@ void UGA_Attack::ActivateAbility(
 	CachedCharacter = Cast<ACharacter>(GetAvatarActorFromActorInfo());
 	CachedAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(CachedCharacter);
 	
-	// 2. Block Movement 
-	CachedCharacter->GetCharacterMovement()->SetMovementMode(MOVE_None);
-	
-	// 3. Trace Task 
+	// 2. Trace Task 
 	UAbilityTask_WaitGameplayTagAdded* WaitTraceStartTask = 
 		UAbilityTask_WaitGameplayTagAdded::WaitGameplayTagAdd(this, DDGameplayTags::Event_Trace_Start);
 	
@@ -60,7 +57,7 @@ void UGA_Attack::ActivateAbility(
 	WaitTraceEndTask->Removed.AddDynamic(this, &ThisClass::OnReceiveTraceEnd);
 	WaitTraceEndTask->ReadyForActivation(); 
 	
-	// 4. Montage Task 
+	// 3. Montage Task 
 	if (!AttackMontage)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
@@ -84,7 +81,6 @@ void UGA_Attack::EndAbility(
 	bool bReplicateEndAbility, bool bWasCancelled)
 {
 	GetWorld()->GetTimerManager().ClearTimer(TraceTimerHandle);
-	CachedCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
