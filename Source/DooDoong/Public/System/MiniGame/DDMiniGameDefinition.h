@@ -4,7 +4,9 @@
 #include "Base/MiniGame/DDMiniGameTypes.h"
 #include "Base/MiniGame/DDMiniGameRuleSet.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
+#include "Base/Player/DDBasePlayerController.h"
 #include "Engine/DataAsset.h"
+#include "Input/DDInputConfig.h"
 #include "DDMiniGameDefinition.generated.h"
 
 /**
@@ -40,13 +42,17 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
 	FGameplayTagContainer MiniGameTags;
 
-	/** 미니게임 맵 */
+	/** 필수 지정 : 미니게임 맵 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
 	TSoftObjectPtr<UWorld> MiniGameMap;
 
 	/** 필수 지정 : 미니게임 모드 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
 	TSubclassOf<ADDMiniGameModeBase> GameModeClass;
+	
+	/** 필수 지정 : 미니게임 IMC */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
+	TObjectPtr<UInputMappingContext> MappingContextClass;
 
 	/** 선택 지정 : 따로 미니게임 RuleSet이 있다면 RuleSet */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")

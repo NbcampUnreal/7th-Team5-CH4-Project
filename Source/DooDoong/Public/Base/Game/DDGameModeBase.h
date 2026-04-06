@@ -11,7 +11,9 @@ class UAbilitySystemComponent;
 UCLASS()
 class ADDGameModeBase : public AGameModeBase
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
+public:
+	ADDGameModeBase();
 
 public:
     ADDGameModeBase();

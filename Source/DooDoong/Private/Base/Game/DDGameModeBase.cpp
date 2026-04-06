@@ -20,6 +20,11 @@ ADDGameModeBase::ADDGameModeBase()
 	PlayerControllerClass = ADDBasePlayerController::StaticClass();
 }
 
+ADDGameModeBase::ADDGameModeBase()
+{
+	bUseSeamlessTravel = true;
+}
+
 void ADDGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();

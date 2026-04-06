@@ -17,6 +17,9 @@ void ADDMiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ADDMiniGameStateBase, RemainingTimeSeconds);
 	DOREPLIFETIME(ADDMiniGameStateBase, Participants);
 	DOREPLIFETIME(ADDMiniGameStateBase, ScoreBoard);
+	DOREPLIFETIME(ADDMiniGameStateBase, ReadyPlayerCount);
+	DOREPLIFETIME(ADDMiniGameStateBase, TotalParticipantCount);
+	DOREPLIFETIME(ADDMiniGameStateBase, ReadyEntries);
 }
 
 void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
@@ -41,6 +44,24 @@ void ADDMiniGameStateBase::SetScoreBoard(const TArray<FMiniGameScoreEntry>& InSc
 {
 	// 룰셋에서 정리한 점수판을 통째로 반영할 때 사용할 수 있음
 	ScoreBoard = InScoreBoard;
+}
+
+void ADDMiniGameStateBase::SetReadyPlayerCount(int32 NewReadyPlayerCount)
+{
+	ReadyPlayerCount = NewReadyPlayerCount;
+	BroadcastReadyStateChanged();
+}
+
+void ADDMiniGameStateBase::SetTotalParticipantCount(int32 NewTotalParticipantCount)
+{
+	TotalParticipantCount = NewTotalParticipantCount;
+	BroadcastReadyStateChanged();
+}
+
+void ADDMiniGameStateBase::SetReadyEntries(const TArray<FMiniGameReadyEntry>& InReadyEntries)
+{
+	ReadyEntries = InReadyEntries;
+	BroadcastReadyEntriesChanged();
 }
 
 void ADDMiniGameStateBase::AddScore(APlayerState* PlayerState, int32 DeltaScore)
@@ -87,4 +108,29 @@ int32 ADDMiniGameStateBase::GetScore(APlayerState* PlayerState) const
 
 	// 플레이어의 기록이 있다면 return, 없다면 0을 return
 	return ExistingEntry != nullptr ? ExistingEntry->Score : 0;
+}
+
+void ADDMiniGameStateBase::OnRep_ReadyPlayerCount()
+{
+	BroadcastReadyStateChanged();
+}
+
+void ADDMiniGameStateBase::OnRep_TotalParticipantCount()
+{
+	BroadcastReadyStateChanged();
+}
+
+void ADDMiniGameStateBase::OnRep_ReadyEntries()
+{
+	BroadcastReadyEntriesChanged();
+}
+
+void ADDMiniGameStateBase::BroadcastReadyStateChanged()
+{
+	OnMiniGameReadyStateChanged.Broadcast(ReadyPlayerCount, TotalParticipantCount);
+}
+
+void ADDMiniGameStateBase::BroadcastReadyEntriesChanged()
+{
+	OnMiniGameReadyEntriesChanged.Broadcast(ReadyEntries);
 }

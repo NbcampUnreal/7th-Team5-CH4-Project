@@ -11,9 +11,10 @@ namespace DDGameplayTags
 	
 	// Ability Input Tags 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Jump); 
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_RollDice); 
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Attack); 
-	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_RollDice);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Attack);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Shot);
+
 	// Event Tags 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_Start); 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_End); 
@@ -47,21 +48,21 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(FinishReason_MiniGame_Completed);
 	
 	// 보드게임 로비 상태 태그 
-    UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_LobbyWaiting);
-    UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_LobbyStarting);
+  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_LobbyWaiting);
+  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_LobbyStarting);
 
-    // 보드게임 보드판 상태 태그
-    UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_Init);
-    UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_PlayerTurn);
-    UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_RoundEnd);
+  // 보드게임 보드판 상태 태그
+  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_Init);
+  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_PlayerTurn);
+  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_RoundEnd);
  
-    // 보드게임 종료 상태 태그 
-    UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_Ending);
-    UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_End);
+  // 보드게임 종료 상태 태그 
+  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_Ending);
+  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_End);
 
-    // 보드게임 턴 제어 상태 태그
-    UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_TurnActive);
-    UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_TurnWaiting);
+  // 보드게임 턴 제어 상태 태그
+  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_TurnActive);
+  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_TurnWaiting);
 	
 	// 보드게임 턴 내부 세부 페이즈 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_BeforeDice);

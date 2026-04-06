@@ -2,6 +2,8 @@
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
+#include "BoardGame/Character/DDBoardGameCharacter.h"
+#include "GameFramework/PlayerState.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 
 void UDDMiniGameManager::Initialize(FSubsystemCollectionBase& Collection)
@@ -53,7 +55,9 @@ bool UDDMiniGameManager::RequestStartMiniGame(FName MiniGameId, const TArray<APl
 	OnMiniGameSelected.Broadcast(ActiveDefinition);
 	// 미니게임 종료 후 되돌아올 월드 이름을 저장해둠.
 	ReturnMapPackageName = World->GetPackage()->GetName();
-
+	// 미니게임 종료 후 되돌아올 타일 이름을 저장해둠.
+	SaveReturnTileInfo(Players);
+	
 	// 상태를 준비 상태로 갱신
 	SetCurrentState(DDGameplayTags::State_MiniGame_Preparing);
 	OnMiniGamePreparing.Broadcast(ActiveSetup);
@@ -231,6 +235,31 @@ bool UDDMiniGameManager::IsActiveMiniGameWorld(const UWorld* World) const
 	return !ActiveMiniGamePackageName.IsEmpty() && World->GetPackage()->GetName() == ActiveMiniGamePackageName;
 }
 
+FName UDDMiniGameManager::GetReturnTileRowName(int32 PlayerId) const
+{
+	for (const FMiniGameReturnTileInfo& ReturnTileInfo : SavedReturnTileInfo)
+	{
+		// Id로 조회
+		if (ReturnTileInfo.PlayerId == PlayerId)
+		{
+			return ReturnTileInfo.TileRowName;
+		}
+	}
+	
+	// 찾지못하면 None을 Return
+	return NAME_None;
+}
+
+FName UDDMiniGameManager::GetReturnTileRowNameForPlayerState(const APlayerState* PlayerState) const
+{
+	if (PlayerState == nullptr)
+	{
+		return NAME_None;
+	}
+	
+	return GetReturnTileRowName(PlayerState->GetPlayerId());
+}
+
 void UDDMiniGameManager::SetCurrentState(FGameplayTag NewState)
 {
 	if (CurrentState == NewState)
@@ -268,6 +297,7 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 
 		FMiniGameParticipantInfo Participant;
 		Participant.PlayerState = Players[Index];
+		Participant.PlayerId = Players[Index]->GetPlayerId();
 		Participant.SlotIndex = Index;
 		Participant.Id = Index;
 		Participant.bReady = true;
@@ -337,4 +367,37 @@ void UDDMiniGameManager::CacheAvailableDefinitions()
 
 		CachedDefinitions.Add(Definition->MiniGameID, Definition);
 	}
+}
+
+void UDDMiniGameManager::SaveReturnTileInfo(const TArray<APlayerState*>& Players)
+{
+	// 일단 한 번 초기화
+	SavedReturnTileInfo.Reset();
+	
+	for (APlayerState* PlayerState : Players)
+	{
+		if (PlayerState == nullptr)
+		{
+			continue;
+		}
+		
+		APawn* Pawn = PlayerState->GetPawn();
+		ADDBoardGameCharacter* BoardCharacter = Cast<ADDBoardGameCharacter>(Pawn);
+		if (BoardCharacter == nullptr || BoardCharacter->StartTile == nullptr)
+		{
+			continue;
+		}
+		
+		// 되돌아갈 타일을 구조체에 저장
+		FMiniGameReturnTileInfo ReturnTileInfo;
+		ReturnTileInfo.PlayerId = PlayerState->GetPlayerId();
+		ReturnTileInfo.TileRowName = BoardCharacter->StartTile->TileRowName;
+		
+		SavedReturnTileInfo.Add(ReturnTileInfo);
+	}
+}
+
+void UDDMiniGameManager::ClearSavedReturnTileInfo()
+{
+	SavedReturnTileInfo.Reset();
 }
