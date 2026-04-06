@@ -29,6 +29,8 @@ public:
 	/*플레이어 준비완료 체크*/
 	void CheckReadyPlayers();
 	
+	void GetPlayerSlotIndex();
+	
 	/*대기시간 타이머 호출 함수*/
 	void WaitingTimerStart();
 	
@@ -69,6 +71,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
 	TArray<float> PlayerMaxDistances;
+	
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
+	TMap<FName, ADDBasePlayerController*> PlayerDatas;
 	
 	/* 게임스테이트 변수 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")

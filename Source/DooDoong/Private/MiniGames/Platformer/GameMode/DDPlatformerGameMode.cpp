@@ -3,10 +3,12 @@
 
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
 #include "MiniGames/Platformer/GameState/DDPlatformerGameState.h"
-#include "Base/Character/DDBaseCharacter.h"
 #include "Base/Player/DDBasePlayerController.h"
-#include "Common/DDLogManager.h"
+#include "Base/Player/DDBasePlayerState.h"
+#include "Base/Character/DDBaseCharacter.h"
 #include "System/DDGameplayTags.h"
+#include "Common/DDLogManager.h"
+#include "EngineUtils.h"
 
 void ADDPlatformerGameMode::OnPostLogin(AController* NewPlayer)
 {
@@ -22,14 +24,17 @@ void ADDPlatformerGameMode::OnPostLogin(AController* NewPlayer)
 			AllPlayerCharacters.Add(PlayerCharacter);
 		}
 		//TODO_@Minjae : Setter 함수 완성되면 DA랑 IMC 넘겨주기
-		
 	}
 }
 
 void ADDPlatformerGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogPMJ, Log, TEXT("BeginPlayServer"));
 	
+	//TODO_@Minjae : 미니게임의 BeginPlay 가 호출되면 각 클라PC에게 미니게임 대기 UI창 띄우라고 전달
+	
+	/* 시작지점 초기화 각 캐릭터가 시작지점을 기준으로 얼마나 멀리갔는지 최고기록 체크를위함 */
 	StartLocation = FVector(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < AllPlayerCharacters.Num(); i++)
 	{
@@ -54,16 +59,17 @@ void ADDPlatformerGameMode::GameStart()
 		PlatformerPlayTimerHandle,
 		this,
 		&ADDPlatformerGameMode::GameEnd,
-		10.f,
-		false,
-		PlatformerPlayTime);
+		PlatformerPlayTime,
+		false
+		);
 	
 	GetWorldTimerManager().SetTimer(
 		DistanceTimerHandle,
 		this,
 		&ADDPlatformerGameMode::PlayeGameTimer,
 		1.f,
-		true);
+		true
+		);
 }
 
 void ADDPlatformerGameMode::GameEnd()
@@ -79,7 +85,7 @@ void ADDPlatformerGameMode::GameEnd()
 void ADDPlatformerGameMode::PlayeGameTimer()
 {
 	UE_LOG(LogPMJ, Log, TEXT("PlayeGameTimer"));
-	
+	/* 게임플레이 타이머함수가 호출될때마다 각 플레이어의 최고 거리를 기록 */
 	for (int i = 0; i < AllPlayerCharacters.Num(); i++)
 	{
 		float CurrentPlayerDistance = FVector::Dist(StartLocation, AllPlayerCharacters[i]->GetActorLocation());
@@ -146,7 +152,7 @@ void ADDPlatformerGameMode::WaitingTimerStart()
 	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 	UE_LOG(LogPMJ, Log, TEXT("WaitingTimerStart"));
 	
-	GetWorld()->GetTimerManager().SetTimer(
+	GetWorldTimerManager().SetTimer(
 	FinishedWaitingTimerHandle,
 	this,
 	&ADDPlatformerGameMode::GameStart,
@@ -175,4 +181,22 @@ void ADDPlatformerGameMode::CheckReadyPlayers()
 		WaitingTimerStart();
 	}
 	*/
+}
+
+void ADDPlatformerGameMode::GetPlayerSlotIndex()
+{
+	/*for (TActorIterator<ADDBasePlayerController> It(GetWorld()); It; ++It)
+	{
+		UE_LOG(LogPMJ, Log, TEXT("ActorIterator"));
+		ADDBasePlayerController* PlayerController = Cast<ADDBasePlayerController>(*It);
+		if (IsValid(PlayerController) == true)
+		{
+			/* PlayerState구조체 접근해서 SlotIndex 가져오기 #1#
+			int32 SlotIndex = PlayerInfo.SlotIndex;
+			FName PlayerName(FString::Printf(TEXT("Player%d"), SlotIndex));
+			PlayerDatas.Add(FName(PlayerName), PlayerController);
+			UE_LOG(LogPMJ, Log, TEXT("Player slotindex: %d"), SlotIndex);
+		}
+	}*/
+	
 }
