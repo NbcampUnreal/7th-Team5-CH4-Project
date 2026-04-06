@@ -17,6 +17,9 @@ struct FTestPlayerData
 
     UPROPERTY(BlueprintReadWrite)
     int32 Health = 100;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UTexture2D* ProfileImage;
 };
 
 UCLASS(Blueprintable)
