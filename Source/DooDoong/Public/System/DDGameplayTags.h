@@ -21,6 +21,12 @@ namespace DDGameplayTags
 	// Data Tags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Health_Damage); 
 	
+
+	// Ability Tile Event Tags
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Coin);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Item);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Move);
+	
 	// 미니게임 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Idle);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Preparing);
