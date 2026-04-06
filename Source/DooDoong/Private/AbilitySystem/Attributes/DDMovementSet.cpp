@@ -2,6 +2,8 @@
 
 UDDMovementSet::UDDMovementSet()
 {
+	InitMoveSpeed(400.f); 
+	InitJumpSpeed(420.f);
 }
 
 void UDDMovementSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -22,4 +24,9 @@ void UDDMovementSet::PostAttributeChange(const FGameplayAttribute& Attribute, fl
 void UDDMovementSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldMoveSpeed)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UDDMovementSet, MoveSpeed, OldMoveSpeed);
+}
+
+void UDDMovementSet::OnRep_JumpSpeed(const FGameplayAttributeData& OldJumpSpeed)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDDMovementSet, JumpSpeed, OldJumpSpeed);
 }

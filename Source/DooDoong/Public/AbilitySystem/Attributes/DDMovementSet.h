@@ -15,6 +15,7 @@ public:
 	
 	ATTRIBUTE_ACCESSORS_BASIC(UDDMovementSet, MoveSpeed); 
 	
+	ATTRIBUTE_ACCESSORS_BASIC(UDDMovementSet, JumpSpeed); 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
@@ -26,9 +27,14 @@ public:
 	UFUNCTION()
 	void OnRep_MoveSpeed(const FGameplayAttributeData& OldMoveSpeed);
 	
-private:
-	UPROPERTY(BlueprintReadOnly, Category = "Trophy", meta = (AllowPrivateAccess = true), ReplicatedUsing = OnRep_MoveSpeed)
-	FGameplayAttributeData MoveSpeed; 
+	UFUNCTION()
+	void OnRep_JumpSpeed(const FGameplayAttributeData& OldJumpSpeed);
 	
+private:
+	UPROPERTY(BlueprintReadOnly, Category = "Attribute", meta = (AllowPrivateAccess = true), ReplicatedUsing = OnRep_MoveSpeed)
+	FGameplayAttributeData MoveSpeed; 
+
+	UPROPERTY(BlueprintReadOnly, Category = "Attribute", meta = (AllowPrivateAccess = true), ReplicatedUsing = OnRep_JumpSpeed)
+	FGameplayAttributeData JumpSpeed; 
 };
 
