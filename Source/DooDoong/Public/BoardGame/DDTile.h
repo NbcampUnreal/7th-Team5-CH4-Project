@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/DataTable.h"
 #include "DDTileData.h"
+#include "Character/DDBoardGameCharacter.h"
 #include "DDTile.generated.h"
 
 class ACharacter;
@@ -73,4 +74,5 @@ public:
 	
 	UFUNCTION()
 	void OnRep_TileData();
+	void TriggerTileAbility(ADDBoardGameCharacter* Character) const;
 };

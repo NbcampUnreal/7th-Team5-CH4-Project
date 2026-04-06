@@ -1,6 +1,9 @@
 ﻿#include "BoardGame/Abilities/DDRollDiceAbility.h"
+#include "BoardGame/DDTile.h"
+#include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/Abilities/DDMoveTileStepTask.h"
 #include "Common/DDLogManager.h"
+#include "BoardGame/Character/DDBoardGameCharacter.h"
 
 UDDRollDiceAbility::UDDRollDiceAbility()
 {
@@ -49,6 +52,25 @@ bool UDDRollDiceAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Han
 void UDDRollDiceAbility::OnMoveFinished()
 {
 	LOG_CYS(Warning, TEXT("[GA_RD] Move Finished"));
+	// 타일 이벤트 실행
+	// if (!HasAuthority(&CurrentActivationInfo))
+	// {
+	// 	return;
+	// }
+
+	ADDBoardGameCharacter* Character =
+	Cast<ADDBoardGameCharacter>(GetAvatarActorFromActorInfo());
+	if (!Character) return;
+
+	ADDBasePlayerState* PS = Character->GetPlayerState<ADDBasePlayerState>();
+	if (!PS) return;
+
+	ADDTile* CurrentTile = PS->CurrentTile;
+	if (CurrentTile)
+	{
+		// 타일 Ability 트리거
+		CurrentTile->TriggerTileAbility(Character);
+	}
 	// 중복 실행 방지
 	bAlreadyRolled=true;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
