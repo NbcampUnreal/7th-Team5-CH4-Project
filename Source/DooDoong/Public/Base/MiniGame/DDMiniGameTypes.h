@@ -98,3 +98,15 @@ struct DOODOONG_API FMiniGameResult
 	UPROPERTY(BlueprintReadOnly)
 	TArray<TObjectPtr<APlayerState>> Ranking;
 };
+
+USTRUCT(BlueprintType)
+struct DOODOONG_API FMiniGameReturnTileInfo
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(BlueprintReadOnly)
+	int32 PlayerId = INDEX_NONE;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FName TileRowName = NAME_None;
+};
