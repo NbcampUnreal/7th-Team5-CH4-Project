@@ -43,4 +43,27 @@ namespace DDGameplayTags
 	// 미니게임 종료 조건 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(FinishReason_MiniGame_TimeOver, "FinishReason.MiniGame.TimeOver", "제한 시간이 종료되어 미니게임이 끝난 경우");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(FinishReason_MiniGame_Completed, "FinishReason.MiniGame.Completed", "승리 조건이나 완료 조건을 충족해 미니게임이 끝난 경우");
+
+	// 보드게임 로비 상태 태그 
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_LobbyWaiting, "State.BoardGame.LobbyWaiting", "로비 대기");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_LobbyStarting, "State.BoardGame.LobbyStarting", "로비 카운트다운");
+    
+    // 보드게임 보드판 상태 태그 
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_Init, "State.BoardGame.Init", "보드판 라운드 시작");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_PlayerTurn, "State.BoardGame.PlayerTurn", "플레이어 턴 진행");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_RoundEnd, "State.BoardGame.RoundEnd", "턴 종료 및 대기");
+	
+    // 보드게임 종료 상태 태그
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_Ending, "State.BoardGame.Ending", "최종 승자 판정");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_End, "State.BoardGame.End", "결과창 출력");
+
+    // 보드게임 턴 제어 상태 태그
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_TurnActive, "State.BoardGame.TurnActive", "내 턴");
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_TurnWaiting, "State.BoardGame.TurnWaiting", "남의 턴");
+	
+	// 보드게임 턴 내부 세부 페이즈 태그
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_BeforeDice, "State.TurnPhase.BeforeDice", "주사위 굴리기 전 (아이템 사용 가능)");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_Moving, "State.TurnPhase.Moving", "보드판 이동 중 (모든 조작 불가)");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_Event, "State.TurnPhase.Event", "이동 완료 후 (상점 이용 및 트로피 획득 판정 중)");
 }
+
