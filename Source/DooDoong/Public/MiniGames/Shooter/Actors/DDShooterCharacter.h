@@ -4,6 +4,9 @@
 #include "Base/Character/DDBaseCharacter.h"
 #include "DDShooterCharacter.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
+
 UCLASS()
 class DOODOONG_API ADDShooterCharacter : public ADDBaseCharacter
 {
@@ -11,7 +14,24 @@ class DOODOONG_API ADDShooterCharacter : public ADDBaseCharacter
 
 public:
 	ADDShooterCharacter();
+	
+public:
+	virtual void BeginPlay() override;
+	
+	bool CanFire() const;
+	void TryFire();
 
 protected:
-	virtual void BeginPlay() override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shooter")
+	TObjectPtr<USceneComponent> MuzzleComp;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shooter")
+	TObjectPtr<USpringArmComponent> SpringArmComp;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shooter")
+	TObjectPtr<UCameraComponent> CameraComp;
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shooter")
+	float AimTraceDistance = 5000.0f;
 };
