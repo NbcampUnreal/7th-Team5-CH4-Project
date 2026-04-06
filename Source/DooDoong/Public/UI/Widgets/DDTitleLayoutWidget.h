@@ -25,6 +25,9 @@ protected:
 
 	UFUNCTION()
 	void OnNicknameTextChanged(const FText& Text);
+	
+	UFUNCTION()
+    void OnNicknameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess, BindWidget))
