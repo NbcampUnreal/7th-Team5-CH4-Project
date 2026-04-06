@@ -26,6 +26,9 @@ private:
 	FTimerHandle MainTimerHandle;
 	int32 RemainWaitingTimeForStarting = 5;
 	bool bIsStarting = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Person")
+	int32 RemainPerson = 4;
 
 	// 에디터에서 설정할 수 있는 본 게임 맵 경로
 	UPROPERTY(EditDefaultsOnly, Category = "Map Settings")

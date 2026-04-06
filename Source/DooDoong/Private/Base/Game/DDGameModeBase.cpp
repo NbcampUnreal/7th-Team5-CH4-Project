@@ -1,6 +1,7 @@
 #include "Base/Game/DDGameModeBase.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
+#include "EngineUtils.h"
 #include "Base/Game/DDGameStateBase.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
@@ -10,6 +11,8 @@
 #include "AbilitySystem/Attributes/DDPointSet.h"
 #include "Base/Player/DDBasePlayerController.h"
 #include "Base/Player/DDBasePlayerState.h"
+#include "BoardGame/DDTileManager.h"
+#include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
 #include "System/MiniGame/DDMiniGameManager.h"
@@ -18,10 +21,7 @@ ADDGameModeBase::ADDGameModeBase()
 {
 	PlayerStateClass = ADDBasePlayerState::StaticClass();
 	PlayerControllerClass = ADDBasePlayerController::StaticClass();
-}
 
-ADDGameModeBase::ADDGameModeBase()
-{
 	bUseSeamlessTravel = true;
 }
 
@@ -103,6 +103,38 @@ void ADDGameModeBase::GenericPlayerInitialization(AController* C)
 		AlivePlayerControllers.AddUnique(PlayerController);
 		UE_LOG(LogCJH, Log, TEXT("[GenericPlayerInitialization] 참여자 접속. 현재 접속 수: %d"), AlivePlayerControllers.Num());
 	}
+	
+	LOG_CYS(Warning, TEXT("[TestGM] PostLogin"));
+
+	// TileManager 찾기
+	ADDTileManager* TM = nullptr;
+	for (TActorIterator<ADDTileManager> It(GetWorld()); It; ++It)
+	{
+		TM = *It;
+		break;
+	}
+
+	if (!TM) return;
+
+	// 타일 초기화 (한 번만)
+	// if (!TM->bIsReady)
+	// {
+		TM->InitializeTiles();
+	// }
+
+	// PlayerState 초기화
+	ADDBasePlayerState* PS = PlayerController->GetPlayerState<ADDBasePlayerState>();
+	if (PS)
+	{
+		PS->InitTile();
+	}
+
+	// Pawn 아직 없을 수도 있음 → RestartPlayer 이후라서 보통 있음
+	ADDBoardGameCharacter* Char = Cast<ADDBoardGameCharacter>(PlayerController->GetPawn());
+	if (Char)
+	{
+		Char->InitLocation();
+	}
 }
 
 void ADDGameModeBase::OnMainTimerElapsed()
@@ -113,7 +145,7 @@ void ADDGameModeBase::OnMainTimerElapsed()
 	// 1. 게임 최초 시작 대기 로직
 	if (!GameStateBase->MatchStateTag.IsValid())
 	{
-		if (AlivePlayerControllers.Num() >= 4)
+		if (AlivePlayerControllers.Num() >= 2)
 		{
 			UE_LOG(LogCJH, Warning, TEXT("[GameLoop] 정원(4명) 접속 완료! 보드게임 Init 상태로 진입합니다."));
 			SetMatchState(DDGameplayTags::State_BoardGame_Init);
@@ -153,11 +185,13 @@ void ADDGameModeBase::OnMainTimerElapsed()
 					if (IsValid(PlayerController) && PlayerController->PlayerState)
 					{
 						MiniGamePlayers.Add(PlayerController->PlayerState);
+						UE_LOG(LogCJH, Log, TEXT("PlayerController->PlayerState"));
 					}
 				}
-
-				if (UDDMiniGameManager* MiniGameManager = Cast<UDDMiniGameManager>(GetGameInstance()))
+				UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>();
+				if (IsValid(MiniGameManager))
 				{
+					UE_LOG(LogCJH, Log, TEXT("MiniGameManager"));
 					MiniGameManager->RequestStartRandomMiniGame(MiniGamePlayers);
 				}
 			}

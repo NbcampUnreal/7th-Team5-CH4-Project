@@ -87,7 +87,7 @@ void ADDLobbyGameMode::OnMainTimerElapsed()
 	// 4명이 모이지 않았다면 카운트다운 대기
 	if (!bIsStarting)
 	{
-		if (Participants.Num() >= 4)
+		if (Participants.Num() >= RemainPerson)
 		{
 			bIsStarting = true;
 			RemainWaitingTimeForStarting = 5; // 5초 카운트다운 세팅
@@ -96,7 +96,7 @@ void ADDLobbyGameMode::OnMainTimerElapsed()
 	else
 	{
 		// 카운트다운 도중 플레이어가 이탈하여 4명 미만이 되면 시작 취소
-		if (Participants.Num() < 4)
+		if (Participants.Num() < RemainPerson)
 		{
 			bIsStarting = false;
 			return;
