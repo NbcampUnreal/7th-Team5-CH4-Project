@@ -3,15 +3,17 @@
 
 #include "MiniGames/Platformer/Actors/DDPlatformerGoalPoint.h"
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
+#include "Base/Character/DDBaseCharacter.h"
+#include "Base/Player/DDBasePlayerController.h"
+#include "Base/Player/DDBasePlayerState.h"
 #include "Common/DDLogManager.h"
-
 #include "Components/BoxComponent.h"
-#include "Interfaces/IPluginManager.h"
 
 
 ADDPlatformerGoalPoint::ADDPlatformerGoalPoint()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 	
 	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
@@ -19,6 +21,21 @@ ADDPlatformerGoalPoint::ADDPlatformerGoalPoint()
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	BoxCollision->SetupAttachment(SceneRoot);
 	BoxCollision->OnComponentBeginOverlap.AddDynamic(this ,&ADDPlatformerGoalPoint::OnComponentBeginOverlap);
+}
+
+void ADDPlatformerGoalPoint::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HasAuthority() == true)
+	{
+		ServerNotifyGoalReached();
+	}
+}
+
+void ADDPlatformerGoalPoint::ServerNotifyGoalReached_Implementation()
+{
+	UE_LOG(LogPMJ, Log, TEXT("ServerFunctionCalled"));
 }
 
 void ADDPlatformerGoalPoint::OnComponentBeginOverlap(
@@ -29,16 +46,10 @@ void ADDPlatformerGoalPoint::OnComponentBeginOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (OtherActor == nullptr)
+	if (HasAuthority() == true && OtherActor == nullptr)
 	{
 		return;
 	}
-	
-	/*APawn* PlayerPawn = Cast<APawn>(OtherActor->GetOwner());
-	if (PlayerPawn != nullptr)
-	{
-		APlayerState* PlayerState = PlayerPawn->GetPlayerState();
-	}*/
 	
 	/* 게임모드 가져오기 */
 	AGameModeBase* CurrentGameModeBase = Cast<AGameModeBase>(GetWorld()->GetAuthGameMode());
