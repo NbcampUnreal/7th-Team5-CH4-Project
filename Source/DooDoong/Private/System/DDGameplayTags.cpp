@@ -19,6 +19,12 @@ namespace DDGameplayTags
 	// Data Tags
 	UE_DEFINE_GAMEPLAY_TAG(Data_Health_Damage, "Data.Health.Damage"); 
 	
+
+	// Ability Tile Event Tags
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tile_Ability_Coin, "Tile.Ability.Coin", "코인 이벤트 타일 어빌리티");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tile_Ability_Item, "Tile.Ability.Item", "아이템 이벤트 타일 어빌리티");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tile_Ability_Move, "Tile.Ability.Move", "이동 이벤트 타일 어빌리티");
+
 	// 미니게임 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_MiniGame_Idle, "State.MiniGame.Idle", "미니게임 세션이 없고 대기 중인 상태");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_MiniGame_Preparing, "State.MiniGame.Preparing", "미니게임 시작을 준비하는 상태");

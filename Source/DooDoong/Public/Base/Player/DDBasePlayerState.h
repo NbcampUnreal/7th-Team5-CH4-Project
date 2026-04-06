@@ -9,7 +9,8 @@ class UDDPointSet;
 class UDDAbilitySystemComponent;
 class UDDHealthSet;
 class UDDMovementSet;
-// class ADDTile; 
+class ADDTile; 
+class ADDTileManager;
 
 UCLASS()
 class DOODOONG_API ADDBasePlayerState : public APlayerState, public IAbilitySystemInterface
@@ -41,6 +42,12 @@ private:
 	TObjectPtr<UDDMovementSet> MovementSet;
 	
 public:
-	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	// ADDTile* CurrentTile;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	ADDTile* CurrentTile;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FName StartTileName;
+	
+	UFUNCTION()
+	void InitTile();
 };

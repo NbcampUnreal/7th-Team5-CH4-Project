@@ -17,4 +17,7 @@ public:
 	TMap<FName, ADDTile*> TileMap;
 
 	void InitializeTiles();
+	
+	UFUNCTION()
+	ADDTile* FindTile(FName TileName);
 };

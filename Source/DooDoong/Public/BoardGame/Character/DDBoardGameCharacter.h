@@ -16,8 +16,11 @@ class DOODOONG_API ADDBoardGameCharacter : public ADDBaseCharacter
 	GENERATED_BODY()
 	
 public:
-	ADDBoardGameCharacter(); 
+	ADDBoardGameCharacter();
 	
+	UFUNCTION()
+	void InitLocation();
+
 	UFUNCTION(BlueprintCallable)
 	void MoveToLocation(FVector TargetLocation);
 	

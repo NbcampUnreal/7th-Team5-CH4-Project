@@ -1,8 +1,22 @@
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 
+#include "Base/Player/DDBasePlayerState.h"
+#include "BoardGame/DDTile.h"
+#include "Common/DDLogManager.h"
+
 ADDBoardGameCharacter::ADDBoardGameCharacter()
 {
-	
+}
+
+void ADDBoardGameCharacter::InitLocation()
+{
+	ADDBasePlayerState* BasePlayerState = GetPlayerState<ADDBasePlayerState>();
+	if (!BasePlayerState) return;
+	if (BasePlayerState->CurrentTile)
+	{
+		LOG_CYS(Warning,TEXT("[BC]SetActorLocation"));
+		SetActorLocation(BasePlayerState->CurrentTile->GetStandLocation(this));
+	}
 }
 
 void ADDBoardGameCharacter::MoveToLocation(FVector TargetLocation)
@@ -52,6 +66,6 @@ void ADDBoardGameCharacter::UpdateMove()
 
 		GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
 
-		OnMoveFinished.Broadcast();
+		OnMoveFinished.Broadcast(); // 이동 완료 태스크에 알림
 	}
 }
