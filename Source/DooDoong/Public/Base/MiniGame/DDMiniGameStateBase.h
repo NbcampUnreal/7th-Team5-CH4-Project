@@ -5,6 +5,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "DDMiniGameStateBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMiniGameReadyStateChanged, int32, ReadyPlayerCount, int32, TotalParticipantCount);
+
 /**
  * 
  */
@@ -36,6 +38,7 @@ public:
 	/** 남은 시간 Get */
 	UFUNCTION(BlueprintPure, Category="MiniGame")
 	float GetRemainingTimeSeconds() const { return RemainingTimeSeconds; }
+	
 	/** 남은 시간 Set */
 	UFUNCTION(BlueprintCallable, Category="MiniGame")
 	void SetRemainingTimeSeconds(float NewRemainingTimeSeconds);
@@ -53,6 +56,22 @@ public:
 	/** 점수판 정보 Set */
 	UFUNCTION(BlueprintCallable, Category="MiniGame")
 	void SetScoreBoard(const TArray<FMiniGameScoreEntry>& InScoreBoard);
+
+	/** 준비 완료 인원 수 Get */
+	UFUNCTION(BlueprintPure, Category="MiniGame|Ready")
+	int32 GetReadyPlayerCount() const { return ReadyPlayerCount; }
+
+	/** 전체 참가자 수 Get */
+	UFUNCTION(BlueprintPure, Category="MiniGame|Ready")
+	int32 GetTotalParticipantCount() const { return TotalParticipantCount; }
+
+	/** 준비 완료 인원 수 Set */
+	UFUNCTION(BlueprintCallable, Category="MiniGame|Ready")
+	void SetReadyPlayerCount(int32 NewReadyPlayerCount);
+
+	/** 전체 참가자 수 Set */
+	UFUNCTION(BlueprintCallable, Category="MiniGame|Ready")
+	void SetTotalParticipantCount(int32 NewTotalParticipantCount);
 	
 public:
 	/** 점수 추가 로직 */
@@ -61,6 +80,19 @@ public:
 	/** 점수 Get */
 	UFUNCTION(BlueprintPure, Category="MiniGame")
 	int32 GetScore(APlayerState* PlayerState) const;
+
+	/** 준비 상태 UI 갱신을 위한 델리게이트 */
+	UPROPERTY(BlueprintAssignable, Category="MiniGame|Ready")
+	FOnMiniGameReadyStateChanged OnMiniGameReadyStateChanged;
+
+protected:
+	UFUNCTION()
+	void OnRep_ReadyPlayerCount();
+
+	UFUNCTION()
+	void OnRep_TotalParticipantCount();
+
+	void BroadcastReadyStateChanged();
 
 protected:
 	/** 현재 게임 상태 */
@@ -78,4 +110,12 @@ protected:
 	/** 점수판 */
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
 	TArray<FMiniGameScoreEntry> ScoreBoard;
+
+	/** 준비 완료한 참가자 수 */
+	UPROPERTY(ReplicatedUsing=OnRep_ReadyPlayerCount, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame|Ready")
+	int32 ReadyPlayerCount = 0;
+
+	/** 준비 대상인 전체 참가자 수 */
+	UPROPERTY(ReplicatedUsing=OnRep_TotalParticipantCount, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame|Ready")
+	int32 TotalParticipantCount = 0;
 };

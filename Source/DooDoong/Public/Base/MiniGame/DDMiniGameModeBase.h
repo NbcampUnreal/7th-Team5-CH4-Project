@@ -89,6 +89,18 @@ protected:
 	
 	/** 미니게임에서 사용할 Input을 적용하는 헬퍼 */
 	void ApplyMiniGameInput(ADDBasePlayerController* PlayerController);
+
+	/** 준비 단계에서 참가자별 ready 상태를 초기화 */
+	void InitializeReadyStates();
+
+	/** 현재 준비 상태를 GameState에 반영 */
+	void UpdateReadyState();
+
+	/** 참가자 전원이 준비 완료되었는지 확인 */
+	bool AreAllParticipantsReady() const;
+
+	/** 전원 준비 완료 시 실제 게임 시작 */
+	void TryStartMiniGame();
 	
 	/** RuleSet이 있는 경우 Initialize하는 헬퍼 */
 	void InitializeRuleSet();
@@ -112,7 +124,7 @@ protected:
 	/** 미니게임 시작 여부 */
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "MiniGame")
 	bool bIsMiniGameStarted = false;
-	
+
 	/** 미니게임 종료 여부 */
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "MiniGame")
 	bool bIsMiniGameFinished = false;
@@ -127,4 +139,13 @@ protected:
 	/** 타이머 시간 갱신 간격 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MiniGame")
 	float TimeUpdateIntervalSeconds = 0.1f;
+
+	/** 참가자별 준비 완료 상태 */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "MiniGame|Ready")
+	TMap<int32, bool> ReadyStates;
+
+public:
+	/** 참가자의 준비 상태를 갱신 */
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category="MiniGame|Ready")
+	void SetPlayerReady(APlayerState* PlayerState, bool bReady);
 };

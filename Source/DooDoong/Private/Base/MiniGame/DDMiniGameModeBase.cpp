@@ -43,8 +43,8 @@ void ADDMiniGameModeBase::BeginPlay()
 	InitializeMiniGame(MiniGameManager->GetActiveSetup(), MiniGameManager->GetActiveParticipants());
 	// RuleSet이 있다면 Initialize
 	InitializeRuleSet();
-	// 미니게임 시작
-	StartMiniGame();
+	// 모든 미니게임은 준비 완료 이후에만 시작되도록 공통 ready 상태를 초기화
+	InitializeReadyStates();
 
 	MiniGameManager->NotifyMiniGameStarted();
 }
@@ -136,6 +136,8 @@ void ADDMiniGameModeBase::InitializeMiniGame(const FMiniGameSetup& InSetup,
 		// 클라이언트가 확인할 초기 상태는 GameState에 복제 가능한 형태로 저장
 		MiniGameState->SetParticipants(ActiveParticipants);
 		MiniGameState->SetRemainingTimeSeconds(ActiveSetup.TimeLimitSeconds);
+		MiniGameState->SetReadyPlayerCount(0);
+		MiniGameState->SetTotalParticipantCount(ActiveParticipants.Num());
 		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 		MiniGameState->SetScoreBoard(TArray<FMiniGameScoreEntry>());
 	}
@@ -301,6 +303,11 @@ void ADDMiniGameModeBase::SpawnSpectatorPawn(APlayerController* PlayerController
 
 void ADDMiniGameModeBase::StartMiniGame()
 {
+	if (bIsMiniGameStarted || bIsMiniGameFinished)
+	{
+		return;
+	}
+
 	// 플레이 시작 및 시작 시점을 기록
 	bIsMiniGameStarted = true;
 	ElapsedTimeSeconds = 0.0f;
@@ -434,6 +441,89 @@ void ADDMiniGameModeBase::ApplyMiniGameInput(ADDBasePlayerController* PlayerCont
 	
 	// Client RPC를 호출해서 Client에 적용
 	PlayerController->Client_ApplyInput(Definition->MappingContextClass);
+}
+
+void ADDMiniGameModeBase::InitializeReadyStates()
+{
+	ReadyStates.Reset();
+
+	for (const FMiniGameParticipantInfo& Participant : ActiveParticipants)
+	{
+		ReadyStates.Add(Participant.PlayerId, false);
+	}
+
+	UpdateReadyState();
+}
+
+void ADDMiniGameModeBase::UpdateReadyState()
+{
+	ADDMiniGameStateBase* MiniGameState = GetMiniGameState();
+	if (MiniGameState == nullptr)
+	{
+		return;
+	}
+
+	int32 ReadyPlayerCount = 0;
+	for (const FMiniGameParticipantInfo& Participant : ActiveParticipants)
+	{
+		const bool* bReady = ReadyStates.Find(Participant.PlayerId);
+		if (bReady != nullptr && *bReady)
+		{
+			++ReadyPlayerCount;
+		}
+	}
+
+	MiniGameState->SetReadyPlayerCount(ReadyPlayerCount);
+	MiniGameState->SetTotalParticipantCount(ActiveParticipants.Num());
+}
+
+bool ADDMiniGameModeBase::AreAllParticipantsReady() const
+{
+	if (ActiveParticipants.Num() == 0)
+	{
+		return false;
+	}
+
+	for (const FMiniGameParticipantInfo& Participant : ActiveParticipants)
+	{
+		const bool* bReady = ReadyStates.Find(Participant.PlayerId);
+		if (bReady == nullptr || !*bReady)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void ADDMiniGameModeBase::TryStartMiniGame()
+{
+	if (bIsMiniGameStarted || bIsMiniGameFinished)
+	{
+		return;
+	}
+
+	if (AreAllParticipantsReady())
+	{
+		StartMiniGame();
+	}
+}
+
+void ADDMiniGameModeBase::SetPlayerReady(APlayerState* PlayerState, bool bReady)
+{
+	if (!HasAuthority() || bIsMiniGameStarted || bIsMiniGameFinished || PlayerState == nullptr)
+	{
+		return;
+	}
+
+	if (FindParticipantInfo(PlayerState) == nullptr)
+	{
+		return;
+	}
+
+	ReadyStates.FindOrAdd(PlayerState->GetPlayerId()) = bReady;
+	UpdateReadyState();
+	TryStartMiniGame();
 }
 
 void ADDMiniGameModeBase::InitializeRuleSet()
