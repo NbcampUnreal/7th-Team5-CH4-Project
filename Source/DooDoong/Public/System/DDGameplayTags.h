@@ -11,9 +11,10 @@ namespace DDGameplayTags
 	
 	// Ability Input Tags 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Jump); 
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_RollDice); 
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Attack); 
-	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_RollDice);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Attack);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Shot);
+
 	// Event Tags 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_Start); 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_End); 

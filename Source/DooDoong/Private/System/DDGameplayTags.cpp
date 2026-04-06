@@ -9,15 +9,16 @@ namespace DDGameplayTags
 	
 	// Ability Input Tags 
 	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_Jump, "Input.Ability.Jump"); 
-	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_RollDice, "Input.Ability.RollDice"); 
+	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_RollDice, "Input.Ability.RollDice");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_Attack, "Input.Ability.Attack");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Ability_Shot, "Input.Ability.Shot", "슈터 미니게임 전용 발사 어빌리티");
 	
 	// Event Tags 
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_Start, "Event.Trace.Start");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_End, "Event.Trace.End");
 	
 	// Data Tags
-	UE_DEFINE_GAMEPLAY_TAG(Data_Health_Damage, "Data.Health.Damage"); 
+	UE_DEFINE_GAMEPLAY_TAG(Data_Health_Damage, "Data.Health.Damage");
 	
 	// 미니게임 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_MiniGame_Idle, "State.MiniGame.Idle", "미니게임 세션이 없고 대기 중인 상태");
