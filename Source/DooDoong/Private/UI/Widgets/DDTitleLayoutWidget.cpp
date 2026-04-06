@@ -18,6 +18,7 @@ void UDDTitleLayoutWidget::NativeConstruct()
 
 	// 닉네임 입력 변화 감지
 	NicknameEditableText->OnTextChanged.AddDynamic(this, &ThisClass::OnNicknameTextChanged);
+	NicknameEditableText->OnTextCommitted.AddDynamic(this, &ThisClass::OnNicknameTextCommitted);
 
 	// 처음에는 닉네임이 없으므로 버튼 비활성화
 	PlayButton->SetIsEnabled(false);
@@ -27,6 +28,18 @@ void UDDTitleLayoutWidget::OnNicknameTextChanged(const FText& Text)
 {
 	// 텍스트가 비어있지 않은지 확인 후 버튼 활성화 여부 결정
 	PlayButton->SetIsEnabled(!Text.IsEmpty());
+}
+
+void UDDTitleLayoutWidget::OnNicknameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
+{
+	// 입력 완료 방식이 'Enter 키 누름' 인지 확인합니다.
+    if (CommitMethod == ETextCommit::OnEnter)
+    {
+        if (PlayButton->GetIsEnabled())
+        {
+            OnPlayButtonClicked();
+        }
+    }
 }
 
 void UDDTitleLayoutWidget::OnPlayButtonClicked()

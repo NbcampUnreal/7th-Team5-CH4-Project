@@ -36,11 +36,7 @@ void ADDHUD::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
 	if (!IsValid(PC)) return;
 
 	// 기존 UI 제거
-	if (MainWidgetInstance)
-	{
-		MainWidgetInstance->RemoveFromParent();
-		MainWidgetInstance = nullptr;
-	}
+	HideMainWidget();
 
 	// 새 UI 생성
 	MainWidgetInstance = CreateWidget<UUserWidget>(PC, WidgetClass);
@@ -56,5 +52,14 @@ void ADDHUD::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
 		PC->SetInputMode(Mode);
 		PC->bShowMouseCursor = true;
 	}
+}
+
+void ADDHUD::HideMainWidget()
+{
+    if (IsValid(MainWidgetInstance))
+    {
+       MainWidgetInstance->RemoveFromParent();
+       MainWidgetInstance = nullptr;
+    }
 }
 
