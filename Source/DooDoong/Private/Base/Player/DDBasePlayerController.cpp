@@ -5,6 +5,7 @@
 #include "AbilitySystem/DDAbilitySystemComponent.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
+#include "System/MiniGame/DDMiniGameManager.h"
 
 ADDBasePlayerController::ADDBasePlayerController()
 {
@@ -61,14 +62,6 @@ void ADDBasePlayerController::SetupInputComponent()
 	}
 }
 
-void ADDBasePlayerController::SetInputConfig(UDDInputConfig* NewConfig)
-{
-	if (NewConfig)
-	{
-		InputConfig = NewConfig; 
-	}
-}
-
 void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIMC)
 {
 	if (auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
@@ -86,9 +79,8 @@ void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIM
 	}
 }
 
-void ADDBasePlayerController::Client_ApplyInput_Implementation(UDDInputConfig* NewConfig, UInputMappingContext* NewIMC)
+void ADDBasePlayerController::Client_ApplyInput_Implementation(UInputMappingContext* NewIMC)
 {
-	SetInputConfig(NewConfig);
 	SetInputMappingContext(NewIMC);
 }
 
@@ -113,7 +105,6 @@ void ADDBasePlayerController::Input_Look(const FInputActionValue& Value)
 	
 	AddYawInput(LookValue.X);
 	AddPitchInput(LookValue.Y);
-	
 }
 
 void ADDBasePlayerController::Input_AbilityPressed(FGameplayTag InputTag)

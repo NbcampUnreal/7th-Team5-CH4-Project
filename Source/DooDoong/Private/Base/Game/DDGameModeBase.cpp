@@ -6,6 +6,11 @@
 #include "System/DDGameInstance.h"
 #include "TimerManager.h"
 
+ADDGameModeBase::ADDGameModeBase()
+{
+	bUseSeamlessTravel = true;
+}
+
 void ADDGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();

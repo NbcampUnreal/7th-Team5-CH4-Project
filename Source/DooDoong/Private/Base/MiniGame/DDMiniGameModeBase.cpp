@@ -3,12 +3,14 @@
 #include "Base/MiniGame/DDMiniGameRuleSet.h"
 #include "Base/MiniGame/DDMiniGameSpawnPoint.h"
 #include "Base/MiniGame/DDMiniGameStateBase.h"
+#include "Base/Player/DDBasePlayerController.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "TimerManager.h"
+#include "GameFramework/PlayerState.h"
 
 ADDMiniGameModeBase::ADDMiniGameModeBase()
 {
@@ -167,7 +169,7 @@ const FMiniGameParticipantInfo* ADDMiniGameModeBase::FindParticipantInfo(const A
 	// 참가자 정보 검색
 	for (const FMiniGameParticipantInfo& Participant : ActiveParticipants)
 	{
-		if (Participant.PlayerState == PlayerState)
+		if (Participant.PlayerId == PlayerState->GetPlayerId())
 		{
 			return &Participant;
 		}
@@ -431,7 +433,7 @@ void ADDMiniGameModeBase::ApplyMiniGameInput(ADDBasePlayerController* PlayerCont
 	}
 	
 	// Client RPC를 호출해서 Client에 적용
-	PlayerController->Client_ApplyInput(Definition->InputConfigClass, Definition->MappingContextClass);
+	PlayerController->Client_ApplyInput(Definition->MappingContextClass);
 }
 
 void ADDMiniGameModeBase::InitializeRuleSet()
