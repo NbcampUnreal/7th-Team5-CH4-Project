@@ -1,14 +1,15 @@
 #pragma once
-
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Data/DDAbilitySet.h"
+#include "GameplayEffectTypes.h"
 #include "DDBaseCharacter.generated.h"
 
 class UDDAbilitySystemComponent;
 class UDDHealthSet;
 class UDDMovementSet;
+struct FOnAttributeChangeData; 
 
 UCLASS()
 class DOODOONG_API ADDBaseCharacter : public ACharacter, public IAbilitySystemInterface
@@ -32,7 +33,13 @@ public:
 
 protected:
 	void InitializeAbilitySystem();
+	
+	void BindAttributeDelegates();
+	
+	void OnWalkSpeedChanged(const FOnAttributeChangeData& Data);
 
+	void OnJumpSpeedChanged(const FOnAttributeChangeData& Data);
+	
 public:
 	UDDHealthSet* GetHealthSet() const; 
 
