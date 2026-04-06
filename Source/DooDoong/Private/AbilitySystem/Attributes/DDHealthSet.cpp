@@ -1,6 +1,8 @@
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 
+#include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
+#include "System/DDGameplayTags.h"
 
 UDDHealthSet::UDDHealthSet()
 {
@@ -33,6 +35,20 @@ void UDDHealthSet::PreAttributeChange(const FGameplayAttribute& Attribute, float
 void UDDHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+}
+
+void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+	
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		FGameplayEventData Payload;
+		Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
+		Payload.Target = Data.Target.GetAvatarActor();
+		
+		Data.Target.HandleGameplayEvent(DDGameplayTags::State_Character_Death, &Payload);
+	}
 }
 
 void UDDHealthSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
