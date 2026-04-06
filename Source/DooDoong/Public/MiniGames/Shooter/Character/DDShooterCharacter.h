@@ -5,6 +5,7 @@
 #include "DDShooterCharacter.generated.h"
 
 class UCameraComponent;
+class USceneComponent;
 class USpringArmComponent;
 
 UCLASS()
@@ -20,6 +21,12 @@ public:
 	
 	bool CanFire() const;
 	void TryFire();
+	bool GetCrosshairAimPoint(FVector& OutTargetPoint) const;
+	FVector GetMuzzleLocation() const;
+
+protected:
+	UFUNCTION(Server, Reliable)
+	void Server_TryFire(const FVector_NetQuantize& MuzzleLocation, const FVector_NetQuantize& TargetPoint);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shooter")
