@@ -1,8 +1,12 @@
 ﻿#include "BoardGame/DDTile.h"
+
+#include "AbilitySystemComponent.h"
+#include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Common/DDLogManager.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "System/DDGameplayTags.h"
 
 ADDTile::ADDTile()
 {
@@ -126,4 +130,38 @@ void ADDTile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADDTile, TileData);
+}
+
+void ADDTile::TriggerTileAbility(ADDBoardGameCharacter* Character) const
+{
+	if (!Character) return;
+
+	UAbilitySystemComponent* AbilitySystemComponent = Character->GetAbilitySystemComponent();
+	if (!AbilitySystemComponent) return;
+
+	// 캐릭터 도착 타일 이벤트 처리
+	FGameplayTag Tag;
+
+	switch (TileData.TileType)
+	{
+	case ETileType::Coin:
+		Tag = DDGameplayTags::Tile_Ability_Coin;
+		LOG_CYS(Warning, TEXT("[Tile][%s] TriggerTileAbility"), *Tag.ToString());
+		break;
+
+	case ETileType::Item:
+		Tag = DDGameplayTags::Tile_Ability_Item;
+		LOG_CYS(Warning, TEXT("[Tile][%s] TriggerTileAbility"), *Tag.ToString());
+		break;
+
+	case ETileType::Move:
+		Tag = DDGameplayTags::Tile_Ability_Move;
+		LOG_CYS(Warning, TEXT("[Tile][%s] TriggerTileAbility"), *Tag.ToString());
+		break;
+
+	default:
+		LOG_CYS(Warning, TEXT("[Tile]TriggerTileAbility No Event"));
+		return;
+	}
+	AbilitySystemComponent->TryActivateAbilitiesByTag(FGameplayTagContainer(Tag));
 }
