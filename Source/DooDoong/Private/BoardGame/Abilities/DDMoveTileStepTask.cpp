@@ -26,6 +26,7 @@ void UDDMoveTileStepTask::MoveNext()
 
 	if (RemainingSteps <= 0)
 	{
+		// 이동완료, 태스크 종료
 		OnFinished.Broadcast();
 		EndTask();
 		return;
@@ -45,6 +46,14 @@ void UDDMoveTileStepTask::MoveNext()
 
 	ADDTile* CurrentTile = PlayerState->CurrentTile;
 
+	// Goal(목표) 도착 시 이동 종료
+	if (CurrentTile->IsGoal())
+	{
+		LOG_CYS(Warning, TEXT("[MT]Goal"));
+		OnFinished.Broadcast();
+		EndTask();
+		return;
+	}
 
 	if (!CurrentTile)
 	{
@@ -69,7 +78,6 @@ void UDDMoveTileStepTask::MoveNext()
 	Character->MoveToLocation(NextTile->GetStandLocation(Character));
 
 	// 캐릭터 State 현재 타일 위치 업데이트
-
 	PlayerState->CurrentTile = NextTile;
 
 	// 다음 스텝
