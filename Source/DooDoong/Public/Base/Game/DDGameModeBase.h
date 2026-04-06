@@ -10,6 +10,8 @@ UCLASS()
 class ADDGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+public:
+	ADDGameModeBase();
 
 public:
 	virtual void BeginPlay() override;

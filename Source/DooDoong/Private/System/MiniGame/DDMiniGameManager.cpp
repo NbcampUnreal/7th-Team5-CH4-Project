@@ -2,6 +2,7 @@
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
+#include "GameFramework/PlayerState.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 
 void UDDMiniGameManager::Initialize(FSubsystemCollectionBase& Collection)
@@ -268,6 +269,7 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 
 		FMiniGameParticipantInfo Participant;
 		Participant.PlayerState = Players[Index];
+		Participant.PlayerId = Players[Index]->GetPlayerId();
 		Participant.SlotIndex = Index;
 		Participant.Id = Index;
 		Participant.bReady = true;

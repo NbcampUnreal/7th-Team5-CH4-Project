@@ -14,6 +14,9 @@ struct DOODOONG_API FMiniGameParticipantInfo
 	TObjectPtr<APlayerState> PlayerState = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 PlayerId = INDEX_NONE;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 SlotIndex = INDEX_NONE;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
