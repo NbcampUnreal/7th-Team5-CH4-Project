@@ -7,8 +7,7 @@
 void ADDTileManager::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InitializeTiles();
+	
 }
 
 void ADDTileManager::InitializeTiles()
@@ -45,5 +44,16 @@ void ADDTileManager::InitializeTiles()
 	{
 		Pair.Value->ResolveNextTiles(TileMap);
 	}
+	// 플레이어 state 로 캐릭터 시작 위치 이동 시키기
+	
 	LOG_CYS(Warning, TEXT("[TM]TileMap loaded. Good!"));
+}
+
+ADDTile* ADDTileManager::FindTile(FName TileName)
+{
+	if (ADDTile** FoundTile = TileMap.Find(TileName))
+	{
+		return *FoundTile;
+	}
+	return nullptr;
 }

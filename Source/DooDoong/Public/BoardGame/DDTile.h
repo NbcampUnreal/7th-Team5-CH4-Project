@@ -4,9 +4,22 @@
 #include "GameFramework/Actor.h"
 #include "Engine/DataTable.h"
 #include "DDTileData.h"
+#include "Character/DDBoardGameCharacter.h"
 #include "DDTile.generated.h"
 
 class ACharacter;
+
+// USTRUCT(BlueprintType)
+// struct FTileVisualData
+// {
+// 	GENERATED_BODY()
+//
+// 	UPROPERTY(EditAnywhere)
+// 	UMaterialInterface* Material;
+//
+// 	UPROPERTY(EditAnywhere)
+// 	UTexture2D* Icon;
+// };
 
 UCLASS()
 class DOODOONG_API ADDTile : public AActor
@@ -19,6 +32,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+	
 public:
 
 	// 컴포넌트
@@ -41,15 +56,26 @@ public:
 	FName TileRowName;
 
 	// 실제 데이터
-	UPROPERTY(VisibleAnywhere, Category="Tile")
+	UPROPERTY(ReplicatedUsing = OnRep_TileData)
 	FTileRowData TileData;
 
 	UPROPERTY(EditAnywhere, Category="Tile")
 	TArray<ADDTile*> NextTiles;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Tile")
+	TMap<ETileType, UMaterialInterface*> TileMaterialMap;
+	// TMap<ETileType, FTileVisualData> TileVisualMap;
+	
 	FVector GetStandLocation(ACharacter* Character) const;
 	
 	void LoadTileData();
 	
 	void ResolveNextTiles(const TMap<FName, ADDTile*>& TileMap);
+	
+	void ApplyTileMaterial();
+	
+	UFUNCTION()
+	void OnRep_TileData();
+	void OnCharacterArrived(ADDBoardGameCharacter* Character) const;
+	bool IsGoal() const;
 };
