@@ -5,13 +5,13 @@ void UTestLogicManager::InitTestPlayers()
     Players.Empty();
 
     FTestPlayerData P1;
-    P1.Name = "changmin";
+    P1.Name = "cuty";
     P1.Gold = 100;
     P1.Health = 80;
     P1.ProfileImage = LoadObject<UTexture2D>(nullptr, TEXT("/Game/DooDoong/05_UI/HUD/UI_Assets/PlayerProfile/p1.p1"));
 
     FTestPlayerData P2;
-    P2.Name = "duckling";
+    P2.Name = "duck";
     P2.Gold = 50;
     P2.Health = 100;
     P2.ProfileImage = LoadObject<UTexture2D>(nullptr, TEXT("/Game/DooDoong/05_UI/HUD/UI_Assets/PlayerProfile/p2.p2"));
