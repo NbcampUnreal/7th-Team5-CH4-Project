@@ -138,6 +138,7 @@ void ADDMiniGameModeBase::InitializeMiniGame(const FMiniGameSetup& InSetup,
 		MiniGameState->SetRemainingTimeSeconds(ActiveSetup.TimeLimitSeconds);
 		MiniGameState->SetReadyPlayerCount(0);
 		MiniGameState->SetTotalParticipantCount(ActiveParticipants.Num());
+		MiniGameState->SetReadyEntries(TArray<FMiniGameReadyEntry>());
 		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 		MiniGameState->SetScoreBoard(TArray<FMiniGameScoreEntry>());
 	}
@@ -464,17 +465,28 @@ void ADDMiniGameModeBase::UpdateReadyState()
 	}
 
 	int32 ReadyPlayerCount = 0;
+	TArray<FMiniGameReadyEntry> ReadyEntries;
+	ReadyEntries.Reserve(ActiveParticipants.Num());
+
 	for (const FMiniGameParticipantInfo& Participant : ActiveParticipants)
 	{
 		const bool* bReady = ReadyStates.Find(Participant.PlayerId);
-		if (bReady != nullptr && *bReady)
+		const bool bIsReady = bReady != nullptr && *bReady;
+		if (bIsReady)
 		{
 			++ReadyPlayerCount;
 		}
+
+		FMiniGameReadyEntry ReadyEntry;
+		ReadyEntry.PlayerId = Participant.PlayerId;
+		ReadyEntry.PlayerName = Participant.PlayerState != nullptr ? Participant.PlayerState->GetPlayerName() : FString();
+		ReadyEntry.bReady = bIsReady;
+		ReadyEntries.Add(ReadyEntry);
 	}
 
 	MiniGameState->SetReadyPlayerCount(ReadyPlayerCount);
 	MiniGameState->SetTotalParticipantCount(ActiveParticipants.Num());
+	MiniGameState->SetReadyEntries(ReadyEntries);
 }
 
 bool ADDMiniGameModeBase::AreAllParticipantsReady() const

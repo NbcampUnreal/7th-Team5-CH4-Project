@@ -19,6 +19,7 @@ void ADDMiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ADDMiniGameStateBase, ScoreBoard);
 	DOREPLIFETIME(ADDMiniGameStateBase, ReadyPlayerCount);
 	DOREPLIFETIME(ADDMiniGameStateBase, TotalParticipantCount);
+	DOREPLIFETIME(ADDMiniGameStateBase, ReadyEntries);
 }
 
 void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
@@ -55,6 +56,12 @@ void ADDMiniGameStateBase::SetTotalParticipantCount(int32 NewTotalParticipantCou
 {
 	TotalParticipantCount = NewTotalParticipantCount;
 	BroadcastReadyStateChanged();
+}
+
+void ADDMiniGameStateBase::SetReadyEntries(const TArray<FMiniGameReadyEntry>& InReadyEntries)
+{
+	ReadyEntries = InReadyEntries;
+	BroadcastReadyEntriesChanged();
 }
 
 void ADDMiniGameStateBase::AddScore(APlayerState* PlayerState, int32 DeltaScore)
@@ -113,7 +120,17 @@ void ADDMiniGameStateBase::OnRep_TotalParticipantCount()
 	BroadcastReadyStateChanged();
 }
 
+void ADDMiniGameStateBase::OnRep_ReadyEntries()
+{
+	BroadcastReadyEntriesChanged();
+}
+
 void ADDMiniGameStateBase::BroadcastReadyStateChanged()
 {
 	OnMiniGameReadyStateChanged.Broadcast(ReadyPlayerCount, TotalParticipantCount);
+}
+
+void ADDMiniGameStateBase::BroadcastReadyEntriesChanged()
+{
+	OnMiniGameReadyEntriesChanged.Broadcast(ReadyEntries);
 }

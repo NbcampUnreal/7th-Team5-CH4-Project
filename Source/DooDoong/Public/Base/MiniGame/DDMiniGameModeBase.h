@@ -99,7 +99,7 @@ protected:
 	/** 참가자 전원이 준비 완료되었는지 확인 */
 	bool AreAllParticipantsReady() const;
 
-	/** 전원 준비 완료 시 실제 게임 시작 */
+	/** 준비 완료 시마다 실제 게임 시작을 시도 -> 모두 준비되면 게임 시작 */
 	void TryStartMiniGame();
 	
 	/** RuleSet이 있는 경우 Initialize하는 헬퍼 */
