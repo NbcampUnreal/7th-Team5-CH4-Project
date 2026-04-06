@@ -14,9 +14,6 @@ class ADDGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 public:
 	ADDGameModeBase();
-
-public:
-    ADDGameModeBase();
     
     virtual void BeginPlay() override;
     virtual void PostLogin(APlayerController* NewPlayer) override;
