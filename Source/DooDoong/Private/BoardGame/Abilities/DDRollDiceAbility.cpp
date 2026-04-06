@@ -69,7 +69,7 @@ void UDDRollDiceAbility::OnMoveFinished()
 	if (CurrentTile)
 	{
 		// 타일 Ability 트리거
-		CurrentTile->TriggerTileAbility(Character);
+		CurrentTile->OnCharacterArrived(Character);
 	}
 	// 중복 실행 방지
 	bAlreadyRolled=true;

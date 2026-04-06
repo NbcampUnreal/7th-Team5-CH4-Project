@@ -74,5 +74,6 @@ public:
 	
 	UFUNCTION()
 	void OnRep_TileData();
-	void TriggerTileAbility(ADDBoardGameCharacter* Character) const;
+	void OnCharacterArrived(ADDBoardGameCharacter* Character) const;
+	bool IsGoal() const;
 };

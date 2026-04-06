@@ -132,7 +132,7 @@ void ADDTile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(ADDTile, TileData);
 }
 
-void ADDTile::TriggerTileAbility(ADDBoardGameCharacter* Character) const
+void ADDTile::OnCharacterArrived(ADDBoardGameCharacter* Character) const
 {
 	if (!Character) return;
 
@@ -144,24 +144,34 @@ void ADDTile::TriggerTileAbility(ADDBoardGameCharacter* Character) const
 
 	switch (TileData.TileType)
 	{
+	case ETileType::Goal:
+		// TODO: 게임모드에 알림, 게임 승리 판정
+		LOG_CYS(Warning, TEXT("[Tile] OnCharacterArrived Goal!!"), *Tag.ToString());
+		break;
+		
 	case ETileType::Coin:
 		Tag = DDGameplayTags::Tile_Ability_Coin;
-		LOG_CYS(Warning, TEXT("[Tile][%s] TriggerTileAbility"), *Tag.ToString());
+		LOG_CYS(Warning, TEXT("[Tile][%s] OnCharacterArrived"), *Tag.ToString());
 		break;
 
 	case ETileType::Item:
 		Tag = DDGameplayTags::Tile_Ability_Item;
-		LOG_CYS(Warning, TEXT("[Tile][%s] TriggerTileAbility"), *Tag.ToString());
+		LOG_CYS(Warning, TEXT("[Tile][%s] OnCharacterArrived"), *Tag.ToString());
 		break;
 
 	case ETileType::Move:
 		Tag = DDGameplayTags::Tile_Ability_Move;
-		LOG_CYS(Warning, TEXT("[Tile][%s] TriggerTileAbility"), *Tag.ToString());
+		LOG_CYS(Warning, TEXT("[Tile][%s] OnCharacterArrived"), *Tag.ToString());
 		break;
 
 	default:
-		LOG_CYS(Warning, TEXT("[Tile]TriggerTileAbility No Event"));
+		LOG_CYS(Warning, TEXT("[Tile] OnCharacterArrived No Event"));
 		return;
 	}
 	AbilitySystemComponent->TryActivateAbilitiesByTag(FGameplayTagContainer(Tag));
+}
+
+bool ADDTile::IsGoal() const
+{
+	return (TileData.TileType==ETileType::Goal);
 }
