@@ -12,6 +12,21 @@ class UDDMovementSet;
 class ADDTile; 
 class ADDTileManager;
 
+USTRUCT(BlueprintType)
+struct FPlayerGameplayInfo
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    int32 SlotIndex = -1; 
+
+    UPROPERTY()
+    FLinearColor PlayerColor; 
+
+    UPROPERTY()
+    FString PlayerDisplayName;
+};
+
 UCLASS()
 class DOODOONG_API ADDBasePlayerState : public APlayerState, public IAbilitySystemInterface
 {

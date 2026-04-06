@@ -16,6 +16,19 @@ class UDDInputConfig;
 /**
  * 
  */
+
+USTRUCT(BlueprintType)
+struct FPlatformerPlayerData
+{
+	GENERATED_BODY()
+	
+	TWeakObjectPtr<ADDBasePlayerController> PlayerController;
+	
+	float PlayerMaxDistance;
+	
+	int32 PlayerRank;
+};
+
 UCLASS()
 class DOODOONG_API ADDPlatformerGameMode : public ADDMiniGameModeBase
 {
@@ -29,11 +42,13 @@ public:
 	/*플레이어 준비완료 체크*/
 	void CheckReadyPlayers();
 	
+	void GetPlayerSlotIndex();
+	
 	/*대기시간 타이머 호출 함수*/
 	void WaitingTimerStart();
 	
 	/* 플레이어 이동거리 체크 타이머 함수 */
-	void PlayeGameTimer();
+	void PlayGameTimer();
 	
 	void CheckGoalPlayerCharacter(AActor* GoalActor);
 	
@@ -44,6 +59,10 @@ public:
 	
 	void GameEnd();
 	
+	/* 구조체 정보전달 함수 */
+	
+public:
+	TMap<FName, FPlatformerPlayerData> PlayerData;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
@@ -70,6 +89,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
 	TArray<float> PlayerMaxDistances;
 	
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
+	TMap<FName, ADDBasePlayerController*> PlayerDatas;
+	
 	/* 게임스테이트 변수 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
 	ADDPlatformerGameState* PlatformerGameStateBase;
@@ -82,7 +104,6 @@ private:
 	
 	/* 게임중인 플레이어 관련 변수 */
 	FVector StartLocation;
-	
-	/* 게임플레이 변수 */
-	int32 GamePlayTime = 0;
+	int32 Rank = 1;
+	int32 MaxPlayer = 4;
 };

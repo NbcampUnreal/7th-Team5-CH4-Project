@@ -3,10 +3,12 @@
 
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
 #include "MiniGames/Platformer/GameState/DDPlatformerGameState.h"
-#include "Base/Character/DDBaseCharacter.h"
 #include "Base/Player/DDBasePlayerController.h"
-#include "Common/DDLogManager.h"
+#include "Base/Player/DDBasePlayerState.h"
+#include "Base/Character/DDBaseCharacter.h"
 #include "System/DDGameplayTags.h"
+#include "Common/DDLogManager.h"
+#include "EngineUtils.h"
 
 void ADDPlatformerGameMode::OnPostLogin(AController* NewPlayer)
 {
@@ -22,14 +24,22 @@ void ADDPlatformerGameMode::OnPostLogin(AController* NewPlayer)
 			AllPlayerCharacters.Add(PlayerCharacter);
 		}
 		//TODO_@Minjae : Setter 함수 완성되면 DA랑 IMC 넘겨주기
-		
 	}
 }
 
 void ADDPlatformerGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogPMJ, Log, TEXT("BeginPlayServer"));
 	
+	//TODO_@Minjae : 미니게임의 BeginPlay 가 호출되면 각 클라PC에게 미니게임 대기 UI창 띄우라고 전달
+	//PlayerData["Player1"].PlayerController->OpenReadyUI();
+	/*for (const TPair<FName, FPlatformerPlayerData>& ServerData : PlayerData)
+	{
+		ServerData.Value.PlayerController->OpenReadyUI();
+	}*/
+	
+	/* 시작지점 초기화 각 캐릭터가 시작지점을 기준으로 얼마나 멀리갔는지 최고기록 체크를위함 */
 	StartLocation = FVector(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < AllPlayerCharacters.Num(); i++)
 	{
@@ -54,16 +64,17 @@ void ADDPlatformerGameMode::GameStart()
 		PlatformerPlayTimerHandle,
 		this,
 		&ADDPlatformerGameMode::GameEnd,
-		10.f,
-		false,
-		PlatformerPlayTime);
+		PlatformerPlayTime,
+		false
+		);
 	
 	GetWorldTimerManager().SetTimer(
 		DistanceTimerHandle,
 		this,
-		&ADDPlatformerGameMode::PlayeGameTimer,
+		&ADDPlatformerGameMode::PlayGameTimer,
 		1.f,
-		true);
+		true
+		);
 }
 
 void ADDPlatformerGameMode::GameEnd()
@@ -76,10 +87,10 @@ void ADDPlatformerGameMode::GameEnd()
 	
 }
 
-void ADDPlatformerGameMode::PlayeGameTimer()
+void ADDPlatformerGameMode::PlayGameTimer()
 {
-	UE_LOG(LogPMJ, Log, TEXT("PlayeGameTimer"));
-	
+	UE_LOG(LogPMJ, Log, TEXT("PlayGameTimer"));
+	/* 게임플레이 타이머함수가 호출될때마다 각 플레이어의 최고 거리를 기록 */
 	for (int i = 0; i < AllPlayerCharacters.Num(); i++)
 	{
 		float CurrentPlayerDistance = FVector::Dist(StartLocation, AllPlayerCharacters[i]->GetActorLocation());
@@ -93,6 +104,19 @@ void ADDPlatformerGameMode::PlayeGameTimer()
 void ADDPlatformerGameMode::CheckGoalPlayerCharacter(AActor* GoalActor)
 {
 	/* 일단은 간략하게 순위정하는거 구현해놓을건데 플레이어별로 구분할 수 있는 태그만들어서 나중에 리펙토링할게요 */
+	APawn* PlayerPawn = Cast<APawn>(GoalActor);
+	if (IsValid(PlayerPawn) == true)
+	{
+		ADDBaseCharacter* PlayerCharacter = Cast<ADDBaseCharacter>(PlayerPawn);
+		if (IsValid(PlayerCharacter) == true)
+		{
+			ADDBasePlayerController* PlayerController = Cast<ADDBasePlayerController>(PlayerCharacter->GetController());
+			if (IsValid(PlayerController) == true)
+			{
+				 /* TODO_@Minjae : 플레이어 구조체 접근해서 slotindex 로 골인한 플레이어 찾아서 순위 매기기 */
+			}
+		}
+	}
 	for (int i = 0; i < AllPlayerCharacters.Num(); i++)
 	{
 		if (GoalActor->GetOwner() == AllPlayerCharacters[i])
@@ -146,7 +170,7 @@ void ADDPlatformerGameMode::WaitingTimerStart()
 	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 	UE_LOG(LogPMJ, Log, TEXT("WaitingTimerStart"));
 	
-	GetWorld()->GetTimerManager().SetTimer(
+	GetWorldTimerManager().SetTimer(
 	FinishedWaitingTimerHandle,
 	this,
 	&ADDPlatformerGameMode::GameStart,
@@ -161,8 +185,8 @@ void ADDPlatformerGameMode::CheckReadyPlayers()
 	//플레이어쪽에서 대기화면이 나타났을때 준비완료 버튼을 누를때마다 이벤트 함수 호출
 	//그때마다 준비상태를 확인하고 4명이 준비완료되었을경우 게임 시작
 	
-	/*
-	if (AllPlayerControllers.IsEmpty() == true)
+	
+	/*if (AllPlayerControllers.IsEmpty() == true)
 	{
 		return;
 	}
@@ -173,6 +197,24 @@ void ADDPlatformerGameMode::CheckReadyPlayers()
 		AllPlayerControllers[3]->bIsReady == true )
 	{
 		WaitingTimerStart();
-	}
-	*/
+	}*/
+	
+}
+
+void ADDPlatformerGameMode::GetPlayerSlotIndex()
+{
+	/*for (TActorIterator<ADDBasePlayerController> It(GetWorld()); It; ++It)
+	{
+		UE_LOG(LogPMJ, Log, TEXT("ActorIterator"));
+		ADDBasePlayerController* PlayerController = Cast<ADDBasePlayerController>(*It);
+		if (IsValid(PlayerController) == true)
+		{
+			/* PlayerState구조체 접근해서 SlotIndex 가져오기 #1#
+			int32 SlotIndex = PlayerInfo.SlotIndex;
+			FName PlayerName(FString::Printf(TEXT("Player%d"), SlotIndex));
+			PlayerDatas.Add(FName(PlayerName), PlayerController);
+			UE_LOG(LogPMJ, Log, TEXT("Player slotindex: %d"), SlotIndex);
+		}
+	}*/
+	
 }
