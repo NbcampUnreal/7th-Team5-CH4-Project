@@ -175,3 +175,29 @@ bool ADDTile::IsGoal() const
 {
 	return (TileData.TileType==ETileType::Goal);
 }
+
+void ADDTile::OnConstruction(const FTransform& Transform)
+{
+	// TileRowName 자동 셋팅!!!
+	Super::OnConstruction(Transform);
+
+	FString Name = GetActorLabel();
+
+	FString NumberPart;
+	for (int32 i = Name.Len() - 1; i >= 0; i--)
+	{
+		if (FChar::IsDigit(Name[i]))
+		{
+			NumberPart.InsertAt(0, Name[i]);
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	if (!NumberPart.IsEmpty())
+	{
+		TileRowName = FName(*FString::Printf(TEXT("Tile%02d"), FCString::Atoi(*NumberPart)));
+	}
+}
