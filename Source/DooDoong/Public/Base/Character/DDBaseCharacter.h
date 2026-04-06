@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
-#include "BoardGame/DDTile.h"
 #include "Data/DDAbilitySet.h"
 #include "DDBaseCharacter.generated.h"
 
