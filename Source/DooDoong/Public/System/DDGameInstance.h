@@ -5,12 +5,16 @@
 #include "DDGameInstance.generated.h"
 
 UCLASS()
-class UDDGameInstance : public UGameInstance
+class DOODOONG_API UDDGameInstance : public UGameInstance
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	// 로비에서 참여자로 확정된 유저들의 명단 (맵 이동 시 유지)
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GameData")
-	TArray<FString> ParticipantNames;
+    // ==========================================
+    // 글로벌 장기 데이터 (맵 전환 시에도 유지됨)
+    // ==========================================
+
+    /** 현재 보드판 라운드 진행도 */
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Global Data")
+    int32 CurrentRound = 1;
 };

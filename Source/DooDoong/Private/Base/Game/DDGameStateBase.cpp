@@ -15,5 +15,6 @@ void ADDGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ADDGameStateBase, MatchState);
+	// 태그를 서버에서 클라이언트로 완벽하게 동기화합니다.
+	DOREPLIFETIME(ADDGameStateBase, MatchStateTag);
 }
