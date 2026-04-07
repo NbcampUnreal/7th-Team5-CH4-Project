@@ -16,10 +16,12 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Shot);
 	
 	// Character State Tags
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Attacking); 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Stun);
 	
 	// Event Tags 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Character_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_Start); 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_End); 
 	
