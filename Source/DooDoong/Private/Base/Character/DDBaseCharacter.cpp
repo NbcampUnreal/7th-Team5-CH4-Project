@@ -4,6 +4,7 @@
 #include "Base/Player/DDBasePlayerState.h"
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 #include "AbilitySystem/Attributes/DDMovementSet.h"
+#include "Components/CapsuleComponent.h"
 
 ADDBaseCharacter::ADDBaseCharacter()
 {
@@ -115,6 +116,42 @@ void ADDBaseCharacter::OnJumpSpeedChanged(const FOnAttributeChangeData& Data)
 	{
 		MovementComponent->JumpZVelocity = Data.NewValue;
 	}
+}
+
+void ADDBaseCharacter::MultiCast_CharacterDeath_Implementation()
+{
+	EnableRagDoll();
+}
+
+void ADDBaseCharacter::EnableRagDoll()
+{
+	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+	{
+		MovementComp->StopMovementImmediately();
+		MovementComp->DisableMovement();
+	}
+	
+	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
+	{
+		Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Capsule->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
+	
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		MeshComp->SetAnimInstanceClass(nullptr);
+		MeshComp->SetAnimationMode(EAnimationMode::AnimationCustomMode);
+		MeshComp->SetCollisionProfileName(TEXT("Ragdoll"));
+		MeshComp->SetAllBodiesSimulatePhysics(true);
+		MeshComp->SetSimulatePhysics(true);
+		
+		MeshComp->WakeAllRigidBodies();
+		
+		MeshComp->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		MeshComp->SetSimulatePhysics(true);
+	}
+	
+	SetLifeSpan(5.f); 
 }
 
 UDDHealthSet* ADDBaseCharacter::GetHealthSet() const

@@ -28,5 +28,5 @@ protected:
 	UAnimMontage* DeathMontage;
 	
 	UPROPERTY(EditDefaultsOnly)
-	float DeathLifeSpan = 5.f;
+	float DeathLifeSpan = 3.f;
 };

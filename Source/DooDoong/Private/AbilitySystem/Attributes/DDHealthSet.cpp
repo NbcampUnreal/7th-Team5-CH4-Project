@@ -43,11 +43,23 @@ void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCall
 	
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
-		FGameplayEventData Payload;
-		Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
-		Payload.Target = Data.Target.GetAvatarActor();
+		const float NewHealth = FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth());
+		SetHealth(NewHealth);
+		UE_LOG(LogTemp,Warning, TEXT("Health Changed : %f"), NewHealth);
 		
-		Data.Target.HandleGameplayEvent(DDGameplayTags::State_Character_Death, &Payload);
+		if (GetHealth() <= 0.f)
+		{
+			UAbilitySystemComponent* TargetASC = &Data.Target; 
+			
+			FGameplayEventData Payload;
+			Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
+			Payload.Target = Data.Target.GetAvatarActor();
+		
+			TargetASC->HandleGameplayEvent(DDGameplayTags::Event_Character_Death, &Payload);
+			UE_LOG(LogTemp,Warning, TEXT("Character Death %s"), *TargetASC->GetAvatarActor()->GetName());
+			
+			TargetASC->AddLooseGameplayTag(DDGameplayTags::State_Character_Death); 
+		}
 	}
 }
 

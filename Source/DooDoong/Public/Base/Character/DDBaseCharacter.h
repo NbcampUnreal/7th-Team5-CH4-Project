@@ -41,6 +41,14 @@ protected:
 	void OnJumpSpeedChanged(const FOnAttributeChangeData& Data);
 	
 public:
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCast_CharacterDeath();
+	
+protected:
+	
+	void EnableRagDoll();
+	
+public:
 	UDDHealthSet* GetHealthSet() const; 
 
 	UDDMovementSet* GetMovementSet() const;
