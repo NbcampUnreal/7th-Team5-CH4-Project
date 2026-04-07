@@ -50,17 +50,20 @@ void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCall
 		if (GetHealth() <= 0.f)
 		{
 			UAbilitySystemComponent* TargetASC = &Data.Target; 
+			if (TargetASC->AbilityActorInfo->IsNetAuthority())
+			{
+				FGameplayEventData Payload;
+				Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
+				Payload.Target = Data.Target.GetAvatarActor();
+				
+				TargetASC->HandleGameplayEvent(DDGameplayTags::Event_Character_Death, &Payload);
+				UE_LOG(LogTemp,Warning, TEXT("Character Death %s"), *TargetASC->GetAvatarActor()->GetName());
 			
-			FGameplayEventData Payload;
-			Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
-			Payload.Target = Data.Target.GetAvatarActor();
-		
-			TargetASC->HandleGameplayEvent(DDGameplayTags::Event_Character_Death, &Payload);
-			UE_LOG(LogTemp,Warning, TEXT("Character Death %s"), *TargetASC->GetAvatarActor()->GetName());
-			
-			TargetASC->AddLooseGameplayTag(DDGameplayTags::State_Character_Death); 
+				TargetASC->AddLooseGameplayTag(DDGameplayTags::State_Character_Death);
+			}
 		}
 	}
+	
 }
 
 void UDDHealthSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
