@@ -16,7 +16,7 @@
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
 #include "System/MiniGame/DDMiniGameManager.h"
-
+#include "InputMappingContext.h"
 ADDGameModeBase::ADDGameModeBase()
 {
 	PlayerStateClass = ADDBasePlayerState::StaticClass();
@@ -239,6 +239,11 @@ void ADDGameModeBase::SetMatchState(FGameplayTag NewStateTag)
 			if (auto Char = Cast<ADDBoardGameCharacter>(PC->GetPawn()))
 			{
 				Char->InitLocation();
+			}
+			// IMC 교체
+			if (auto DDPC = Cast<ADDBasePlayerController>(PC))
+			{
+				DDPC->Client_ApplyState(NewStateTag);
 			}
 		}
 

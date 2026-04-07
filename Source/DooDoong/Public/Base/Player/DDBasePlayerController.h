@@ -26,6 +26,10 @@ protected:
 public:
 	void SetInputMappingContext(UInputMappingContext* NewIMC);
 	
+	/** 윤서 : GameMode에서 상태(로비/보드)에 따라 IMC 지정 */
+	UFUNCTION(Client, Reliable)
+	void Client_ApplyState(FGameplayTag StateTag);
+
 	/** 주현 : GameMode에서 곧바로 Set을 호출하는 것이 불가능해서 추가한 Client RPC */
 	UFUNCTION(Client, Reliable)
 	void Client_ApplyInput(UInputMappingContext* NewIMC);
@@ -49,4 +53,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> DefaultIMC;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputMappingContext> BoardGameIMC;
 };
