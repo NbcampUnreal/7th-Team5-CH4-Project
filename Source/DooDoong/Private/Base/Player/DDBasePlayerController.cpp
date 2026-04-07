@@ -3,8 +3,10 @@
 #include "AbilitySystemInterface.h"
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystem/DDAbilitySystemComponent.h"
+#include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
+#include "System/MiniGame/DDMiniGameManager.h"
 
 ADDBasePlayerController::ADDBasePlayerController()
 {
@@ -61,14 +63,6 @@ void ADDBasePlayerController::SetupInputComponent()
 	}
 }
 
-void ADDBasePlayerController::SetInputConfig(UDDInputConfig* NewConfig)
-{
-	if (NewConfig)
-	{
-		InputConfig = NewConfig; 
-	}
-}
-
 void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIMC)
 {
 	if (auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
@@ -84,6 +78,22 @@ void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIM
 			Subsystem->AddMappingContext(DefaultIMC, 0);
 		}
 	}
+}
+
+void ADDBasePlayerController::Client_ApplyInput_Implementation(UInputMappingContext* NewIMC)
+{
+	SetInputMappingContext(NewIMC);
+}
+
+void ADDBasePlayerController::Server_SetMiniGameReady_Implementation(bool bReady)
+{
+	ADDMiniGameModeBase* MiniGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDMiniGameModeBase>() : nullptr;
+	if (MiniGameMode == nullptr)
+	{
+		return;
+	}
+
+	MiniGameMode->SetPlayerReady(PlayerState, bReady);
 }
 
 void ADDBasePlayerController::Input_Move(const FInputActionValue& Value)
@@ -107,7 +117,6 @@ void ADDBasePlayerController::Input_Look(const FInputActionValue& Value)
 	
 	AddYawInput(LookValue.X);
 	AddPitchInput(LookValue.Y);
-	
 }
 
 void ADDBasePlayerController::Input_AbilityPressed(FGameplayTag InputTag)

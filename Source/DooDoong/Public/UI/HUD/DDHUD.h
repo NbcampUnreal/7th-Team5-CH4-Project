@@ -15,6 +15,9 @@ protected:
 public:
 	// UI 교체용 (나중 확장)
 	void ShowWidget(TSubclassOf<class UUserWidget> WidgetClass);
+	
+	/** 현재 화면에 띄워진 메인 위젯을 제거하는 함수 */
+    void HideMainWidget();
 
 protected:
 	// 로비 UI

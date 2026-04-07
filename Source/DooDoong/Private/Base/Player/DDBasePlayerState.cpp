@@ -1,8 +1,9 @@
 #include "Base/Player/DDBasePlayerState.h"
-#include "AbilitySystem//DDAbilitySystemComponent.h"
+#include "AbilitySystem/DDAbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 #include "AbilitySystem/Attributes/DDPointSet.h"
 #include "AbilitySystem/Attributes/DDMovementSet.h"
+#include "Net/UnrealNetwork.h"
 #include "Base/Game/DDGameStateBase.h"
 #include "BoardGame/DDTileManager.h"
 #include "Common/DDLogManager.h"
@@ -11,7 +12,6 @@ ADDBasePlayerState::ADDBasePlayerState()
 {
 	AbilitySystemComponent = CreateDefaultSubobject<UDDAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
-
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 
 	HealthSet = CreateDefaultSubobject<UDDHealthSet>(TEXT("HealthSet"));
@@ -29,6 +29,26 @@ ADDBasePlayerState::ADDBasePlayerState()
 UAbilitySystemComponent* ADDBasePlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ADDBasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADDBasePlayerState, Nickname);
+	DOREPLIFETIME(ADDBasePlayerState, bIsParticipant);
+}
+
+void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	if (ADDBasePlayerState* NewPlayerState = Cast<ADDBasePlayerState>(PlayerState))
+	{
+		// 커스텀 데이터 복제
+		NewPlayerState->Nickname = this->Nickname;
+		NewPlayerState->bIsParticipant = this->bIsParticipant;
+	}
 }
 
 void ADDBasePlayerState::InitTile()

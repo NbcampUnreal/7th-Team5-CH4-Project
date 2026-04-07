@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Base/MiniGame/DDMiniGameTypes.h"
@@ -94,6 +92,15 @@ public:
 
 	/** 현재 월드가 활성화 된 미니게임 월드인지 판별 */
 	bool IsActiveMiniGameWorld(const UWorld* World) const;
+	
+public:
+	/** 돌아갈 보드판 타일을 PlayerId로 조회해서 Get */
+	UFUNCTION(BlueprintPure, Category="MiniGame")
+	FName GetReturnTileRowName(int32 PlayerId) const;
+	
+	/** PlayerState로 조회해서 Get */
+	UFUNCTION(BlueprintPure, Category="MiniGame")
+	FName GetReturnTileRowNameForPlayerState(const APlayerState* PlayerState) const;
 
 public:
 	/** 상태 변화 델리게이트 메서드 모음 */
@@ -122,6 +129,13 @@ protected:
 
 	/** 데이터 에셋 검색 및 캐시 */
 	void CacheAvailableDefinitions();
+	
+protected:
+	/** 타일 정보를 저장 */
+	void SaveReturnTileInfo(const TArray<APlayerState*>& Players);
+	
+	/** 저장된 타일 정보를 클리어 */
+	void ClearSavedReturnTileInfo();
 	
 protected:
 	/** 현재 게임의 상태 */
@@ -155,4 +169,7 @@ protected:
 	/**	되돌아갈 맵의 이름 저장 */
 	UPROPERTY()
 	FString ReturnMapPackageName;
+	
+	UPROPERTY()
+	TArray<FMiniGameReturnTileInfo> SavedReturnTileInfo;
 };

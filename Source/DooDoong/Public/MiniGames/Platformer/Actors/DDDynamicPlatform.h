@@ -19,13 +19,12 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
 	
 public:
-	void MovingPlatform(float DeltaTime);
-	void RotatingPlatform(float DeltaTime);
+	UFUNCTION()
+	void MovingPlatform();
+	UFUNCTION()
+	void RotatingPlatform();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Components", meta = (AllowPrivateAccess = "true"))
@@ -47,4 +46,8 @@ protected:
 private:
 	FVector StartLocation;
 	FVector MoveDirection;
+	
+	float TimerRate;
+	
+	FTimerHandle DynamicPlatformTimerHandle;
 };
