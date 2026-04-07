@@ -1,15 +1,12 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "DDPlatformerGameMode.generated.h"
 
-class ADDPlatformerPlayerController;
 class ADDPlatformerGameState;
+class ADDBasePlayerState;
 class ADDBasePlayerController;
-class ADDBaseCharacter;
 class UInputMappingContext;
 class UDDInputConfig;
 
@@ -21,12 +18,34 @@ USTRUCT(BlueprintType)
 struct FPlatformerPlayerData
 {
 	GENERATED_BODY()
+	/*BasePlayerState에서 넘겨받을 정보*/
+	UPROPERTY()
+	FLinearColor PlayerColor; 
+
+	UPROPERTY()
+	FString PlayerDisplayName;
 	
+	UPROPERTY()
+	int32 PlayerSlotIndex;
+	
+	/* 미니게임 에서 필요한 추가 정보 */
+	UPROPERTY()
 	TWeakObjectPtr<ADDBasePlayerController> PlayerController;
 	
-	float PlayerMaxDistance;
+	UPROPERTY()
+	TWeakObjectPtr<ADDBasePlayerState> PlayerState;
 	
-	int32 PlayerRank;
+	UPROPERTY()
+	float PlayerMaxDistance = 0.f;
+	
+	UPROPERTY()
+	int32 PlayerRank = -1;
+	
+	UPROPERTY()
+	bool bIsGoalIn = false;
+	
+	UPROPERTY()
+	FVector SavePointLocation;
 };
 
 UCLASS()
@@ -34,15 +53,11 @@ class DOODOONG_API ADDPlatformerGameMode : public ADDMiniGameModeBase
 {
 	GENERATED_BODY()
 public:
-	virtual void OnPostLogin(AController* NewPlayer) override;
-	
 	virtual void BeginPlay() override;
 	
 public:
 	/*플레이어 준비완료 체크*/
 	void CheckReadyPlayers();
-	
-	void GetPlayerSlotIndex();
 	
 	/*대기시간 타이머 호출 함수*/
 	void WaitingTimerStart();
@@ -57,12 +72,14 @@ public:
 	/* 대기시간 타이머 종료 게임시작 */
 	void GameStart();
 	
-	void GameEnd();
+	void GameEnd();	
 	
-	/* 구조체 정보전달 함수 */
-	
+	/* 초기화 함수 */
+	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
 public:
-	TMap<FName, FPlatformerPlayerData> PlayerData;
+	/* 참가한 플레이어 관련 정보 */
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
+	TMap<int32, FPlatformerPlayerData> PlayerDatas;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
@@ -71,26 +88,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
 	TObjectPtr<UInputMappingContext> PlatformerIMC;
 	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBasePlayerController*> AllPlayerControllers;
+	/* 참가한 플레이어 관련 정보 */
 	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBaseCharacter*> AllPlayerCharacters;
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
+	TMap<int32, FPlatformerPlayerData> PlayerRankingArrays;
 	
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
+	TMap<int32, FPlatformerPlayerData> PlayerNoGoalArrays;
+	
+	/* 게임 진행시간 */
 	UPROPERTY(EditAnywhere, Category = "PlatformerData")
 	float PlatformerPlayTime = 30.f;
-	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBaseCharacter*> PlayerRankingArrays;
-	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBaseCharacter*> PlayerGoalInArrays;
-	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<float> PlayerMaxDistances;
-	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TMap<FName, ADDBasePlayerController*> PlayerDatas;
 	
 	/* 게임스테이트 변수 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
@@ -105,5 +113,9 @@ private:
 	/* 게임중인 플레이어 관련 변수 */
 	FVector StartLocation;
 	int32 Rank = 1;
-	int32 MaxPlayer = 4;
+	int32 MaxPlayer = 2;
+	
+	/* 테스트용 임시변수 */
+	int32 PlayerIndex = 1;
+	
 };

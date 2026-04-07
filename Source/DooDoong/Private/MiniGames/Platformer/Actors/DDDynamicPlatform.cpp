@@ -50,7 +50,6 @@ void ADDDynamicPlatform::BeginPlay()
 
 void ADDDynamicPlatform::MovingPlatform()
 {
-	UE_LOG(LogPMJ, Log, TEXT("MovingPlatform"))
 	FVector CurrentLocation = GetActorLocation();
 	CurrentLocation += MoveDirection * PlatformVelocity * TimerRate;
 	SetActorLocation(CurrentLocation);

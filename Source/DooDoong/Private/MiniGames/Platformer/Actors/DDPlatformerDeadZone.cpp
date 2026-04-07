@@ -1,6 +1,9 @@
 ﻿#include "MiniGames/Platformer/Actors/DDPlatformerDeadZone.h"
 
+#include "Base/Player/DDBasePlayerState.h"
+#include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
 #include "Components/BoxComponent.h"
+#include "Interfaces/IPluginManager.h"
 
 ADDPlatformerDeadZone::ADDPlatformerDeadZone()
 {
@@ -17,8 +20,6 @@ ADDPlatformerDeadZone::ADDPlatformerDeadZone()
 void ADDPlatformerDeadZone::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	StartLocation = FVector(0.0f, 0.0f, 0.0f);
 }
 
 void ADDPlatformerDeadZone::OnComponentBeginOverlap(
@@ -35,8 +36,25 @@ void ADDPlatformerDeadZone::OnComponentBeginOverlap(
 		return;
 	}
 	
-	OtherActor->SetActorLocation(StartLocation);
-	
+	APawn* OverlapPawn = Cast<APawn>(OtherActor);
+	if (IsValid(OverlapPawn) == true)
+	{
+		ADDBasePlayerState* DDPlayerState = OverlapPawn->GetPlayerState<ADDBasePlayerState>();
+		if (DDPlayerState != nullptr)
+		{
+			ADDPlatformerGameMode* CurrentGameMode = Cast<ADDPlatformerGameMode>(GetWorld()->GetAuthGameMode());
+			if (IsValid(CurrentGameMode) == true)
+			{
+				for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : CurrentGameMode->PlayerDatas)
+				{
+					if (DDPlayerState->PlayerGameData.SlotIndex == EnteredPlayer.Value.PlayerSlotIndex)
+					{
+						OtherActor->SetActorLocation(EnteredPlayer.Value.SavePointLocation);
+					}
+				}
+			}
+		}
+	}
 }
 
 

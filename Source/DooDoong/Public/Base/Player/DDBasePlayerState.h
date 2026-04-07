@@ -24,7 +24,10 @@ struct FPlayerGameplayInfo
     FLinearColor PlayerColor; 
 
     UPROPERTY()
-    FString PlayerDisplayName;
+    FString PlayerNickName;
+	
+    UPROPERTY()
+	bool bIsReady = false;
 };
 
 UCLASS()
@@ -76,4 +79,8 @@ public:
     /** 선착순 4인에 포함된 게임 참여자(true)인지 관전자(false)인지 식별 */
     UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
     bool bIsParticipant = false;
+	
+	/* 플레이어 정보 구조체 */
+	UPROPERTY(BlueprintReadOnly)
+	FPlayerGameplayInfo PlayerGameData;
 };

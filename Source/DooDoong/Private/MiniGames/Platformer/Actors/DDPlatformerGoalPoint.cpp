@@ -3,9 +3,6 @@
 
 #include "MiniGames/Platformer/Actors/DDPlatformerGoalPoint.h"
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
-#include "Base/Character/DDBaseCharacter.h"
-#include "Base/Player/DDBasePlayerController.h"
-#include "Base/Player/DDBasePlayerState.h"
 #include "Common/DDLogManager.h"
 #include "Components/BoxComponent.h"
 
@@ -59,7 +56,6 @@ void ADDPlatformerGoalPoint::OnComponentBeginOverlap(
 		if (PlatformerGameModeBase != nullptr)
 		{
 			PlatformerGameModeBase->CheckGoalPlayerCharacter(OtherActor);
-			//TODO_@Minjae : 점수전달 로직 구현
 			UE_LOG(LogPMJ, Log, TEXT("점수 전달!"));
 		}
 	}
