@@ -15,14 +15,6 @@ class DOODOONG_API UGA_Attack : public UGameplayAbility
 public:
 	UGA_Attack(); 
 	
-	virtual bool CanActivateAbility(
-		const FGameplayAbilitySpecHandle Handle, 
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayTagContainer* SourceTags = nullptr, 
-		const FGameplayTagContainer* TargetTags = nullptr, 
-		FGameplayTagContainer* OptionalRelevantTags = nullptr
-	) const override;
-	
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -49,7 +41,9 @@ protected:
 	
 	void PerformTrace();
 	
-	void ApplyEffectsToTarget(AActor* TargetActor); 
+	bool TryApplyDamageToActor(AActor* HitActor);
+	
+	void ApplyDamageToActor(AActor* TargetActor); 
 	
 	void LaunchTarget(AActor* TargetActor, float Strength);
 
