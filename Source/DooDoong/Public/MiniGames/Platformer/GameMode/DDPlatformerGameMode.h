@@ -6,8 +6,8 @@
 #include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "DDPlatformerGameMode.generated.h"
 
-class ADDPlatformerPlayerController;
 class ADDPlatformerGameState;
+class ADDBasePlayerState;
 class ADDBasePlayerController;
 class ADDBaseCharacter;
 class UInputMappingContext;
@@ -21,12 +21,30 @@ USTRUCT(BlueprintType)
 struct FPlatformerPlayerData
 {
 	GENERATED_BODY()
+	/*BasePlayerState에서 넘겨받을 정보*/
+	UPROPERTY()
+	FLinearColor PlayerColor; 
+
+	UPROPERTY()
+	FString PlayerDisplayName;
 	
+	UPROPERTY()
+	int32 PlayerSlotIndex;
+	
+	/* 미니게임 에서 필요한 추가 정보 */
+	UPROPERTY()
 	TWeakObjectPtr<ADDBasePlayerController> PlayerController;
 	
+	UPROPERTY()
+	TWeakObjectPtr<ADDBasePlayerState> PlayerState;
+	
+	UPROPERTY()
 	float PlayerMaxDistance;
 	
+	UPROPERTY()
 	int32 PlayerRank;
+	
+	
 };
 
 UCLASS()
@@ -60,9 +78,11 @@ public:
 	void GameEnd();
 	
 	/* 구조체 정보전달 함수 */
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* PlatformerEnteredPlayer) override;
 	
 public:
-	TMap<FName, FPlatformerPlayerData> PlayerData;
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
+	TMap<int32, FPlatformerPlayerData> PlayerDatas;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
@@ -89,8 +109,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
 	TArray<float> PlayerMaxDistances;
 	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TMap<FName, ADDBasePlayerController*> PlayerDatas;
+	/*UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
+	TMap<FName, ADDBasePlayerController*> PlayerDatas;*/
 	
 	/* 게임스테이트 변수 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
@@ -105,5 +125,6 @@ private:
 	/* 게임중인 플레이어 관련 변수 */
 	FVector StartLocation;
 	int32 Rank = 1;
+	int32 PlayerIndex = 1;
 	int32 MaxPlayer = 4;
 };

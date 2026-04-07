@@ -8,6 +8,7 @@
 #include "Base/Character/DDBaseCharacter.h"
 #include "System/DDGameplayTags.h"
 #include "Common/DDLogManager.h"
+#include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 
 void ADDPlatformerGameMode::OnPostLogin(AController* NewPlayer)
@@ -27,17 +28,39 @@ void ADDPlatformerGameMode::OnPostLogin(AController* NewPlayer)
 	}
 }
 
+void ADDPlatformerGameMode::HandleStartingNewPlayer_Implementation(APlayerController* PlatformerEnteredPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(PlatformerEnteredPlayer);
+	
+	ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlatformerEnteredPlayer);
+	if (IsValid(BasePlayerController) == true)
+	{
+		ADDBasePlayerState* BasePlayerState = BasePlayerController->GetPlayerState<ADDBasePlayerState>();
+		if (IsValid(BasePlayerState) == true)
+		{
+			//플레이어 게임설명UI창 열어주기
+			//PlatformerEnteredPlayer->OpenReadyUI();
+			FPlatformerPlayerData PlayerData;
+			PlayerData.PlayerController = BasePlayerController;
+			PlayerData.PlayerState = BasePlayerState;
+			PlayerData.PlayerMaxDistance = 0;
+			PlayerData.PlayerRank = -1;
+			PlayerData.PlayerSlotIndex = BasePlayerState->PlayerGameData.SlotIndex;
+			PlayerData.PlayerDisplayName = BasePlayerState->PlayerGameData.PlayerNickName;
+			PlayerData.PlayerColor = BasePlayerState->PlayerGameData.PlayerColor;
+			LOG_PMJ(Warning, TEXT("PlayerSlotIndex : %d"), PlayerData.PlayerSlotIndex);
+			PlayerDatas.Add(PlayerData.PlayerSlotIndex, PlayerData);
+		}
+	}
+	
+}
+
 void ADDPlatformerGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogPMJ, Log, TEXT("BeginPlayServer"));
-	
-	//TODO_@Minjae : 미니게임의 BeginPlay 가 호출되면 각 클라PC에게 미니게임 대기 UI창 띄우라고 전달
-	//PlayerData["Player1"].PlayerController->OpenReadyUI();
-	/*for (const TPair<FName, FPlatformerPlayerData>& ServerData : PlayerData)
-	{
-		ServerData.Value.PlayerController->OpenReadyUI();
-	}*/
+	LOG_PMJ(Warning, TEXT("BeginPlayServer"));
+	/* 게임모드 일시정지 */
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 	
 	/* 시작지점 초기화 각 캐릭터가 시작지점을 기준으로 얼마나 멀리갔는지 최고기록 체크를위함 */
 	StartLocation = FVector(0.0f, 0.0f, 0.0f);
@@ -58,6 +81,8 @@ void ADDPlatformerGameMode::BeginPlay()
 void ADDPlatformerGameMode::GameStart()
 {
 	UE_LOG(LogPMJ, Log, TEXT("GameStart"));
+	/* 게임모드일시정지 해제*/
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
 	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Playing);
 	GetWorldTimerManager().ClearTimer(FinishedWaitingTimerHandle);
 	GetWorldTimerManager().SetTimer(
@@ -168,6 +193,7 @@ void ADDPlatformerGameMode::PlayerRanking()
 void ADDPlatformerGameMode::WaitingTimerStart()
 {
 	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
+	
 	UE_LOG(LogPMJ, Log, TEXT("WaitingTimerStart"));
 	
 	GetWorldTimerManager().SetTimer(
@@ -185,10 +211,14 @@ void ADDPlatformerGameMode::CheckReadyPlayers()
 	//플레이어쪽에서 대기화면이 나타났을때 준비완료 버튼을 누를때마다 이벤트 함수 호출
 	//그때마다 준비상태를 확인하고 4명이 준비완료되었을경우 게임 시작
 	
-	
 	/*if (AllPlayerControllers.IsEmpty() == true)
 	{
 		return;
+	}
+	
+	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
+	{
+		
 	}
 	
 	if (AllPlayerControllers[0]->bIsReady == true && 
@@ -218,3 +248,4 @@ void ADDPlatformerGameMode::GetPlayerSlotIndex()
 	}*/
 	
 }
+
