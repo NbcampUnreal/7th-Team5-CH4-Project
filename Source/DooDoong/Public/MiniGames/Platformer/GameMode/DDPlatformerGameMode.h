@@ -7,7 +7,6 @@
 class ADDPlatformerGameState;
 class ADDBasePlayerState;
 class ADDBasePlayerController;
-class ADDBaseCharacter;
 class UInputMappingContext;
 class UDDInputConfig;
 
@@ -37,10 +36,10 @@ struct FPlatformerPlayerData
 	TWeakObjectPtr<ADDBasePlayerState> PlayerState;
 	
 	UPROPERTY()
-	float PlayerMaxDistance;
+	float PlayerMaxDistance = 0.f;
 	
 	UPROPERTY()
-	int32 PlayerRank;
+	int32 PlayerRank = -1;
 	
 	UPROPERTY()
 	bool bIsGoalIn = false;
@@ -52,15 +51,11 @@ class DOODOONG_API ADDPlatformerGameMode : public ADDMiniGameModeBase
 {
 	GENERATED_BODY()
 public:
-	virtual void OnPostLogin(AController* NewPlayer) override;
-	
 	virtual void BeginPlay() override;
 	
 public:
 	/*플레이어 준비완료 체크*/
 	void CheckReadyPlayers();
-	
-	void GetPlayerSlotIndex();
 	
 	/*대기시간 타이머 호출 함수*/
 	void WaitingTimerStart();
@@ -79,11 +74,7 @@ public:
 	
 	/* 구조체 정보전달 함수 */
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* PlatformerEnteredPlayer) override;
-	
-public:
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TMap<int32, FPlatformerPlayerData> PlayerDatas;
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
 	TObjectPtr<UDDInputConfig> PlatformerInputConfig;
@@ -91,26 +82,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
 	TObjectPtr<UInputMappingContext> PlatformerIMC;
 	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBasePlayerController*> AllPlayerControllers;
+	/* 참가한 플레이어 관련 정보 */
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
+	TMap<int32, FPlatformerPlayerData> PlayerDatas;
 	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBaseCharacter*> AllPlayerCharacters;
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
+	TMap<int32, FPlatformerPlayerData> PlayerRankingArrays;
 	
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
+	TMap<int32, FPlatformerPlayerData> PlayerNoGoalArrays;
+	
+	/* 게임 진행시간 */
 	UPROPERTY(EditAnywhere, Category = "PlatformerData")
 	float PlatformerPlayTime = 30.f;
-	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<TWeakObjectPtr<ADDBasePlayerController>> PlayerRankingArrays;
-	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBaseCharacter*> PlayerGoalInArrays;
-	
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<float> PlayerMaxDistances;
-	
-	/*UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TMap<FName, ADDBasePlayerController*> PlayerDatas;*/
 	
 	/* 게임스테이트 변수 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
@@ -125,7 +109,7 @@ private:
 	/* 게임중인 플레이어 관련 변수 */
 	FVector StartLocation;
 	int32 Rank = 1;
-	int32 MaxPlayer = 4;
+	int32 MaxPlayer = 2;
 	
 	/* 테스트용 임시변수 */
 	int32 PlayerIndex = 1;

@@ -5,25 +5,6 @@
 #include "Base/Character/DDBaseCharacter.h"
 #include "System/DDGameplayTags.h"
 #include "Common/DDLogManager.h"
-#include "Kismet/GameplayStatics.h"
-#include "EngineUtils.h"
-
-void ADDPlatformerGameMode::OnPostLogin(AController* NewPlayer)
-{
-	Super::OnPostLogin(NewPlayer);
-	/* 캐릭터 고유 ID 생길경우 TMap 으로 리펙토링 예정 */
-	ADDBasePlayerController* PlayerController = Cast<ADDBasePlayerController>(NewPlayer);
-	if (IsValid(PlayerController) == true)
-	{
-		AllPlayerControllers.Add(PlayerController);
-		ADDBaseCharacter* PlayerCharacter = Cast<ADDBaseCharacter>(PlayerController->GetPawn());
-		if (IsValid(PlayerCharacter) == true)
-		{
-			AllPlayerCharacters.Add(PlayerCharacter);
-		}
-		//TODO_@Minjae : Setter 함수 완성되면 DA랑 IMC 넘겨주기
-	}
-}
 
 void ADDPlatformerGameMode::HandleStartingNewPlayer_Implementation(APlayerController* PlatformerEnteredPlayer)
 {
@@ -35,6 +16,8 @@ void ADDPlatformerGameMode::HandleStartingNewPlayer_Implementation(APlayerContro
 		ADDBasePlayerState* BasePlayerState = BasePlayerController->GetPlayerState<ADDBasePlayerState>();
 		if (IsValid(BasePlayerState) == true)
 		{
+			BasePlayerState->PlayerGameData.SlotIndex = PlayerIndex;
+			PlayerIndex++;
 			//플레이어 게임설명UI창 열어주기
 			//PlatformerEnteredPlayer->OpenReadyUI();
 			FPlatformerPlayerData PlayerData;
@@ -60,10 +43,6 @@ void ADDPlatformerGameMode::BeginPlay()
 	
 	/* 시작지점 초기화 각 캐릭터가 시작지점을 기준으로 얼마나 멀리갔는지 최고기록 체크를위함 */
 	StartLocation = FVector(0.0f, 0.0f, 0.0f);
-	for (int i = 0; i < AllPlayerCharacters.Num(); i++)
-	{
-		PlayerMaxDistances[i] = 0.0f;
-	}
 	
 	AGameStateBase* GameStateBase = Cast<AGameStateBase>(GetWorld()->GetGameState());
 	if (IsValid(GameStateBase) == true)
@@ -78,7 +57,7 @@ void ADDPlatformerGameMode::GameStart()
 {
 	UE_LOG(LogPMJ, Log, TEXT("GameStart"));
 	/* 게임모드일시정지 해제*/
-	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	//UGameplayStatics::SetGamePaused(GetWorld(), false);
 	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Playing);
 	GetWorldTimerManager().ClearTimer(FinishedWaitingTimerHandle);
 	GetWorldTimerManager().SetTimer(
@@ -104,6 +83,14 @@ void ADDPlatformerGameMode::GameEnd()
 	GetWorldTimerManager().ClearTimer(DistanceTimerHandle);
 	//TODO_@Minjae : 점수 계산해서 넘겨주는 로직 구현
 	
+	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
+	{
+		if (EnteredPlayer.Value.bIsGoalIn == false)
+		{
+			PlayerNoGoalArrays.Add(EnteredPlayer);
+		}
+	}
+	
 	PlayerRanking();
 	
 }
@@ -112,12 +99,13 @@ void ADDPlatformerGameMode::PlayGameTimer()
 {
 	UE_LOG(LogPMJ, Log, TEXT("PlayGameTimer"));
 	/* 게임플레이 타이머함수가 호출될때마다 각 플레이어의 최고 거리를 기록 */
-	for (int i = 0; i < AllPlayerCharacters.Num(); i++)
+	for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
 	{
-		float CurrentPlayerDistance = FVector::Dist(StartLocation, AllPlayerCharacters[i]->GetActorLocation());
-		if (PlayerMaxDistances[i] < CurrentPlayerDistance)
+		FVector PlayerLocation = EnteredPlayer.Value.PlayerController->GetCharacter()->GetActorLocation();
+		float CurrentPlayerDistance = FVector::Dist(StartLocation, PlayerLocation);
+		if (EnteredPlayer.Value.PlayerMaxDistance < CurrentPlayerDistance)
 		{
-			PlayerMaxDistances[i] = CurrentPlayerDistance;
+			EnteredPlayer.Value.PlayerMaxDistance = CurrentPlayerDistance;
 		}
 	}
 }
@@ -128,27 +116,34 @@ void ADDPlatformerGameMode::CheckGoalPlayerCharacter(AActor* GoalActor)
 	APawn* PlayerPawn = Cast<APawn>(GoalActor);
 	if (IsValid(PlayerPawn) == true)
 	{
+		/* 캐릭터 캐스팅 */
 		ADDBaseCharacter* PlayerCharacter = Cast<ADDBaseCharacter>(PlayerPawn);
 		if (IsValid(PlayerCharacter) == true)
 		{
+			/* 컨트롤러 캐스팅 */
 			ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlayerCharacter->GetController());
 			if (IsValid(BasePlayerController) == true)
 			{
-				 /* TODO_@Minjae : 플레이어 구조체 접근해서 slotindex 로 골인한 플레이어 찾아서 순위 매기기 */
+				/* 플레이어 스테이트 캐스팅 */
 				ADDBasePlayerState* BasePlayerState = BasePlayerController->GetPlayerState<ADDBasePlayerState>();
 				if (IsValid(BasePlayerState) == true)
 				{
+					/* 입장한 플레이어 순회 */
 					for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
 					{
+						/* 골인한 플레이어 를 찾았다면 */
 						if (EnteredPlayer.Value.PlayerSlotIndex == BasePlayerState->PlayerGameData.SlotIndex)
 						{
+							/* 골인 안한 상태라면 */
 							if (EnteredPlayer.Value.bIsGoalIn == false)
 							{
+								/* 순위 지정하고 다음순위 수정 */
 								EnteredPlayer.Value.PlayerRank = Rank;
 								LOG_PMJ(Warning, TEXT("PlayerRank : %d"), EnteredPlayer.Value.PlayerRank);
 								Rank++;
 								EnteredPlayer.Value.bIsGoalIn = true;
-								PlayerRankingArrays.Add(EnteredPlayer.Value.PlayerController);
+								/* 랭킹배열에 넣고 */
+								PlayerRankingArrays.Add(EnteredPlayer);
 							}
 							else
 							{
@@ -165,32 +160,31 @@ void ADDPlatformerGameMode::CheckGoalPlayerCharacter(AActor* GoalActor)
 void ADDPlatformerGameMode::PlayerRanking()
 {
 	UE_LOG(LogPMJ, Log, TEXT("PlayerRanking"));
-	
-	
-	if (PlayerRankingArrays.Num() != AllPlayerControllers.Num())
+	/* 랭킹배열 돌았는데 인원이 맞지 않고 */
+	if (PlayerRankingArrays.Num() != MaxPlayer)
 	{
-		int32 Index = AllPlayerCharacters.Num();
-		for (int i = 0; i < Index; i++)
+		/* 점수산정해야하는 플레이어가 비어있지않다면 */
+		if (PlayerNoGoalArrays.IsEmpty() == false)
 		{
-			float MaxValue = PlayerMaxDistances[i];
-			for (int j = 0; j < PlayerMaxDistances.Num(); j++)
+			/* 골인 못한 플레이어들 최대 이동거리별로 정렬 */
+			PlayerNoGoalArrays.ValueSort([](
+			const FPlatformerPlayerData& A,const FPlatformerPlayerData& B)
 			{
-				if (MaxValue < PlayerMaxDistances[j])
-				{
-					MaxValue = PlayerMaxDistances[j];
-				}
-			}
+				return A.PlayerMaxDistance > B.PlayerMaxDistance;
+			});
 			
-			for (int j = 0; j < PlayerMaxDistances.Num(); j++)
+			/* 정렬된 순서대로 높은 등수 부여 */
+			for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerNoGoalArrays)
 			{
-				if (MaxValue == PlayerMaxDistances[j])
-				{
-					PlayerRankingArrays.Add(AllPlayerCharacters[j]);
-					AllPlayerCharacters.RemoveAt(j);
-					PlayerMaxDistances.RemoveAt(j);
-				}
+				EnteredPlayer.Value.PlayerRank = Rank;
+				Rank++;
+				PlayerRankingArrays.Add(EnteredPlayer);
 			}
 		}
+	}
+	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerRankingArrays)
+	{
+		LOG_PMJ(Warning, TEXT("PlayerID : %d PlayerRank : %d"), EnteredPlayer.Value.PlayerSlotIndex, EnteredPlayer.Value.PlayerRank);
 	}
 	
 	//TODO_@Minjae : AddScore 로직 필요
@@ -207,8 +201,7 @@ void ADDPlatformerGameMode::WaitingTimerStart()
 	this,
 	&ADDPlatformerGameMode::GameStart,
 	10.f,
-	false,
-	10.f);
+	false);
 }
 
 void ADDPlatformerGameMode::CheckReadyPlayers()
@@ -233,24 +226,6 @@ void ADDPlatformerGameMode::CheckReadyPlayers()
 		AllPlayerControllers[3]->bIsReady == true )
 	{
 		WaitingTimerStart();
-	}*/
-	
-}
-
-void ADDPlatformerGameMode::GetPlayerSlotIndex()
-{
-	/*for (TActorIterator<ADDBasePlayerController> It(GetWorld()); It; ++It)
-	{
-		UE_LOG(LogPMJ, Log, TEXT("ActorIterator"));
-		ADDBasePlayerController* PlayerController = Cast<ADDBasePlayerController>(*It);
-		if (IsValid(PlayerController) == true)
-		{
-			/* PlayerState구조체 접근해서 SlotIndex 가져오기 #1#
-			int32 SlotIndex = PlayerInfo.SlotIndex;
-			FName PlayerName(FString::Printf(TEXT("Player%d"), SlotIndex));
-			PlayerDatas.Add(FName(PlayerName), PlayerController);
-			UE_LOG(LogPMJ, Log, TEXT("Player slotindex: %d"), SlotIndex);
-		}
 	}*/
 	
 }
