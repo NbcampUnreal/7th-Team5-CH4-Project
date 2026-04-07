@@ -104,37 +104,6 @@ void ADDGameModeBase::GenericPlayerInitialization(AController* C)
 		UE_LOG(LogCJH, Log, TEXT("[GenericPlayerInitialization] 참여자 접속. 현재 접속 수: %d"), AlivePlayerControllers.Num());
 	}
 	
-	LOG_CYS(Warning, TEXT("[TestGM] PostLogin"));
-
-	// TileManager 찾기
-	ADDTileManager* TM = nullptr;
-	for (TActorIterator<ADDTileManager> It(GetWorld()); It; ++It)
-	{
-		TM = *It;
-		break;
-	}
-
-	if (!TM) return;
-
-	// 타일 초기화 (한 번만)
-	// if (!TM->bIsReady)
-	// {
-		TM->InitializeTiles();
-	// }
-
-	// PlayerState 초기화
-	ADDBasePlayerState* PS = PlayerController->GetPlayerState<ADDBasePlayerState>();
-	if (PS)
-	{
-		PS->InitTile();
-	}
-
-	// Pawn 아직 없을 수도 있음 → RestartPlayer 이후라서 보통 있음
-	ADDBoardGameCharacter* Char = Cast<ADDBoardGameCharacter>(PlayerController->GetPawn());
-	if (Char)
-	{
-		Char->InitLocation();
-	}
 }
 
 void ADDGameModeBase::OnMainTimerElapsed()
@@ -233,6 +202,48 @@ void ADDGameModeBase::SetMatchState(FGameplayTag NewStateTag)
 	// 각 상태에 따른 게임 루프 실행
 	if (NewStateTag == DDGameplayTags::State_BoardGame_Init)
 	{
+		
+		LOG_CYS(Warning, TEXT("[GM] 보드게임 전체 초기화 시작"));
+
+		// 1️⃣ TileManager 초기화 (1번만)
+		ADDTileManager* TM = nullptr;
+		for (TActorIterator<ADDTileManager> It(GetWorld()); It; ++It)
+		{
+			TM = *It;
+			break;
+		}
+
+		if (TM)
+		{
+			TM->InitializeTiles();
+		}
+
+		// 2️⃣ PlayerState InitTile
+		for (APlayerController* PC : AlivePlayerControllers)
+		{
+			if (auto PS = PC->GetPlayerState<ADDBasePlayerState>())
+			{
+				PS->InitTile();
+			}
+		}
+
+		// 3️⃣ Character InitLocation
+		for (APlayerController* PC : AlivePlayerControllers)
+		{
+			// 혹시 모를 안전장치
+			if (!PC->GetPawn())
+			{
+				RestartPlayer(PC);
+			}
+
+			if (auto Char = Cast<ADDBoardGameCharacter>(PC->GetPawn()))
+			{
+				Char->InitLocation();
+			}
+		}
+
+		LOG_CYS(Warning, TEXT("[GM] 보드게임 전체 초기화 완료"));
+
 		CheckWinCondition();
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
