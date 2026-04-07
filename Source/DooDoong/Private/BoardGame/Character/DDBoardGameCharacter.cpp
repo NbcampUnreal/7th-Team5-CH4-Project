@@ -1,6 +1,7 @@
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 
 #include "Base/Player/DDBasePlayerState.h"
+#include "BoardGame/DDDiceActor.h"
 #include "BoardGame/DDTile.h"
 #include "Common/DDLogManager.h"
 
@@ -67,5 +68,46 @@ void ADDBoardGameCharacter::UpdateMove()
 		GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
 
 		OnMoveFinished.Broadcast(); // 이동 완료 태스크에 알림
+	}
+}
+
+void ADDBoardGameCharacter::Multicast_PlayDiceAnimation_Implementation(int32 DiceValue)
+{
+	if (!DiceMontage)
+	{
+		LOG_CYS(Error, TEXT("DiceMontage is NULL"));
+		return;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(DiceMontage);
+	}
+
+	// 🎲 Dice 스폰
+	if (!DiceClass)
+	{
+		LOG_CYS(Error, TEXT("DiceClass is NULL"));
+		return;
+	}
+
+	FVector Loc = GetMesh()->GetSocketLocation(TEXT("head"));
+	Loc.Z+=70;
+	Dice = GetWorld()->SpawnActor<ADDDiceActor>(
+		DiceClass,
+		Loc,
+		FRotator::ZeroRotator
+	);
+
+	if (Dice)
+	{
+		Dice->AttachToComponent(
+			GetMesh(),
+			FAttachmentTransformRules::KeepWorldTransform,
+			TEXT("head")
+		);
+
+		Dice->StartRoll(DiceValue);
 	}
 }

@@ -6,7 +6,7 @@
 
 class UDDBoardGameAttributeSet;
 class UDDHealthSet;
-
+class ADDDiceActor;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMoveFinished);
  
 
@@ -27,12 +27,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateMove();
 	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayDiceAnimation(int32 DiceValue);
+	
 	UPROPERTY()
 	FTimerHandle MoveTimerHandle;
 	
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY()
 	FOnMoveFinished OnMoveFinished;
 
+	UPROPERTY(EditAnywhere, Category="Dice")
+	UAnimMontage* DiceMontage;
 private:
 	FVector MoveStartLocation;
 	FVector MoveTargetLocation;
@@ -42,6 +47,10 @@ private:
 
 	bool bIsMoving = false;
 	
+	UPROPERTY(EditAnywhere, Category="Dice")
+	TSubclassOf<class ADDDiceActor> DiceClass;
+	
+	ADDDiceActor* Dice;
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attribute", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDDHealthSet> AttributeSet;
