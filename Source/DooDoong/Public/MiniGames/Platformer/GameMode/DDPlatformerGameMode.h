@@ -72,10 +72,10 @@ public:
 	/* 대기시간 타이머 종료 게임시작 */
 	void GameStart();
 	
-	void GameEnd();
+	void GameEnd();	
 	
-	/* 구조체 정보전달 함수 */
-	virtual void HandleStartingNewPlayer_Implementation(APlayerController* PlatformerEnteredPlayer) override;
+	/* 초기화 함수 */
+	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
 public:
 	/* 참가한 플레이어 관련 정보 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")

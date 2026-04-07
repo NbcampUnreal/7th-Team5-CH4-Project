@@ -6,14 +6,15 @@
 #include "System/DDGameplayTags.h"
 #include "Common/DDLogManager.h"
 
-void ADDPlatformerGameMode::HandleStartingNewPlayer_Implementation(APlayerController* PlatformerEnteredPlayer)
+void ADDPlatformerGameMode::HandleSeamlessTravelPlayer(AController*& C)
 {
-	Super::HandleStartingNewPlayer_Implementation(PlatformerEnteredPlayer);
+	Super::HandleSeamlessTravelPlayer(C);
 	
-	ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlatformerEnteredPlayer);
+	LOG_PMJ(Warning, TEXT("HandleSeamlessTravel"));
+	ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(C);
 	if (IsValid(BasePlayerController) == true)
 	{
-		ADDBasePlayerState* BasePlayerState = BasePlayerController->GetPlayerState<ADDBasePlayerState>();
+		ADDBasePlayerState* BasePlayerState = C->GetPlayerState<ADDBasePlayerState>();
 		if (IsValid(BasePlayerState) == true)
 		{
 			BasePlayerState->PlayerGameData.SlotIndex = PlayerIndex;
@@ -117,40 +118,30 @@ void ADDPlatformerGameMode::CheckGoalPlayerCharacter(AActor* GoalActor)
 	APawn* PlayerPawn = Cast<APawn>(GoalActor);
 	if (IsValid(PlayerPawn) == true)
 	{
-		/* 캐릭터 캐스팅 */
-		ADDBaseCharacter* PlayerCharacter = Cast<ADDBaseCharacter>(PlayerPawn);
-		if (IsValid(PlayerCharacter) == true)
+		/* 플레이어 스테이트 캐스팅 */
+		ADDBasePlayerState* BasePlayerState = PlayerPawn->GetPlayerState<ADDBasePlayerState>();
+		if (IsValid(BasePlayerState) == true)
 		{
-			/* 컨트롤러 캐스팅 */
-			ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlayerCharacter->GetController());
-			if (IsValid(BasePlayerController) == true)
+			/* 입장한 플레이어 순회 */
+			for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
 			{
-				/* 플레이어 스테이트 캐스팅 */
-				ADDBasePlayerState* BasePlayerState = BasePlayerController->GetPlayerState<ADDBasePlayerState>();
-				if (IsValid(BasePlayerState) == true)
+				/* 골인한 플레이어 를 찾았다면 */
+				if (EnteredPlayer.Value.PlayerSlotIndex == BasePlayerState->PlayerGameData.SlotIndex)
 				{
-					/* 입장한 플레이어 순회 */
-					for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
+					/* 골인 안한 상태라면 */
+					if (EnteredPlayer.Value.bIsGoalIn == false)
 					{
-						/* 골인한 플레이어 를 찾았다면 */
-						if (EnteredPlayer.Value.PlayerSlotIndex == BasePlayerState->PlayerGameData.SlotIndex)
-						{
-							/* 골인 안한 상태라면 */
-							if (EnteredPlayer.Value.bIsGoalIn == false)
-							{
-								/* 순위 지정하고 다음순위 수정 */
-								EnteredPlayer.Value.PlayerRank = Rank;
-								LOG_PMJ(Warning, TEXT("PlayerRank : %d"), EnteredPlayer.Value.PlayerRank);
-								Rank++;
-								EnteredPlayer.Value.bIsGoalIn = true;
-								/* 랭킹배열에 넣고 */
-								PlayerRankingArrays.Add(EnteredPlayer);
-							}
-							else
-							{
-								LOG_PMJ(Warning, TEXT("해당플레이어는 이미 %d등 입니다"), EnteredPlayer.Value.PlayerRank);
-							}
-						}
+						/* 순위 지정하고 다음순위 수정 */
+						EnteredPlayer.Value.PlayerRank = Rank;
+						LOG_PMJ(Warning, TEXT("PlayerRank : %d"), EnteredPlayer.Value.PlayerRank);
+						Rank++;
+						EnteredPlayer.Value.bIsGoalIn = true;
+						/* 랭킹배열에 넣고 */
+						PlayerRankingArrays.Add(EnteredPlayer);
+					}
+					else
+					{
+						LOG_PMJ(Warning, TEXT("해당플레이어는 이미 %d등 입니다"), EnteredPlayer.Value.PlayerRank);
 					}
 				}
 			}
