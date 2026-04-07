@@ -17,17 +17,17 @@ struct FPlayerGameplayInfo
 {
     GENERATED_BODY()
 
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     int32 SlotIndex = -1; 
 
-    UPROPERTY()
-    FLinearColor PlayerColor; 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    FLinearColor PlayerColor = FLinearColor::White; 
 
-    UPROPERTY()
-    FString PlayerNickName;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    FName PlayerDisplayName = FName("");
 	
-    UPROPERTY()
-	bool bIsReady = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bPlayerIsDead = false; 
 };
 
 UCLASS()
@@ -46,9 +46,13 @@ public:
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
     
+public:
     /** 심리스 트래블 시 새 맵의 PlayerState로 데이터를 인수인계 */
     virtual void CopyProperties(APlayerState* PlayerState) override;
-
+	
+	UFUNCTION()
+	void InitTile();
+	
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities", meta = (AllowPrivateAccess = true))
     TObjectPtr<UDDAbilitySystemComponent> AbilitySystemComponent;
@@ -68,9 +72,6 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FName StartTileName;
-	
-	UFUNCTION()
-	void InitTile();
 	
     /** 유저가 로비에서 설정한 닉네임 */
     UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
