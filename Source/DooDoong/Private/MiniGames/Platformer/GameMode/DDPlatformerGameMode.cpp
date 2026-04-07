@@ -28,7 +28,7 @@ void ADDPlatformerGameMode::HandleSeamlessTravelPlayer(AController*& C)
 			PlayerData.PlayerRank = -1;
 			PlayerData.SavePointLocation = FVector(0.f,0.f,0.f);
 			PlayerData.PlayerSlotIndex = BasePlayerState->PlayerGameData.SlotIndex;
-			PlayerData.PlayerDisplayName = BasePlayerState->PlayerGameData.PlayerNickName;
+			PlayerData.PlayerDisplayName = BasePlayerState->PlayerGameData.PlayerDisplayName.ToString();
 			PlayerData.PlayerColor = BasePlayerState->PlayerGameData.PlayerColor;
 			LOG_PMJ(Warning, TEXT("PlayerSlotIndex : %d"), PlayerData.PlayerSlotIndex);
 			PlayerDatas.Add(PlayerData.PlayerSlotIndex, PlayerData);
@@ -188,7 +188,7 @@ void ADDPlatformerGameMode::WaitingTimerStart()
 	
 	for (const TPair<int32 ,FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
 	{
-		EnteredPlayer.Value.PlayerState->PlayerGameData.bIsReady = false;
+		EnteredPlayer.Value.PlayerState->PlayerGameData.bPlayerIsDead = false;
 	}
 	
 	UE_LOG(LogPMJ, Log, TEXT("WaitingTimerStart"));
@@ -215,7 +215,7 @@ void ADDPlatformerGameMode::CheckReadyPlayers()
 	
 	for (const TPair<int32 ,FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
 	{
-		if (EnteredPlayer.Value.PlayerState->PlayerGameData.bIsReady == false)
+		if (EnteredPlayer.Value.PlayerState->PlayerGameData.bPlayerIsDead == false)
 		{
 			bIsAllReady = false;
 		}

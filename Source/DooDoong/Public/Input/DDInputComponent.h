@@ -1,5 +1,3 @@
-
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -46,7 +44,7 @@ public:
 		const UDDInputConfig* InputConfig,
 		UserClass* Object, 
 		PressedFuncType PressedFunc, 
-		ReleasedFuncType ReleasedFunc, 
+		ReleasedFuncType ReleasedFunc,
 		TArray<uint32>& BindHandles
 	);
 
@@ -65,23 +63,38 @@ void UDDInputComponent::BindNativeAction(const UDDInputConfig* InputConfig, cons
 }
 
 template <class UserClass, typename PressedFuncType, typename ReleasedFuncType>
-void UDDInputComponent::BindAbilityActions(const UDDInputConfig* InputConfig, UserClass* Object,
-	PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, TArray<uint32>& BindHandles)
+void UDDInputComponent::BindAbilityActions(
+	const UDDInputConfig* InputConfig, UserClass* Object,
+	PressedFuncType PressedFunc,
+	ReleasedFuncType ReleasedFunc, 
+	TArray<uint32>& BindHandles)
 {
 	check(InputConfig);
-
+	
 	for (const FDDInputAction& Action : InputConfig->AbilityInputActions)
 	{
 		if (Action.InputAction && Action.InputTag.IsValid())
 		{
 			if (PressedFunc)
 			{
-				BindHandles.Add(BindAction(Action.InputAction, ETriggerEvent::Triggered, Object, PressedFunc, Action.InputTag).GetHandle());
+				BindHandles.Add(BindAction(
+					Action.InputAction,
+					Action.PressedTriggerEvent,
+					Object,
+					PressedFunc, 
+					Action.InputTag
+				).GetHandle());
 			}
 			
 			if (ReleasedFunc)
 			{
-				BindHandles.Add(BindAction(Action.InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Action.InputTag).GetHandle());
+				BindHandles.Add(BindAction(
+					Action.InputAction, 
+					Action.ReleasedTriggerEvent,
+					Object,
+					ReleasedFunc,
+					Action.InputTag
+				).GetHandle());
 			}
 		}
 	}

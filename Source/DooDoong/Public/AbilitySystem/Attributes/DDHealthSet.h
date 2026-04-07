@@ -22,6 +22,7 @@ protected:
 	
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 public:
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth);

@@ -1,7 +1,5 @@
 ﻿#include "AbilitySystem/DDAbilitySystemComponent.h"
-
 #include "Data/DDAbilitySet.h"
-
 
 void UDDAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
 {
@@ -84,7 +82,10 @@ void UDDAbilitySystemComponent::GiveAbilities(UDDAbilitySet* DefaultAbilitySet)
 	
 	for (const auto& AbilityClass : DefaultAbilitySet->GrantedAbilities)
 	{
-		GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, -1)); 
-		UE_LOG(LogTemp, Warning, TEXT("Ability Granted: %s"), *AbilityClass->GetName());
+		if (!FindAbilitySpecFromClass(AbilityClass))
+		{
+			GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, -1)); 
+			UE_LOG(LogTemp, Warning, TEXT("Ability Granted: %s"), *AbilityClass->GetName());
+		}
 	}
 }

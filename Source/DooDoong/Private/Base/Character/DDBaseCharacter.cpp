@@ -1,8 +1,10 @@
 #include "Base/Character/DDBaseCharacter.h"
 #include "AbilitySystem/DDAbilitySystemComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 #include "AbilitySystem/Attributes/DDMovementSet.h"
+#include "Components/CapsuleComponent.h"
 
 ADDBaseCharacter::ADDBaseCharacter()
 {
@@ -42,6 +44,8 @@ void ADDBaseCharacter::PossessedBy(AController* NewController)
 	
 	InitializeAbilitySystem(); 
 	
+	BindAttributeDelegates();
+	
 	if (HasAuthority() && AbilitySystemComponent)
 	{
 		AbilitySystemComponent->GiveAbilities(DefaultAbilitySet);
@@ -53,6 +57,8 @@ void ADDBaseCharacter::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 	
 	InitializeAbilitySystem();
+	
+	BindAttributeDelegates();
 }
 
 void ADDBaseCharacter::InitializeAbilitySystem()
@@ -68,6 +74,83 @@ void ADDBaseCharacter::InitializeAbilitySystem()
 	
 	HealthSet = PS->GetHealthSet();
 	MovementSet = PS->GetMovementSet();
+}
+
+void ADDBaseCharacter::BindAttributeDelegates()
+{
+	if (!AbilitySystemComponent || !MovementSet) return;
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementSet->GetMoveSpeedAttribute()).RemoveAll(this);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementSet->GetJumpSpeedAttribute()).RemoveAll(this);
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementSet->GetMoveSpeedAttribute())
+	.AddUObject(this, &ThisClass::OnWalkSpeedChanged);
+	
+	FOnAttributeChangeData WalkSpeedData;
+	WalkSpeedData.NewValue = MovementSet->GetMoveSpeed();
+	WalkSpeedData.OldValue = MovementSet->GetMoveSpeed();
+    
+	OnWalkSpeedChanged(WalkSpeedData);
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementSet->GetJumpSpeedAttribute())
+	.AddUObject(this, &ThisClass::OnJumpSpeedChanged);
+	
+	FOnAttributeChangeData JumpSpeedData;
+	JumpSpeedData.NewValue = MovementSet->GetJumpSpeed();
+	JumpSpeedData.OldValue = MovementSet->GetJumpSpeed();
+	
+	OnJumpSpeedChanged(JumpSpeedData);
+	
+}
+
+void ADDBaseCharacter::OnWalkSpeedChanged(const FOnAttributeChangeData& Data) 
+{
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		MovementComponent->MaxWalkSpeed = Data.NewValue;
+	}
+}
+
+void ADDBaseCharacter::OnJumpSpeedChanged(const FOnAttributeChangeData& Data)
+{
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		MovementComponent->JumpZVelocity = Data.NewValue;
+	}
+}
+
+void ADDBaseCharacter::MultiCast_HandleRagDoll_Implementation()
+{
+	EnableRagDoll();
+}
+
+void ADDBaseCharacter::EnableRagDoll()
+{
+	UE_LOG(LogTemp,Warning,TEXT("Character RagDoll"));
+	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+	{
+		MovementComp->StopMovementImmediately();
+		MovementComp->DisableMovement();
+	}
+	
+	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
+	{
+		Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Capsule->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
+	
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		MeshComp->SetAnimInstanceClass(nullptr);
+		MeshComp->SetAnimationMode(EAnimationMode::AnimationCustomMode);
+		MeshComp->SetCollisionProfileName(TEXT("Ragdoll"));
+		MeshComp->SetAllBodiesSimulatePhysics(true);
+		MeshComp->SetSimulatePhysics(true);
+		
+		MeshComp->WakeAllRigidBodies();
+		
+		MeshComp->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		MeshComp->SetSimulatePhysics(true);
+	}
 }
 
 UDDHealthSet* ADDBaseCharacter::GetHealthSet() const

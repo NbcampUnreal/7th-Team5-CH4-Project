@@ -1,6 +1,9 @@
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 
+#include "GameplayEffectExtension.h"
+#include "Common/DDLogManager.h"
 #include "Net/UnrealNetwork.h"
+#include "System/DDGameplayTags.h"
 
 UDDHealthSet::UDDHealthSet()
 {
@@ -33,6 +36,38 @@ void UDDHealthSet::PreAttributeChange(const FGameplayAttribute& Attribute, float
 void UDDHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+}
+
+void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+	
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		// 1. Clamp 
+		const float NewHealth = FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth());
+		SetHealth(NewHealth);
+		LOG_KMS(Warning, TEXT("Health Changed : %f"), NewHealth);
+		
+		// 2. 캐릭터 사망 체크 
+		if (GetHealth() <= 0.f)
+		{
+			UAbilitySystemComponent* TargetASC = &Data.Target; 
+			if (TargetASC->AbilityActorInfo->IsNetAuthority())
+			{
+				FGameplayEventData Payload;
+				Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
+				Payload.Target = Data.Target.GetAvatarActor();
+				
+				// 3. 사망 이벤트 시작(GA_Death 호출) 
+				TargetASC->HandleGameplayEvent(DDGameplayTags::Event_Character_Death, &Payload);
+				LOG_KMS(Warning, TEXT("Character Death %s"), *TargetASC->GetAvatarActor()->GetName());
+			
+				TargetASC->AddLooseGameplayTag(DDGameplayTags::State_Character_Death);
+			}
+		}
+	}
+	
 }
 
 void UDDHealthSet::OnRep_Health(const FGameplayAttributeData& OldHealth)

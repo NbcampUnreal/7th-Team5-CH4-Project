@@ -7,6 +7,7 @@
 
 class APlayerController;
 class UAbilitySystemComponent;
+class UGameplayEffect; 
 
 UCLASS()
 class ADDGameModeBase : public AGameModeBase
@@ -58,6 +59,9 @@ protected:
     
     /** 모든 플레이어의 카메라를 특정 타겟으로 부드럽게 이동시킵니다. */
     void FocusAllCamerasOnTarget(AActor* TargetActor);
+    
+public: 
+    void HandleRespawn(AController* TargetController);
 
 protected:
     /** 본 게임에 참여 중인 플레이어 컨트롤러 목록 (관전자 제외, 턴 관리에 사용) */
@@ -91,10 +95,15 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameData")
     int32 MaxRound = 10;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Response")
+    TArray<TSubclassOf<UGameplayEffect>> ReSpawnEffectClasses;
+    
 private:
     /** 상태가 전환될 때 기존 규칙을 회수하기 위해 현재 적용 중인 태그들을 기억해두는 변수 */
     FGameplayTagContainer CurrentAppliedTags;
     
     /** 현재 턴을 진행 중인 플레이어에게 부여된 세부 페이즈 태그 (페이즈 종료 시 회수 목적) */
     FGameplayTag CurrentTurnPhaseTag;
+    
+   
 };

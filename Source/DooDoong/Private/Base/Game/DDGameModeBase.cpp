@@ -422,6 +422,45 @@ void ADDGameModeBase::FocusAllCamerasOnTarget(AActor* TargetActor)
 	UE_LOG(LogCJH, Log, TEXT("[Camera] 모든 플레이어의 화면이 주인공 타겟(%s)을 향합니다."), *TargetActor->GetName());
 }
 
+void ADDGameModeBase::HandleRespawn(AController* TargetController)
+{
+	if (TargetController)
+	{
+		// 1. 기존 캐릭터 제거  
+		if (APawn* OldPawn = TargetController->GetPawn())
+		{
+			OldPawn->Destroy();
+		}
+		
+		// 2. ASC 초기화
+		ADDBasePlayerState* PS = TargetController->GetPlayerState<ADDBasePlayerState>();
+		UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent(); 
+		
+		ASC->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(DDGameplayTags::State_Character_Death));
+		ASC->RemoveLooseGameplayTag(DDGameplayTags::State_Character_Death);
+		ASC->SetLooseGameplayTagCount(DDGameplayTags::State_Character_Death, 0);
+		
+		for (auto EffectClass : ReSpawnEffectClasses)
+		{
+			if (IsValid(EffectClass))
+			{
+				FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+				Context.AddSourceObject(ASC);
+				
+				FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(EffectClass, 1.f, Context);
+				if (SpecHandle.IsValid())
+				{
+					FActiveGameplayEffectHandle ActiveHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+				}
+			}
+		}
+		
+		// 3. 새로운 캐릭터 생성 및 할당 
+		RestartPlayer(TargetController);
+		LOG_KMS(Warning, TEXT("[GameMode] %s : ReSpawned."), *TargetController->GetPawn()->GetName());
+	}
+}
+
 void ADDGameModeBase::CalculateFinalWinner()
 {
 	UE_LOG(LogCJH, Warning, TEXT("🎊 [CalculateFinalWinner] 최종 승자 집계를 시작합니다..."));

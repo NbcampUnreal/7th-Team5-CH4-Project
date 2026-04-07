@@ -1,8 +1,7 @@
-
-
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EnhancedInputComponent.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
 #include "DDInputConfig.generated.h"
@@ -17,8 +16,13 @@ struct FDDInputAction
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (Category = "InputTag"))
 	FGameplayTag InputTag; 
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (Category = "InputTag"))
+	ETriggerEvent PressedTriggerEvent = ETriggerEvent::Triggered;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (Category = "InputTag"))
+	ETriggerEvent ReleasedTriggerEvent = ETriggerEvent::Completed;
 };
-
 
 UCLASS()
 class DOODOONG_API UDDInputConfig : public UDataAsset
@@ -34,7 +38,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Pawn")
 	const UInputAction* FindAbilityInputActionForTag(const FGameplayTag& InputTag, bool bLogNotFound = true) const;
 
-	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (TitleProperty = "InputAction"))
 	TArray<FDDInputAction> NativeInputActions;
@@ -42,5 +45,3 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (TitleProperty = "InputAction"))
 	TArray<FDDInputAction> AbilityInputActions;
 };
-
-
