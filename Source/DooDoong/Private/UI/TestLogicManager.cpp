@@ -64,3 +64,4 @@ TArray<FTestPlayerData> UTestLogicManager::GetSortedPlayers()
 
     return Sorted;
 }
+

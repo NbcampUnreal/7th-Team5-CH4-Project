@@ -25,3 +25,4 @@ public:
     UFUNCTION(BlueprintCallable)
     void SetText(const FString& InputText);
 };
+

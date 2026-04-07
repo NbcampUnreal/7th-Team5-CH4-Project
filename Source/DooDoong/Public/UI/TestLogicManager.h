@@ -44,3 +44,4 @@ public:
     UFUNCTION(BlueprintCallable)
     TArray<FTestPlayerData> GetSortedPlayers();
 };
+

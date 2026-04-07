@@ -29,3 +29,4 @@ void UColorTextWidget::SetText(const FString& InputText)
         }
     }
 }
+
