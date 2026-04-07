@@ -113,4 +113,5 @@ private:
 	
 	/* 테스트용 임시변수 */
 	int32 PlayerIndex = 1;
+	
 };

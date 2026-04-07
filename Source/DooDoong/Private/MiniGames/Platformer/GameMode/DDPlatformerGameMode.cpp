@@ -210,23 +210,23 @@ void ADDPlatformerGameMode::CheckReadyPlayers()
 	//플레이어쪽에서 대기화면이 나타났을때 준비완료 버튼을 누를때마다 이벤트 함수 호출
 	//그때마다 준비상태를 확인하고 4명이 준비완료되었을경우 게임 시작
 	
-	/*if (AllPlayerControllers.IsEmpty() == true)
+	if (PlayerDatas.IsEmpty() == true)
 	{
 		return;
 	}
+	bool bIsAllReady = true;
 	
-	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
+	for (const TPair<int32 ,FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
 	{
-		
+		if (EnteredPlayer.Value.PlayerState->PlayerGameData.bIsReady == false)
+		{
+			bIsAllReady = false;
+		}
 	}
 	
-	if (AllPlayerControllers[0]->bIsReady == true && 
-		AllPlayerControllers[1]->bIsReady == true &&
-		AllPlayerControllers[2]->bIsReady == true &&
-		AllPlayerControllers[3]->bIsReady == true )
+	if (bIsAllReady)
 	{
 		WaitingTimerStart();
-	}*/
-	
+	}
 }
 
