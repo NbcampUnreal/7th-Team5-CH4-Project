@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
+﻿#include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
 #include "MiniGames/Platformer/GameState/DDPlatformerGameState.h"
 #include "Base/Player/DDBasePlayerController.h"
 #include "Base/Player/DDBasePlayerState.h"
@@ -52,7 +49,6 @@ void ADDPlatformerGameMode::HandleStartingNewPlayer_Implementation(APlayerContro
 			PlayerDatas.Add(PlayerData.PlayerSlotIndex, PlayerData);
 		}
 	}
-	
 }
 
 void ADDPlatformerGameMode::BeginPlay()
@@ -60,7 +56,7 @@ void ADDPlatformerGameMode::BeginPlay()
 	Super::BeginPlay();
 	LOG_PMJ(Warning, TEXT("BeginPlayServer"));
 	/* 게임모드 일시정지 */
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
+	//UGameplayStatics::SetGamePaused(GetWorld(), true);
 	
 	/* 시작지점 초기화 각 캐릭터가 시작지점을 기준으로 얼마나 멀리갔는지 최고기록 체크를위함 */
 	StartLocation = FVector(0.0f, 0.0f, 0.0f);
@@ -135,20 +131,33 @@ void ADDPlatformerGameMode::CheckGoalPlayerCharacter(AActor* GoalActor)
 		ADDBaseCharacter* PlayerCharacter = Cast<ADDBaseCharacter>(PlayerPawn);
 		if (IsValid(PlayerCharacter) == true)
 		{
-			ADDBasePlayerController* PlayerController = Cast<ADDBasePlayerController>(PlayerCharacter->GetController());
-			if (IsValid(PlayerController) == true)
+			ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlayerCharacter->GetController());
+			if (IsValid(BasePlayerController) == true)
 			{
 				 /* TODO_@Minjae : 플레이어 구조체 접근해서 slotindex 로 골인한 플레이어 찾아서 순위 매기기 */
+				ADDBasePlayerState* BasePlayerState = BasePlayerController->GetPlayerState<ADDBasePlayerState>();
+				if (IsValid(BasePlayerState) == true)
+				{
+					for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
+					{
+						if (EnteredPlayer.Value.PlayerSlotIndex == BasePlayerState->PlayerGameData.SlotIndex)
+						{
+							if (EnteredPlayer.Value.bIsGoalIn == false)
+							{
+								EnteredPlayer.Value.PlayerRank = Rank;
+								LOG_PMJ(Warning, TEXT("PlayerRank : %d"), EnteredPlayer.Value.PlayerRank);
+								Rank++;
+								EnteredPlayer.Value.bIsGoalIn = true;
+								PlayerRankingArrays.Add(EnteredPlayer.Value.PlayerController);
+							}
+							else
+							{
+								LOG_PMJ(Warning, TEXT("해당플레이어는 이미 %d등 입니다"), EnteredPlayer.Value.PlayerRank);
+							}
+						}
+					}
+				}
 			}
-		}
-	}
-	for (int i = 0; i < AllPlayerCharacters.Num(); i++)
-	{
-		if (GoalActor->GetOwner() == AllPlayerCharacters[i])
-		{
-			PlayerGoalInArrays.Add(AllPlayerCharacters[i]);
-			AllPlayerCharacters.RemoveAt(i);
-			PlayerMaxDistances.Remove(i);
 		}
 	}
 }
@@ -156,10 +165,7 @@ void ADDPlatformerGameMode::CheckGoalPlayerCharacter(AActor* GoalActor)
 void ADDPlatformerGameMode::PlayerRanking()
 {
 	UE_LOG(LogPMJ, Log, TEXT("PlayerRanking"));
-	for (int i = 0; i < PlayerGoalInArrays.Num(); i++)
-	{
-		PlayerRankingArrays.Add(PlayerGoalInArrays[i]);
-	}
+	
 	
 	if (PlayerRankingArrays.Num() != AllPlayerControllers.Num())
 	{

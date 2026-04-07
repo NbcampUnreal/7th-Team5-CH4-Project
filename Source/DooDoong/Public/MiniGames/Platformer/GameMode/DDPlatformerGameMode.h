@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
@@ -44,6 +42,8 @@ struct FPlatformerPlayerData
 	UPROPERTY()
 	int32 PlayerRank;
 	
+	UPROPERTY()
+	bool bIsGoalIn = false;
 	
 };
 
@@ -101,7 +101,7 @@ protected:
 	float PlatformerPlayTime = 30.f;
 	
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
-	TArray<ADDBaseCharacter*> PlayerRankingArrays;
+	TArray<TWeakObjectPtr<ADDBasePlayerController>> PlayerRankingArrays;
 	
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
 	TArray<ADDBaseCharacter*> PlayerGoalInArrays;
@@ -125,6 +125,8 @@ private:
 	/* 게임중인 플레이어 관련 변수 */
 	FVector StartLocation;
 	int32 Rank = 1;
-	int32 PlayerIndex = 1;
 	int32 MaxPlayer = 4;
+	
+	/* 테스트용 임시변수 */
+	int32 PlayerIndex = 1;
 };
