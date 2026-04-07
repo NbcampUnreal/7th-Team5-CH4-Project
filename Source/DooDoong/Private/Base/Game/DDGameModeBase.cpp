@@ -422,6 +422,41 @@ void ADDGameModeBase::FocusAllCamerasOnTarget(AActor* TargetActor)
 	UE_LOG(LogCJH, Log, TEXT("[Camera] 모든 플레이어의 화면이 주인공 타겟(%s)을 향합니다."), *TargetActor->GetName());
 }
 
+void ADDGameModeBase::HandleRespawn(AController* TargetController)
+{
+	if (TargetController)
+	{
+		if (APawn* OldPawn = TargetController->GetPawn())
+		{
+			OldPawn->Destroy();
+		}
+		
+		ADDBasePlayerState* PS = TargetController->GetPlayerState<ADDBasePlayerState>();
+		UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent(); 
+		
+		ASC->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(DDGameplayTags::State_Character_Death));
+		ASC->SetTagMapCount(DDGameplayTags::State_Character_Death, 0);
+		
+		for (auto EffectClass : ReSpawnEffectClasses)
+		{
+			if (IsValid(EffectClass))
+			{
+				FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+				Context.AddSourceObject(ASC);
+				
+				FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(EffectClass, 1.f, Context);
+				if (SpecHandle.IsValid())
+				{
+					FActiveGameplayEffectHandle ActiveHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+				}
+			}
+		}
+		
+		RestartPlayer(TargetController);
+		UE_LOG(LogTemp, Warning, TEXT("[GameMode] %s : Responsed."), *TargetController->GetPawn()->GetName());
+	}
+}
+
 void ADDGameModeBase::CalculateFinalWinner()
 {
 	UE_LOG(LogCJH, Warning, TEXT("🎊 [CalculateFinalWinner] 최종 승자 집계를 시작합니다..."));

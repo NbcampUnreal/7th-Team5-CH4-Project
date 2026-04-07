@@ -21,12 +21,19 @@ public:
 	
 public:
 	UFUNCTION()
-	void OnMontageFinished();
+	void OnMontageCompleted();
+	
+	void SetResponseTimer(float InResponseTime);
+	
+	UFUNCTION()
+	void RequestRespawn();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Montage")
 	UAnimMontage* DeathMontage;
 	
-	UPROPERTY(EditDefaultsOnly)
-	float DeathLifeSpan = 3.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Response")
+	float RespawnDelay = 3.f; 
+	
+	FTimerHandle ResponseTimerHandle;
 };
