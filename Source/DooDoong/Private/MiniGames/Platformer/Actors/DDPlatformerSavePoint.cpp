@@ -1,35 +1,27 @@
-﻿#include "MiniGames/Platformer/Actors/DDPlatformerDeadZone.h"
-
-#include "Base/Player/DDBasePlayerState.h"
+﻿#include "MiniGames/Platformer/Actors/DDPlatformerSavePoint.h"
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
+#include "Base/Player/DDBasePlayerState.h"
 #include "Components/BoxComponent.h"
-#include "Interfaces/IPluginManager.h"
 
-ADDPlatformerDeadZone::ADDPlatformerDeadZone()
+ADDPlatformerSavePoint::ADDPlatformerSavePoint()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 	
 	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
 	
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
-	BoxCollision->SetupAttachment(RootComponent);
-	BoxCollision->OnComponentBeginOverlap.AddDynamic(this ,&ADDPlatformerDeadZone::OnComponentBeginOverlap);
+	BoxCollision->SetupAttachment(SceneRoot);
+	BoxCollision->OnComponentBeginOverlap.AddDynamic(this ,&ADDPlatformerSavePoint::OnComponentBeginOverlap);
 }
 
-void ADDPlatformerDeadZone::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void ADDPlatformerDeadZone::OnComponentBeginOverlap(
+void ADDPlatformerSavePoint::OnComponentBeginOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult
-	)
+	UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
 {
 	if (OtherActor == nullptr)
 	{
@@ -45,11 +37,11 @@ void ADDPlatformerDeadZone::OnComponentBeginOverlap(
 			ADDPlatformerGameMode* CurrentGameMode = Cast<ADDPlatformerGameMode>(GetWorld()->GetAuthGameMode());
 			if (IsValid(CurrentGameMode) == true)
 			{
-				for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : CurrentGameMode->PlayerDatas)
+				for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : CurrentGameMode->PlayerDatas)
 				{
 					if (DDPlayerState->PlayerGameData.SlotIndex == EnteredPlayer.Value.PlayerSlotIndex)
 					{
-						OtherActor->SetActorLocation(EnteredPlayer.Value.SavePointLocation);
+						EnteredPlayer.Value.SavePointLocation = GetActorLocation();
 					}
 				}
 			}

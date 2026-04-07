@@ -44,6 +44,8 @@ struct FPlatformerPlayerData
 	UPROPERTY()
 	bool bIsGoalIn = false;
 	
+	UPROPERTY()
+	FVector SavePointLocation;
 };
 
 UCLASS()
@@ -74,7 +76,11 @@ public:
 	
 	/* 구조체 정보전달 함수 */
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* PlatformerEnteredPlayer) override;
-
+public:
+	/* 참가한 플레이어 관련 정보 */
+	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
+	TMap<int32, FPlatformerPlayerData> PlayerDatas;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")
 	TObjectPtr<UDDInputConfig> PlatformerInputConfig;
@@ -83,8 +89,6 @@ protected:
 	TObjectPtr<UInputMappingContext> PlatformerIMC;
 	
 	/* 참가한 플레이어 관련 정보 */
-	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
-	TMap<int32, FPlatformerPlayerData> PlayerDatas;
 	
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
 	TMap<int32, FPlatformerPlayerData> PlayerRankingArrays;

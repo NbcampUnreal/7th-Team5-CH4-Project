@@ -25,6 +25,7 @@ void ADDPlatformerGameMode::HandleStartingNewPlayer_Implementation(APlayerContro
 			PlayerData.PlayerState = BasePlayerState;
 			PlayerData.PlayerMaxDistance = 0;
 			PlayerData.PlayerRank = -1;
+			PlayerData.SavePointLocation = FVector(0.f,0.f,0.f);
 			PlayerData.PlayerSlotIndex = BasePlayerState->PlayerGameData.SlotIndex;
 			PlayerData.PlayerDisplayName = BasePlayerState->PlayerGameData.PlayerNickName;
 			PlayerData.PlayerColor = BasePlayerState->PlayerGameData.PlayerColor;
