@@ -19,6 +19,9 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	) override;
+	
+	UFUNCTION()
+	void OnDiceAnimationFinished();
 
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
 	UFUNCTION()
@@ -26,4 +29,5 @@ public:
 	
 private:
 	bool bAlreadyRolled=false;
+	int32 CachedDice;
 };
