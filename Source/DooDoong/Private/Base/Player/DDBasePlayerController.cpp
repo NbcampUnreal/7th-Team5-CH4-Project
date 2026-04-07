@@ -79,7 +79,20 @@ void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIM
 		}
 	}
 }
-
+void ADDBasePlayerController::Client_ApplyState_Implementation(FGameplayTag StateTag)
+{
+	if (StateTag.MatchesTag(DDGameplayTags::State_BoardGame_LobbyWaiting) ||
+		StateTag.MatchesTag(DDGameplayTags::State_BoardGame_LobbyStarting))
+	{
+		SetInputMappingContext(DefaultIMC);
+	}
+	else if (StateTag.MatchesTag(DDGameplayTags::State_BoardGame_Init) ||
+			 StateTag.MatchesTag(DDGameplayTags::State_BoardGame_PlayerTurn) ||
+			 StateTag.MatchesTag(DDGameplayTags::State_BoardGame_RoundEnd))
+	{
+		SetInputMappingContext(BoardGameIMC);
+	}
+}
 void ADDBasePlayerController::Client_ApplyInput_Implementation(UInputMappingContext* NewIMC)
 {
 	SetInputMappingContext(NewIMC);
