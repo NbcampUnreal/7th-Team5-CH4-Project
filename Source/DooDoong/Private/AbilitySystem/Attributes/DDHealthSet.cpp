@@ -1,6 +1,7 @@
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 
 #include "GameplayEffectExtension.h"
+#include "Common/DDLogManager.h"
 #include "Net/UnrealNetwork.h"
 #include "System/DDGameplayTags.h"
 
@@ -43,10 +44,12 @@ void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCall
 	
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
+		// 1. Clamp 
 		const float NewHealth = FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth());
 		SetHealth(NewHealth);
-		UE_LOG(LogTemp,Warning, TEXT("Health Changed : %f"), NewHealth);
+		LOG_KMS(Warning, TEXT("Health Changed : %f"), NewHealth);
 		
+		// 2. 캐릭터 사망 체크 
 		if (GetHealth() <= 0.f)
 		{
 			UAbilitySystemComponent* TargetASC = &Data.Target; 
@@ -56,8 +59,9 @@ void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCall
 				Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
 				Payload.Target = Data.Target.GetAvatarActor();
 				
+				// 3. 사망 이벤트 시작(GA_Death 호출) 
 				TargetASC->HandleGameplayEvent(DDGameplayTags::Event_Character_Death, &Payload);
-				UE_LOG(LogTemp,Warning, TEXT("Character Death %s"), *TargetASC->GetAvatarActor()->GetName());
+				LOG_KMS(Warning, TEXT("Character Death %s"), *TargetASC->GetAvatarActor()->GetName());
 			
 				TargetASC->AddLooseGameplayTag(DDGameplayTags::State_Character_Death);
 			}

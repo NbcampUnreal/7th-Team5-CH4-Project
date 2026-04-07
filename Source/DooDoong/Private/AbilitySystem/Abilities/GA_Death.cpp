@@ -6,6 +6,7 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Base/Character/DDBaseCharacter.h"
 #include "Base/Game/DDGameModeBase.h"
+#include "Common/DDLogManager.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "System/DDGameplayTags.h"
@@ -42,10 +43,13 @@ void UGA_Death::ActivateAbility(
 	ADDBaseCharacter* Character = Cast<ADDBaseCharacter>(GetAvatarActorFromActorInfo());
 	if (!Character) return; 
 	
+	// 2. 실행 중인 어빌리티 취소 
 	GetAbilitySystemComponentFromActorInfo()->CancelAbilities(nullptr, nullptr, this); 
 	
+	// 3. 사망 태그 부착 
 	GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(DDGameplayTags::State_Character_Death);
 		
+	// 4. 몽타주 재생 Task 
 	UAbilityTask_PlayMontageAndWait* MontageTask = 
 		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
 			this, 
@@ -65,14 +69,17 @@ void UGA_Death::OnMontageCompleted()
 	ADDBaseCharacter* Character = Cast<ADDBaseCharacter>(GetAvatarActorFromActorInfo());
 	if(Character && Character->HasAuthority()) 
 	{
+		// 1. 래그돌 
 		Character->MultiCast_HandleRagDoll(); 
+		
+		// 부활 타이머 시작 
 		SetResponseTimer(RespawnDelay);
 	}
 }
 
 void UGA_Death::SetResponseTimer(float InResponseTime)
 {
-	UE_LOG(LogTemp,Warning,TEXT("UGA_Death : SetResponseTimer Started."));
+	LOG_KMS(Warning, TEXT("UGA_Death : SetResponseTimer Started."));
 	GetWorld()->GetTimerManager().SetTimer(
 		ResponseTimerHandle, 
 		this, 
@@ -84,7 +91,6 @@ void UGA_Death::SetResponseTimer(float InResponseTime)
 
 void UGA_Death::RequestRespawn()
 {
-	UE_LOG(LogTemp,Warning,TEXT("GA_Death : RequestRespawn"))
 	ADDBaseCharacter* Character = Cast<ADDBaseCharacter>(GetAvatarActorFromActorInfo());
 	if (!Character || !Character->HasAuthority()) return;
 	
@@ -92,7 +98,7 @@ void UGA_Death::RequestRespawn()
 	
 	if (ADDGameModeBase* GM = Cast<ADDGameModeBase>(GetWorld()->GetAuthGameMode()))
 	{
-		UE_LOG(LogTemp,Warning,TEXT("GA_Death : Success RequestRespawn"))
+		LOG_KMS(Warning, TEXT("GA_Death : Success Request Respawn"))
 		GM->HandleRespawn(Controller);
 	}
 	
