@@ -194,6 +194,11 @@ void ADDPlatformerGameMode::WaitingTimerStart()
 {
 	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 	
+	for (const TPair<int32 ,FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
+	{
+		EnteredPlayer.Value.PlayerState->PlayerGameData.bIsReady = false;
+	}
+	
 	UE_LOG(LogPMJ, Log, TEXT("WaitingTimerStart"));
 	
 	GetWorldTimerManager().SetTimer(
