@@ -437,7 +437,8 @@ void ADDGameModeBase::HandleRespawn(AController* TargetController)
 		UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent(); 
 		
 		ASC->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(DDGameplayTags::State_Character_Death));
-		ASC->SetTagMapCount(DDGameplayTags::State_Character_Death, 0);
+		ASC->RemoveLooseGameplayTag(DDGameplayTags::State_Character_Death);
+		ASC->SetLooseGameplayTagCount(DDGameplayTags::State_Character_Death, 0);
 		
 		for (auto EffectClass : ReSpawnEffectClasses)
 		{

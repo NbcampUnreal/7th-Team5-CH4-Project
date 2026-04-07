@@ -19,6 +19,7 @@ UGA_Death::UGA_Death()
 	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnly; 
 	
 	ActivationBlockedTags.AddTag(DDGameplayTags::State_Character_Death); 
+	ActivationOwnedTags.AddTag(DDGameplayTags::State_Character_Death);
 	
 	FAbilityTriggerData TriggerData;
 	TriggerData.TriggerTag = DDGameplayTags::Event_Character_Death;
@@ -45,11 +46,8 @@ void UGA_Death::ActivateAbility(
 	
 	// 2. 실행 중인 어빌리티 취소 
 	GetAbilitySystemComponentFromActorInfo()->CancelAbilities(nullptr, nullptr, this); 
-	
-	// 3. 사망 태그 부착 
-	GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(DDGameplayTags::State_Character_Death);
-		
-	// 4. 몽타주 재생 Task 
+
+	// 3. 몽타주 재생 Task 
 	UAbilityTask_PlayMontageAndWait* MontageTask = 
 		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
 			this, 
@@ -100,6 +98,8 @@ void UGA_Death::RequestRespawn()
 	{
 		LOG_KMS(Warning, TEXT("GA_Death : Success Request Respawn"))
 		GM->HandleRespawn(Controller);
+		
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
 	}
 	
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false); 
