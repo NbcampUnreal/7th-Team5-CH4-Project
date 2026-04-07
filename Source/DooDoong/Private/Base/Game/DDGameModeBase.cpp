@@ -453,7 +453,7 @@ void ADDGameModeBase::HandleRespawn(AController* TargetController)
 		}
 		
 		RestartPlayer(TargetController);
-		UE_LOG(LogTemp, Warning, TEXT("[GameMode] %s : Responsed."), *TargetController->GetPawn()->GetName());
+		LOG_KMS(Warning, TEXT("[GameMode] %s : ReSpawned."), *TargetController->GetPawn()->GetName());
 	}
 }
 
