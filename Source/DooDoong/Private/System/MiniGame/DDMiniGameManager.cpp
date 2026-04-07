@@ -4,6 +4,7 @@
 #include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
+#include "BoardGame/DDTile.h"
 #include "GameFramework/PlayerState.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 
@@ -377,26 +378,24 @@ void UDDMiniGameManager::SaveReturnTileInfo(const TArray<APlayerState*>& Players
 	
 	for (APlayerState* PlayerState : Players)
 	{
-		if (PlayerState == nullptr)
+		ADDBasePlayerState* BasePlayerState = Cast<ADDBasePlayerState>(PlayerState);
+		if (BasePlayerState == nullptr || BasePlayerState->CurrentTile == nullptr)
 		{
 			continue;
 		}
-		
-		/*APawn* Pawn = PlayerState->GetPawn();
-		ADDBoardGameCharacter* BoardCharacter = Cast<ADDBoardGameCharacter>(Pawn);
-		ADDBasePlayerState* PS = BoardCharacter->GetPlayerState<ADDBasePlayerState>();
-		if (BoardCharacter == nullptr || PS->StartTileName == NAME_None)
+
+		const FName TileRowName = BasePlayerState->CurrentTile->TileRowName;
+		if (TileRowName == NAME_None)
 		{
 			continue;
 		}
-		
+
 		// 되돌아갈 타일을 구조체에 저장
 		FMiniGameReturnTileInfo ReturnTileInfo;
 		ReturnTileInfo.PlayerId = PlayerState->GetPlayerId();
-		// ReturnTileInfo.TileRowName = PS->StartTileName;
+		ReturnTileInfo.TileRowName = TileRowName;
 		
 		SavedReturnTileInfo.Add(ReturnTileInfo);
-		*/
 	}
 }
 
