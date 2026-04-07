@@ -426,11 +426,13 @@ void ADDGameModeBase::HandleRespawn(AController* TargetController)
 {
 	if (TargetController)
 	{
+		// 1. 기존 캐릭터 제거  
 		if (APawn* OldPawn = TargetController->GetPawn())
 		{
 			OldPawn->Destroy();
 		}
 		
+		// 2. ASC 초기화
 		ADDBasePlayerState* PS = TargetController->GetPlayerState<ADDBasePlayerState>();
 		UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent(); 
 		
@@ -452,6 +454,7 @@ void ADDGameModeBase::HandleRespawn(AController* TargetController)
 			}
 		}
 		
+		// 3. 새로운 캐릭터 생성 및 할당 
 		RestartPlayer(TargetController);
 		LOG_KMS(Warning, TEXT("[GameMode] %s : ReSpawned."), *TargetController->GetPawn()->GetName());
 	}
