@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Base/Character/DDBaseCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "System/DDGameplayTags.h"
@@ -12,8 +13,13 @@ UGA_Death::UGA_Death()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	bRetriggerInstancedAbility = false; 
-		
-	AbilityTags.AddTag(DDGameplayTags::State_Character_Death); 
+	
+	ActivationBlockedTags.AddTag(DDGameplayTags::State_Character_Death); 
+	
+	FAbilityTriggerData TriggerData;
+	TriggerData.TriggerTag = DDGameplayTags::Event_Character_Death;
+	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+	AbilityTriggers.Add(TriggerData);
 }
 
 void UGA_Death::ActivateAbility(
@@ -24,16 +30,20 @@ void UGA_Death::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
+	UE_LOG(LogTemp,Warning, TEXT("UGA_Death ActivateAbility ")); 
+	
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 	
-	ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
+	ADDBaseCharacter* Character = Cast<ADDBaseCharacter>(GetAvatarActorFromActorInfo());
 	if (!Character) return; 
 	
 	GetAbilitySystemComponentFromActorInfo()->CancelAllAbilities(); 
+	
+	GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(DDGameplayTags::State_Character_Death);
 		
 	UAbilityTask_PlayMontageAndWait* MontageTask = 
 		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
@@ -41,23 +51,15 @@ void UGA_Death::ActivateAbility(
 			TEXT("Death"),
 			DeathMontage
 		);
+	
 	MontageTask->OnCompleted.AddDynamic(this, &UGA_Death::OnMontageFinished);
 	MontageTask->ReadyForActivation();
-
-	if (Character->HasAuthority())
-	{
-		Character->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
-		Character->GetCharacterMovement()->StopMovementImmediately();
-		Character->GetCharacterMovement()->DisableMovement();
-		
-		Character->SetLifeSpan(5.f); 
-	}
 }
 
 void UGA_Death::OnMontageFinished()
 {
-	ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
-	Character->GetMesh()->SetSimulatePhysics(true);
+	ADDBaseCharacter* Character = Cast<ADDBaseCharacter>(GetAvatarActorFromActorInfo());
+	if (Character) Character->MultiCast_CharacterDeath(); 
 	
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false); 
 }
