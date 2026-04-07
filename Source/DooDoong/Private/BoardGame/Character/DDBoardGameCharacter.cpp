@@ -67,6 +67,17 @@ void ADDBoardGameCharacter::UpdateMove()
 
 		GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
 
+		// 주사위 파괴
+		if (Dice && Dice->IsValidLowLevel())
+		{
+			// 소켓에서 Detach
+			Dice->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+			LOG_CYS(Error, TEXT("Dice->DetachFromActor: %s"), *Dice->GetName());
+			// 삭제
+			Dice->Destroy();
+			Dice = nullptr;
+		}
 		OnMoveFinished.Broadcast(); // 이동 완료 태스크에 알림
 	}
 }
@@ -84,30 +95,33 @@ void ADDBoardGameCharacter::Multicast_PlayDiceAnimation_Implementation(int32 Dic
 	{
 		AnimInstance->Montage_Play(DiceMontage);
 	}
-
-	// 🎲 Dice 스폰
-	if (!DiceClass)
+	if (HasAuthority())
 	{
-		LOG_CYS(Error, TEXT("DiceClass is NULL"));
-		return;
-	}
+		// 서버에서 Dice 스폰, 클라이언트는 복제된 actor을 봄
+		if (!DiceClass)
+		{
+			LOG_CYS(Error, TEXT("DiceClass is NULL"));
+			return;
+		}
 
-	FVector Loc = GetMesh()->GetSocketLocation(TEXT("head"));
-	Loc.Z+=70;
-	Dice = GetWorld()->SpawnActor<ADDDiceActor>(
-		DiceClass,
-		Loc,
-		FRotator::ZeroRotator
-	);
-
-	if (Dice)
-	{
-		Dice->AttachToComponent(
-			GetMesh(),
-			FAttachmentTransformRules::KeepWorldTransform,
-			TEXT("head")
+		FVector Loc = GetMesh()->GetSocketLocation(TEXT("head"));
+		Loc.Z+=70;
+		Dice = GetWorld()->SpawnActor<ADDDiceActor>(
+			DiceClass,
+			Loc,
+			FRotator::ZeroRotator
 		);
 
-		Dice->StartRoll(DiceValue);
+		LOG_CYS(Error, TEXT("DiceSpawn: %s"), *Dice->GetName());
+		if (Dice)
+		{
+			Dice->AttachToComponent(
+				GetMesh(),
+				FAttachmentTransformRules::KeepWorldTransform,
+				TEXT("head")
+			);
+
+			Dice->StartRoll(DiceValue);
+		}
 	}
 }

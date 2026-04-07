@@ -4,6 +4,10 @@
 ADDDiceActor::ADDDiceActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
+	// 네트워크에서 복제 가능하게
+	bReplicates = true; 
+	SetReplicateMovement(true);
 }
 
 void ADDDiceActor::StartRoll(int32 InValue)
