@@ -118,13 +118,14 @@ void ADDBaseCharacter::OnJumpSpeedChanged(const FOnAttributeChangeData& Data)
 	}
 }
 
-void ADDBaseCharacter::MultiCast_CharacterDeath_Implementation()
+void ADDBaseCharacter::MultiCast_HandleRagDoll_Implementation()
 {
 	EnableRagDoll();
 }
 
 void ADDBaseCharacter::EnableRagDoll()
 {
+	UE_LOG(LogTemp,Warning,TEXT("Character RagDoll"));
 	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
 	{
 		MovementComp->StopMovementImmediately();
@@ -150,8 +151,6 @@ void ADDBaseCharacter::EnableRagDoll()
 		MeshComp->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 		MeshComp->SetSimulatePhysics(true);
 	}
-	
-	SetLifeSpan(5.f); 
 }
 
 UDDHealthSet* ADDBaseCharacter::GetHealthSet() const

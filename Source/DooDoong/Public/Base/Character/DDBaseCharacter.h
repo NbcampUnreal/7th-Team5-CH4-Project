@@ -42,10 +42,9 @@ protected:
 	
 public:
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCast_CharacterDeath();
+	void MultiCast_HandleRagDoll();
 	
 protected:
-	
 	void EnableRagDoll();
 	
 public:
