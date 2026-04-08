@@ -79,6 +79,7 @@ void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIM
 		}
 	}
 }
+
 void ADDBasePlayerController::Client_ApplyState_Implementation(FGameplayTag StateTag)
 {
 	if (StateTag.MatchesTag(DDGameplayTags::State_BoardGame_LobbyWaiting) ||
@@ -93,6 +94,7 @@ void ADDBasePlayerController::Client_ApplyState_Implementation(FGameplayTag Stat
 		SetInputMappingContext(BoardGameIMC);
 	}
 }
+
 void ADDBasePlayerController::Client_ApplyInput_Implementation(UInputMappingContext* NewIMC)
 {
 	SetInputMappingContext(NewIMC);

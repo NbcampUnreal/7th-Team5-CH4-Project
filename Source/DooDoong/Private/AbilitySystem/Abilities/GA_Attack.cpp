@@ -86,8 +86,10 @@ void UGA_Attack::OnMontageCompleted()
 
 void UGA_Attack::OnReceiveTraceStart()
 {
+	// 1. 중복 초기화 
 	HitActors.Empty();
 
+	// 2. 트레이스 타이머 시작 
 	GetWorld()->GetTimerManager().SetTimer(
 		TraceTimerHandle,
 		this,
@@ -149,11 +151,14 @@ bool UGA_Attack::TryApplyDamageToActor(AActor* HitActor)
 {
 	if (!HasAuthority(&CurrentActivationInfo) || !HitActor) return false;
 
+	// 1. 중복 처리 
 	if (HitActors.Contains(HitActor)) return false;
 	HitActors.Add(HitActor);
 
+	// 2. 캐릭터 넉백 
 	LaunchTarget(HitActor, KnockBackStrength);
 	
+	// 3. 데미지 적용 
 	ApplyDamageToActor(HitActor);
 
 	UE_LOG(LogTemp, Log, TEXT("[Attack] Hit:%s (Total:%d)"),
@@ -167,6 +172,7 @@ void UGA_Attack::ApplyDamageToActor(AActor* TargetActor)
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	if (!TargetASC || !CachedAbilitySystemComponent) return;
 
+	// 1. 데미지 적용 
 	if (DamageEffectClass)
 	{
 		FGameplayEffectContextHandle Context = CachedAbilitySystemComponent->MakeEffectContext();
@@ -184,8 +190,11 @@ void UGA_Attack::ApplyDamageToActor(AActor* TargetActor)
 		}
 	}
 
+	// 2.추가 효과 적용 
 	for (auto EffectClass : AdditionalEffectClasses)
 	{
+		if (!EffectClass) continue; 
+		
 		FGameplayEffectContextHandle Context = CachedAbilitySystemComponent->MakeEffectContext();
 		Context.AddSourceObject(CachedCharacter);
 

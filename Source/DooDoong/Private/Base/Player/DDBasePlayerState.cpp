@@ -39,6 +39,18 @@ void ADDBasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME(ADDBasePlayerState, bIsParticipant);
 }
 
+void ADDBasePlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	HealthSet->KillLogSignature.AddUObject(this, &ThisClass::MultiCast_BroadcastKillLog);
+}
+
+void ADDBasePlayerState::MultiCast_BroadcastKillLog_Implementation(AActor* Victim, AActor* Killer)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[PS] : %s was killed by %s"), *Victim->GetName(), *Killer->GetName());
+}
+
 void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);

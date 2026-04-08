@@ -1,6 +1,7 @@
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 
 #include "GameplayEffectExtension.h"
+#include "Base/Game/DDGameModeBase.h"
 #include "Common/DDLogManager.h"
 #include "Net/UnrealNetwork.h"
 #include "System/DDGameplayTags.h"
@@ -52,6 +53,17 @@ void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCall
 		// 2. 캐릭터 사망 체크 
 		if (GetHealth() <= 0.f)
 		{
+			AActor* Killer = Data.EffectSpec.GetContext().GetInstigator();
+			AActor* Victim = Data.Target.GetAvatarActor();
+			
+			// 3. 킬로그 브로드캐스트 
+			KillLogSignature.Broadcast(Killer, Victim);
+			if (ADDGameModeBase* GM = Cast<ADDGameModeBase>(GetWorld()->GetAuthGameMode()))
+			{
+				GM->OnCharacterKilled(Killer, Victim);
+			}
+			
+			// 4. 사망 이벤트 시작(GA_Death 호출) 
 			UAbilitySystemComponent* TargetASC = &Data.Target; 
 			if (TargetASC->AbilityActorInfo->IsNetAuthority())
 			{
@@ -59,7 +71,7 @@ void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCall
 				Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
 				Payload.Target = Data.Target.GetAvatarActor();
 				
-				// 3. 사망 이벤트 시작(GA_Death 호출) 
+				
 				TargetASC->HandleGameplayEvent(DDGameplayTags::Event_Character_Death, &Payload);
 				LOG_KMS(Warning, TEXT("Character Death %s"), *TargetASC->GetAvatarActor()->GetName());
 			
