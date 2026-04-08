@@ -61,6 +61,7 @@ protected:
     void FocusAllCamerasOnTarget(AActor* TargetActor);
     
 public: 
+    
     virtual void OnCharacterKilled(AActor* Killer, AActor* Victim);
     
     void HandleRespawn(AController* TargetController);

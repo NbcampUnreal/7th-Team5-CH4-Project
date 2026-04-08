@@ -428,6 +428,7 @@ void ADDGameModeBase::OnCharacterKilled(AActor* Killer, AActor* Victim)
 	LOG_KMS(Warning, TEXT("[GM] : %s was killed by %s"), *Victim->GetName(), *Killer->GetName());
 }
 
+
 void ADDGameModeBase::HandleRespawn(AController* TargetController)
 {
 	if (TargetController)
