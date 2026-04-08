@@ -13,7 +13,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Logout(AController* Exiting) override;
 
-	void ProcessPlayerJoin(class ADDLobbyPlayerController* LobbyPlayerController, const FString& Nickname);
+	void ProcessPlayerJoin(class ADDLobbyPlayerController* LobbyPlayerController, const FName& Nickname);
 	
 protected:
 	UFUNCTION()

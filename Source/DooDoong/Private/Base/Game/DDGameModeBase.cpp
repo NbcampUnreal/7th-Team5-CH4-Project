@@ -65,7 +65,7 @@ void ADDGameModeBase::HandleSeamlessTravelPlayer(AController*& ParticipantContro
 	// 복사된 PlayerState의 정보를 확인하여 관전자와 참여자를 분리
 	if (ADDBasePlayerState* BasePlayerState = ParticipantController->GetPlayerState<ADDBasePlayerState>())
 	{
-		UE_LOG(LogCJH, Log, TEXT("[SeamlessTravel] 접속 유저: %s, 참여 여부: %d"), *BasePlayerState->Nickname,
+		UE_LOG(LogCJH, Log, TEXT("[SeamlessTravel] 접속 유저: %s, 참여 여부: %d"), *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString(),
 		       BasePlayerState->bIsParticipant);
 
 		if (!BasePlayerState->bIsParticipant)
@@ -285,7 +285,7 @@ void ADDGameModeBase::CheckWinCondition()
 		{
 			if (BasePlayerState->GetPointSet() && BasePlayerState->GetPointSet()->GetTrophy() >= MaxTrophy)
 			{
-				UE_LOG(LogCJH, Warning, TEXT("🏆 목표 트로피 도달자 발생! (닉네임: %s)"), *BasePlayerState->Nickname);
+				UE_LOG(LogCJH, Warning, TEXT("🏆 목표 트로피 도달자 발생! (닉네임: %s)"), *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString());
 				bHasTrophyWinner = true;
 				break;
 			}
@@ -490,7 +490,7 @@ void ADDGameModeBase::CalculateFinalWinner()
 				float CurrentTrophy = BasePlayerState->GetPointSet()->GetTrophy();
 				float CurrentCoin = BasePlayerState->GetPointSet()->GetCoin();
 
-				UE_LOG(LogCJH, Log, TEXT(" - 참여자 [%s] | 트로피: %f | 코인: %f"), *BasePlayerState->Nickname, CurrentTrophy,
+				UE_LOG(LogCJH, Log, TEXT(" - 참여자 [%s] | 트로피: %f | 코인: %f"), *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString(), CurrentTrophy,
 				       CurrentCoin);
 
 				// 1순위: 트로피 개수 비교
@@ -524,7 +524,7 @@ void ADDGameModeBase::CalculateFinalWinner()
 		FString WinnerNames = TEXT("");
 		for (ADDBasePlayerState* Winner : Winners)
 		{
-			WinnerNames += Winner->Nickname + TEXT(" ");
+			WinnerNames += Winner->PlayerGameData.PlayerDisplayName.ToString() + TEXT(" ");
 		}
 		UE_LOG(LogCJH, Warning, TEXT("🏆 게임 종료! 승자: %s (트로피: %d, 코인: %d)"), *WinnerNames, (int32)HighestTrophy,
 		       (int32)HighestCoin);

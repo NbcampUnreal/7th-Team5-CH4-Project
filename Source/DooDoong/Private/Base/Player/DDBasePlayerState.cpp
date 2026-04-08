@@ -34,8 +34,8 @@ UAbilitySystemComponent* ADDBasePlayerState::GetAbilitySystemComponent() const
 void ADDBasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ADDBasePlayerState, Nickname);
+	
+	DOREPLIFETIME(ADDBasePlayerState, PlayerGameData);
 	DOREPLIFETIME(ADDBasePlayerState, bIsParticipant);
 }
 
@@ -58,7 +58,7 @@ void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 	if (ADDBasePlayerState* NewPlayerState = Cast<ADDBasePlayerState>(PlayerState))
 	{
 		// 커스텀 데이터 복제
-		NewPlayerState->Nickname = this->Nickname;
+		NewPlayerState->PlayerGameData.PlayerDisplayName = this->PlayerGameData.PlayerDisplayName;
 		NewPlayerState->bIsParticipant = this->bIsParticipant;
 	}
 }

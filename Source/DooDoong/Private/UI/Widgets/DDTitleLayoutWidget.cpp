@@ -50,7 +50,7 @@ void UDDTitleLayoutWidget::OnPlayButtonClicked()
 		FText Nickname = NicknameEditableText->GetText();
 
 		// 서버로 닉네임을 전송해 달라고 컨트롤러에 요청
-		LobbyPlayerController->Server_SubmitNickname(Nickname.ToString());
+		LobbyPlayerController->Server_SubmitNickname(FName(*Nickname.ToString()));
 
 		// 버튼을 연타하지 못하도록 비활성화
 		PlayButton->SetIsEnabled(false);

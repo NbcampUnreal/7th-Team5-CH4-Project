@@ -77,16 +77,12 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FName StartTileName;
-	
-    /** 유저가 로비에서 설정한 닉네임 */
-    UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
-    FString Nickname;
 
     /** 선착순 4인에 포함된 게임 참여자(true)인지 관전자(false)인지 식별 */
     UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
     bool bIsParticipant = false;
 	
 	/* 플레이어 정보 구조체 */
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	FPlayerGameplayInfo PlayerGameData;
 };
