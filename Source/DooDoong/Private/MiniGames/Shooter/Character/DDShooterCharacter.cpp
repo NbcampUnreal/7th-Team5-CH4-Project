@@ -1,17 +1,21 @@
-﻿#include "MiniGames/Shooter/Character/DDShooterCharacter.h"
+#include "MiniGames/Shooter/Character/DDShooterCharacter.h"
 
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SceneComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "MiniGames/Shooter/Actors/DDShotProjectile.h"
 #include "MiniGames/Shooter/GameMode/DDShooterGameMode.h"
 
 ADDShooterCharacter::ADDShooterCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	
+
 	bUseControllerRotationYaw = true;
-	
+
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
 	SpringArmComp->SetupAttachment(GetRootComponent());
 	SpringArmComp->TargetArmLength = 200.f;
@@ -20,11 +24,11 @@ ADDShooterCharacter::ADDShooterCharacter()
 	SpringArmComp->bInheritYaw = true;
 	SpringArmComp->bInheritRoll = false;
 	SpringArmComp->bDoCollisionTest = false;
-	
+
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->bUsePawnControlRotation = false;
-	
+
 	MuzzleComp = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleComp"));
 	MuzzleComp->SetupAttachment(GetMesh());
 }
@@ -34,28 +38,27 @@ void ADDShooterCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
-bool ADDShooterCharacter::CanFire() const
+bool ADDShooterCharacter::BIsCanFire() const
 {
-	return true;
+	return ProjectileClass != nullptr;
 }
 
 void ADDShooterCharacter::TryFire()
 {
-	if (!CanFire())
+	if (!BIsCanFire())
 	{
 		return;
 	}
 
-	FVector TargetPoint;
-	if (!GetCrosshairAimPoint(TargetPoint))
-	{
-		return;
-	}
+	PlayFireMontage();
 
-	Server_TryFire(GetMuzzleLocation(), TargetPoint);
+	if (FireMontage == nullptr)
+	{
+		HandleFireMontageNotify();
+	}
 }
 
-bool ADDShooterCharacter::GetCrosshairAimPoint(FVector& OutTargetPoint) const
+bool ADDShooterCharacter::GetAimPoint(FVector& OutTargetPoint) const
 {
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (PlayerController == nullptr || GetWorld() == nullptr)
@@ -94,6 +97,12 @@ bool ADDShooterCharacter::GetCrosshairAimPoint(FVector& OutTargetPoint) const
 
 FVector ADDShooterCharacter::GetMuzzleLocation() const
 {
+	if (const USkeletalMeshComponent* MeshComponent = GetMesh();
+		MeshComponent != nullptr && ProjectileSocketName != NAME_None && MeshComponent->DoesSocketExist(ProjectileSocketName))
+	{
+		return MeshComponent->GetSocketLocation(ProjectileSocketName);
+	}
+
 	if (MuzzleComp != nullptr)
 	{
 		return MuzzleComp->GetComponentLocation();
@@ -102,7 +111,40 @@ FVector ADDShooterCharacter::GetMuzzleLocation() const
 	return GetActorLocation();
 }
 
-void ADDShooterCharacter::Server_TryFire_Implementation(const FVector_NetQuantize& MuzzleLocation, const FVector_NetQuantize& TargetPoint)
+FTransform ADDShooterCharacter::GetProjectileSpawnTransform() const
+{
+	if (const USkeletalMeshComponent* MeshComponent = GetMesh();
+		MeshComponent != nullptr && ProjectileSocketName != NAME_None && MeshComponent->DoesSocketExist(ProjectileSocketName))
+	{
+		return MeshComponent->GetSocketTransform(ProjectileSocketName, RTS_World);
+	}
+
+	if (MuzzleComp != nullptr)
+	{
+		return MuzzleComp->GetComponentTransform();
+	}
+
+	return GetActorTransform();
+}
+
+void ADDShooterCharacter::HandleFireMontageNotify()
+{
+	if (!BIsCanFire())
+	{
+		return;
+	}
+
+	FVector TargetPoint;
+	if (!GetAimPoint(TargetPoint))
+	{
+		return;
+	}
+
+	Server_TryFire(GetMuzzleLocation(), TargetPoint);
+}
+
+void ADDShooterCharacter::Server_TryFire_Implementation(const FVector_NetQuantize& MuzzleLocation,
+	const FVector_NetQuantize& TargetPoint)
 {
 	ADDShooterGameMode* ShooterGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDShooterGameMode>() : nullptr;
 	if (ShooterGameMode == nullptr)
@@ -116,8 +158,21 @@ void ADDShooterCharacter::Server_TryFire_Implementation(const FVector_NetQuantiz
 		return;
 	}
 
-	const FRotator ShotRotation = ShotDirection.Rotation();
+	ShooterGameMode->FireProjectile(this, MuzzleLocation, ShotDirection.Rotation());
+}
 
-	// Projectile가 준비되면 GameMode의 발사 함수로 연결
-	// ShooterGameMode->FireProjectile(this, MuzzleLocation, ShotRotation);
+void ADDShooterCharacter::PlayFireMontage()
+{
+	if (FireMontage == nullptr)
+	{
+		return;
+	}
+
+	if (USkeletalMeshComponent* MeshComponent = GetMesh())
+	{
+		if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
+		{
+			AnimInstance->Montage_Play(FireMontage);
+		}
+	}
 }

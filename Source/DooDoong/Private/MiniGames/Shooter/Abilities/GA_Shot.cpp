@@ -24,7 +24,7 @@ void UGA_Shot::ActivateAbility(
 	}
 
 	ADDShooterCharacter* ShooterCharacter = Cast<ADDShooterCharacter>(ActorInfo->AvatarActor.Get());
-	if (ShooterCharacter == nullptr || !ShooterCharacter->CanFire())
+	if (ShooterCharacter == nullptr || !ShooterCharacter->BIsCanFire())
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
