@@ -1,26 +1,55 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "MiniGames/Shooter/Actors/DDShooterTarget.h"
 
+#include "Base/MiniGame/DDMiniGameStateBase.h"
+#include "Common/DDLogManager.h"
+#include "Components/BoxComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "GameFramework/PlayerState.h"
+#include "MiniGames/Shooter/Actors/DDShotProjectile.h"
+#include "MiniGames/Shooter/GameMode/DDShooterGameMode.h"
 
-// Sets default values
 ADDShooterTarget::ADDShooterTarget()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
+
+	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComp"));
+	SetRootComponent(CollisionComp);
+	CollisionComp->SetBoxExtent(FVector(50.0f));
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	MeshComp->SetupAttachment(RootComponent);
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-// Called when the game starts or when spawned
 void ADDShooterTarget::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
-// Called every frame
-void ADDShooterTarget::Tick(float DeltaTime)
+bool ADDShooterTarget::HandleProjectileHit(ADDShotProjectile* ShotProjectile)
 {
-	Super::Tick(DeltaTime);
-}
+	if (!HasAuthority() || !bCanGetScore || ShotProjectile == nullptr)
+	{
+		return false;
+	}
 
+	APlayerState* ShooterPlayerState = ShotProjectile->GetShooterPlayerState();
+	ADDShooterGameMode* ShooterGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDShooterGameMode>() : nullptr;
+	if (ShooterPlayerState == nullptr || ShooterGameMode == nullptr)
+	{
+		return false;
+	}
+
+	bCanGetScore = false;
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ShooterGameMode->AddScore(ShooterPlayerState, ScoreValue);
+
+	LOG_JJH(Warning, TEXT("플레이어 : %s, 획득 점수 : %d"),
+	        *ShooterPlayerState->GetPlayerName(),
+	        ScoreValue);
+	return true;
+}
