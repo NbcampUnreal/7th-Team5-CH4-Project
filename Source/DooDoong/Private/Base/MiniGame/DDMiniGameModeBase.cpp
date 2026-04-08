@@ -313,6 +313,16 @@ void ADDMiniGameModeBase::StartMiniGame()
 	bIsMiniGameStarted = true;
 	ElapsedTimeSeconds = 0.0f;
 
+	// suyeon : Ready UI 닫기
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ADDBasePlayerController* PC = Cast<ADDBasePlayerController>(It->Get());
+		if (PC && PC->MiniGameUI)
+		{
+			PC->Client_CloseReadyUI();
+		}
+	}
+
 	// GameState에서 시작 상태 태그를 갱신 & 게임의 남은 시간을 게임 데이터의 제한시간으로 갱신
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
@@ -454,6 +464,16 @@ void ADDMiniGameModeBase::InitializeReadyStates()
 	}
 
 	UpdateReadyState();
+
+	// === suyeon: Ready UI 열기 ===
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ADDBasePlayerController* PC = Cast<ADDBasePlayerController>(It->Get());
+		if (PC && PC->MiniGameUI)
+		{
+			PC->Client_OpenReadyUI();
+		}
+	}
 }
 
 void ADDMiniGameModeBase::UpdateReadyState()
