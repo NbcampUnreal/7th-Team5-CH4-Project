@@ -3,6 +3,7 @@
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "Camera/CameraComponent.h"
+#include "Common/DDLogManager.h"
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -12,7 +13,7 @@
 
 ADDShooterCharacter::ADDShooterCharacter()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	bUseControllerRotationYaw = true;
 
@@ -129,35 +130,47 @@ FTransform ADDShooterCharacter::GetProjectileSpawnTransform() const
 
 void ADDShooterCharacter::HandleFireMontageNotify()
 {
+	LOG_JJH(Log, TEXT("[ShooterCharacter] HandleFireMontageNotify"));
+
 	if (!BIsCanFire())
 	{
+		LOG_JJH(Warning, TEXT("[ShooterCharacter] Cannot fire"));
 		return;
 	}
 
 	FVector TargetPoint;
 	if (!GetAimPoint(TargetPoint))
 	{
+		LOG_JJH(Warning, TEXT("[ShooterCharacter] Failed to get aim point"));
 		return;
 	}
 
+	LOG_JJH(Log, TEXT("[ShooterCharacter] Request server fire. Muzzle=%s Target=%s"),
+	        *GetMuzzleLocation().ToString(),
+	        *TargetPoint.ToString());
 	Server_TryFire(GetMuzzleLocation(), TargetPoint);
 }
 
 void ADDShooterCharacter::Server_TryFire_Implementation(const FVector_NetQuantize& MuzzleLocation,
 	const FVector_NetQuantize& TargetPoint)
 {
+	LOG_JJH(Log, TEXT("[ShooterCharacter] Server_TryFire"));
+
 	ADDShooterGameMode* ShooterGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDShooterGameMode>() : nullptr;
 	if (ShooterGameMode == nullptr)
 	{
+		LOG_JJH(Warning, TEXT("[ShooterCharacter] ShooterGameMode is null"));
 		return;
 	}
 
 	const FVector ShotDirection = (TargetPoint - MuzzleLocation).GetSafeNormal();
 	if (ShotDirection.IsNearlyZero())
 	{
+		LOG_JJH(Warning, TEXT("[ShooterCharacter] Shot direction is nearly zero"));
 		return;
 	}
 
+	LOG_JJH(Log, TEXT("[ShooterCharacter] Spawn projectile. Direction=%s"), *ShotDirection.ToString());
 	ShooterGameMode->FireProjectile(this, MuzzleLocation, ShotDirection.Rotation());
 }
 
