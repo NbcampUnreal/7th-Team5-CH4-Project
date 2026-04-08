@@ -193,7 +193,10 @@ void ADDGameModeBase::SetMatchState(FGameplayTag NewStateTag)
 		if (UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponentFromPlayer(PlayerController))
 		{
 			AbilitySystemComponent->RemoveLooseGameplayTags(CurrentAppliedTags);
+			AbilitySystemComponent->RemoveReplicatedLooseGameplayTags(CurrentAppliedTags);
 			AbilitySystemComponent->AddLooseGameplayTags(TagsToApply);
+			AbilitySystemComponent->AddReplicatedLooseGameplayTags(TagsToApply);
+			
 		}
 	}
 	CurrentAppliedTags = TagsToApply;
@@ -306,16 +309,15 @@ void ADDGameModeBase::CheckWinCondition()
 
 void ADDGameModeBase::StartNextPlayerTurn()
 {
-	// 모든 플레이어의 턴이 끝난 경우 라운드 종료
 	if (CurrentTurnPlayerIndex >= AlivePlayerControllers.Num())
 	{
-		LOG_CJH(Log, TEXT("[StartNextPlayerTurn] 모든 플레이어의 턴 종료. 라운드를 넘깁니다."));
 		CurrentTurnPlayerIndex = 0;
 
 		UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
 		if (IsValid(GameInstance))
 		{
 			GameInstance->CurrentRound++;
+			LOG_CJH(Log, TEXT("모든 플레이어의 턴 종료. 라운드를 넘깁니다."));
 		}
 
 		SetMatchState(DDGameplayTags::State_BoardGame_RoundEnd);
@@ -340,9 +342,15 @@ void ADDGameModeBase::StartNextPlayerTurn()
 
 		if (i == CurrentTurnPlayerIndex)
 		{
-			// 현재 턴 주인공에게 권한 태그 부여
+			// 현재 턴 플레이어에게 권한 태그 부여
+			AbilitySystemComponent->RemoveReplicatedLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnWaiting);
 			AbilitySystemComponent->RemoveLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnWaiting);
+			AbilitySystemComponent->SetLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnWaiting, 0);
+			AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnWaiting, 0);
+			AbilitySystemComponent->AddReplicatedLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnActive);
 			AbilitySystemComponent->AddLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnActive);
+			AbilitySystemComponent->SetLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnActive, 1);
+			AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnActive, 1);
 
 			StateTimer = MaxStateTimer;
 
@@ -352,13 +360,19 @@ void ADDGameModeBase::StartNextPlayerTurn()
 		}
 		else
 		{
-			// 타인에게 대기 태그 부여 (Lyra 방식: 이 태그로 조작과 스킬이 자동 차단됨)
+			// 타인에게 대기 태그 부여
+			AbilitySystemComponent->RemoveReplicatedLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnActive);
 			AbilitySystemComponent->RemoveLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnActive);
+			AbilitySystemComponent->SetLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnActive, 0);
+			AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnActive, 0);
+			AbilitySystemComponent->AddReplicatedLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnWaiting);
 			AbilitySystemComponent->AddLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnWaiting);
+			AbilitySystemComponent->SetLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnWaiting, 1);
+			AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnWaiting, 1);
 		}
 	}
 
-	// 주인공 화면으로 모두의 카메라 시점 이동
+	// 현재 턴 플레이어 화면으로 모두의 카메라 시점 이동
 	FocusAllCamerasOnTarget(ActivePawn);
 }
 
@@ -394,14 +408,21 @@ void ADDGameModeBase::SetTurnPhase(FGameplayTag NewPhaseTag)
 
 	if (CurrentTurnPhaseTag.IsValid())
 	{
+		AbilitySystemComponent->RemoveReplicatedLooseGameplayTag(CurrentTurnPhaseTag);
 		AbilitySystemComponent->RemoveLooseGameplayTag(CurrentTurnPhaseTag);
+		AbilitySystemComponent->SetLooseGameplayTagCount(CurrentTurnPhaseTag, 0);
+		AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(CurrentTurnPhaseTag, 0);
+		
 	}
 
 	CurrentTurnPhaseTag = NewPhaseTag;
 
 	if (CurrentTurnPhaseTag.IsValid())
 	{
+		AbilitySystemComponent->AddReplicatedLooseGameplayTag(CurrentTurnPhaseTag);
 		AbilitySystemComponent->AddLooseGameplayTag(CurrentTurnPhaseTag);
+		AbilitySystemComponent->SetLooseGameplayTagCount(CurrentTurnPhaseTag, 1);
+		AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(CurrentTurnPhaseTag, 1);
 		LOG_CJH(Log, TEXT("   └ [TurnPhase] 페이즈 갱신: %s"), *NewPhaseTag.ToString());
 	}
 }
