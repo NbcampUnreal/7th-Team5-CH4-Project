@@ -27,6 +27,8 @@ namespace DDGameplayTags
 	
 	// Data Tags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Health_Damage); 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Point_Coin); 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Point_Trophy); 
 	
 	// Ability Tile Event Tags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Coin);

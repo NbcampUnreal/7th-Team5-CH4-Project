@@ -25,20 +25,11 @@ void UDDRollDiceAbility::ActivateAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
-	if (!HasAuthority(&ActivationInfo))
-	{
-		return; // 서버 실행
-	}
-	if (bAlreadyRolled)
-	{
-		return;
-	}
-
 	LOG_CYS(Warning, TEXT("[GA_RD]Roll Dice"));
 	// 주사위
-	CachedDice = FMath::RandRange(1, 6);
+	DiceResult = FMath::RandRange(1, 6);
 	GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(DDGameplayTags::State_TurnPhase_Moving);
-	bAlreadyRolled = true;
+
 	ADDBoardGameCharacter* Character =
 		Cast<ADDBoardGameCharacter>(GetAvatarActorFromActorInfo());
 
@@ -52,9 +43,9 @@ void UDDRollDiceAbility::ActivateAbility(
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;
 	}
-	Character->Multicast_PlayDiceAnimation(CachedDice);
+	Character->PlayDice(DiceResult);
 
-	// 🎯 연출 시간만 기다림
+	// 연출 시간만 기다림
 	UAbilityTask_WaitDelay* DelayTask = UAbilityTask_WaitDelay::WaitDelay(this, 2.0f);
 	DelayTask->OnFinish.AddDynamic(this, &UDDRollDiceAbility::OnDiceAnimationFinished);
 	DelayTask->ReadyForActivation();
@@ -62,7 +53,7 @@ void UDDRollDiceAbility::ActivateAbility(
 
 void UDDRollDiceAbility::OnDiceAnimationFinished()
 {
-	UDDMoveTileStepTask* Task = UDDMoveTileStepTask::MoveTile(this, CachedDice);
+	UDDMoveTileStepTask* Task = UDDMoveTileStepTask::MoveTile(this, DiceResult);
 	if (!Task)
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
@@ -80,10 +71,7 @@ bool UDDRollDiceAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Han
                                             FGameplayTagContainer* OptionalRelevantTags) const
 {
 	// if (!IsMyTurn) return false; // 턴 체크
-	if (bAlreadyRolled)
-	{
-		return false;
-	}
+
 	if (ActorInfo->AbilitySystemComponent->HasMatchingGameplayTag(
 		DDGameplayTags::State_TurnPhase_Moving))
 	{
@@ -96,18 +84,21 @@ bool UDDRollDiceAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Han
 void UDDRollDiceAbility::OnMoveFinished()
 {
 	LOG_CYS(Warning, TEXT("[GA_RD] Move Finished"));
-	// 타일 이벤트 실행
-	// if (!HasAuthority(&CurrentActivationInfo))
-	// {
-	// 	return;
-	// }
 
 	ADDBoardGameCharacter* Character =
 		Cast<ADDBoardGameCharacter>(GetAvatarActorFromActorInfo());
-	if (!Character) return;
+	if (!Character)
+	{
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+		return;
+	}
 
 	ADDBasePlayerState* PS = Character->GetPlayerState<ADDBasePlayerState>();
-	if (!PS) return;
+	if (!PS)
+	{
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+		return;
+	}
 
 	ADDTile* CurrentTile = PS->CurrentTile;
 	if (CurrentTile)
@@ -115,6 +106,17 @@ void UDDRollDiceAbility::OnMoveFinished()
 		// 타일 Ability 트리거
 		CurrentTile->OnCharacterArrived(Character);
 	}
-	GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(DDGameplayTags::State_TurnPhase_Moving);
+
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+}
+
+void UDDRollDiceAbility::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility, bool bWasCancelled
+)
+{
+	GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(DDGameplayTags::State_TurnPhase_Moving);
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

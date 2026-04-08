@@ -6,8 +6,8 @@
 
 UDDMoveTileStepTask* UDDMoveTileStepTask::MoveTile(UGameplayAbility* OwningAbility, int32 Steps)
 {
-	LOG_CYS(Warning, TEXT("[MT]MOVE:%s"), *OwningAbility->GetName());
-	LOG_CYS(Warning, TEXT("[MT]Steps:%d"), Steps);
+	LOG_CYS(Warning, TEXT("[MoveTask] MOVE: %s"), *OwningAbility->GetName());
+	LOG_CYS(Warning, TEXT("[MoveTask] Steps: %d"), Steps);
 
 	auto Task = NewAbilityTask<UDDMoveTileStepTask>(OwningAbility);
 	Task->RemainingSteps = Steps;
@@ -16,13 +16,13 @@ UDDMoveTileStepTask* UDDMoveTileStepTask::MoveTile(UGameplayAbility* OwningAbili
 
 void UDDMoveTileStepTask::Activate()
 {
-	LOG_CYS(Warning, TEXT("[MT]Activate"));
+	LOG_CYS(Warning, TEXT("[MoveTask] Activate"));
 	MoveNext();
 }
 
 void UDDMoveTileStepTask::MoveNext()
 {
-	LOG_CYS(Warning, TEXT("[MT]MoveNext"));
+	LOG_CYS(Warning, TEXT("[MoveTask] MoveNext"));
 
 	if (RemainingSteps <= 0)
 	{
@@ -35,7 +35,7 @@ void UDDMoveTileStepTask::MoveNext()
 	ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(GetAvatarActor());
 	if (!Character)
 	{
-		LOG_CYS(Warning, TEXT("[MT]NoCharacter"));
+		LOG_CYS(Error, TEXT("[MoveTask] NoCharacter"));
 		return;
 	}
 
@@ -49,7 +49,7 @@ void UDDMoveTileStepTask::MoveNext()
 	// Goal(목표) 도착 시 이동 종료
 	if (CurrentTile->IsGoal())
 	{
-		LOG_CYS(Warning, TEXT("[MT]Goal"));
+		LOG_CYS(Warning, TEXT("[MoveTask] Goal"));
 		OnFinished.Broadcast();
 		EndTask();
 		return;
@@ -57,7 +57,7 @@ void UDDMoveTileStepTask::MoveNext()
 
 	if (!CurrentTile)
 	{
-		LOG_CYS(Warning, TEXT("[MT]NoCurrentTile"));
+		LOG_CYS(Error, TEXT("[MoveTask] NoCurrentTile"));
 
 		EndTask();
 		return;
@@ -65,14 +65,14 @@ void UDDMoveTileStepTask::MoveNext()
 	// 다음 타일 선택 (일단 랜덤)
 	if (CurrentTile->NextTiles.Num() == 0)
 	{
-		LOG_CYS(Warning, TEXT("[MT]NoNEXT"));
+		LOG_CYS(Error, TEXT("[MoveTask] NoNEXT"));
 
 		return;
 	}
 
 	ADDTile* NextTile = CurrentTile->NextTiles[0]; // TODO: 분기 선택
 
-	LOG_CYS(Warning, TEXT("[MT]NEXT:%s"), *NextTile->TileRowName.ToString());
+	LOG_CYS(Warning, TEXT("[MoveTask] NEXT: %s"), *NextTile->TileRowName.ToString());
 
 	// 위치 이동
 	Character->MoveToLocation(NextTile->GetStandLocation(Character));

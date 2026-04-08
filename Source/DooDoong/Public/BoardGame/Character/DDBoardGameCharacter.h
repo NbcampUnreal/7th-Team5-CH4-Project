@@ -26,12 +26,22 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void UpdateMove();
+
+	UFUNCTION()
+	void PlayDice(int32 DiceValue);
 	
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_PlayDiceAnimation(int32 DiceValue);
+	void Multicast_PlayDiceAnimation();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ShowTileContentAboveHead(FGameplayTag TileTag);
+	
 	
 	UPROPERTY()
 	FTimerHandle MoveTimerHandle;
+	
+	UPROPERTY()
+	FTimerHandle EventDestroyTimerHandle;
 	
 	UPROPERTY()
 	FOnMoveFinished OnMoveFinished;
@@ -47,10 +57,24 @@ private:
 
 	bool bIsMoving = false;
 	
-	UPROPERTY(EditAnywhere, Category="Dice")
+	UPROPERTY(EditAnywhere, Category="Object")
 	TSubclassOf<class ADDDiceActor> DiceClass;
 	
+	UPROPERTY(EditAnywhere, Category="Object")
+	TSubclassOf<class AActor> CoinClass;
+	
+	UPROPERTY(EditAnywhere, Category="Object")
+	TSubclassOf<class AActor> MoveClass;
+	
+	// UPROPERTY(EditAnywhere, Category="Object")
+	
+	UPROPERTY()
 	ADDDiceActor* Dice;
+	UPROPERTY()
+	AActor* EventActor;
+	
+	UPROPERTY(EditAnywhere, Category="UX")
+	float HeadOffset = 70.f;
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attribute", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDDHealthSet> AttributeSet;
