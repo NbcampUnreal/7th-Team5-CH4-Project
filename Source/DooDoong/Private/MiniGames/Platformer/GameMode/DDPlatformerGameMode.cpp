@@ -52,7 +52,17 @@ void ADDPlatformerGameMode::BeginPlay()
 		PlatformerGameStateBase = Cast<ADDPlatformerGameState>(GameStateBase);
 	}
 	
-	WaitingTimerStart();
+	//WaitingTimerStart();
+}
+
+
+void ADDPlatformerGameMode::StartMiniGame()
+{
+	Super::StartMiniGame(); // 필수
+
+	UE_LOG(LogPMJ, Log, TEXT("Platformer StartMiniGame"));
+
+	GameStart(); //기존짜놓으신 로직 연결
 }
 
 void ADDPlatformerGameMode::GameStart()
@@ -60,7 +70,7 @@ void ADDPlatformerGameMode::GameStart()
 	UE_LOG(LogPMJ, Log, TEXT("GameStart"));
 	/* 게임모드일시정지 해제*/
 	//UGameplayStatics::SetGamePaused(GetWorld(), false);
-	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Playing);
+	//PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Playing);
 	GetWorldTimerManager().ClearTimer(FinishedWaitingTimerHandle);
 	GetWorldTimerManager().SetTimer(
 		PlatformerPlayTimerHandle,

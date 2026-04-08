@@ -54,6 +54,7 @@ class DOODOONG_API ADDPlatformerGameMode : public ADDMiniGameModeBase
 	GENERATED_BODY()
 public:
 	virtual void BeginPlay() override;
+	virtual void StartMiniGame() override;
 	
 public:
 	/*플레이어 준비완료 체크*/

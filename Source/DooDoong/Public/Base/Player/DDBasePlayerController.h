@@ -46,7 +46,7 @@ public:
     void Client_ApplyInput(UInputMappingContext* NewIMC);
 
     /** 서버에서 Ready 상태 설정 */
-    UFUNCTION(Server, Reliable)
+    UFUNCTION(Server, Reliable, BlueprintCallable)
     void Server_SetMiniGameReady(bool bReady);
 
 protected:
