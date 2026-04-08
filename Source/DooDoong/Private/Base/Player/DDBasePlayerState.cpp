@@ -60,6 +60,7 @@ void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 		// 커스텀 데이터 복제
 		NewPlayerState->PlayerGameData.PlayerDisplayName = this->PlayerGameData.PlayerDisplayName;
 		NewPlayerState->bIsParticipant = this->bIsParticipant;
+		NewPlayerState->PlayerGameData.TurnOrder = this->PlayerGameData.TurnOrder;
 	}
 }
 

@@ -28,6 +28,9 @@ struct FPlayerGameplayInfo
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bPlayerIsDead = false; 
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    int32 TurnOrder = -1;
 };
 
 UCLASS()
