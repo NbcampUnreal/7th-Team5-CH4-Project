@@ -24,6 +24,7 @@ void ADDLobbyGameMode::ProcessPlayerJoin(ADDLobbyPlayerController* LobbyPlayerCo
 	if (ADDBasePlayerState* BasePlayerState = LobbyPlayerController->GetPlayerState<ADDBasePlayerState>())
 	{
 		// 닉네임 설정
+		BasePlayerState->SetPlayerName(Nickname.ToString());
 		BasePlayerState->PlayerGameData.PlayerDisplayName = Nickname;
 
 		ADDGameStateBase* GameStateBase = GetGameState<ADDGameStateBase>();
