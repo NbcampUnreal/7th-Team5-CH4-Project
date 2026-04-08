@@ -1,5 +1,4 @@
 #include "BoardGame/Character/DDBoardGameCharacter.h"
-
 #include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/DDDiceActor.h"
 #include "BoardGame/DDTile.h"
@@ -25,6 +24,9 @@ void ADDBoardGameCharacter::MoveToLocation(FVector TargetLocation)
 {
 	if (bIsMoving) return;
 
+	UWorld* World = GetWorld();
+	if (!World) return;
+
 	MoveStartLocation = GetActorLocation();
 	MoveTargetLocation = TargetLocation;
 
@@ -33,18 +35,22 @@ void ADDBoardGameCharacter::MoveToLocation(FVector TargetLocation)
 
 	bIsMoving = true;
 
-	GetWorld()->GetTimerManager().SetTimer(
+	World->GetTimerManager().SetTimer(
 		MoveTimerHandle,
 		this,
 		&ADDBoardGameCharacter::UpdateMove,
-		0.016f, // 약 60fps
+		World->GetDeltaSeconds(),
 		true
 	);
 }
 
 void ADDBoardGameCharacter::UpdateMove()
 {
-	MoveElapsedTime += 0.016f;
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	float DeltaTime = World->GetDeltaSeconds();
+	MoveElapsedTime += DeltaTime;
 
 	float Alpha = MoveElapsedTime / MoveDuration;
 	Alpha = FMath::Clamp(Alpha, 0.f, 1.f);
@@ -54,7 +60,7 @@ void ADDBoardGameCharacter::UpdateMove()
 	FVector LerpPos = FMath::Lerp(MoveStartLocation, MoveTargetLocation, Alpha);
 
 	float Height = 100.f;
-	float ZOffset = Height * 4 * Alpha * (1 - Alpha);
+	float ZOffset = Height * FMath::Sin(Alpha * PI);
 
 	LerpPos.Z += ZOffset;
 
@@ -66,10 +72,10 @@ void ADDBoardGameCharacter::UpdateMove()
 
 		bIsMoving = false;
 
-		GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
+		World->GetTimerManager().ClearTimer(MoveTimerHandle);
 
 		// 주사위 파괴
-		if (Dice && Dice->IsValidLowLevel())
+		if (IsValid(Dice))
 		{
 			// 소켓에서 Detach
 			Dice->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -83,7 +89,47 @@ void ADDBoardGameCharacter::UpdateMove()
 	}
 }
 
-void ADDBoardGameCharacter::Multicast_PlayDiceAnimation_Implementation(int32 DiceValue)
+void ADDBoardGameCharacter::PlayDice(int32 DiceValue)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	// 서버에서 Dice 스폰, 클라이언트는 복제된 actor을 봄
+	if (!DiceClass)
+	{
+		LOG_CYS(Error, TEXT("DiceClass is NULL"));
+		return;
+	}
+
+	FVector Loc = GetMesh()->GetSocketLocation(TEXT("head"));
+	Loc.Z += HeadOffset;
+	Dice = World->SpawnActor<ADDDiceActor>(
+		DiceClass,
+		Loc,
+		FRotator::ZeroRotator
+	);
+
+	if (Dice)
+	{
+		LOG_CYS(Warning, TEXT("DiceSpawn: %s"), *Dice->GetName());
+		Dice->AttachToComponent(
+			GetMesh(),
+			FAttachmentTransformRules::KeepWorldTransform,
+			TEXT("head")
+		);
+
+		Dice->StartRoll(DiceValue);
+	}
+
+	Multicast_PlayDiceAnimation();
+}
+
+void ADDBoardGameCharacter::Multicast_PlayDiceAnimation_Implementation()
 {
 	if (!DiceMontage)
 	{
@@ -96,42 +142,14 @@ void ADDBoardGameCharacter::Multicast_PlayDiceAnimation_Implementation(int32 Dic
 	{
 		AnimInstance->Montage_Play(DiceMontage);
 	}
-	if (HasAuthority())
-	{
-		// 서버에서 Dice 스폰, 클라이언트는 복제된 actor을 봄
-		if (!DiceClass)
-		{
-			LOG_CYS(Error, TEXT("DiceClass is NULL"));
-			return;
-		}
-
-		FVector Loc = GetMesh()->GetSocketLocation(TEXT("head"));
-		Loc.Z += HeadOffset;
-		Dice = GetWorld()->SpawnActor<ADDDiceActor>(
-			DiceClass,
-			Loc,
-			FRotator::ZeroRotator
-		);
-
-		LOG_CYS(Warning, TEXT("DiceSpawn: %s"), *Dice->GetName());
-		if (Dice)
-		{
-			Dice->AttachToComponent(
-				GetMesh(),
-				FAttachmentTransformRules::KeepWorldTransform,
-				TEXT("head")
-			);
-
-			Dice->StartRoll(DiceValue);
-		}
-	}
 }
 
 void ADDBoardGameCharacter::Multicast_ShowTileContentAboveHead_Implementation(FGameplayTag TileTag)
 {
-	// if (!HasAuthority()) return;
 	if (!GetMesh()) return;
-	if (!GetWorld()) return;
+
+	UWorld* World = GetWorld();
+	if (!World) return;
 
 	FVector Loc = GetMesh()->GetSocketLocation(TEXT("head"));
 	Loc.Z += HeadOffset;
@@ -186,8 +204,8 @@ void ADDBoardGameCharacter::Multicast_ShowTileContentAboveHead_Implementation(FG
 		SpawnRot.Pitch = 0.f;
 		SpawnRot.Roll = 0.f;
 	}
-	
-	EventActor = GetWorld()->SpawnActor<AActor>(
+
+	EventActor = World->SpawnActor<AActor>(
 		SpawnClass,
 		Loc,
 		SpawnRot
@@ -205,11 +223,10 @@ void ADDBoardGameCharacter::Multicast_ShowTileContentAboveHead_Implementation(FG
 		TEXT("head")
 	);
 	LOG_CYS(Warning, TEXT("Spawn: %s"), *EventActor->GetName());
-	FTimerHandle TimerHandle;
 
 	// (임시) 2초 후 파괴
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle,
+	World->GetTimerManager().SetTimer(
+		EventDestroyTimerHandle,
 		[this]()
 		{
 			if (EventActor && IsValid(EventActor))

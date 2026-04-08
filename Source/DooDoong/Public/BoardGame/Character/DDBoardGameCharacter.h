@@ -27,8 +27,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateMove();
 
+	UFUNCTION()
+	void PlayDice(int32 DiceValue);
+	
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_PlayDiceAnimation(int32 DiceValue);
+	void Multicast_PlayDiceAnimation();
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ShowTileContentAboveHead(FGameplayTag TileTag);
@@ -36,6 +39,9 @@ public:
 	
 	UPROPERTY()
 	FTimerHandle MoveTimerHandle;
+	
+	UPROPERTY()
+	FTimerHandle EventDestroyTimerHandle;
 	
 	UPROPERTY()
 	FOnMoveFinished OnMoveFinished;
