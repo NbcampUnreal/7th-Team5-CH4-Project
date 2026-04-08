@@ -25,7 +25,8 @@ namespace DDGameplayTags
 	
 	// Data Tags
 	UE_DEFINE_GAMEPLAY_TAG(Data_Health_Damage, "Data.Health.Damage");
-	
+	UE_DEFINE_GAMEPLAY_TAG(Data_Point_Coin, "Data.Point.Coin");
+	UE_DEFINE_GAMEPLAY_TAG(Data_Point_Trophy, "Data.Point.Trophy");
 
 	// Ability Tile Event Tags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tile_Ability_Coin, "Tile.Ability.Coin", "코인 이벤트 타일 어빌리티");
