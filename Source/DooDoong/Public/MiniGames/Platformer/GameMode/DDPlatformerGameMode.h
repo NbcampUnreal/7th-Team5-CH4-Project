@@ -124,7 +124,7 @@ private:
 	/* 게임중인 플레이어 관련 변수 */
 	FVector StartLocation;
 	int32 Rank = 1;
-	int32 MaxPlayer = 2;
+	int32 MaxPlayer = 4;
 	
 	/* 테스트용 임시변수 */
 	int32 PlayerIndex = 1;
