@@ -16,4 +16,17 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData) override;
+	
+	
+	UFUNCTION()
+	void OnMove();
+	
+	UPROPERTY()
+	int32 AddMove;
+
+	UFUNCTION()
+	void OnMoveFinished();
+
+	UPROPERTY(EditDefaultsOnly, Category = "UX")
+	FGameplayTag TileEventTag;
 };
