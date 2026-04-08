@@ -46,6 +46,10 @@ struct FPlatformerPlayerData
 	
 	UPROPERTY()
 	FVector SavePointLocation;
+
+	// 추가: 플레이어 준비 상태
+	UPROPERTY()
+	bool bIsReady = false;
 };
 
 UCLASS()
@@ -59,6 +63,8 @@ public:
 public:
 	/*플레이어 준비완료 체크*/
 	void CheckReadyPlayers();
+
+	void SetPlayerReady(int32 SlotIndex);
 	
 	/*대기시간 타이머 호출 함수*/
 	void WaitingTimerStart();

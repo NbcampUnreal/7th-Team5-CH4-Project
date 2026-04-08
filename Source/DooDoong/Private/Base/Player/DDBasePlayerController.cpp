@@ -147,10 +147,23 @@ void ADDBasePlayerController::Input_AbilityReleased(FGameplayTag InputTag)
 // MiniGame UI
 void ADDBasePlayerController::Client_OpenReadyUI_Implementation()
 {
-    if (MiniGameUI)
+    UE_LOG(LogTemp, Warning, TEXT("Client_OpenReadyUI 실행됨")); // 추가
+
+    if (!ReadyWidgetClass)
     {
-        MiniGameUI->OpenReadyUI(this);
+        UE_LOG(LogTemp, Error, TEXT("ReadyWidgetClass NULL"));
+        return;
     }
+
+    ReadyWidget = CreateWidget<UUserWidget>(this, ReadyWidgetClass);
+
+    if (!ReadyWidget)
+    {
+        UE_LOG(LogTemp, Error, TEXT("CreateWidget 실패"));
+        return;
+    }
+
+    ReadyWidget->AddToViewport();
 }
 
 void ADDBasePlayerController::Client_CloseReadyUI_Implementation()
@@ -159,4 +172,28 @@ void ADDBasePlayerController::Client_CloseReadyUI_Implementation()
     {
         MiniGameUI->CloseReadyUI(this);
     }
+}
+
+
+
+
+void ADDBasePlayerController::Server_StartRandomMiniGame_Implementation()
+{
+    if (GetGameInstance() == nullptr) return;
+
+    UDDMiniGameManager* Manager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>();
+    if (Manager == nullptr) return;
+
+    TArray<APlayerState*> Players;
+
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        APlayerController* PC = It->Get();
+        if (PC && PC->PlayerState)
+        {
+            Players.Add(PC->PlayerState);
+        }
+    }
+
+    Manager->RequestStartRandomMiniGame(Players);
 }

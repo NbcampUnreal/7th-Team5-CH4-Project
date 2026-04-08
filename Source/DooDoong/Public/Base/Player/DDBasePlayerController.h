@@ -30,6 +30,16 @@ public:
     UPROPERTY()
     UMiniGameUIWrapper* MiniGameUI;
 
+    /** randomminigame을골라서 해당미니게임레벨로 트래블하는함수호출 */
+    UFUNCTION(Server, Reliable, BlueprintCallable)
+    void Server_StartRandomMiniGame();
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+    TSubclassOf<UUserWidget> ReadyWidgetClass;
+
+    UPROPERTY()
+    UUserWidget* ReadyWidget;
+
     /** Ready UI RPCs */
     UFUNCTION(Client, Reliable)
     void Client_OpenReadyUI();

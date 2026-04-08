@@ -40,21 +40,37 @@ void ADDPlatformerGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	LOG_PMJ(Warning, TEXT("BeginPlayServer"));
-	/* 게임모드 일시정지 */
-	//UGameplayStatics::SetGamePaused(GetWorld(), true);
-	
-	/* 시작지점 초기화 각 캐릭터가 시작지점을 기준으로 얼마나 멀리갔는지 최고기록 체크를위함 */
-	StartLocation = FVector(0.0f, 0.0f, 0.0f);
-	
-	AGameStateBase* GameStateBase = Cast<AGameStateBase>(GetWorld()->GetGameState());
-	if (IsValid(GameStateBase) == true)
+
+	StartLocation = FVector(0.f, 0.f, 0.f);
+
+	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
+	if (IsValid(GameStateBase))
 	{
 		PlatformerGameStateBase = Cast<ADDPlatformerGameState>(GameStateBase);
 	}
-	
-	//WaitingTimerStart();
+
+	// Ready UI 열기만 하고 게임 시작은 플레이어 준비 완료 후
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ADDBasePlayerController* PC = Cast<ADDBasePlayerController>(It->Get());
+		if (PC)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Open Ready UI for PC"));
+			PC->Client_OpenReadyUI();
+		}
+	}
 }
 
+
+// 플레이어가 준비 완료 버튼 클릭 시 호출
+void ADDPlatformerGameMode::SetPlayerReady(int32 SlotIndex)
+{
+	if (FPlatformerPlayerData* PlayerData = PlayerDatas.Find(SlotIndex))
+	{
+		PlayerData->bIsReady = true;
+		CheckReadyPlayers();
+	}
+}
 
 void ADDPlatformerGameMode::StartMiniGame()
 {
@@ -211,29 +227,25 @@ void ADDPlatformerGameMode::WaitingTimerStart()
 	false);
 }
 
+// 모든 플레이어 준비 여부 확인
 void ADDPlatformerGameMode::CheckReadyPlayers()
 {
-	//TODO_@Minjae : 플레이어들이 준비되었는지 확인하는 로직 구현 
-	//플레이어쪽에서 대기화면이 나타났을때 준비완료 버튼을 누를때마다 이벤트 함수 호출
-	//그때마다 준비상태를 확인하고 4명이 준비완료되었을경우 게임 시작
-	
-	if (PlayerDatas.IsEmpty() == true)
-	{
+	if (PlayerDatas.IsEmpty())
 		return;
-	}
+
 	bool bIsAllReady = true;
-	
-	for (const TPair<int32 ,FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
+	for (const TPair<int32, FPlatformerPlayerData>& Entry : PlayerDatas)
 	{
-		if (EnteredPlayer.Value.PlayerState->PlayerGameData.bPlayerIsDead == false)
+		if (!Entry.Value.bIsReady)
 		{
 			bIsAllReady = false;
+			break;
 		}
 	}
-	
+
 	if (bIsAllReady)
 	{
-		WaitingTimerStart();
+		WaitingTimerStart(); // 모든 플레이어 준비 완료 후 타이머 시작
 	}
 }
 
