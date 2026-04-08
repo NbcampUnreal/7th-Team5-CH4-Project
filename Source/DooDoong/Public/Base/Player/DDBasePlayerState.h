@@ -86,6 +86,6 @@ public:
     bool bIsParticipant = false;
 	
 	/* 플레이어 정보 구조체 */
-	UPROPERTY(Replicated, BlueprintReadOnly)
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
 	FPlayerGameplayInfo PlayerGameData;
 };

@@ -51,6 +51,9 @@ protected:
     void StartNextPlayerTurn();
     void CalculateFinalWinner();
     
+    /** 라운드 시작 시 턴 순서대로 배열을 정렬하는 함수 */
+    void SortPlayersByTurnOrder();
+    
     /** 플레이어의 AbilitySystemComponent를 가져오는 헬퍼 함수 */
     UAbilitySystemComponent* GetAbilitySystemComponentFromPlayer(APlayerController* PlayerController);
     
