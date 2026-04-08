@@ -17,4 +17,10 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	) override;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "GAS")
+	TSubclassOf<UGameplayEffect> GE_Coin;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "UX")
+	FGameplayTag TileEventTag;
 };
