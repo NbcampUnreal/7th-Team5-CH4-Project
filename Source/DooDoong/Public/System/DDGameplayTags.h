@@ -77,5 +77,6 @@ namespace DDGameplayTags
 	// 보드게임 턴 내부 세부 페이즈 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_BeforeDice);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_Moving);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_SelectTile);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_Event);
 }
