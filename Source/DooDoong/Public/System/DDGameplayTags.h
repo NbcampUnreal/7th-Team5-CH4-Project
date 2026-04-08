@@ -24,6 +24,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Character_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_Start); 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_End); 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Shooter_Fire);
 	
 	// Data Tags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Health_Damage); 

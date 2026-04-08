@@ -22,6 +22,7 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Character_Death, "Event.Character.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_Start, "Event.Trace.Start");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_End, "Event.Trace.End");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Shooter_Fire, "Event.Shooter.Fire", "슈터 미니게임 발사 애니메이션 몽타주에서 사용할 발사 이벤트 태그");
 	
 	// Data Tags
 	UE_DEFINE_GAMEPLAY_TAG(Data_Health_Damage, "Data.Health.Damage");
