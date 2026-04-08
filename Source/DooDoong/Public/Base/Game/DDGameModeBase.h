@@ -61,6 +61,8 @@ protected:
     void FocusAllCamerasOnTarget(AActor* TargetActor);
     
 public: 
+    virtual void OnCharacterKilled(AActor* Killer, AActor* Victim);
+    
     void HandleRespawn(AController* TargetController);
 
 protected:
@@ -104,6 +106,4 @@ private:
     
     /** 현재 턴을 진행 중인 플레이어에게 부여된 세부 페이즈 태그 (페이즈 종료 시 회수 목적) */
     FGameplayTag CurrentTurnPhaseTag;
-    
-   
 };

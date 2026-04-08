@@ -4,6 +4,8 @@
 #include "AbilitySystemComponent.h"
 #include "DDHealthSet.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FKillLogSignature, AActor* /*Killer*/, AActor* /*Victim*/);
+
 UCLASS()
 class DOODOONG_API UDDHealthSet : public UAttributeSet
 {
@@ -36,4 +38,7 @@ private:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = true), ReplicatedUsing = OnRep_MaxHealth)
 	FGameplayAttributeData MaxHealth; 
+	
+public:
+	FKillLogSignature KillLogSignature;
 };

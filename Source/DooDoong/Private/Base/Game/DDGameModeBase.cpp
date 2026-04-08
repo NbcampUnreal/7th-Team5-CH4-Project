@@ -17,6 +17,7 @@
 #include "System/DDGameplayTags.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "InputMappingContext.h"
+
 ADDGameModeBase::ADDGameModeBase()
 {
 	PlayerStateClass = ADDBasePlayerState::StaticClass();
@@ -420,6 +421,11 @@ void ADDGameModeBase::FocusAllCamerasOnTarget(AActor* TargetActor)
 		}
 	}
 	UE_LOG(LogCJH, Log, TEXT("[Camera] 모든 플레이어의 화면이 주인공 타겟(%s)을 향합니다."), *TargetActor->GetName());
+}
+
+void ADDGameModeBase::OnCharacterKilled(AActor* Killer, AActor* Victim)
+{
+	LOG_KMS(Warning, TEXT("[GM] : %s was killed by %s"), *Victim->GetName(), *Killer->GetName());
 }
 
 void ADDGameModeBase::HandleRespawn(AController* TargetController)

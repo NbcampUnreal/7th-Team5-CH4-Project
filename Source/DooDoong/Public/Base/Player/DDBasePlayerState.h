@@ -46,6 +46,11 @@ public:
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
     
+	virtual void BeginPlay() override;
+public:
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCast_BroadcastKillLog(AActor* Victim, AActor* Killer);
+	
 public:
     /** 심리스 트래블 시 새 맵의 PlayerState로 데이터를 인수인계 */
     virtual void CopyProperties(APlayerState* PlayerState) override;
