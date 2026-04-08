@@ -5,7 +5,11 @@
 #include "AbilitySystem/DDAbilitySystemComponent.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "Input/DDInputComponent.h"
+
 #include "UI/MiniGameUI/MiniGameUIWrapper.h"
+#include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
+#include "Base/Player/DDBasePlayerState.h"
+
 #include "System/DDGameplayTags.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 
@@ -168,10 +172,7 @@ void ADDBasePlayerController::Client_OpenReadyUI_Implementation()
 
 void ADDBasePlayerController::Client_CloseReadyUI_Implementation()
 {
-    if (MiniGameUI)
-    {
-        MiniGameUI->CloseReadyUI(this);
-    }
+
 }
 
 
@@ -196,4 +197,14 @@ void ADDBasePlayerController::Server_StartRandomMiniGame_Implementation()
     }
 
     Manager->RequestStartRandomMiniGame(Players);
+}
+
+
+void ADDBasePlayerController::ServerSetPlayerReady_Implementation()
+{
+    ADDPlatformerGameMode* GM = GetWorld()->GetAuthGameMode<ADDPlatformerGameMode>();
+    if (!GM) return;
+
+    int32 SlotIndex = GetPlayerState<ADDBasePlayerState>()->PlayerGameData.SlotIndex;
+    GM->SetPlayerReady(SlotIndex);
 }

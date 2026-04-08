@@ -40,6 +40,9 @@ public:
     UPROPERTY()
     UUserWidget* ReadyWidget;
 
+    UFUNCTION(Server, Reliable)
+    void ServerSetPlayerReady();
+
     /** Ready UI RPCs */
     UFUNCTION(Client, Reliable)
     void Client_OpenReadyUI();

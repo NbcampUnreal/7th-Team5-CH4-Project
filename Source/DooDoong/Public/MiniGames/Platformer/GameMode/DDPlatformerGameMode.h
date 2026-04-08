@@ -110,6 +110,8 @@ protected:
 	/* 게임스테이트 변수 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
 	ADDPlatformerGameState* PlatformerGameStateBase;
+
+	bool bReadyUIShown = false;
 	
 private:
 	/* 타이머핸들러 */
