@@ -96,13 +96,7 @@ void ADDBasePlayerController::Client_ApplyInput_Implementation(UInputMappingCont
     SetInputMappingContext(NewIMC);
 }
 
-void ADDBasePlayerController::Server_SetMiniGameReady_Implementation(bool bReady)
-{
-    if (ADDMiniGameModeBase* MiniGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDMiniGameModeBase>() : nullptr)
-    {
-        MiniGameMode->SetPlayerReady(PlayerState, bReady);
-    }
-}
+
 
 void ADDBasePlayerController::Input_Move(const FInputActionValue& Value)
 {
@@ -208,3 +202,27 @@ void ADDBasePlayerController::ServerSetPlayerReady_Implementation()
     int32 SlotIndex = GetPlayerState<ADDBasePlayerState>()->PlayerGameData.SlotIndex;
     GM->SetPlayerReady(SlotIndex);
 }
+
+
+void ADDBasePlayerController::Client_UpdateReadyCount_Implementation(int32 ReadyCount, int32 TotalCount)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Ready: %d / %d"), ReadyCount, TotalCount);
+
+    if (MiniGameUI)
+    {
+        MiniGameUI->UpdateReadyCount(ReadyCount, TotalCount);
+    }
+}
+
+
+
+void ADDBasePlayerController::Server_SetMiniGameReady_Implementation(bool bReady)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Server_SetMiniGameReady_Implementation 실행됨, bReady=%s"), bReady ? TEXT("true") : TEXT("false"));
+
+    if (ADDMiniGameModeBase* MiniGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDMiniGameModeBase>() : nullptr)
+    {
+        MiniGameMode->SetPlayerReady(PlayerState, bReady);
+    }
+}
+

@@ -95,27 +95,53 @@ void ADDPlatformerGameMode::SetPlayerReady(int32 PlayerSlotIndex)
     }
 }
 
+
+
+
+int32 ADDPlatformerGameMode::GetReadyPlayerCount() const
+{
+    int32 Count = 0;
+
+    for (const auto& Entry : PlayerDatas)
+    {
+        if (Entry.Value.bIsReady)
+        {
+            Count++;
+        }
+    }
+
+    return Count;
+}
+
+
+
 // 모든 플레이어 준비 여부 확인
 void ADDPlatformerGameMode::CheckReadyPlayers()
 {
     if (PlayerDatas.IsEmpty()) return;
 
     bool bIsAllReady = true;
+    int32 ReadyCount = 0;
+    int32 TotalCount = PlayerDatas.Num();
 
     for (const TPair<int32, FPlatformerPlayerData>& Entry : PlayerDatas)
     {
-        if (!Entry.Value.bIsReady)
+        if (Entry.Value.bIsReady)
+        {
+            ReadyCount++;
+        }
+        else
         {
             bIsAllReady = false;
-            break;
         }
     }
+
+    // ✅ 디버그 로그 추가
+    LOG_PMJ(Warning, TEXT("Ready Count: %d / %d"), ReadyCount, TotalCount);
 
     if (bIsAllReady)
     {
         LOG_PMJ(Warning, TEXT("All players are READY"));
-
-
 
         WaitingTimerStart();
     }

@@ -87,6 +87,8 @@ public:
 	/* 참가한 플레이어 관련 정보 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData | EnteredPlayer")
 	TMap<int32, FPlatformerPlayerData> PlayerDatas;
+
+	int32 GetReadyPlayerCount() const;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlatformerData")

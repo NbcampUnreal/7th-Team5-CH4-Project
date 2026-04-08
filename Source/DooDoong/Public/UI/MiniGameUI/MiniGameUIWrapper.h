@@ -14,6 +14,8 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
     TSubclassOf<UUserWidget> ReadyWidgetClass;
 
+    void UpdateReadyCount(int32 ReadyCount, int32 TotalCount);
+
 private:
     /** 실제 생성된 위젯 */
     UPROPERTY()
