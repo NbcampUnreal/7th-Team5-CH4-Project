@@ -164,9 +164,22 @@ void ADDBasePlayerController::Client_OpenReadyUI_Implementation()
     ReadyWidget->AddToViewport();
 }
 
+
 void ADDBasePlayerController::Client_CloseReadyUI_Implementation()
 {
+    if (ReadyWidget && ReadyWidget->IsInViewport())
+    {
+        ReadyWidget->RemoveFromParent();
+        ReadyWidget = nullptr; // 필요하면 포인터 초기화
+    }
 
+    if (MiniGameUI)
+    {
+        MiniGameUI->RemoveFromParent();
+        MiniGameUI = nullptr;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Ready UI closed."));
 }
 
 

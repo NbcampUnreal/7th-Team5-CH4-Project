@@ -167,8 +167,19 @@ void ADDPlatformerGameMode::GameStart()
 {
     LOG_PMJ(Log, TEXT("GameStart"));
 
+    // 1. 모든 플레이어의 Ready UI 닫기
+    for (auto& Pair : PlayerDatas)
+    {
+        if (ADDBasePlayerController* PC = Pair.Value.PlayerController.Get())
+        {
+            PC->Client_CloseReadyUI();
+        }
+    }
+
+    // 2. 대기 타이머 해제
     GetWorldTimerManager().ClearTimer(FinishedWaitingTimerHandle);
 
+    // 3. 게임 종료 타이머 시작
     GetWorldTimerManager().SetTimer(
         PlatformerPlayTimerHandle,
         this,
@@ -177,6 +188,7 @@ void ADDPlatformerGameMode::GameStart()
         false
     );
 
+    // 4. 플레이어 이동/거리 체크 타이머 시작
     GetWorldTimerManager().SetTimer(
         DistanceTimerHandle,
         this,
@@ -184,6 +196,10 @@ void ADDPlatformerGameMode::GameStart()
         1.f,
         true
     );
+
+    // 필요하면 시작 위치 초기화나 Rank 초기화 등 추가 가능
+    Rank = 1;
+    StartLocation = FVector(0.f, 0.f, 0.f);
 }
 
 void ADDPlatformerGameMode::GameEnd()
