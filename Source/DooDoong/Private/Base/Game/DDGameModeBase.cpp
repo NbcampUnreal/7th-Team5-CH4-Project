@@ -115,9 +115,9 @@ void ADDGameModeBase::OnMainTimerElapsed()
 	// 1. 게임 최초 시작 대기 로직
 	if (!GameStateBase->MatchStateTag.IsValid())
 	{
-		if (AlivePlayerControllers.Num() >= 2)
+		if (AlivePlayerControllers.Num() >= GameStateBase->MinPlayerCount)
 		{
-			UE_LOG(LogCJH, Warning, TEXT("[GameLoop] 정원(4명) 접속 완료! 보드게임 Init 상태로 진입합니다."));
+			LOG_CJH(Log, TEXT("[GameLoop] %d명 접속 완료! 보드게임 Init 상태로 진입합니다."), GameStateBase->MinPlayerCount);
 			SetMatchState(DDGameplayTags::State_BoardGame_Init);
 		}
 		return;

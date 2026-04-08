@@ -14,7 +14,7 @@ public:
 	virtual void Logout(AController* Exiting) override;
 
 	void ProcessPlayerJoin(class ADDLobbyPlayerController* LobbyPlayerController, const FString& Nickname);
-
+	
 protected:
 	UFUNCTION()
 	void OnMainTimerElapsed();
@@ -24,13 +24,14 @@ private:
 	TArray<TObjectPtr<ADDLobbyPlayerController>> Spectators;
 
 	FTimerHandle MainTimerHandle;
-	int32 RemainWaitingTimeForStarting = 5;
+	
 	bool bIsStarting = false;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Person")
-	int32 RemainPerson = 4;
-
-	// 에디터에서 설정할 수 있는 본 게임 맵 경로
-	UPROPERTY(EditDefaultsOnly, Category = "Map Settings")
+	UPROPERTY(EditDefaultsOnly, Category = "GameSettings", meta=(DisplayName="N초 후 게임 시작"))
+	int32 MaxWaitingTime = 5;
+	
+	int32 WaitingTime = MaxWaitingTime;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "GameSettings", meta=(DisplayName="보드게임 맵 경로"))
 	FString BaseGameMapPath = TEXT("/Game/DooDoong/Map/L_BaseGame?listen");
 };
