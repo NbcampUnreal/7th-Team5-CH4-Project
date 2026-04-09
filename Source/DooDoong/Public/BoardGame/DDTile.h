@@ -4,11 +4,10 @@
 #include "GameFramework/Actor.h"
 #include "Engine/DataTable.h"
 #include "DDTileData.h"
-#include "Character/DDBoardGameCharacter.h"
 #include "DDTile.generated.h"
 
 class ACharacter;
-
+class ADDBoardGameCharacter;
 // USTRUCT(BlueprintType)
 // struct FTileVisualData
 // {
