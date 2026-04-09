@@ -44,6 +44,8 @@ void ADDMiniGameStateBase::SetScoreBoard(const TArray<FMiniGameScoreEntry>& InSc
 {
 	// 룰셋에서 정리한 점수판을 통째로 반영할 때 사용할 수 있음
 	ScoreBoard = InScoreBoard;
+	// 브로드캐스트
+	BroadcastScoreBoardChanged();
 }
 
 void ADDMiniGameStateBase::SetReadyPlayerCount(int32 NewReadyPlayerCount)
@@ -123,6 +125,16 @@ void ADDMiniGameStateBase::OnRep_TotalParticipantCount()
 void ADDMiniGameStateBase::OnRep_ReadyEntries()
 {
 	BroadcastReadyEntriesChanged();
+}
+
+void ADDMiniGameStateBase::OnRep_ScoreBoard()
+{
+	BroadcastScoreBoardChanged();
+}
+
+void ADDMiniGameStateBase::BroadcastScoreBoardChanged()
+{
+	OnMiniGameScoreBoardChanged.Broadcast();
 }
 
 void ADDMiniGameStateBase::BroadcastReadyStateChanged()

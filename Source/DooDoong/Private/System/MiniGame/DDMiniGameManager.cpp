@@ -3,9 +3,10 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "Base/Player/DDBasePlayerState.h"
-#include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "BoardGame/DDTile.h"
 #include "GameFramework/PlayerState.h"
+#include "TimerManager.h"
+#include "Common/DDLogManager.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 
 void UDDMiniGameManager::Initialize(FSubsystemCollectionBase& Collection)
@@ -21,6 +22,11 @@ void UDDMiniGameManager::Initialize(FSubsystemCollectionBase& Collection)
 
 void UDDMiniGameManager::Deinitialize()
 {
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(ResultDisplayTimerHandle);
+	}
+
 	// 종료 시 런타임 캐시 정리
 	CachedDefinitions.Reset();
 	// 마지막 진행 정보들을 정리
@@ -163,20 +169,49 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 
 	SetCurrentState(DDGameplayTags::State_MiniGame_Completed);
 	OnMiniGameResultCommitted.Broadcast(Result);
+	
+	if (ReturnMapPackageName.IsEmpty())
+	{
+		ClearActiveSession();
+		SetCurrentState(DDGameplayTags::State_MiniGame_Idle);
+		return;
+	}
 
+	// 종료 타이머 설정
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(ResultDisplayTimerHandle);
+		LOG_JJH(Warning, TEXT("결과UI호출 타이머 시작"));
+		World->GetTimerManager().SetTimer(
+			ResultDisplayTimerHandle,
+			this,
+			&UDDMiniGameManager::HandleMiniGameResultDisplayFinished,
+			ResultDisplayDurationSeconds,
+			false);
+	}
+}
+
+void UDDMiniGameManager::HandleMiniGameResultDisplayFinished()
+{
+	
+	LOG_JJH(Warning, TEXT("결과UI호출 타이머 종료"));
+	
 	const FString SavedReturnMapPackageName = ReturnMapPackageName;
 	ClearActiveSession();
 
-	if (!SavedReturnMapPackageName.IsEmpty())
+	if (SavedReturnMapPackageName.IsEmpty())
 	{
-		SetCurrentState(DDGameplayTags::State_MiniGame_Returning);
+		SetCurrentState(DDGameplayTags::State_MiniGame_Idle);
+		return;
+	}
 
-		if (UWorld* World = GetWorld())
-		{
-			// 미니게임이 끝나면 ServerTravel로 참가자 전원을 원래 맵으로 복귀시킴
-			// TODO 보드판이 준비되면 단순한 복귀가 아니라 보드칸의 정보를 확인해서 원래 플레이어가 서 있던 칸으로 복귀시켜야함.
-			World->ServerTravel(SavedReturnMapPackageName);
-		}
+	SetCurrentState(DDGameplayTags::State_MiniGame_Returning);
+
+	if (UWorld* World = GetWorld())
+	{
+		// 미니게임이 끝나면 정해둔 시간 동안 결과창을 보여준 뒤 ServerTravel로 참가자 전원을 원래 맵으로 복귀시킴
+		World->ServerTravel(SavedReturnMapPackageName);
+		return;
 	}
 
 	SetCurrentState(DDGameplayTags::State_MiniGame_Idle);
@@ -315,6 +350,11 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 
 void UDDMiniGameManager::ClearActiveSession()
 {
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(ResultDisplayTimerHandle);
+	}
+
 	// 현재 진행 중인 미니게임과 관련된 런타임 데이터만 Clear
 	ActiveDefinition = nullptr;
 	ActiveParticipants.Reset();

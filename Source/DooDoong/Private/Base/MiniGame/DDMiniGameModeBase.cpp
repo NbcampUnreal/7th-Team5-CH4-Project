@@ -366,6 +366,34 @@ FMiniGameResult ADDMiniGameModeBase::BuildMiniGameResult() const
 	return Result;
 }
 
+void ADDMiniGameModeBase::RefreshRanking(ADDMiniGameStateBase* MiniGameState) const
+{
+	if (MiniGameState == nullptr)
+	{
+		return;
+	}
+
+	if (RuleSet != nullptr)
+	{
+		RuleSet->ResolveRanking(MiniGameState);
+		return;
+	}
+
+	// 내림차순 정렬
+	TArray<FMiniGameScoreEntry> SortedScoreBoard = MiniGameState->GetScoreBoard();
+	SortedScoreBoard.Sort([](const FMiniGameScoreEntry& Left, const FMiniGameScoreEntry& Right)
+	{
+		return Left.Score > Right.Score;
+	});
+
+	for (int32 Index = 0; Index < SortedScoreBoard.Num(); ++Index)
+	{
+		SortedScoreBoard[Index].Rank = Index + 1;
+	}
+
+	MiniGameState->SetScoreBoard(SortedScoreBoard);
+}
+
 void ADDMiniGameModeBase::AddScore(APlayerState* PlayerState, int32 DeltaScore)
 {
 	ADDMiniGameStateBase* MiniGameState = GetMiniGameState();
@@ -383,6 +411,8 @@ void ADDMiniGameModeBase::AddScore(APlayerState* PlayerState, int32 DeltaScore)
 	{
 		MiniGameState->AddScore(PlayerState, DeltaScore);
 	}
+
+	RefreshRanking(MiniGameState);
 }
 
 void ADDMiniGameModeBase::FinishGame(FGameplayTag Reason)
@@ -404,11 +434,8 @@ void ADDMiniGameModeBase::FinishGame(FGameplayTag Reason)
 		// 게임이 종료된 상태로 갱신
 		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Finishing);
 
-		// RuleSet이 있다면 RuleSet의 규칙에 따라 랭킹 정리
-		if (RuleSet != nullptr)
-		{
-			RuleSet->ResolveRanking(MiniGameState);
-		}
+		// 종료 직전에 현재 점수판 기준으로 최종 랭킹을 확정
+		RefreshRanking(MiniGameState);
 
 		MiniGameState->SetRemainingTimeSeconds(0.f);
 		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Completed);
