@@ -4,11 +4,12 @@
 #include "Base/Character/DDBaseCharacter.h"
 #include "DDBoardGameCharacter.generated.h"
 
+class UDDMoveTileStepTask;
 class UDDBoardGameAttributeSet;
 class UDDHealthSet;
 class ADDDiceActor;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMoveFinished);
- 
 
 UCLASS()
 class DOODOONG_API ADDBoardGameCharacter : public ADDBaseCharacter
@@ -48,6 +49,13 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Dice")
 	UAnimMontage* DiceMontage;
+	
+	UPROPERTY()
+	UDDMoveTileStepTask* CurrentMoveTask;
+	
+	UPROPERTY(EditAnywhere, Category="Object")
+	TSubclassOf<class AActor> SelectableActorClass;
+	
 private:
 	FVector MoveStartLocation;
 	FVector MoveTargetLocation;
@@ -66,7 +74,6 @@ private:
 	UPROPERTY(EditAnywhere, Category="Object")
 	TSubclassOf<class AActor> MoveClass;
 	
-	// UPROPERTY(EditAnywhere, Category="Object")
 	
 	UPROPERTY()
 	ADDDiceActor* Dice;
