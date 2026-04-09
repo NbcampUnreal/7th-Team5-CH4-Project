@@ -81,6 +81,9 @@ void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 
 	// 실제 참가자라면 미니게임 규칙에 맞는 Pawn과 DDMiniGameSpawnPoint 액터를 기본으로 하는 시작 위치로 스폰
 	SpawnParticipantPawn(PlayerController, *Participant);
+	
+	// TODO 추후에 UI로 준비완료 로직이 추가되면 삭제해야할 로직.
+	SetPlayerReady(PlayerController->PlayerState, true);
 }
 
 void ADDMiniGameModeBase::UpdateMiniGameTime()
