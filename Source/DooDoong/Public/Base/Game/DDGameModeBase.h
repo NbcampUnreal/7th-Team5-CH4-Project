@@ -37,10 +37,6 @@ public:
     UFUNCTION(BlueprintCallable, Category = "GameLoop|TurnPhase")
     void NotifyMovementFinished();
 
-    /** 상점 이용 등 발판 이벤트 처리가 모두 끝나면 호출 */
-    UFUNCTION(BlueprintCallable, Category = "GameLoop|TurnPhase")
-    void NotifyTileEventFinished();
-
 protected:
     /** 1초마다 반복 실행되며 게임의 턴 시간과 대기 시간을 체크 */
     UFUNCTION()

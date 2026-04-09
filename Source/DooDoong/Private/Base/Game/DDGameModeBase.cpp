@@ -420,19 +420,9 @@ void ADDGameModeBase::NotifyMovementFinished()
 void ADDGameModeBase::ExecuteNextTurnTransition()
 {
     LOG_CJH(Log, TEXT("[Timer] 2초 대기 완료. 다음 플레이어로 턴을 전환합니다."));
-    
-    // 기존 NotifyTileEventFinished의 로직을 수행
+	
     CurrentTurnPlayerIndex++;
     SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
-}
-
-void ADDGameModeBase::NotifyTileEventFinished()
-{
-	LOG_CJH(Log, TEXT("[Notify] 발판 이벤트 완료. 턴을 종료하고 다음 플레이어로 넘어갑니다."));
-
-	SetTurnPhase(FGameplayTag::EmptyTag);
-	CurrentTurnPlayerIndex++;
-	SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 }
 
 void ADDGameModeBase::SetTurnPhase(FGameplayTag NewPhaseTag)
