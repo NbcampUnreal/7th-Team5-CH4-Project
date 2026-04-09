@@ -27,7 +27,7 @@ public:
 
 	UFUNCTION()
 	void OnCharacterMoveFinished();
-	void OnDestroy(bool AbilityEnded);
+	virtual void OnDestroy(bool AbilityEnded) override;
 
 	void SelectNextTile(ADDTile* SelectedTile);
 	
