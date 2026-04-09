@@ -7,6 +7,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMiniGameReadyStateChanged, int32, ReadyPlayerCount, int32, TotalParticipantCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGameReadyEntriesChanged, const TArray<FMiniGameReadyEntry>&, ReadyEntries);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMiniGameScoreBoardChanged);
 
 /**
  * 
@@ -100,7 +101,11 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="MiniGame|Ready")
 	FOnMiniGameReadyEntriesChanged OnMiniGameReadyEntriesChanged;
 
-protected:
+	/** 플레이어의 ScoreBoard 갱신 시 UI도 갱신하기 위한 델리게이트 */
+	UPROPERTY(BlueprintAssignable, Category="MiniGame|ScoreBoard")
+	FOnMiniGameScoreBoardChanged OnMiniGameScoreBoardChanged;
+
+public:
 	/** 준비 인원 수가 클라이언트에 동기화되면 UI를 갱신하기 위해 호출 */
 	UFUNCTION()
 	void OnRep_ReadyPlayerCount();
@@ -112,13 +117,20 @@ protected:
 	/** 준비 상태가 바뀌어서 클라이언트에 동기화되면 UI 갱신하기 위해 호출 */
 	UFUNCTION()
 	void OnRep_ReadyEntries();
+	
+	/** ScoreBoard가 갱신되면 UI도 갱신하기 위함 */
+	UFUNCTION()
+	void OnRep_ScoreBoard();
 
-protected:
+public:
 	/** 준비상태 변화 헬퍼 */
 	void BroadcastReadyStateChanged();
 	
 	/** 준비상태 변화 헬퍼2 */
 	void BroadcastReadyEntriesChanged();
+	
+	/** ScoreBoard 변화 헬퍼 */
+	void BroadcastScoreBoardChanged();
 
 protected:
 	/** 현재 게임 상태 */
@@ -134,7 +146,7 @@ protected:
 	TArray<FMiniGameParticipantInfo> Participants;
 	
 	/** 점수판 */
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
+	UPROPERTY(ReplicatedUsing=OnRep_ScoreBoard, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
 	TArray<FMiniGameScoreEntry> ScoreBoard;
 
 	/** 준비 완료한 참가자 수 */
