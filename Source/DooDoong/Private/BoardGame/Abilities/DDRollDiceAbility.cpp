@@ -7,7 +7,7 @@
 #include "Common/DDLogManager.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Abilities/Tasks/AbilityTask_WaitDelay.h"
-#include "Base/Game/DDGameModeBase.h"
+#include "BoardGame/Game/DDBoardGameMode.h"
 #include "System/DDGameplayTags.h"
 
 UDDRollDiceAbility::UDDRollDiceAbility()
@@ -32,7 +32,7 @@ void UDDRollDiceAbility::ActivateAbility(
 {
 	LOG_CYS(Warning, TEXT("[GA_RD]Roll Dice"));
 	
-	if (ADDGameModeBase* GM = Cast<ADDGameModeBase>(GetWorld()->GetAuthGameMode()))
+	if (ADDBoardGameMode* GM = Cast<ADDBoardGameMode>(GetWorld()->GetAuthGameMode()))
     {
        GM->NotifyDiceRolled();
     }
@@ -91,7 +91,7 @@ void UDDRollDiceAbility::OnMoveFinished()
 {
 	LOG_CYS(Warning, TEXT("[GA_RD] Move Finished"));
 
-	if (ADDGameModeBase* GM = Cast<ADDGameModeBase>(GetWorld()->GetAuthGameMode()))
+	if (ADDBoardGameMode* GM = Cast<ADDBoardGameMode>(GetWorld()->GetAuthGameMode()))
     {
        GM->NotifyMovementFinished();
     }
