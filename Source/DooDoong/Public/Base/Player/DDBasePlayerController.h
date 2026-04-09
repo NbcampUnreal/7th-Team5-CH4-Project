@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "BoardGame/DDSelectableTileActor.h"
 #include "GameFramework/PlayerController.h"
 #include "DDBasePlayerController.generated.h"
 
@@ -25,7 +26,7 @@ protected:
 
 public:
 	void SetInputMappingContext(UInputMappingContext* NewIMC);
-	
+
 	/** 윤서 : GameMode에서 상태(로비/보드)에 따라 IMC 지정 */
 	UFUNCTION(Client, Reliable)
 	void Client_ApplyState(FGameplayTag StateTag);
@@ -37,7 +38,12 @@ public:
 	/** 주현 : 준비완료 상태를 서버에서 호출시키기 위한 Server RPC */
 	UFUNCTION(Server, Reliable)
 	void Server_SetMiniGameReady(bool bReady);
-	
+
+	void OnMouseClick();
+
+	UFUNCTION(Server, Reliable)
+	void Server_SelectTile(ADDSelectableTileActor* TileActor);
+
 protected:
 	void Input_Move(const FInputActionValue& Value);
 
@@ -47,7 +53,6 @@ protected:
 
 	void Input_AbilityReleased(FGameplayTag InputTag);
 
-protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UDDInputConfig> InputConfig;
 
