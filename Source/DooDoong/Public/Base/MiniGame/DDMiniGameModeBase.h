@@ -86,6 +86,9 @@ protected:
 protected:
 	/** MiniGameStateBase를 가져오는 헬퍼 */
 	TObjectPtr<ADDMiniGameStateBase> GetMiniGameState() const { return GetGameState<ADDMiniGameStateBase>(); }
+
+	/** 현재 점수판 기준으로 랭킹을 다시 계산하는 헬퍼 */
+	void RefreshRanking(ADDMiniGameStateBase* MiniGameState) const;
 	
 	/** 미니게임에서 사용할 Input을 적용하는 헬퍼 */
 	void ApplyMiniGameInput(ADDBasePlayerController* PlayerController);
