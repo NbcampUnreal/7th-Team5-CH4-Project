@@ -1,16 +1,33 @@
 #include "Base/Player/DDLobbyPlayerController.h"
 #include "Base/Game/DDLobbyGameMode.h"
+#include "Base/Player/DDBasePlayerState.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "GameFramework/GameStateBase.h"
 #include "UI/HUD/DDHUD.h"
+#include "UI/Widgets/DDTitleLayoutWidget.h"
 
-bool ADDLobbyPlayerController::Server_SubmitNickname_Validate(const FString& InNickname)
+bool ADDLobbyPlayerController::Server_SubmitNickname_Validate(const FName& InNickname)
 {
-	// 닉네임 입력 방어 로직
-	return !InNickname.IsEmpty() && InNickname.Len() <= 12;
+	return !InNickname.IsNone() && InNickname.ToString().Len() <= 12;
 }
 
-void ADDLobbyPlayerController::Server_SubmitNickname_Implementation(const FString& InNickname)
+void ADDLobbyPlayerController::Server_SubmitNickname_Implementation(const FName& InNickname)
 {
-	// 클라이언트의 요청을 받아 서버 게임모드로 전달합니다.
+	AGameStateBase* GameState = GetWorld()->GetGameState();
+    if (IsValid(GameState))
+    {
+        // 모든 플레이어의 닉네임 중복 검사
+        for (APlayerState* PS : GameState->PlayerArray)
+        {
+            ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(PS);
+            if (DDPS && DDPS->PlayerGameData.PlayerDisplayName == InNickname)
+            {
+                Client_ReceiveNicknameFailure(TEXT("이미 존재하는 닉네임입니다."));
+                return;
+            }
+        }
+    }
+	
 	ADDLobbyGameMode* LobbyGameMode = GetWorld()->GetAuthGameMode<ADDLobbyGameMode>();
 	if (IsValid(LobbyGameMode))
 	{
@@ -32,4 +49,20 @@ void ADDLobbyPlayerController::Client_JoinLobby_Implementation()
 	FInputModeGameOnly Mode;
 	SetInputMode(Mode);
 	bShowMouseCursor = false;
+}
+
+void ADDLobbyPlayerController::Client_ReceiveNicknameFailure_Implementation(const FString& ErrorMessage)
+{
+	// 로컬 뷰포트에서 UI 위젯을 찾아 버튼을 다시 활성화
+    TArray<UUserWidget*> FoundWidgets;
+    UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), FoundWidgets, UDDTitleLayoutWidget::StaticClass(), false);
+
+    if (FoundWidgets.Num() > 0)
+    {
+        if (UDDTitleLayoutWidget* TitleWidget = Cast<UDDTitleLayoutWidget>(FoundWidgets[0]))
+        {
+            // 위젯 버튼 활성화 및 에러 메시지 처리 요청
+            TitleWidget->OnNicknameSubmitResult(false, ErrorMessage);
+        }
+    }
 }

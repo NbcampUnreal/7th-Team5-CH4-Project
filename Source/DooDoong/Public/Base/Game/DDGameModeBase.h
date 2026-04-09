@@ -37,10 +37,6 @@ public:
     UFUNCTION(BlueprintCallable, Category = "GameLoop|TurnPhase")
     void NotifyMovementFinished();
 
-    /** 상점 이용 등 발판 이벤트 처리가 모두 끝나면 호출 */
-    UFUNCTION(BlueprintCallable, Category = "GameLoop|TurnPhase")
-    void NotifyTileEventFinished();
-
 protected:
     /** 1초마다 반복 실행되며 게임의 턴 시간과 대기 시간을 체크 */
     UFUNCTION()
@@ -51,6 +47,9 @@ protected:
     void StartNextPlayerTurn();
     void CalculateFinalWinner();
     
+    /** 라운드 시작 시 턴 순서대로 배열을 정렬하는 함수 */
+    void SortPlayersByTurnOrder();
+    
     /** 플레이어의 AbilitySystemComponent를 가져오는 헬퍼 함수 */
     UAbilitySystemComponent* GetAbilitySystemComponentFromPlayer(APlayerController* PlayerController);
     
@@ -60,51 +59,70 @@ protected:
     /** 모든 플레이어의 카메라를 특정 타겟으로 부드럽게 이동시킵니다. */
     void FocusAllCamerasOnTarget(AActor* TargetActor);
     
+    /** 타이머 종료 후 실제로 다음 사람에게 턴을 넘기는 함수 */
+    void ExecuteNextTurnTransition();
+    
 public: 
     
     virtual void OnCharacterKilled(AActor* Killer, AActor* Victim);
     
     void HandleRespawn(AController* TargetController);
+    
+
 
 protected:
-    /** 본 게임에 참여 중인 플레이어 컨트롤러 목록 (관전자 제외, 턴 관리에 사용) */
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="본 게임에 참여 중인 플레이어 컨트롤러 목록"))
     TArray<TObjectPtr<APlayerController>> AlivePlayerControllers;
 
     /** 메인 게임 루프 타이머 관리 핸들 */
     FTimerHandle MainTimerHandle;
-
-    /** 각 턴당 주어지는 최대 제한 시간 */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameData")
+    
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="각 턴당 주어지는 최대 제한 시간"))
     int32 MaxStateTimer = 30; 
     
-    /** 현재 상태에서 남은 제한 시간 (-1일 경우 타이머 일시 정지) */
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="현재 상태에서 남은 제한 시간 (-1일 경우 타이머 일시 정지)"))
     int32 StateTimer = 0; 
-
-    /** 현재 누구의 턴인지 추적하는 인덱스 (AlivePlayerControllers 기준) */
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData")
-    int32 CurrentTurnPlayerIndex = 0;
-
-    /** 상태 태그가 바뀔 때 자동으로 적용할 부가 규칙 태그 매핑 데이터 */
-    UPROPERTY(EditDefaultsOnly, Category = "GAS|MatchState")
-    TMap<FGameplayTag, FGameplayTagContainer> StateTagMapping;
     
-    /** 게임 종료 조건 1: 우승에 필요한 목표 트로피 개수 */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameData")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="현재 누구의 턴인지 추적하는 인덱스"))
+    int32 CurrentTurnPlayerIndex = 0;
+    
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameData", meta=(DisplayName="우승에 필요한 목표 트로피 개수"))
     int32 MaxTrophy = 1;
     
-    /** 게임 종료 조건 2: 게임이 종료되는 최대 라운드 수 */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameData")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameData", meta=(DisplayName="게임이 종료되는 최대 라운드 수"))
     int32 MaxRound = 10;
+    
+    UPROPERTY(EditDefaultsOnly, Category = "GameData", meta=(DisplayName="N초 대기 후 다음 턴 넘기기"))
+    int32 TurnTransitionTimer = 3.0f;
+    
+    /** N초 대기 후 다음 턴으로 넘기기 위한 타이머 핸들 */
+    FTimerHandle TurnTransitionTimerHandle;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Response")
     TArray<TSubclassOf<UGameplayEffect>> ReSpawnEffectClasses;
-    
+
 private:
     /** 상태가 전환될 때 기존 규칙을 회수하기 위해 현재 적용 중인 태그들을 기억해두는 변수 */
     FGameplayTagContainer CurrentAppliedTags;
     
     /** 현재 턴을 진행 중인 플레이어에게 부여된 세부 페이즈 태그 (페이즈 종료 시 회수 목적) */
     FGameplayTag CurrentTurnPhaseTag;
+    
+protected:
+    /** 매치 상태(Init, PlayerTurn 등) 전환 시 적용할 GE 목록 */
+    UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|MatchState")
+    TMap<FGameplayTag, TSubclassOf<UGameplayEffect>> MatchStateEffectClasses;
+
+    /** 페이즈(BeforeDice, Moving, Event) 전환 시 적용할 GE 목록 */
+    UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Phase")
+    TMap<FGameplayTag, TSubclassOf<UGameplayEffect>> TurnPhaseEffectClasses;
+
+    /** 현재 턴인 플레이어에게 부여할 GE */
+    UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Turn")
+    TSubclassOf<UGameplayEffect> TurnActiveEffectClass;
+
+    /** 턴 대기 중인 플레이어에게 부여할 GE */
+    UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Turn")
+    TSubclassOf<UGameplayEffect> TurnWaitingEffectClass;
+
 };

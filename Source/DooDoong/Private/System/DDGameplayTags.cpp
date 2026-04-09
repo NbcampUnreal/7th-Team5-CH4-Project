@@ -62,6 +62,8 @@ namespace DDGameplayTags
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_PlayerTurn, "State.BoardGame.PlayerTurn", "플레이어 턴 진행");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_RoundEnd, "State.BoardGame.RoundEnd", "턴 종료 및 대기");
 	
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_HasUsedItem, "State.BoardGame.HasUsedItem", "아이템 사용한 상태");
+	
     // 보드게임 종료 상태 태그
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_Ending, "State.BoardGame.Ending", "최종 승자 판정");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_End, "State.BoardGame.End", "결과창 출력");
@@ -71,7 +73,7 @@ namespace DDGameplayTags
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_TurnWaiting, "State.BoardGame.TurnWaiting", "남의 턴");
 	
 	// 보드게임 턴 내부 세부 페이즈 태그
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_BeforeDice, "State.TurnPhase.BeforeDice", "주사위 굴리기 전 (아이템 사용 가능)");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_BeforeDice, "State.TurnPhase.BeforeDice", "주사위 굴리기 전");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_Moving, "State.TurnPhase.Moving", "보드판 이동 중 (모든 조작 불가)");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_Event, "State.TurnPhase.Event", "이동 완료 후 (상점 이용 및 트로피 획득 판정 중)");
 }

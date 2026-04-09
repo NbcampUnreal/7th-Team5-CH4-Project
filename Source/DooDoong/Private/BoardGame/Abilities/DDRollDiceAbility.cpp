@@ -7,6 +7,7 @@
 #include "Common/DDLogManager.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Abilities/Tasks/AbilityTask_WaitDelay.h"
+#include "Base/Game/DDGameModeBase.h"
 #include "System/DDGameplayTags.h"
 
 UDDRollDiceAbility::UDDRollDiceAbility()
@@ -15,8 +16,12 @@ UDDRollDiceAbility::UDDRollDiceAbility()
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
-
+	
+	ActivationRequiredTags.AddTag(DDGameplayTags::State_BoardGame_TurnActive);
+    ActivationRequiredTags.AddTag(DDGameplayTags::State_TurnPhase_BeforeDice);
+	
 	ActivationBlockedTags.AddTag(DDGameplayTags::State_TurnPhase_Moving);
+	ActivationBlockedTags.AddTag(DDGameplayTags::State_BoardGame_TurnWaiting);
 }
 
 void UDDRollDiceAbility::ActivateAbility(
@@ -26,19 +31,20 @@ void UDDRollDiceAbility::ActivateAbility(
 	const FGameplayEventData* TriggerEventData)
 {
 	LOG_CYS(Warning, TEXT("[GA_RD]Roll Dice"));
+	
+	if (ADDGameModeBase* GM = Cast<ADDGameModeBase>(GetWorld()->GetAuthGameMode()))
+    {
+       GM->NotifyDiceRolled();
+    }
+	
 	// 주사위
 	DiceResult = FMath::RandRange(1, 6);
-	GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(DDGameplayTags::State_TurnPhase_Moving);
-
 	ADDBoardGameCharacter* Character =
 		Cast<ADDBoardGameCharacter>(GetAvatarActorFromActorInfo());
 
 	if (!Character)
 	{
 		LOG_CYS(Error, TEXT("Character NULL"));
-		GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(
-			DDGameplayTags::State_TurnPhase_Moving
-		);
 
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;
@@ -85,6 +91,11 @@ void UDDRollDiceAbility::OnMoveFinished()
 {
 	LOG_CYS(Warning, TEXT("[GA_RD] Move Finished"));
 
+	if (ADDGameModeBase* GM = Cast<ADDGameModeBase>(GetWorld()->GetAuthGameMode()))
+    {
+       GM->NotifyMovementFinished();
+    }
+
 	ADDBoardGameCharacter* Character =
 		Cast<ADDBoardGameCharacter>(GetAvatarActorFromActorInfo());
 	if (!Character)
@@ -117,6 +128,5 @@ void UDDRollDiceAbility::EndAbility(
 	bool bReplicateEndAbility, bool bWasCancelled
 )
 {
-	GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(DDGameplayTags::State_TurnPhase_Moving);
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
