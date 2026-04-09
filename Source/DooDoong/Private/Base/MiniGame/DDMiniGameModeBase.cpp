@@ -6,7 +6,6 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerStart.h"
-#include "GameFramework/SpectatorPawn.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "TimerManager.h"
@@ -24,7 +23,6 @@ ADDMiniGameModeBase::ADDMiniGameModeBase()
 {
 	GameStateClass = ADDMiniGameStateBase::StaticClass();
 	PrimaryActorTick.bCanEverTick = false;
-	bUseSeamlessTravel = true;
 }
 
 void ADDMiniGameModeBase::BeginPlay()
@@ -59,7 +57,7 @@ void ADDMiniGameModeBase::BeginPlay()
 
 void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 {
-	Super::HandleSeamlessTravelPlayer(C);
+	AGameModeBase::HandleSeamlessTravelPlayer(C);
 
 	// Seamless Travel 시점에는 BeginPlay보다 먼저 호출될 수 있다고 함 
 	// 따라서 런타임 데이터를 한 번 동기화 시켜 줌
@@ -236,39 +234,6 @@ bool ADDMiniGameModeBase::ShouldSpawnAsSpectator(const FMiniGameParticipantInfo&
 {
 	// 기본적오르논 준비되지 않았거나 연결이 끊긴 참가자를 관전자로 처리
 	return !Participant.bReady || !Participant.bConnected;
-}
-
-void ADDMiniGameModeBase::SpawnSpectatorPawn(APlayerController* PlayerController)
-{
-	if (PlayerController == nullptr || GetWorld() == nullptr)
-	{
-		return;
-	}
-
-	// 관전자 Pawn의 Transforms
-	FVector SpectatorLocation = FVector(0.0f, 0.0f, 300.0f);
-	FRotator SpectatorRotation = FRotator::ZeroRotator;
-
-	AActor* StartSpot = nullptr;
-	StartSpot = Super::ChoosePlayerStart_Implementation(PlayerController);
-	if (StartSpot != nullptr)
-	{
-		// 관전자도 가능하면 기존 PlayerStart 근처에 배치
-		SpectatorLocation = StartSpot->GetActorLocation() + FVector(0.0f, 0.0f, 200.0f);
-		SpectatorRotation = StartSpot->GetActorRotation();
-	}
-
-	// 관전사 생성
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = PlayerController;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	// 관전자 Pawn 생성
-	APawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(ASpectatorPawn::StaticClass(), SpectatorLocation, SpectatorRotation, SpawnParams);
-	if (SpectatorPawn != nullptr)
-	{
-		PlayerController->Possess(SpectatorPawn);
-	}
 }
 
 void ADDMiniGameModeBase::StartMiniGame()

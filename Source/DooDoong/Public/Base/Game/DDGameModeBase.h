@@ -31,6 +31,7 @@ public:
 protected:
 	/** 플레이어의 AbilitySystemComponent를 가져오는 공통 헬퍼 함수 */
 	UAbilitySystemComponent* GetAbilitySystemComponentFromPlayer(APlayerController* PlayerController);
+	virtual void SpawnSpectatorPawn(APlayerController* PlayerController);
 
 protected:
 	/** 본 게임에 참여 중인 플레이어 컨트롤러 목록 (관전자 제외) */

@@ -50,14 +50,7 @@ void ADDGameModeBase::HandleSeamlessTravelPlayer(AController*& ParticipantContro
 
 		if (!BasePlayerState->bIsParticipant)
 		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-			APawn* Spectator = GetWorld()->SpawnActor<ASpectatorPawn>(ASpectatorPawn::StaticClass(),
-			                                                          FVector(0, 0, 1000), FRotator::ZeroRotator,
-			                                                          SpawnParams);
-
-			if (Spectator) ParticipantController->Possess(Spectator);
+			SpawnSpectatorPawn(PlayerController);
 			if (IsValid(PlayerController)) AlivePlayerControllers.Remove(PlayerController);
 
 			return;
@@ -147,4 +140,32 @@ UAbilitySystemComponent* ADDGameModeBase::GetAbilitySystemComponentFromPlayer(AP
 		return AbilitySystemInterface->GetAbilitySystemComponent();
 	}
 	return nullptr;
+}
+
+void ADDGameModeBase::SpawnSpectatorPawn(APlayerController* PlayerController)
+{
+	if (PlayerController == nullptr || GetWorld() == nullptr)
+	{
+		return;
+	}
+
+	FVector SpectatorLocation = FVector(0.0f, 0.0f, 300.0f);
+	FRotator SpectatorRotation = FRotator::ZeroRotator;
+
+	AActor* StartSpot = AGameModeBase::ChoosePlayerStart_Implementation(PlayerController);
+	if (StartSpot != nullptr)
+	{
+		SpectatorLocation = StartSpot->GetActorLocation() + FVector(0.0f, 0.0f, 200.0f);
+		SpectatorRotation = StartSpot->GetActorRotation();
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = PlayerController;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	if (APawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(
+		ASpectatorPawn::StaticClass(), SpectatorLocation, SpectatorRotation, SpawnParams))
+	{
+		PlayerController->Possess(SpectatorPawn);
+	}
 }

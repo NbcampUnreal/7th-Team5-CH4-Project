@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Base/Game/DDGameModeBase.h"
 #include "DDMiniGameStateBase.h"
 #include "DDMiniGameTypes.h"
-#include "GameFramework/GameModeBase.h"
 #include "DDMiniGameModeBase.generated.h"
 
 class ADDBasePlayerController;
@@ -13,7 +13,7 @@ struct FTimerHandle;
  * 
  */
 UCLASS()
-class DOODOONG_API ADDMiniGameModeBase : public AGameModeBase
+class DOODOONG_API ADDMiniGameModeBase : public ADDGameModeBase
 {
 	GENERATED_BODY()
 	
@@ -24,6 +24,8 @@ public:
 	
 	/** Seamless Travel 직후 플레이어별 Pawn과 시작 위치를 공통으로 처리하기 위한 전용 함수 */
 	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
+	
+	/** PlayerStart 액터를 스폰 포인트로 활용하기 위해 스폰지점 액터를 반환하는 함수 */
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	
 public:
@@ -65,10 +67,6 @@ protected:
 	
 	/** 관전자 처리를 미니게임별로 쉽게 교체할 수 있도록 분리 */
 	virtual bool ShouldSpawnAsSpectator(const FMiniGameParticipantInfo& Participant) const;
-	
-	/** 비참가자 혹은 연결이 끊기거나 여타 예외상황이 발생한 플레이어용 Spectator 스폰*/
-	UFUNCTION(BlueprintCallable, Category="MiniGame|Spawn")
-	virtual void SpawnSpectatorPawn(APlayerController* PlayerController);
 	
 protected:
 	/** MiniGameStateBase를 가져오는 헬퍼 */
