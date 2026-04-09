@@ -1,5 +1,4 @@
 ﻿#include "BoardGame/Abilities/DDMoveTileStepTask.h"
-#include "Base/Player/DDBasePlayerController.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/DDSelectableTileActor.h"
 #include "BoardGame/DDTile.h"
@@ -67,7 +66,6 @@ void UDDMoveTileStepTask::MoveNext()
 	{
 		LOG_CYS(Error, TEXT("[MoveTask] NoNEXT"));
 		EndTask();
-		return;
 	}
 	else if (NextTiles.Num() == 1)
 	{
@@ -78,14 +76,6 @@ void UDDMoveTileStepTask::MoveNext()
 		// 분기
 		SpawnSelectableActors(NextTiles);
 		LOG_CYS(Error, TEXT("[MoveTask] 갈림길"));
-
-		ADDBasePlayerController* PC = Cast<ADDBasePlayerController>(Character->GetController());
-		if (PC)
-		{
-			// PC->Client_EnableCursor(); // 커서 활성화
-		}
-
-		return;
 	}
 }
 
@@ -143,17 +133,6 @@ void UDDMoveTileStepTask::SelectNextTile(ADDTile* SelectedTile)
 
 	// 화살표 제거
 	ClearSelectableActors();
-
-	// 커서 끄기
-	ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(GetAvatarActor());
-	if (Character)
-	{
-		ADDBasePlayerController* PC = Cast<ADDBasePlayerController>(Character->GetController());
-		if (PC)
-		{
-			// PC->Client_DisableCursor();
-		}
-	}
 
 	// 이동 이어서 진행
 	ContinueMove(SelectedTile);
