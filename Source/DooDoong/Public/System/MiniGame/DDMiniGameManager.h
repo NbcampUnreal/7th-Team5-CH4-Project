@@ -6,6 +6,7 @@
 #include "DDMiniGameManager.generated.h"
 
 class UDDMiniGameDefinition;
+struct FTimerHandle;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGameStateChanged, FGameplayTag, NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGameSelected, UDDMiniGameDefinition*, MiniGameDefinition);
@@ -47,6 +48,10 @@ public:
 	/** 미니게임 결과를 커밋 */
 	UFUNCTION(BlueprintCallable, Category="MiniGame")
 	void CommitMiniGameResult(const FMiniGameResult& Result);
+
+	/** 결과창 표시가 끝난 뒤 원래 맵으로 복귀 */
+	UFUNCTION()
+	void HandleMiniGameResultDisplayFinished();
 
 	/** 미니게임이 시작되었음을 알리고 상태 변경 */
 	UFUNCTION(BlueprintCallable, Category="MiniGame")
@@ -138,6 +143,10 @@ protected:
 	void ClearSavedReturnTileInfo();
 	
 protected:
+	/** 결과창을 보여줄 최소 시간 */
+	UPROPERTY(EditDefaultsOnly, Category="MiniGame")
+	float ResultDisplayDurationSeconds = 10.0f;
+
 	/** 현재 게임의 상태 */
 	UPROPERTY(VisibleInstanceOnly, Category="MiniGame", meta=(Categories="MiniGame.State"))
 	FGameplayTag CurrentState = DDGameplayTags::State_MiniGame_Idle;
@@ -172,4 +181,7 @@ protected:
 	
 	UPROPERTY()
 	TArray<FMiniGameReturnTileInfo> SavedReturnTileInfo;
+
+	/** 결과창 표시 대기용 타이머 */
+	FTimerHandle ResultDisplayTimerHandle;
 };
