@@ -101,6 +101,7 @@ bool UDDMiniGameManager::RequestStartRandomMiniGame(const TArray<APlayerState*>&
 		return false;
 	}
 
+	SetCurrentState(DDGameplayTags::State_MiniGame_Idle);
 	// 캐시에 있는 미니게임 정의 중 하나를 랜덤으로 골라 기존 시작 로직에 연결
 	const int32 RandomIndex = FMath::RandRange(0, CandidateMiniGameIds.Num() - 1);
 	return RequestStartMiniGame(CandidateMiniGameIds[RandomIndex], Players);
