@@ -88,10 +88,6 @@ protected:
     /** 현재 누구의 턴인지 추적하는 인덱스 (AlivePlayerControllers 기준) */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData")
     int32 CurrentTurnPlayerIndex = 0;
-
-    /** 상태 태그가 바뀔 때 자동으로 적용할 부가 규칙 태그 매핑 데이터 */
-    UPROPERTY(EditDefaultsOnly, Category = "GAS|MatchState")
-    TMap<FGameplayTag, FGameplayTagContainer> StateTagMapping;
     
     /** 게임 종료 조건 1: 우승에 필요한 목표 트로피 개수 */
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameData")
@@ -110,4 +106,21 @@ private:
     
     /** 현재 턴을 진행 중인 플레이어에게 부여된 세부 페이즈 태그 (페이즈 종료 시 회수 목적) */
     FGameplayTag CurrentTurnPhaseTag;
+    
+protected:
+    /** 매치 상태(Init, PlayerTurn 등) 전환 시 적용할 GE 목록 */
+    UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|MatchState")
+    TMap<FGameplayTag, TSubclassOf<UGameplayEffect>> MatchStateEffectClasses;
+
+    /** 페이즈(BeforeDice, Moving, Event) 전환 시 적용할 GE 목록 */
+    UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Phase")
+    TMap<FGameplayTag, TSubclassOf<UGameplayEffect>> TurnPhaseEffectClasses;
+
+    /** 현재 턴인 플레이어에게 부여할 GE */
+    UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Turn")
+    TSubclassOf<UGameplayEffect> TurnActiveEffectClass;
+
+    /** 턴 대기 중인 플레이어에게 부여할 GE */
+    UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Turn")
+    TSubclassOf<UGameplayEffect> TurnWaitingEffectClass;
 };

@@ -16,7 +16,6 @@
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
 #include "System/MiniGame/DDMiniGameManager.h"
-#include "InputMappingContext.h"
 
 ADDGameModeBase::ADDGameModeBase()
 {
@@ -114,14 +113,28 @@ void ADDGameModeBase::OnMainTimerElapsed()
 
 	// 1. 게임 최초 시작 대기 로직
 	if (!GameStateBase->MatchStateTag.IsValid())
-	{
-		if (AlivePlayerControllers.Num() >= GameStateBase->MinPlayerCount)
-		{
-			LOG_CJH(Log, TEXT("[GameLoop] %d명 접속 완료! 보드게임 Init 상태로 진입합니다."), GameStateBase->MinPlayerCount);
-			SetMatchState(DDGameplayTags::State_BoardGame_Init);
-		}
-		return;
-	}
+    {
+       if (AlivePlayerControllers.Num() >= GameStateBase->MinPlayerCount)
+       {
+           // PlayerState 로딩 대기 안전장치
+           bool bAllPlayerStatesReady = true;
+           for (APlayerController* PC : AlivePlayerControllers)
+           {
+               if (!IsValid(PC->PlayerState))
+               {
+                   bAllPlayerStatesReady = false;
+                   break;
+               }
+           }
+           
+           if (bAllPlayerStatesReady)
+           {
+              LOG_CJH(Log, TEXT("[GameLoop] %d명 접속 완료! 보드게임 Init 상태로 진입합니다."), GameStateBase->MinPlayerCount);
+              SetMatchState(DDGameplayTags::State_BoardGame_Init);
+           }
+       }
+       return;
+    }
 
 	// 2. 플레이어 턴 제한 시간 관리
 	if (GameStateBase->MatchStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
@@ -178,28 +191,32 @@ void ADDGameModeBase::SetMatchState(FGameplayTag NewStateTag)
 
 	GameStateBase->MatchStateTag = NewStateTag;
 
-	FGameplayTagContainer TagsToApply;
-	TagsToApply.AddTag(NewStateTag);
-
-	// 기획자가 설정한 부가 태그 병합
-	if (const FGameplayTagContainer* EditorTags = StateTagMapping.Find(NewStateTag))
-	{
-		TagsToApply.AppendTags(*EditorTags);
-	}
-
-	// 모든 플레이어에게 이전 태그를 제거하고 새 태그 부여
 	for (APlayerController* PlayerController : AlivePlayerControllers)
-	{
-		if (UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponentFromPlayer(PlayerController))
-		{
-			AbilitySystemComponent->RemoveLooseGameplayTags(CurrentAppliedTags);
-			AbilitySystemComponent->RemoveReplicatedLooseGameplayTags(CurrentAppliedTags);
-			AbilitySystemComponent->AddLooseGameplayTags(TagsToApply);
-			AbilitySystemComponent->AddReplicatedLooseGameplayTags(TagsToApply);
-			
-		}
-	}
-	CurrentAppliedTags = TagsToApply;
+    {
+       if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(PlayerController))
+       {
+          // 1. 기존 매치 상태 태그를 가진 GE 모두 제거
+          ASC->RemoveActiveEffectsWithGrantedTags(CurrentAppliedTags);
+          
+          // 2. 새로운 매치 상태 GE 적용
+          if (TSubclassOf<UGameplayEffect>* EffectClassPtr = MatchStateEffectClasses.Find(NewStateTag))
+          {
+             if (*EffectClassPtr)
+             {
+                FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+                Context.AddSourceObject(this);
+                FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(*EffectClassPtr, 1.0f, Context);
+                if (SpecHandle.IsValid())
+                {
+                   ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+                }
+             }
+          }
+       }
+    }
+    
+    // 현재 태그 갱신 (다음 상태 전환 시 제거하기 위함)
+    CurrentAppliedTags = FGameplayTagContainer(NewStateTag);
 
 	// 각 상태에 따른 게임 루프 실행
 	if (NewStateTag == DDGameplayTags::State_BoardGame_Init)
@@ -287,7 +304,7 @@ void ADDGameModeBase::CheckWinCondition()
 		{
 			if (BasePlayerState->GetPointSet() && BasePlayerState->GetPointSet()->GetTrophy() >= MaxTrophy)
 			{
-				LOG_CJH(Log, TEXT("🏆 목표 트로피 도달자 발생! (닉네임: %s)"), *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString());
+				LOG_CJH(Log, TEXT("목표 트로피 도달자 발생! (닉네임: %s)"), *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString());
 				bHasTrophyWinner = true;
 				break;
 			}
@@ -333,47 +350,43 @@ void ADDGameModeBase::StartNextPlayerTurn()
 	for (int32 i = 0; i < AlivePlayerControllers.Num(); ++i)
 	{
 		APlayerController* PlayerController = AlivePlayerControllers[i];
-		ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlayerController);
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(PlayerController);
+       if (!ASC)
+       {
+          LOG_CJH(Error, TEXT("ASC가 존재하지 않습니다"));
+          continue;
+       }
 
-		if (!IsValid(BasePlayerController)) continue;
+		// 1. 기존 턴/대기 태그를 부여했던 GE 제거
+       FGameplayTagContainer TurnTagsToRemove;
+       TurnTagsToRemove.AddTag(DDGameplayTags::State_BoardGame_TurnActive);
+       TurnTagsToRemove.AddTag(DDGameplayTags::State_BoardGame_TurnWaiting);
+       ASC->RemoveActiveEffectsWithGrantedTags(TurnTagsToRemove);
 
-		UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponentFromPlayer(BasePlayerController);
-		if (!AbilitySystemComponent) continue;
+       // 2. 현재 상태에 맞는 새로운 GE 할당
+       TSubclassOf<UGameplayEffect> EffectToApply = (i == CurrentTurnPlayerIndex) ? TurnActiveEffectClass : TurnWaitingEffectClass;
 
-		if (i == CurrentTurnPlayerIndex)
-		{
-			// 현재 턴 플레이어에게 권한 태그 부여
-			AbilitySystemComponent->RemoveReplicatedLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnWaiting);
-			AbilitySystemComponent->RemoveLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnWaiting);
-			AbilitySystemComponent->SetLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnWaiting, 0);
-			AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnWaiting, 0);
-			AbilitySystemComponent->AddReplicatedLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnActive);
-			AbilitySystemComponent->AddLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnActive);
-			AbilitySystemComponent->SetLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnActive, 1);
-			AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnActive, 1);
+       // 3. GE 적용
+       if (EffectToApply)
+       {
+          FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+          Context.AddSourceObject(this);
+          FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(EffectToApply, 1.0f, Context);
+          if (SpecHandle.IsValid())
+          {
+             ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+          }
+       }
 
-			StateTimer = MaxStateTimer;
+       if (i == CurrentTurnPlayerIndex)
+       {
+          StateTimer = MaxStateTimer;
+          LOG_CJH(Log, TEXT("▶ [%d]번 플레이어 턴 시작! (제한시간 %d초)"), i, MaxStateTimer);
+          SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
+       }
+    }
 
-			LOG_CJH(Log, TEXT("▶ [%d]번 플레이어 턴 시작! (제한시간 %d초)"), i, MaxStateTimer);
-
-			SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
-		}
-		else
-		{
-			// 타인에게 대기 태그 부여
-			AbilitySystemComponent->RemoveReplicatedLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnActive);
-			AbilitySystemComponent->RemoveLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnActive);
-			AbilitySystemComponent->SetLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnActive, 0);
-			AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnActive, 0);
-			AbilitySystemComponent->AddReplicatedLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnWaiting);
-			AbilitySystemComponent->AddLooseGameplayTag(DDGameplayTags::State_BoardGame_TurnWaiting);
-			AbilitySystemComponent->SetLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnWaiting, 1);
-			AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(DDGameplayTags::State_BoardGame_TurnWaiting, 1);
-		}
-	}
-
-	// 현재 턴 플레이어 화면으로 모두의 카메라 시점 이동
-	FocusAllCamerasOnTarget(ActivePawn);
+    FocusAllCamerasOnTarget(ActivePawn);
 }
 
 void ADDGameModeBase::NotifyDiceRolled()
@@ -403,28 +416,36 @@ void ADDGameModeBase::SetTurnPhase(FGameplayTag NewPhaseTag)
 	if (!AlivePlayerControllers.IsValidIndex(CurrentTurnPlayerIndex)) return;
 
 	APlayerController* PlayerController = AlivePlayerControllers[CurrentTurnPlayerIndex];
-	UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponentFromPlayer(PlayerController);
-	if (!AbilitySystemComponent) return;
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(PlayerController);
+	if (!ASC) return;
 
-	if (CurrentTurnPhaseTag.IsValid())
-	{
-		AbilitySystemComponent->RemoveReplicatedLooseGameplayTag(CurrentTurnPhaseTag);
-		AbilitySystemComponent->RemoveLooseGameplayTag(CurrentTurnPhaseTag);
-		AbilitySystemComponent->SetLooseGameplayTagCount(CurrentTurnPhaseTag, 0);
-		AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(CurrentTurnPhaseTag, 0);
-		
-	}
+	// 기존 페이즈 GE 제거
+    if (CurrentTurnPhaseTag.IsValid())
+    {
+       FGameplayTagContainer PhaseTagToRemove(CurrentTurnPhaseTag);
+       ASC->RemoveActiveEffectsWithGrantedTags(PhaseTagToRemove);
+    }
 
-	CurrentTurnPhaseTag = NewPhaseTag;
+    CurrentTurnPhaseTag = NewPhaseTag;
 
-	if (CurrentTurnPhaseTag.IsValid())
-	{
-		AbilitySystemComponent->AddReplicatedLooseGameplayTag(CurrentTurnPhaseTag);
-		AbilitySystemComponent->AddLooseGameplayTag(CurrentTurnPhaseTag);
-		AbilitySystemComponent->SetLooseGameplayTagCount(CurrentTurnPhaseTag, 1);
-		AbilitySystemComponent->SetReplicatedLooseGameplayTagCount(CurrentTurnPhaseTag, 1);
-		LOG_CJH(Log, TEXT("   └ [TurnPhase] 페이즈 갱신: %s"), *NewPhaseTag.ToString());
-	}
+    // 새로운 페이즈 GE 적용
+    if (CurrentTurnPhaseTag.IsValid())
+    {
+       if (TSubclassOf<UGameplayEffect>* EffectClassPtr = TurnPhaseEffectClasses.Find(NewPhaseTag))
+       {
+          if (*EffectClassPtr)
+          {
+             FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+             Context.AddSourceObject(this);
+             FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(*EffectClassPtr, 1.0f, Context);
+             if (SpecHandle.IsValid())
+             {
+                ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+             }
+          }
+       }
+       LOG_CJH(Log, TEXT("   └ [TurnPhase] 페이즈 갱신: %s"), *NewPhaseTag.ToString());
+    }
 }
 
 void ADDGameModeBase::FocusAllCamerasOnTarget(AActor* TargetActor)
@@ -464,6 +485,8 @@ void ADDGameModeBase::HandleRespawn(AController* TargetController)
 		ASC->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(DDGameplayTags::State_Character_Death));
 		ASC->RemoveLooseGameplayTag(DDGameplayTags::State_Character_Death);
 		ASC->SetLooseGameplayTagCount(DDGameplayTags::State_Character_Death, 0);
+		
+		
 		
 		for (auto EffectClass : ReSpawnEffectClasses)
 		{
@@ -544,7 +567,7 @@ void ADDGameModeBase::CalculateFinalWinner()
 		{
 			WinnerNames += Winner->PlayerGameData.PlayerDisplayName.ToString() + TEXT(" ");
 		}
-		LOG_CJH(Log, TEXT("🏆 게임 종료! 승자: %s (트로피: %d, 코인: %d)"), *WinnerNames, (int32)HighestTrophy, (int32)HighestCoin);
+		LOG_CJH(Log, TEXT("게임 종료! 승자: %s (트로피: %d, 코인: %d)"), *WinnerNames, (int32)HighestTrophy, (int32)HighestCoin);
 	}
 	else
 	{
