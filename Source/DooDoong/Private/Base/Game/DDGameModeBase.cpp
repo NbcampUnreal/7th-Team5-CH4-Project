@@ -361,6 +361,7 @@ void ADDGameModeBase::StartNextPlayerTurn()
        FGameplayTagContainer TurnTagsToRemove;
        TurnTagsToRemove.AddTag(DDGameplayTags::State_BoardGame_TurnActive);
        TurnTagsToRemove.AddTag(DDGameplayTags::State_BoardGame_TurnWaiting);
+		TurnTagsToRemove.AddTag(DDGameplayTags::State_BoardGame_HasUsedItem);
        ASC->RemoveActiveEffectsWithGrantedTags(TurnTagsToRemove);
 
        // 2. 현재 상태에 맞는 새로운 GE 할당
