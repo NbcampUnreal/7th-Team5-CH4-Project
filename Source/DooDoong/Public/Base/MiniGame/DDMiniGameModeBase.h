@@ -7,7 +7,6 @@
 #include "DDMiniGameModeBase.generated.h"
 
 class ADDBasePlayerController;
-class ADDMiniGameSpawnPoint;
 class UDDMiniGameRuleSet;
 struct FTimerHandle;
 /**
@@ -25,6 +24,7 @@ public:
 	
 	/** Seamless Travel 직후 플레이어별 Pawn과 시작 위치를 공통으로 처리하기 위한 전용 함수 */
 	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	
 public:
 	/** 미니게임 데이터 Initialize */
@@ -63,21 +63,8 @@ protected:
 	/** 현재 PlayerState에 대응되는 참가자 정보를 찾음 */
 	const FMiniGameParticipantInfo* FindParticipantInfo(const APlayerState* PlayerState) const;
 	
-	/** 슬롯 번호에 대응되는 스폰 포인트를 찾음 */
-	ADDMiniGameSpawnPoint* FindSpawnPointBySlotIndex(int32 SlotIndex) const;
-	
 	/** 관전자 처리를 미니게임별로 쉽게 교체할 수 있도록 분리 */
 	virtual bool ShouldSpawnAsSpectator(const FMiniGameParticipantInfo& Participant) const;
-	
-	/** 미니게임별 Pawn 타입 교체를 쉽게 하기 위한 함수 */
-	virtual TSubclassOf<APawn> ResolvePawnClass(const FMiniGameParticipantInfo& Participant) const;
-	
-	/** 기본은 SpawnPoint 액터의 위치에서 스폰되도록, 특수한 경우라면 override 하면 되도록 분리 */
-	virtual FTransform ResolveSpawnTransform(const FMiniGameParticipantInfo& Participant);
-	
-	/** 참가자용 Pawn 스폰 및 Possess 공통 처리 */
-	UFUNCTION(BlueprintCallable, Category="MiniGame|Spawn")
-	virtual void SpawnParticipantPawn(APlayerController* PlayerController, const FMiniGameParticipantInfo& Participant);
 	
 	/** 비참가자 혹은 연결이 끊기거나 여타 예외상황이 발생한 플레이어용 Spectator 스폰*/
 	UFUNCTION(BlueprintCallable, Category="MiniGame|Spawn")

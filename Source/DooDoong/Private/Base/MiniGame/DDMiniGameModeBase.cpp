@@ -1,16 +1,24 @@
 ﻿#include "Base/MiniGame/DDMiniGameModeBase.h"
 
 #include "Base/MiniGame/DDMiniGameRuleSet.h"
-#include "Base/MiniGame/DDMiniGameSpawnPoint.h"
 #include "Base/MiniGame/DDMiniGameStateBase.h"
 #include "Base/Player/DDBasePlayerController.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerStart.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "TimerManager.h"
 #include "GameFramework/PlayerState.h"
+
+static const TArray<FName> MiniGameSpawnTags =
+{
+	TEXT("SpawnSlot_MiniGame_Slot0"),
+	TEXT("SpawnSlot_MiniGame_Slot1"),
+	TEXT("SpawnSlot_MiniGame_Slot2"),
+	TEXT("SpawnSlot_MiniGame_Slot3"),
+};
 
 ADDMiniGameModeBase::ADDMiniGameModeBase()
 {
@@ -79,11 +87,51 @@ void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 		return;
 	}
 
-	// 실제 참가자라면 미니게임 규칙에 맞는 Pawn과 DDMiniGameSpawnPoint 액터를 기본으로 하는 시작 위치로 스폰
-	SpawnParticipantPawn(PlayerController, *Participant);
+	if (AActor* StartSpot = ChoosePlayerStart(PlayerController))
+	{
+		RestartPlayerAtPlayerStart(PlayerController, StartSpot);
+	}
+	else
+	{
+		RestartPlayer(PlayerController);
+	}
+
+	if (ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlayerController))
+	{
+		ApplyMiniGameInput(BasePlayerController);
+	}
 	
 	// TODO 추후에 UI로 준비완료 로직이 추가되면 삭제해야할 로직.
 	SetPlayerReady(PlayerController->PlayerState, true);
+}
+
+AActor* ADDMiniGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	const APlayerState* PlayerState = Player != nullptr ? Player->PlayerState : nullptr;
+	const FMiniGameParticipantInfo* Participant = FindParticipantInfo(PlayerState);
+	if (Participant == nullptr)
+	{
+		return Super::ChoosePlayerStart_Implementation(Player);
+	}
+
+	if (!MiniGameSpawnTags.IsValidIndex(Participant->SlotIndex))
+	{
+		return Super::ChoosePlayerStart_Implementation(Player);
+	}
+
+	// 만들어둔 태그배열을 인덱스로 찾아서 해당하는 태그를 찾음
+	const FName& SlotTag = MiniGameSpawnTags[Participant->SlotIndex];
+	
+	// 월드에 배치된 모든 PlayerStart 액터를 순회해서 해당하는 SlotTag를 가진 PlayerStart를 찾아서 반환
+	for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
+	{
+		if (It->ActorHasTag(SlotTag))
+		{
+			return *It;
+		}
+	}
+
+	return Super::ChoosePlayerStart_Implementation(Player);
 }
 
 void ADDMiniGameModeBase::UpdateMiniGameTime()
@@ -184,92 +232,10 @@ const FMiniGameParticipantInfo* ADDMiniGameModeBase::FindParticipantInfo(const A
 	return nullptr;
 }
 
-ADDMiniGameSpawnPoint* ADDMiniGameModeBase::FindSpawnPointBySlotIndex(int32 SlotIndex) const
-{
-	if (GetWorld() == nullptr)
-	{
-		return nullptr;
-	}
-
-	// SlotIndex와 매칭되는 SpawnPoint를 찾음
-	for (TActorIterator<ADDMiniGameSpawnPoint> It(GetWorld()); It; ++It)
-	{
-		if (It->SlotIndex == SlotIndex)
-		{
-			return *It;
-		}
-	}
-
-	return nullptr;
-}
-
 bool ADDMiniGameModeBase::ShouldSpawnAsSpectator(const FMiniGameParticipantInfo& Participant) const
 {
 	// 기본적오르논 준비되지 않았거나 연결이 끊긴 참가자를 관전자로 처리
 	return !Participant.bReady || !Participant.bConnected;
-}
-
-TSubclassOf<APawn> ADDMiniGameModeBase::ResolvePawnClass(const FMiniGameParticipantInfo& Participant) const
-{
-	// 대부분의 미니게임은 DefaultPawnClass만 지정하면 되도록 기본값 제공
-	return DefaultPawnClass;
-}
-
-FTransform ADDMiniGameModeBase::ResolveSpawnTransform(const FMiniGameParticipantInfo& Participant)
-{
-	// 레벨에 배치된 SpawnPoint의 SlotIndex를 참가자의 SlotIndex와 매칭
-	if (ADDMiniGameSpawnPoint* SpawnPoint = FindSpawnPointBySlotIndex(Participant.SlotIndex))
-	{
-		return SpawnPoint->GetActorTransform();
-	}
-
-	// 아래는 DDMiniGameSpawnPoint가 하나도 없거나, 해당 슬롯용 포인트가 없을 때
-	AActor* StartSpot = nullptr;
-
-	// StartSpot = ChoosePlayerStart(nullptr);
-	// 언리얼 기본 PlayerStart 선택 로직을 써서 일단 스폰 가능한 위치(PlayerStart 중 하나) 얻고 그 곳에 스폰.
-	StartSpot = ChoosePlayerStart(nullptr);
-	if (StartSpot != nullptr)
-	{
-		return StartSpot->GetActorTransform();
-	}
-
-	// 진짜 최후의 최후에는 그냥 원점을 반환함 : (0, 0, 0) 위치, 기본 회전, 기본 스케일
-	return FTransform::Identity;
-}
-
-void ADDMiniGameModeBase::SpawnParticipantPawn(APlayerController* PlayerController,
-                                               const FMiniGameParticipantInfo& Participant)
-{
-	if (PlayerController == nullptr || GetWorld() == nullptr)
-	{
-		return;
-	}
-
-	TSubclassOf<APawn> PawnClass = ResolvePawnClass(Participant);
-	if (PawnClass == nullptr)
-	{
-		return;
-	}
-	
-	const FTransform SpawnTransform = ResolveSpawnTransform(Participant);
-	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = PlayerController;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	// RestartPlayer 대신 직접 Spawn + Possess를 사용
-	APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, SpawnParams);
-	if (SpawnedPawn != nullptr)
-	{
-		PlayerController->Possess(SpawnedPawn);
-	}
-	
-	// MiniGame에서 사용할 InputConfig / IMC를 적용하는 시점
-	if (ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlayerController))
-	{
-		ApplyMiniGameInput(BasePlayerController);
-	}
 }
 
 void ADDMiniGameModeBase::SpawnSpectatorPawn(APlayerController* PlayerController)
@@ -284,7 +250,7 @@ void ADDMiniGameModeBase::SpawnSpectatorPawn(APlayerController* PlayerController
 	FRotator SpectatorRotation = FRotator::ZeroRotator;
 
 	AActor* StartSpot = nullptr;
-	StartSpot = ChoosePlayerStart(PlayerController);
+	StartSpot = Super::ChoosePlayerStart_Implementation(PlayerController);
 	if (StartSpot != nullptr)
 	{
 		// 관전자도 가능하면 기존 PlayerStart 근처에 배치

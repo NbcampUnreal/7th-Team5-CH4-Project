@@ -53,6 +53,12 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(FinishReason_MiniGame_TimeOver, "FinishReason.MiniGame.TimeOver", "제한 시간이 종료되어 미니게임이 끝난 경우");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(FinishReason_MiniGame_Completed, "FinishReason.MiniGame.Completed", "승리 조건이나 완료 조건을 충족해 미니게임이 끝난 경우");
 
+	// 미니게임 스폰 슬롯 태그
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SpawnSlot_MiniGame_Slot0, "SpawnSlot.MiniGame.Slot0", "SlotIndex 0번과 대응");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SpawnSlot_MiniGame_Slot1, "SpawnSlot.MiniGame.Slot1", "SlotIndex 1번과 대응");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SpawnSlot_MiniGame_Slot2, "SpawnSlot.MiniGame.Slot2", "SlotIndex 2번과 대응");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SpawnSlot_MiniGame_Slot3, "SpawnSlot.MiniGame.Slot3", "SlotIndex 3번과 대응");
+	
 	// 보드게임 로비 상태 태그 
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_LobbyWaiting, "State.BoardGame.LobbyWaiting", "로비 대기");
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_BoardGame_LobbyStarting, "State.BoardGame.LobbyStarting", "로비 카운트다운");
