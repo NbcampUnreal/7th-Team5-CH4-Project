@@ -123,4 +123,11 @@ protected:
     /** 턴 대기 중인 플레이어에게 부여할 GE */
     UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Turn")
     TSubclassOf<UGameplayEffect> TurnWaitingEffectClass;
+    
+protected:
+    // 2초 대기 후 다음 턴으로 넘기기 위한 타이머 핸들
+    FTimerHandle TurnTransitionTimerHandle;
+
+    // 타이머 종료 후 실제로 다음 사람에게 턴을 넘기는 함수
+    void ExecuteNextTurnTransition();
 };

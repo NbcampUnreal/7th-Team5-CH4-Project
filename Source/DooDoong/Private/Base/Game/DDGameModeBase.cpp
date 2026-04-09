@@ -391,15 +391,39 @@ void ADDGameModeBase::StartNextPlayerTurn()
 
 void ADDGameModeBase::NotifyDiceRolled()
 {
-	LOG_CJH(Log, TEXT("[Notify] 주사위 굴림 감지. 타이머를 멈추고 이동 페이즈로 전환합니다."));
-	StateTimer = -1;
-	SetTurnPhase(DDGameplayTags::State_TurnPhase_Moving);
+	LOG_CJH(Log, TEXT("[Notify] 주사위 굴림. BeforeDice를 제거하고 Moving 페이즈로 전환."));
+    // 1. BeforeDice 페이즈 종료 (GE 제거)
+    // 2. Moving 페이즈 시작 (GE 부여)
+    SetTurnPhase(DDGameplayTags::State_TurnPhase_Moving);
+    
+    // 주사위를 굴렸으므로 타이머는 멈춥니다 (필요 시)
+    StateTimer = -1;
 }
 
 void ADDGameModeBase::NotifyMovementFinished()
 {
-	LOG_CJH(Log, TEXT("[Notify] 캐릭터 이동 완료. 발판 이벤트 페이즈로 전환합니다."));
-	SetTurnPhase(DDGameplayTags::State_TurnPhase_Event);
+	LOG_CJH(Log, TEXT("[Notify] 이동 완료. Moving 태그를 제거하고 2초 뒤 턴을 넘깁니다."));
+    
+    // 1. 현재 페이즈(Moving) GE 제거
+    SetTurnPhase(FGameplayTag::EmptyTag);
+
+    // 2. 2초 뒤에 ExecuteNextTurnTransition 함수가 호출되도록 타이머 설정
+    GetWorldTimerManager().SetTimer(
+        TurnTransitionTimerHandle, 
+        this, 
+        &ThisClass::ExecuteNextTurnTransition, 
+        2.0f, 
+        false
+    );
+}
+
+void ADDGameModeBase::ExecuteNextTurnTransition()
+{
+    LOG_CJH(Log, TEXT("[Timer] 2초 대기 완료. 다음 플레이어로 턴을 전환합니다."));
+    
+    // 기존 NotifyTileEventFinished의 로직을 수행
+    CurrentTurnPlayerIndex++;
+    SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 }
 
 void ADDGameModeBase::NotifyTileEventFinished()
