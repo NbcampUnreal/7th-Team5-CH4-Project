@@ -403,24 +403,24 @@ void ADDGameModeBase::NotifyDiceRolled()
 
 void ADDGameModeBase::NotifyMovementFinished()
 {
-	LOG_CJH(Log, TEXT("[Notify] 이동 완료. Moving 태그를 제거하고 2초 뒤 턴을 넘깁니다."));
+	LOG_CJH(Log, TEXT("[Notify] 이동 완료. Moving 태그를 제거하고 %d초 뒤 턴을 넘깁니다."), TurnTransitionTimer);
     
     // 1. 현재 페이즈(Moving) GE 제거
     SetTurnPhase(FGameplayTag::EmptyTag);
 
-    // 2. 2초 뒤에 ExecuteNextTurnTransition 함수가 호출되도록 타이머 설정
+    // 2. N초 뒤에 ExecuteNextTurnTransition 함수가 호출되도록 타이머 설정
     GetWorldTimerManager().SetTimer(
         TurnTransitionTimerHandle, 
         this, 
         &ThisClass::ExecuteNextTurnTransition, 
-        2.0f, 
+        TurnTransitionTimer, 
         false
     );
 }
 
 void ADDGameModeBase::ExecuteNextTurnTransition()
 {
-    LOG_CJH(Log, TEXT("[Timer] 2초 대기 완료. 다음 플레이어로 턴을 전환합니다."));
+    LOG_CJH(Log, TEXT("[Timer] %d초 대기 완료. 다음 플레이어로 턴을 전환합니다."), TurnTransitionTimer);
 	
     CurrentTurnPlayerIndex++;
     SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
