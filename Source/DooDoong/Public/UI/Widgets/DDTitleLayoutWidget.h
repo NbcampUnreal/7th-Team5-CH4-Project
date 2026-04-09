@@ -28,6 +28,10 @@ protected:
 	
 	UFUNCTION()
     void OnNicknameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod);
+	
+public:
+	UFUNCTION()
+	void OnNicknameSubmitResult(bool bSuccess, const FString& ErrorMessage);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess, BindWidget))

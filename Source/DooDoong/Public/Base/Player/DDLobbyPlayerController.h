@@ -19,4 +19,8 @@ public:
 	// 서버가 클라이언트에게 UI를 닫고 게임 모드로 전환하라고 지시하는 RPC
 	UFUNCTION(Client, Reliable)
 	void Client_JoinLobby();
+	
+	// 중복 닉네임인 경우 실패 통보할 RPC
+    UFUNCTION(Client, Reliable)
+    void Client_ReceiveNicknameFailure(const FString& ErrorMessage);
 };
