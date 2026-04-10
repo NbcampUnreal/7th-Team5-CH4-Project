@@ -6,21 +6,14 @@
 #include "DDMoveTileStepTask.generated.h"
 
 class ADDTile;
+class ADDSelectableTileActor;
 
 UCLASS()
 class DOODOONG_API UDDMoveTileStepTask : public UAbilityTask
 {
 	GENERATED_BODY()
-	
-public:
 
-	UPROPERTY(BlueprintAssignable)
-	FOnMoveFinished OnFinished;
-	
-	// Dump: 임시 현재 타일 // 나중에 지울 것
-	// UPROPERTY(EditAnywhere)
-	// ADDTile* CurrentTile;
-	
+public:
 	static UDDMoveTileStepTask* MoveTile(
 		UGameplayAbility* OwningAbility,
 		int32 Steps
@@ -28,12 +21,31 @@ public:
 
 	virtual void Activate() override;
 
-private:
-
-	int32 RemainingSteps;
-
 	void MoveNext();
-public:
+
+	void ContinueMove(ADDTile* Tile);
+
 	UFUNCTION()
 	void OnCharacterMoveFinished();
+	virtual void OnDestroy(bool AbilityEnded) override;
+
+	void SelectNextTile(ADDTile* SelectedTile);
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnMoveFinished OnFinished;
+
+private:
+	int32 RemainingSteps = 0;
+
+	UPROPERTY()
+	TArray<ADDSelectableTileActor*> SpawnedActors;
+
+	UPROPERTY()
+	ADDTile* PendingTile; // 선택 대기용
+
+	void SpawnSelectableActors(const TArray<ADDTile*>& Tiles);
+
+	void ClearSelectableActors();
+
+public:
 };

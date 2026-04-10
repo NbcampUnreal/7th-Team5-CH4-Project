@@ -6,6 +6,7 @@ namespace DDGameplayTags
 	// Native Input Tags 
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Move, "Input.Native.Move");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Look, "Input.Native.Look");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Click, "Input.Native.Click");
 	
 	// Ability Input Tags 
 	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_Jump, "Input.Ability.Jump"); 
@@ -75,6 +76,7 @@ namespace DDGameplayTags
 	// 보드게임 턴 내부 세부 페이즈 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_BeforeDice, "State.TurnPhase.BeforeDice", "주사위 굴리기 전");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_Moving, "State.TurnPhase.Moving", "보드판 이동 중 (모든 조작 불가)");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_SelectTile, "State.TurnPhase.SelectTile", "이동 중 타일 선택 (마우스 허용)");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_Event, "State.TurnPhase.Event", "이동 완료 후 (상점 이용 및 트로피 획득 판정 중)");
 }
 
