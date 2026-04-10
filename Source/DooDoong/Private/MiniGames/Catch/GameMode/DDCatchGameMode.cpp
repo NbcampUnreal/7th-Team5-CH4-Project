@@ -1,0 +1,36 @@
+﻿#include "MiniGames/Catch/GameMode/DDCatchGameMode.h"
+
+#include "EngineUtils.h"
+#include "Camera/CameraActor.h"
+#include "Common/DDLogManager.h"
+#include "MiniGames/Catch/GameState/DDCatchGameState.h"
+
+ADDCatchGameMode::ADDCatchGameMode()
+{
+	GameStateClass = ADDCatchGameState::StaticClass();
+}
+
+void ADDCatchGameMode::StartMiniGame()
+{
+	Super::StartMiniGame();
+
+	LOG_CYS(Warning,TEXT("다이아 캐치캐치 시작"));
+	AActor* FoundCamera = nullptr;
+
+	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
+	{
+		if (It->ActorHasTag(TEXT("GameCamera")))
+		{
+			FoundCamera = *It;
+			break;
+		}
+	}
+
+	if (!FoundCamera) return;
+
+	ADDCatchGameState* GS = GetGameState<ADDCatchGameState>();
+	if (GS)
+	{
+		GS->Multicast_SetGameCamera(FoundCamera);
+	}
+}
