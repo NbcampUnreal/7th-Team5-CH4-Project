@@ -20,7 +20,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Attacking);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Stun);
-	
+
 	// Event Tags 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Character_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_Start);
@@ -36,7 +36,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Coin);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Item);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Move);
-	
+
 	// 미니게임 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Idle);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Preparing);
@@ -51,30 +51,36 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Genre_MiniGame_Competition);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Genre_MiniGame_Survival);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Genre_MiniGame_Race);
-	
+
 	// 미니게임 종료 조건 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(FinishReason_MiniGame_TimeOver);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(FinishReason_MiniGame_Completed);
 	
+	// 미니게임 스폰 슬롯 태그
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SpawnSlot_MiniGame_Slot0);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SpawnSlot_MiniGame_Slot1);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SpawnSlot_MiniGame_Slot2);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SpawnSlot_MiniGame_Slot3);
+
 	// 보드게임 로비 상태 태그 
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_LobbyWaiting);
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_LobbyStarting);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_LobbyWaiting);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_LobbyStarting);
 
-  // 보드게임 보드판 상태 태그
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_Init);
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_PlayerTurn);
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_RoundEnd);
-	
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_HasUsedItem);
- 
-  // 보드게임 종료 상태 태그 
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_Ending);
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_End);
+	// 보드게임 보드판 상태 태그
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_Init);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_PlayerTurn);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_RoundEnd);
 
-  // 보드게임 턴 제어 상태 태그
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_TurnActive);
-  UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_TurnWaiting);
-	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_HasUsedItem);
+
+	// 보드게임 종료 상태 태그 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_Ending);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_End);
+
+	// 보드게임 턴 제어 상태 태그
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_TurnActive);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_BoardGame_TurnWaiting);
+
 	// 보드게임 턴 내부 세부 페이즈 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_BeforeDice);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_Moving);
