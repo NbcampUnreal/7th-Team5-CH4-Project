@@ -37,3 +37,7 @@ void ADDShooterGameMode::FireProjectile(ADDShooterCharacter* ShooterCharacter, c
 
 	Projectile->InitializeShot(ShooterCharacter, ShooterCharacter, SpawnRotation.Vector());
 }
+
+void ADDShooterGameMode::SpawnTarget()
+{
+}
