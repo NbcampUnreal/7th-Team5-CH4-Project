@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/PlayerState.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "MiniGames/Shooter/Actors/DDShotProjectile.h"
 #include "MiniGames/Shooter/GameMode/DDShooterGameMode.h"
 
@@ -12,6 +13,7 @@ ADDShooterTarget::ADDShooterTarget()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
+	SetReplicateMovement(true);
 
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComp"));
 	SetRootComponent(CollisionComp);
@@ -23,11 +25,26 @@ ADDShooterTarget::ADDShooterTarget()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
+	ProjectileMovementComp->InitialSpeed = StartSpeed;
+	ProjectileMovementComp->MaxSpeed = MaxSpeed;
+	ProjectileMovementComp->ProjectileGravityScale = GravityScale;
+	ProjectileMovementComp->bRotationFollowsVelocity = true;
+	ProjectileMovementComp->bShouldBounce = false;
 }
 
 void ADDShooterTarget::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ADDShooterTarget::LaunchTarget(const FVector& LaunchDirection, float Speed)
+{
+	const FVector LaunchVelocity = LaunchDirection.GetSafeNormal() * Speed;
+	
+	ProjectileMovementComp->Velocity = LaunchVelocity;
+	ProjectileMovementComp->Activate(true);
 }
 
 bool ADDShooterTarget::HandleProjectileHit(ADDShotProjectile* ShotProjectile)
