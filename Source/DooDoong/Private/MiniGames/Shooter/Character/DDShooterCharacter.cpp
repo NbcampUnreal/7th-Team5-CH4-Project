@@ -19,7 +19,6 @@ ADDShooterCharacter::ADDShooterCharacter()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
 	SpringArmComp->SetupAttachment(GetRootComponent());
-	SpringArmComp->TargetArmLength = 200.f;
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->bInheritPitch = true;
 	SpringArmComp->bInheritYaw = true;
