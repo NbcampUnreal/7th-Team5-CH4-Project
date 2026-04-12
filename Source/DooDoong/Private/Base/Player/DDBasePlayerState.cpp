@@ -7,6 +7,7 @@
 #include "Base/Game/DDGameStateBase.h"
 #include "BoardGame/DDTileManager.h"
 #include "Common/DDLogManager.h"
+#include "GameFramework/Character.h"
 
 ADDBasePlayerState::ADDBasePlayerState()
 {
@@ -59,6 +60,7 @@ void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 	{
 		// 커스텀 데이터 복제
 		NewPlayerState->PlayerGameData.PlayerDisplayName = this->PlayerGameData.PlayerDisplayName;
+		NewPlayerState->PlayerGameData.PlayerColor = this->PlayerGameData.PlayerColor;
 		NewPlayerState->bIsParticipant = this->bIsParticipant;
 		NewPlayerState->PlayerGameData.TurnOrder = this->PlayerGameData.TurnOrder;
 	}
@@ -72,4 +74,37 @@ void ADDBasePlayerState::InitTile()
 
 	CurrentTile = GameState->TileManager->FindTile(StartTileName);
 
+}
+
+void ADDBasePlayerState::OnRep_PlayerGameData()
+{
+	UpdateCharacterVisuals();
+}
+
+void ADDBasePlayerState::SetPlayerColor(FLinearColor InNewColor)
+{
+	if (HasAuthority()) 
+    {
+        PlayerGameData.PlayerColor = InNewColor;
+		
+        UpdateCharacterVisuals(); 
+    }
+}
+
+void ADDBasePlayerState::UpdateCharacterVisuals()
+{
+	APawn* OwningPawn = GetPawn();
+    if (!OwningPawn) return;
+	
+	ACharacter* Character = Cast<ACharacter>(OwningPawn);
+    if (Character && Character->GetMesh())
+    {
+        USkeletalMeshComponent* Mesh = Character->GetMesh();
+    	
+        UMaterialInstanceDynamic* DynMaterial = Mesh->CreateDynamicMaterialInstance(0);
+        if (DynMaterial)
+        {
+            DynMaterial->SetVectorParameterValue(TEXT("PlayerColor"), PlayerGameData.PlayerColor);
+        }
+    }
 }

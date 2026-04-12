@@ -50,6 +50,11 @@ void ADDBaseCharacter::PossessedBy(AController* NewController)
 	{
 		AbilitySystemComponent->GiveAbilities(DefaultAbilitySet);
 	}
+	
+	if (ADDBasePlayerState* PS = GetPlayerState<ADDBasePlayerState>())
+    {
+        PS->UpdateCharacterVisuals();
+    }
 }
 
 void ADDBaseCharacter::OnRep_PlayerState()
@@ -59,6 +64,11 @@ void ADDBaseCharacter::OnRep_PlayerState()
 	InitializeAbilitySystem();
 	
 	BindAttributeDelegates();
+	
+	if (ADDBasePlayerState* PS = GetPlayerState<ADDBasePlayerState>())
+    {
+        PS->UpdateCharacterVisuals();
+    }
 }
 
 void ADDBaseCharacter::InitializeAbilitySystem()
