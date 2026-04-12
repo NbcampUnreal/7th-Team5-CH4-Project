@@ -1,6 +1,6 @@
 ﻿
 #include "UI/Inventory/DDInventoryComponent.h"
-#include "UI/Inventory/DDInvenGrid.h"
+#include "UI/Inventory/DDInventory.h"
 
 #include "Base/Player/DDBasePlayerController.h"
 #include "UI/Inventory/DDInventoryBase.h"
@@ -26,7 +26,7 @@ void UDDInventoryComponent::ConstructInventory()
 	checkf(OwningController.IsValid(), TEXT("플레이어의 인벤토리가 유효하지않습니다."));
 	if (!OwningController->IsLocalController()) return;
 	
-	InventoryWidget = CreateWidget<UDDInvenGrid>(OwningController.Get(), InventoryWidgetClass);
+	InventoryWidget = CreateWidget<UDDInventory>(OwningController.Get(), InventoryWidgetClass);
 	InventoryWidget->AddToViewport();
 	
 }
