@@ -2,11 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "AbilitySystemInterface.h"
 #include "DDPlatformerDeadZone.generated.h"
 
 UCLASS()
-class DOODOONG_API ADDPlatformerDeadZone : public AActor, public IAbilitySystemInterface
+class DOODOONG_API ADDPlatformerDeadZone : public AActor
 {
 	GENERATED_BODY()
 
@@ -35,8 +34,6 @@ protected:
 	TObjectPtr<class UBoxComponent> BoxCollision;
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UDDAbilitySystemComponent> AbilitySystemComponent;
 	
 	FVector StartLocation;
 };

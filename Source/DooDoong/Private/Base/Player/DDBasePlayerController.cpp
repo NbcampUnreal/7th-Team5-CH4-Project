@@ -14,6 +14,7 @@
 
 ADDBasePlayerController::ADDBasePlayerController()
 {
+	
 }
 
 void ADDBasePlayerController::BeginPlay()
@@ -29,6 +30,7 @@ void ADDBasePlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(DefaultIMC, 0);
 	}
+	
 }
 
 void ADDBasePlayerController::SetupInputComponent()
@@ -219,3 +221,4 @@ void ADDBasePlayerController::Input_AbilityReleased(FGameplayTag InputTag)
 		}
 	}
 }
+
