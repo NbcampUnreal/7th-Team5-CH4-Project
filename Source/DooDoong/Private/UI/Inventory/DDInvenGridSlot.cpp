@@ -2,3 +2,8 @@
 
 
 #include "UI/Inventory/DDInvenGridSlot.h"
+
+void UDDInvenGridSlot::SetImage(UImage* Image)
+{
+	Image_ItemIcon = Image;
+}
