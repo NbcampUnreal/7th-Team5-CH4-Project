@@ -3,6 +3,7 @@
 #include "Components/ArrowComponent.h"
 #include "Components/SceneComponent.h"
 #include "MiniGames/Shooter/Actors/DDShooterTarget.h"
+#include "MiniGames/Shooter/GameMode/DDShooterGameMode.h"
 
 ADDShooterTargetSpawner::ADDShooterTargetSpawner()
 {
@@ -16,6 +17,34 @@ ADDShooterTargetSpawner::ADDShooterTargetSpawner()
 	LaunchDirectionArrow->ArrowSize = 1.5f;
 
 	TargetClass = ADDShooterTarget::StaticClass();
+}
+
+void ADDShooterTargetSpawner::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (!HasAuthority() || GetWorld() == nullptr)
+	{
+		return;
+	}
+
+	if (ADDShooterGameMode* ShooterGameMode = GetWorld()->GetAuthGameMode<ADDShooterGameMode>())
+	{
+		ShooterGameMode->RegisterTargetSpawner(this);
+	}
+}
+
+void ADDShooterTargetSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (HasAuthority() && GetWorld() != nullptr)
+	{
+		if (ADDShooterGameMode* ShooterGameMode = GetWorld()->GetAuthGameMode<ADDShooterGameMode>())
+		{
+			ShooterGameMode->UnregisterTargetSpawner(this);
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 ADDShooterTarget* ADDShooterTargetSpawner::SpawnTarget()
@@ -47,7 +76,9 @@ ADDShooterTarget* ADDShooterTargetSpawner::SpawnTarget()
 
 FVector ADDShooterTargetSpawner::GetLaunchDirection() const
 {
-	FRotator LaunchRotation = GetActorRotation();
+	FRotator LaunchRotation = LaunchDirectionArrow != nullptr
+		? LaunchDirectionArrow->GetComponentRotation()
+		: GetActorRotation();
 
 	LaunchRotation.Yaw += FMath::FRandRange(-RandomYawAngle, RandomYawAngle);
 	LaunchRotation.Pitch += FMath::FRandRange(-RandomPitchAngle, RandomPitchAngle);
