@@ -8,30 +8,19 @@
 
 bool ADDLobbyPlayerController::Server_SubmitNickname_Validate(const FName& InNickname)
 {
+	// 닉네임 길이 검사 
 	return !InNickname.IsNone() && InNickname.ToString().Len() <= 12;
 }
 
 void ADDLobbyPlayerController::Server_SubmitNickname_Implementation(const FName& InNickname)
 {
-	AGameStateBase* GameState = GetWorld()->GetGameState();
-    if (IsValid(GameState))
-    {
-        // 모든 플레이어의 닉네임 중복 검사
-        for (APlayerState* PS : GameState->PlayerArray)
-        {
-            ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(PS);
-            if (DDPS && DDPS->PlayerGameData.PlayerDisplayName == InNickname)
-            {
-                Client_ReceiveNicknameFailure(TEXT("이미 존재하는 닉네임입니다."));
-                return;
-            }
-        }
-    }
-	
 	ADDLobbyGameMode* LobbyGameMode = GetWorld()->GetAuthGameMode<ADDLobbyGameMode>();
-	if (IsValid(LobbyGameMode))
+	if (!IsValid(LobbyGameMode)) return; 
+	
+	FString ErrorMessage;
+	if (!LobbyGameMode->TryRegisterPlayerNickname(this, InNickname, ErrorMessage))
 	{
-		LobbyGameMode->ProcessPlayerJoin(this, InNickname);
+		Client_ReceiveNicknameFailure(ErrorMessage);
 	}
 }
 
