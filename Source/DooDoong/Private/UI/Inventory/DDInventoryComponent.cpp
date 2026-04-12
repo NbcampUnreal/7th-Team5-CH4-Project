@@ -1,5 +1,6 @@
 ﻿
 #include "UI/Inventory/DDInventoryComponent.h"
+#include "UI/Inventory/DDInvenGrid.h"
 
 #include "Base/Player/DDBasePlayerController.h"
 #include "UI/Inventory/DDInventoryBase.h"
@@ -22,10 +23,10 @@ void UDDInventoryComponent::BeginPlay()
 void UDDInventoryComponent::ConstructInventory()
 {
 	OwningController = Cast<ADDBasePlayerController>(GetOwner());
-	checkf(OwningController.IsValid(), TEXT("인벤토리가 플레이어 컨트롤러 소유여야합니다."));
+	checkf(OwningController.IsValid(), TEXT("플레이어의 인벤토리가 유효하지않습니다."));
 	if (!OwningController->IsLocalController()) return;
 	
-	InventoryMenu = CreateWidget<UDDInventoryBase>(OwningController.Get(), InventoryMenuClass);
-	InventoryMenu->AddToViewport();
+	InventoryWidget = CreateWidget<UDDInvenGrid>(OwningController.Get(), InventoryWidgetClass);
+	InventoryWidget->AddToViewport();
 	
 }

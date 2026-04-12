@@ -5,6 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "DDInventoryComponent.generated.h"
 
+class UDDInvenGrid;
 class ADDBasePlayerController;
 class UDDInventoryBase;
 
@@ -25,10 +26,9 @@ private:
 	void ConstructInventory();
 	
 	UPROPERTY()
-	TObjectPtr<UDDInventoryBase> InventoryMenu;
+	TObjectPtr<UDDInvenGrid> InventoryWidget;
 	
 	UPROPERTY(EditDefaultsOnly, Category= "Inventory")
-	TSubclassOf<UDDInventoryBase> InventoryMenuClass;
-	
+	TSubclassOf<UDDInvenGrid> InventoryWidgetClass;
 	
 };
