@@ -53,8 +53,10 @@ private:
 	FString BaseGameMapPath = TEXT("/Game/DooDoong/Map/L_BaseGame?listen");
 	
 protected:
-	/** 남아있는 선택 가능한 색상 목록을 담아둘 배열 */
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category = "GameSettings|Color", meta=(DisplayName="기본 플레이어 색상 목록"))
+    TArray<FLinearColor> DefaultPlayerColors;
+	
+	UPROPERTY(VisibleAnywhere, Transient, Category = "GameSettings|Color", meta=(DisplayName="현재 남은 색상 목록"))
     TArray<FLinearColor> AvailableColors;
 	
 	/** 중복되지 않는 랜덤 색상을 반환하고 배열에서 제거하는 함수 */
