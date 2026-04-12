@@ -109,8 +109,11 @@ void ADDShooterGameMode::SpawnTarget()
 		return;
 	}
 
-	const int32 SpawnerIndex = FMath::RandRange(0, EnabledSpawners.Num() - 1);
-	EnabledSpawners[SpawnerIndex]->SpawnTarget();
+	for (int i = 0; i < TargetSpawnCount; i++)
+	{
+		const int32 SpawnerIndex = FMath::RandRange(0, EnabledSpawners.Num() - 1);
+		EnabledSpawners[SpawnerIndex]->SpawnTarget();
+	}
 }
 
 void ADDShooterGameMode::RegisterTargetSpawner(ADDShooterTargetSpawner* Spawner)

@@ -1,6 +1,5 @@
 #include "MiniGames/Shooter/Actors/DDShooterTarget.h"
 
-#include "Base/MiniGame/DDMiniGameStateBase.h"
 #include "Common/DDLogManager.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -20,6 +19,7 @@ ADDShooterTarget::ADDShooterTarget()
 	CollisionComp->SetBoxExtent(FVector(50.0f));
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
@@ -31,7 +31,7 @@ ADDShooterTarget::ADDShooterTarget()
 	ProjectileMovementComp->MaxSpeed = MaxSpeed;
 	ProjectileMovementComp->ProjectileGravityScale = GravityScale;
 	ProjectileMovementComp->bRotationFollowsVelocity = true;
-	ProjectileMovementComp->bShouldBounce = false;
+	ProjectileMovementComp->bShouldBounce = true;
 }
 
 void ADDShooterTarget::BeginPlay()
@@ -64,7 +64,8 @@ bool ADDShooterTarget::HandleProjectileHit(ADDShotProjectile* ShotProjectile)
 	bCanGetScore = false;
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ShooterGameMode->AddScore(ShooterPlayerState, ScoreValue);
-
+	Destroy();
+	
 	LOG_JJH(Warning, TEXT("플레이어 : %s, 획득 점수 : %d"),
 	        *ShooterPlayerState->GetPlayerName(),
 	        ScoreValue);

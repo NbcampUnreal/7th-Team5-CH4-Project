@@ -45,6 +45,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shooter|Target", meta = (ClampMin = "0.0"))
 	float TargetSpawnInterval = 3.0f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shooter|Target")
+	int32 TargetSpawnCount = 3;
 
 private:
 	void HandleTargetSpawnTimer();

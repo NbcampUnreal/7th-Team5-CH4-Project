@@ -42,13 +42,13 @@ protected:
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shooter", meta = (AllowPrivateAccess = true))
-	float StartSpeed = 2000.0f;
+	float StartSpeed = 4000.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shooter", meta = (AllowPrivateAccess = true))
-	float MaxSpeed = 2000.0f;
+	float MaxSpeed = 4000.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shooter", meta = (AllowPrivateAccess = true))
-	float GravityScale = 0.0f;
+	float GravityScale = 0.3f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shooter", meta = (AllowPrivateAccess = true))
 	float LifeSeconds = 5.0f;
