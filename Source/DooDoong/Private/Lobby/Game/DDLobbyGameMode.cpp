@@ -1,10 +1,10 @@
-#include "Base/Game/DDLobbyGameMode.h"
-#include "Base/Player/DDLobbyPlayerController.h"
+#include "Lobby/Game/DDLobbyGameMode.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "TimerManager.h"
 #include "Base/Game/DDGameStateBase.h"
 #include "Common/DDLogManager.h"
+#include "Lobby/Player/DDLobbyPlayerController.h"
 
 ADDLobbyGameMode::ADDLobbyGameMode()
 {
@@ -41,9 +41,7 @@ void ADDLobbyGameMode::Logout(AController* Exiting)
 	Spectators.Remove(PC);
 }
 
-bool ADDLobbyGameMode::TryRegisterPlayerNickname(
-	ADDLobbyPlayerController* Requester,
-	const FName& Nickname,
+bool ADDLobbyGameMode::TryRegisterPlayerNickname(ADDLobbyPlayerController* Requester, const FName& Nickname,
 	FString& ErrorMessage)
 {
 	// 1. 유효성 및 중복 체크
