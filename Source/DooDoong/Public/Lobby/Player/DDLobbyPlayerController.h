@@ -1,5 +1,4 @@
 #pragma once
-
 #include "CoreMinimal.h"
 #include "Base/Player/DDBasePlayerController.h"
 #include "DDLobbyPlayerController.generated.h"

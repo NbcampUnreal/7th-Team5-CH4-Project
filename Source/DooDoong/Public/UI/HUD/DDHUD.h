@@ -4,6 +4,8 @@
 #include "GameFramework/HUD.h"
 #include "DDHUD.generated.h"
 
+class UUserWidget;
+
 UCLASS()
 class DOODOONG_API ADDHUD : public AHUD
 {
@@ -11,25 +13,24 @@ class DOODOONG_API ADDHUD : public AHUD
 
 protected:
 	virtual void BeginPlay() override;
+	
+public:
+	void InitializeLevelUI();
+	
+	void ToggleWidgetVisibility(bool bVisible);
 
 public:
-	// UI 교체용 (나중 확장)
-	void ShowWidget(TSubclassOf<class UUserWidget> WidgetClass);
+	template<typename T>
+	T* GetMainWidget() const 
+	{ 
+		return Cast<T>(CurrentMainWidgetInst); 
+	}
 	
-	/** 현재 화면에 띄워진 메인 위젯을 제거하는 함수 */
-    void HideMainWidget();
-
 protected:
-	// 로비 UI
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> LobbyWidgetClass;
-
-	// 기본 게임 UI
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> BaseGameWidgetClass;
-
-	// 현재 위젯
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> CurrentMainWidgetClass;
+	
 	UPROPERTY()
-	UUserWidget* MainWidgetInstance;
+	UUserWidget* CurrentMainWidgetInst;
 };
 

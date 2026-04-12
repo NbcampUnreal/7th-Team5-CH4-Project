@@ -24,4 +24,8 @@ public:
 	
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = "Game State", meta=(DisplayName="게임 참가자 수"))
     int32 MinPlayerCount = 4;
+	
+public:
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> LevelMainWidgetClass;
 };
