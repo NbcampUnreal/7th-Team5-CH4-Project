@@ -1,15 +1,15 @@
-#include "UI/Widgets/DDTitleLayoutWidget.h"
-#include "Base/Player/DDLobbyPlayerController.h"
+#include "UI/Widgets/DDLobbyWidget.h"
 #include "Components/Button.h"
 #include "Components/EditableText.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Lobby/Player/DDLobbyPlayerController.h"
 
-UDDTitleLayoutWidget::UDDTitleLayoutWidget(const FObjectInitializer& ObjectInitializer)
+UDDLobbyWidget::UDDLobbyWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-void UDDTitleLayoutWidget::NativeConstruct()
+void UDDLobbyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -22,12 +22,12 @@ void UDDTitleLayoutWidget::NativeConstruct()
 	PlayButton->SetIsEnabled(false);
 }
 
-void UDDTitleLayoutWidget::OnNicknameTextChanged(const FText& Text)
+void UDDLobbyWidget::OnNicknameTextChanged(const FText& Text)
 {
 	PlayButton->SetIsEnabled(!Text.IsEmpty());
 }
 
-void UDDTitleLayoutWidget::OnNicknameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
+void UDDLobbyWidget::OnNicknameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
 {
     if (CommitMethod == ETextCommit::OnEnter)
     {
@@ -38,7 +38,7 @@ void UDDTitleLayoutWidget::OnNicknameTextCommitted(const FText& Text, ETextCommi
     }
 }
 
-void UDDTitleLayoutWidget::OnNicknameSubmitResult(bool bSuccess, const FString& ErrorMessage)
+void UDDLobbyWidget::OnNicknameSubmitResult(bool bSuccess, const FString& ErrorMessage)
 {
 	if (bSuccess)
     {
@@ -52,7 +52,7 @@ void UDDTitleLayoutWidget::OnNicknameSubmitResult(bool bSuccess, const FString& 
     }
 }
 
-void UDDTitleLayoutWidget::OnPlayButtonClicked()
+void UDDLobbyWidget::OnPlayButtonClicked()
 {
 	ADDLobbyPlayerController* LobbyPlayerController = GetOwningPlayer<ADDLobbyPlayerController>();
 	if (IsValid(LobbyPlayerController))
@@ -65,7 +65,7 @@ void UDDTitleLayoutWidget::OnPlayButtonClicked()
 	}
 }
 
-void UDDTitleLayoutWidget::OnExitButtonClicked()
+void UDDLobbyWidget::OnExitButtonClicked()
 {
 	UKismetSystemLibrary::QuitGame(
 		this,
@@ -73,7 +73,3 @@ void UDDTitleLayoutWidget::OnExitButtonClicked()
 		EQuitPreference::Quit,
 		false);
 }
-
-
-
-

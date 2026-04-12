@@ -1,18 +1,18 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "DDTitleLayoutWidget.generated.h"
+#include "DDLobbyWidget.generated.h"
 
 class UButton;
 class UEditableText;
 
 UCLASS()
-class UDDTitleLayoutWidget : public UUserWidget
+class UDDLobbyWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
-	UDDTitleLayoutWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UDDLobbyWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void NativeConstruct() override;
