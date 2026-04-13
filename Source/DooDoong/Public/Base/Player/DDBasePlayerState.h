@@ -46,10 +46,14 @@ public:
     FORCEINLINE UDDHealthSet* GetHealthSet() const { return HealthSet; }
     FORCEINLINE UDDPointSet* GetPointSet() const { return PointSet; }
     FORCEINLINE UDDMovementSet* GetMovementSet() const { return MovementSet; }
+	
+	UFUNCTION(BlueprintCallable, Category = "PlayerState|Visuals")
+    void SetPlayerColor(FLinearColor InNewColor);
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
     
 	virtual void BeginPlay() override;
+	
 public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCast_BroadcastKillLog(AActor* Victim, AActor* Killer);
@@ -86,6 +90,11 @@ public:
     bool bIsParticipant = false;
 	
 	/* 플레이어 정보 구조체 */
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
+	UPROPERTY(ReplicatedUsing = OnRep_PlayerGameData, VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
 	FPlayerGameplayInfo PlayerGameData;
+	
+	UFUNCTION()
+    void OnRep_PlayerGameData();
+	
+	void UpdateCharacterVisuals();
 };

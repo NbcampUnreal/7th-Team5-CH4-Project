@@ -19,6 +19,10 @@ ADDBasePlayerController::ADDBasePlayerController()
 void ADDBasePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	FInputModeGameAndUI Mode;
+	SetInputMode(Mode);
+	bShowMouseCursor = true;
 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))

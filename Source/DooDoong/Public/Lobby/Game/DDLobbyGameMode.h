@@ -51,4 +51,14 @@ private:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "GameSettings", meta=(DisplayName="보드게임 맵 경로"))
 	FString BaseGameMapPath = TEXT("/Game/DooDoong/Map/L_BaseGame?listen");
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "GameSettings|Color", meta=(DisplayName="기본 플레이어 색상 목록"))
+    TArray<FLinearColor> DefaultPlayerColors;
+	
+	UPROPERTY(VisibleAnywhere, Transient, Category = "GameSettings|Color", meta=(DisplayName="현재 남은 색상 목록"))
+    TArray<FLinearColor> AvailableColors;
+	
+	/** 중복되지 않는 랜덤 색상을 반환하고 배열에서 제거하는 함수 */
+	FLinearColor GetRandomAvailableColor();
 };
