@@ -316,7 +316,7 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 		}
 	}
 
-	FocusAllCamerasOnTarget(ActivePawn);
+	Super::FocusAllCamerasOnTarget(ActivePawn);
 }
 
 void ADDBoardGameMode::NotifyDiceRolled()
@@ -374,20 +374,6 @@ void ADDBoardGameMode::SetTurnPhase(FGameplayTag NewPhaseTag)
 		}
 		LOG_CJH(Log, TEXT("   └ [TurnPhase] 페이즈 갱신: %s"), *NewPhaseTag.ToString());
 	}
-}
-
-void ADDBoardGameMode::FocusAllCamerasOnTarget(AActor* TargetActor)
-{
-	if (!IsValid(TargetActor)) return;
-
-	for (APlayerController* PlayerController : AlivePlayerControllers)
-	{
-		if (IsValid(PlayerController))
-		{
-			PlayerController->SetViewTargetWithBlend(TargetActor, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
-		}
-	}
-	LOG_CJH(Log, TEXT("[Camera] 모든 플레이어의 화면이 주인공 타겟(%s)을 향합니다."), *TargetActor->GetName());
 }
 
 void ADDBoardGameMode::CalculateFinalWinner()
