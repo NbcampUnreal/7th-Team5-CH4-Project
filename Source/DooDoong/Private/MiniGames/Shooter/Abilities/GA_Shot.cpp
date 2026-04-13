@@ -57,8 +57,6 @@ void UGA_Shot::ActivateAbility(
 		return;
 	}
 
-	LOG_JJH(Log, TEXT("[GA_Shot] Play montage: %s"), *MontageToPlay->GetName());
-
 	UAbilityTask_WaitGameplayEvent* WaitFireEventTask =
 		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, DDGameplayTags::Event_Shooter_Fire);
 	WaitFireEventTask->EventReceived.AddDynamic(this, &ThisClass::OnReceiveFireEvent);

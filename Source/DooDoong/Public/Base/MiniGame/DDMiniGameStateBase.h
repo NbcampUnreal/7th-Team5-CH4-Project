@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "DDMiniGameTypes.h"
-#include "GameFramework/GameStateBase.h"
+#include "Base/Game/DDGameStateBase.h"
 #include "DDMiniGameStateBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMiniGameReadyStateChanged, int32, ReadyPlayerCount, int32, TotalParticipantCount);
@@ -13,7 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMiniGameScoreBoardChanged);
  * 
  */
 UCLASS()
-class DOODOONG_API ADDMiniGameStateBase : public AGameStateBase
+class DOODOONG_API ADDMiniGameStateBase : public ADDGameStateBase
 {
 	GENERATED_BODY()
 	

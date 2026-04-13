@@ -1,10 +1,10 @@
 #include "MiniGames/Shooter/Actors/DDShooterTarget.h"
 
-#include "Base/MiniGame/DDMiniGameStateBase.h"
 #include "Common/DDLogManager.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/PlayerState.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "MiniGames/Shooter/Actors/DDShotProjectile.h"
 #include "MiniGames/Shooter/GameMode/DDShooterGameMode.h"
 
@@ -12,22 +12,39 @@ ADDShooterTarget::ADDShooterTarget()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
+	SetReplicateMovement(true);
 
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComp"));
 	SetRootComponent(CollisionComp);
 	CollisionComp->SetBoxExtent(FVector(50.0f));
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
+	ProjectileMovementComp->InitialSpeed = StartSpeed;
+	ProjectileMovementComp->MaxSpeed = MaxSpeed;
+	ProjectileMovementComp->ProjectileGravityScale = GravityScale;
+	ProjectileMovementComp->bRotationFollowsVelocity = true;
+	ProjectileMovementComp->bShouldBounce = true;
 }
 
 void ADDShooterTarget::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ADDShooterTarget::LaunchTarget(const FVector& LaunchDirection, float Speed)
+{
+	const FVector LaunchVelocity = LaunchDirection.GetSafeNormal() * Speed;
+	
+	ProjectileMovementComp->Velocity = LaunchVelocity;
+	ProjectileMovementComp->Activate(true);
 }
 
 bool ADDShooterTarget::HandleProjectileHit(ADDShotProjectile* ShotProjectile)
@@ -47,7 +64,8 @@ bool ADDShooterTarget::HandleProjectileHit(ADDShotProjectile* ShotProjectile)
 	bCanGetScore = false;
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ShooterGameMode->AddScore(ShooterPlayerState, ScoreValue);
-
+	Destroy();
+	
 	LOG_JJH(Warning, TEXT("플레이어 : %s, 획득 점수 : %d"),
 	        *ShooterPlayerState->GetPlayerName(),
 	        ScoreValue);

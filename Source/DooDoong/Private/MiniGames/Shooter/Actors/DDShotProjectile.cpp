@@ -48,7 +48,9 @@ void ADDShotProjectile::InitializeShot(AActor* InOwnerActor, APawn* InInstigator
 		CollisionComp->IgnoreActorWhenMoving(InInstigatorPawn, true);
 	}
 
-	ProjectileMovementComp->Velocity = ShotDirection.GetSafeNormal() * StartSpeed;
+	const FVector ShotVelocity = ShotDirection.GetSafeNormal() * StartSpeed;
+	
+	ProjectileMovementComp->Velocity = ShotVelocity;
 }
 
 APlayerState* ADDShotProjectile::GetShooterPlayerState() const
