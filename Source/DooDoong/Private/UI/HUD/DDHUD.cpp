@@ -206,18 +206,7 @@ void ADDHUD::ShowMiniGameReadyUI()
 
 
 
-void ADDHUD::HideMainWidget()
-{
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] HideMainWidget CALL"));
 
-	if (MainWidgetInstance)
-	{
-		MainWidgetInstance->RemoveFromParent();
-		MainWidgetInstance = nullptr;
-
-		UE_LOG(LogDDHUD, Warning, TEXT("[HUD] MainWidget Removed"));
-	}
-}
 
 
 
@@ -281,34 +270,36 @@ void ADDHUD::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
 
 
 
+void ADDHUD::HideMainWidget()
+{
+	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] HideMainWidget CALL"));
+
+	if (MainWidgetInstance)
+	{
+		MainWidgetInstance->RemoveFromParent();
+		MainWidgetInstance = nullptr;
+
+		UE_LOG(LogDDHUD, Warning, TEXT("[HUD] MainWidget Removed"));
+	}
+}
+
+
+
+
+
+
+
 void ADDHUD::HideMiniGameReadyUI()
 {
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] HideMiniGameReadyUI CALL"));
 
-	if (!UIConfig || !UIConfig->MiniGameReadyWidget)
-		return;
-
-	//  현재 월드의 모든 위젯 찾기
-	TArray<UUserWidget*> FoundWidgets;
-
-	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(
-		GetWorld(),
-		FoundWidgets,
-		UIConfig->MiniGameReadyWidget,
-		false
-	);
-
-	// 👉 전부 제거
-	for (UUserWidget* Widget : FoundWidgets)
+	if (IsValid(MiniGameReadyWidget))
 	{
-		if (Widget)
-		{
-			UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Removing Widget %p"), Widget);
-			Widget->RemoveFromParent();
-		}
-	}
+		UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Removing ReadyWidget %p"), MiniGameReadyWidget.Get());
 
-	MiniGameReadyWidget = nullptr;
+		MiniGameReadyWidget->RemoveFromParent();
+		MiniGameReadyWidget = nullptr;
+	}
 }
 
 
