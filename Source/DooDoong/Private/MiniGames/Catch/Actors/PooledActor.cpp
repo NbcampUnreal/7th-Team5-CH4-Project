@@ -1,20 +1,22 @@
 ﻿#include "MiniGames/Catch/Actors/PooledActor.h"
-
+#include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
-
 
 APooledActor::APooledActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-	bInUse=true;
+	bInUse = true;
+
 	// Root
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	SetRootComponent(Root);
+	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+	SetRootComponent(CollisionComp);
 
 	// Mesh
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	Mesh->SetupAttachment(Root);
+	Mesh->SetupAttachment(CollisionComp);
+
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void APooledActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -27,12 +29,16 @@ void APooledActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void APooledActor::SetInUse(bool InUse)
 {
 	if (bInUse == InUse) return;
-
 	bInUse = InUse;
 
 	if (HasAuthority())
 	{
-		OnRep_InUse(); // 서버에서도 직접 적용
+		if (!InUse)
+		{
+			// 비활성화 시 맵 밖으로 이동
+			SetActorLocation(PoolHideLocation, false, nullptr, ETeleportType::TeleportPhysics);
+		}
+		OnRep_InUse();
 	}
 }
 
@@ -41,15 +47,14 @@ bool APooledActor::IsInUse() const
 	return bInUse;
 }
 
-void APooledActor::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void APooledActor::OnRep_InUse()
 {
-	SetActorEnableCollision(bInUse);
+	// Hidden만 처리, 콜리전 건드리지 않음
 	SetActorHiddenInGame(!bInUse);
+
+	// 클라이언트도 비활성 시 맵 밖으로
+	if (!bInUse)
+	{
+		SetActorLocation(PoolHideLocation, false, nullptr, ETeleportType::TeleportPhysics);
+	}
 }
-
-

@@ -1,4 +1,6 @@
 ﻿#include "MiniGames/Catch/Actors/DiamondActor.h"
+#include "Common/DDLogManager.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "MiniGames/Catch/GameMode/DDCatchGameMode.h"
 
@@ -6,27 +8,32 @@
 ADiamondActor::ADiamondActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	
-	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	Mesh->SetCollisionResponseToAllChannels(ECR_Overlap);
-	Mesh->SetGenerateOverlapEvents(true);
+
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	CollisionComp->SetGenerateOverlapEvents(true);
 }
 
 void ADiamondActor::BeginPlay()
 {
 	Super::BeginPlay();
-	Mesh->OnComponentBeginOverlap.AddDynamic(this, &ADiamondActor::OnOverlap);
+
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(
+		this,
+		&ADiamondActor::OnOverlap
+	);
 }
 
 void ADiamondActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                              UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                              const FHitResult& SweepResult)
 {
 	if (!HasAuthority()) return;
 
 	if (!IsInUse()) return;
-	
+	LOG_CYS(Warning, TEXT("[Diamond] Overlap발생 → IsInUse: %d"), IsInUse());
 	SetInUse(false); // 풀로 반환
-	
+
 	// 플레이어 캐릭터 체크
 	ACharacter* Character = Cast<ACharacter>(OtherActor);
 	if (!Character) return;
