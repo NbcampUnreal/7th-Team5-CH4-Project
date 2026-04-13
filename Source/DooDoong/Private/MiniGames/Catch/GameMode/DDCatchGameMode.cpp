@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "Camera/CameraActor.h"
 #include "Common/DDLogManager.h"
+#include "MiniGames/Catch/Actors/DiamondSpawner.h"
 #include "MiniGames/Catch/GameState/DDCatchGameState.h"
 
 ADDCatchGameMode::ADDCatchGameMode()
@@ -33,5 +34,30 @@ void ADDCatchGameMode::StartMiniGame()
 	if (GS)
 	{
 		GS->Multicast_SetGameCamera(FoundCamera);
+	}
+	
+	// 스포너 시작
+	for (TActorIterator<ADiamondSpawner> It(GetWorld()); It; ++It)
+	{
+		ADiamondSpawner* Spawner = *It;
+		if (Spawner)
+		{
+			LOG_CYS(Warning,TEXT("다이아를 스폰해라."))
+			Spawner->StartSpawn();
+		}
+	}
+}
+
+void ADDCatchGameMode::FinishMiniGame()
+{
+	Super::FinishMiniGame();
+	
+	for (TActorIterator<ADiamondSpawner> It(GetWorld()); It; ++It)
+	{
+		ADiamondSpawner* Spawner = *It;
+		if (Spawner)
+		{
+			Spawner->StopSpawn();
+		}
 	}
 }
