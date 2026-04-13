@@ -8,7 +8,6 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMiniGameReadyStateChanged, int32, ReadyPlayerCount, int32, TotalParticipantCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGameReadyEntriesChanged, const TArray<FMiniGameReadyEntry>&, ReadyEntries);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMiniGameScoreBoardChanged);
-
 /**
  * 
  */
@@ -35,6 +34,12 @@ public:
 	/** 미니 게임 상태가 해당하는 상태인지 확인하는 헬퍼 */
 	UFUNCTION(BlueprintPure, Category="MiniGame")
 	bool IsMiniGameState(FGameplayTag StateTag) const { return CurrentState == StateTag; }
+
+	UPROPERTY(ReplicatedUsing = OnRep_MiniGameID)
+	FName MiniGameID;
+
+	UFUNCTION()
+	void OnRep_MiniGameID();
 
 public:
 	/** 남은 시간 Get */

@@ -10,6 +10,7 @@ class UDDAbilitySystemComponent;
 class UDDHealthSet;
 class UDDMovementSet;
 struct FOnAttributeChangeData; 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStateReady, ADDBaseCharacter*);
 
 UCLASS()
 class DOODOONG_API ADDBaseCharacter : public ACharacter, public IAbilitySystemInterface
@@ -51,6 +52,8 @@ public:
 	UDDHealthSet* GetHealthSet() const; 
 
 	UDDMovementSet* GetMovementSet() const;
+
+	FOnPlayerStateReady OnPlayerStateReady;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem", meta = (AllowPrivateAccess = "true"))

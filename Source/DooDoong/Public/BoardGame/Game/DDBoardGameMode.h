@@ -41,7 +41,7 @@ protected:
 	FTimerHandle MainTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="각 턴당 주어지는 최대 제한 시간"))
-	int32 MaxStateTimer = 30;
+	int32 MaxStateTimer = 3;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="현재 상태에서 남은 제한 시간"))
 	int32 StateTimer = 0;

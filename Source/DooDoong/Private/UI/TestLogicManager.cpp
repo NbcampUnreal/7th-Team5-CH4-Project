@@ -65,3 +65,15 @@ TArray<FTestPlayerData> UTestLogicManager::GetSortedPlayers()
     return Sorted;
 }
 
+
+void UTestLogicManager::SetHealth(int32 PlayerIndex, int32 NewValue)
+{
+    if (Players.IsValidIndex(PlayerIndex))
+    {
+        Players[PlayerIndex].Health = NewValue;
+
+        // ?? ???? ??? UI ?? ??? ??
+    }
+}
+
+
