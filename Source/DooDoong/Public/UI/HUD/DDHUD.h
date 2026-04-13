@@ -4,13 +4,7 @@
 #include "GameFramework/HUD.h"
 #include "GameplayTagContainer.h"
 
-#include "UI/TestLogicManager.h"
 #include "UI/UIConfigData.h"
-#include "AbilitySystemComponent.h"
-
-#include "Base/Player/DDBasePlayerState.h"
-#include "AbilitySystem/Attributes/DDPointSet.h"
-
 #include "UI/Widgets/BaseGameWidget.h"
 #include "UI/Widgets/DDMiniGameReadyWidget.h"
 
@@ -18,7 +12,6 @@
 
 class UUserWidget;
 class UDDMiniGameManager;
-class UBaseGameWidget;
 
 UCLASS()
 class DOODOONG_API ADDHUD : public AHUD
@@ -51,26 +44,19 @@ public:
 	void HideMiniGameReadyUI();
 
 	// =========================
-	// State / Binding
+	// State
 	// =========================
-	void BindToGameState();
-	void BindToPlayerState();
+	UPROPERTY()
+	FGameplayTag LastState;
 
 	UFUNCTION()
 	void HandleMiniGameStateChanged(FGameplayTag NewState);
 
-	UFUNCTION()
-	void HandleReadyStateChanged(int32 ReadyCount, int32 TotalCount);
-
-
 	// =========================
-	// UI Update
+	// UI Update (필요 시 유지)
 	// =========================
 	void UpdateHealth(float Value);
 	void UpdateGold(int32 Value);
-
-	UFUNCTION()
-	void InitHUDDelayed();
 
 public:
 	// =========================
@@ -80,9 +66,6 @@ public:
 	TObjectPtr<UUserWidget> MainWidgetInstance;
 
 	UPROPERTY()
-	TObjectPtr<UBaseGameWidget> MainWidget;
-
-	UPROPERTY()
 	TObjectPtr<UDDMiniGameReadyWidget> MiniGameReadyWidget;
 
 	UPROPERTY()
@@ -90,9 +73,4 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UUIConfigData> UIConfig;
-
-	UPROPERTY()
-	UTestLogicManager* TestLogicManager;
-
-	FGameplayTag LastState;
 };

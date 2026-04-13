@@ -15,6 +15,12 @@ class DOODOONG_API UBaseGameWidget : public UUserWidget
 public:
     void InitHUD(const TArray<class APlayerState*>& PlayerStates);
 
+    UFUNCTION()
+    void HandlePlayerStateChanged();
+
+    void BindToGameState();
+    void RefreshPlayerList();
+
 protected:
     virtual void NativeConstruct() override;
 

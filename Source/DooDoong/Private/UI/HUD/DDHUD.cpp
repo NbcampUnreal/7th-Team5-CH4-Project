@@ -76,7 +76,7 @@ void ADDHUD::BeginPlay()
 	// GameState / GAS / PlayerState "구독만"
 	// -----------------------------
 
-	BindToPlayerState();
+
 
 	// MiniGameManager는 즉시 구독 가능
 	if (UGameInstance* GI = GetGameInstance())
@@ -93,9 +93,18 @@ void ADDHUD::BeginPlay()
 			HandleMiniGameStateChanged(MiniGameManager->GetCurrentState());
 		}
 	}
-	BindToGameState();
 
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -207,6 +216,25 @@ void ADDHUD::ShowMiniGameReadyUI()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void ADDHUD::HideMainWidget()
 {
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] HideMainWidget CALL"));
@@ -290,32 +318,9 @@ void ADDHUD::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
 
 		UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Calling InitHUD, PlayerNum: %d"), GS->PlayerArray.Num());
 
-		GameWidget->InitHUD(GS->PlayerArray);
+		//GameWidget->InitHUD(GS->PlayerArray);
 	}
 }
-
-
-
-
-
-
-void ADDHUD::HandleReadyStateChanged(int32 ReadyCount, int32 TotalCount)
-{
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Ready: %d / %d"), ReadyCount, TotalCount);
-
-	if (MiniGameReadyWidget)
-	{
-		MiniGameReadyWidget->SetReadyCount(ReadyCount, TotalCount);
-	}
-
-	if (TotalCount > 0 && ReadyCount >= TotalCount)
-	{
-		UE_LOG(LogDDHUD, Warning, TEXT("[HUD] All Ready → Hide Ready UI"));
-
-		HideMiniGameReadyUI();
-	}
-}
-
 
 
 
@@ -370,46 +375,6 @@ void ADDHUD::HideMiniGameReadyUI()
 
 
 
-void ADDHUD::BindToGameState()
-{
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] BindToGameState ENTER"));
-
-	UWorld* World = GetWorld();
-	if (!World)
-	{
-		return;
-	}
-
-	ADDMiniGameStateBase* GS = World->GetGameState<ADDMiniGameStateBase>();
-	if (!GS)
-	{
-		UE_LOG(LogDDHUD, Warning, TEXT("[HUD] GameState NOT READY -> retry"));
-
-		World->GetTimerManager().SetTimerForNextTick(
-			this,
-			&ADDHUD::BindToGameState
-		);
-		return;
-	}
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] GameState READY"));
-
-	// 중복 바인딩 방지
-	GS->OnMiniGameReadyStateChanged.RemoveAll(this);
-
-	GS->OnMiniGameReadyStateChanged.AddDynamic(
-		this,
-		&ADDHUD::HandleReadyStateChanged
-	);
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] ReadyState Delegate BOUND"));
-
-	// ✔ 초기 sync (Getter 사용)
-	HandleReadyStateChanged(
-		GS->GetReadyPlayerCount(),
-		GS->GetTotalParticipantCount()
-	);
-}
 
 
 
@@ -424,55 +389,10 @@ void ADDHUD::BindToGameState()
 
 
 
-void ADDHUD::BindToPlayerState()
-{
-	
-	APlayerController* PC = GetOwningPlayerController();
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][PS] BindToPlayerState ENTER"));
-
-	if (!PC)
-	{
-		UE_LOG(LogDDHUD, Error, TEXT("[HUD][PS] PC NULL"));
-		return;
-	}
-
-	ADDBasePlayerState* PS = PC->GetPlayerState<ADDBasePlayerState>();
-
-	if (!PS)
-	{
-		UE_LOG(LogDDHUD, Warning, TEXT("[HUD][PS] PlayerState NOT READY -> retry next tick"));
-
-		GetWorld()->GetTimerManager().SetTimerForNextTick(
-			this,
-			&ADDHUD::BindToPlayerState
-		);
-		return;
-	}
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][PS] PlayerState READY: %s"), *PS->GetPlayerName());
-
-}
 
 
 
 
 
-void ADDHUD::InitHUDDelayed()
-{
-	if (!MainWidgetInstance) return;
 
-	UBaseGameWidget* GameWidget = Cast<UBaseGameWidget>(MainWidgetInstance);
-	if (!GameWidget) return;
 
-	AGameStateBase* GS = GetWorld()->GetGameState();
-	if (!GS)
-	{
-		UE_LOG(LogDDHUD, Error, TEXT("[HUD] GameState NULL"));
-		return;
-	}
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Calling InitHUD, PlayerNum: %d"), GS->PlayerArray.Num());
-
-	GameWidget->InitHUD(GS->PlayerArray);
-}

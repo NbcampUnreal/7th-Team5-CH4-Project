@@ -5,12 +5,17 @@
 void UDDMiniGameReadyWidget::NativeConstruct()
 {
     Super::NativeConstruct();
+
+
+    BindToGameState();
+
     ApplyToUI();
     //ApplyToUI(); NativeConstruct 시점 = 아직 데이터 없음 -> 그래서 초기값(null / 0) 먼저 찍힘
 
     // 약간 늦게 한 번 더 (GameState replication 기다림)
-    GetWorld()->GetTimerManager().SetTimerForNextTick(this,
-        &UDDMiniGameReadyWidget::ApplyToUI);
+    //GetWorld()->GetTimerManager().SetTimerForNextTick(this,
+        //&UDDMiniGameReadyWidget::ApplyToUI);
+    //이제 필요 없음 (Delegate가 대신함)
 }
 
 void UDDMiniGameReadyWidget::SetMiniGameData(const UDDMiniGameDefinition* Definition)
@@ -120,5 +125,52 @@ void UDDMiniGameReadyWidget::SetReadyCount(int32 Ready, int32 Total)
         ReadyText->SetText(FText::FromString(
             FString::Printf(TEXT("%d / %d"), Ready, Total)
         ));
+    }
+}
+
+
+
+
+void UDDMiniGameReadyWidget::BindToGameState()
+{
+    UWorld* World = GetWorld();
+    if (!World) return;
+
+    ADDMiniGameStateBase* GS =
+        World->GetGameState<ADDMiniGameStateBase>();
+
+    if (!GS)
+    {
+        World->GetTimerManager().SetTimerForNextTick(
+            this,
+            &UDDMiniGameReadyWidget::BindToGameState
+        );
+        return;
+    }
+
+    // 중복 방지
+    GS->OnMiniGameReadyStateChanged.RemoveAll(this);
+
+    GS->OnMiniGameReadyStateChanged.AddDynamic(
+        this,
+        &UDDMiniGameReadyWidget::HandleReadyStateChanged
+    );
+
+    // 초기 동기화
+    HandleReadyStateChanged(
+        GS->GetReadyPlayerCount(),
+        GS->GetTotalParticipantCount()
+    );
+}
+
+
+
+void UDDMiniGameReadyWidget::HandleReadyStateChanged(int32 Ready, int32 Total)
+{
+    SetReadyCount(Ready, Total);
+
+    if (Total > 0 && Ready >= Total)
+    {
+        RemoveFromParent(); // Ready UI 자동 종료
     }
 }
