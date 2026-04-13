@@ -4,6 +4,7 @@
 #include "GameplayTagContainer.h"
 #include "BoardGame/DDSelectableTileActor.h"
 #include "GameFramework/PlayerController.h"
+#include "UI/GameUIManager.h"
 #include "DDBasePlayerController.generated.h"
 
 struct FInputActionValue;
@@ -36,8 +37,18 @@ public:
 	void Client_ApplyInput(UInputMappingContext* NewIMC);
 
 	/** 주현 : 준비완료 상태를 서버에서 호출시키기 위한 Server RPC */
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_SetMiniGameReady(bool bReady);
+
+	/** suyeon : set minigameready wrapper */
+	UFUNCTION(BlueprintCallable)
+	void Call_SetReady();
+
+	UPROPERTY()
+	TObjectPtr<UGameUIManager> UIManager;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UUIConfigData> UIConfig;
 
 	void OnMouseClick();
 

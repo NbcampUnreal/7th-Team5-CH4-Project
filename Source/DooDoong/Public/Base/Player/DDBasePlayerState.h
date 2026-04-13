@@ -11,6 +11,7 @@ class UDDHealthSet;
 class UDDMovementSet;
 class ADDTile; 
 class ADDTileManager;
+DECLARE_MULTICAST_DELEGATE(FOnGASReady);
 
 USTRUCT(BlueprintType)
 struct FPlayerGameplayInfo
@@ -40,6 +41,8 @@ class DOODOONG_API ADDBasePlayerState : public APlayerState, public IAbilitySyst
 
 public:
     ADDBasePlayerState();
+
+    FOnGASReady OnGASReady;
 
     virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 

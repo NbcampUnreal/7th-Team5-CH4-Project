@@ -59,6 +59,7 @@ void ADDBaseCharacter::OnRep_PlayerState()
 	InitializeAbilitySystem();
 	
 	BindAttributeDelegates();
+	OnPlayerStateReady.Broadcast(this);
 }
 
 void ADDBaseCharacter::InitializeAbilitySystem()

@@ -304,7 +304,7 @@ void UDDMiniGameManager::SetCurrentState(FGameplayTag NewState)
 	{
 		return;
 	}
-	
+	UE_LOG(LogTemp, Warning, TEXT("[MiniGameManager] State Change: %s"), *NewState.ToString());
 	CurrentState = NewState;
 	// 상태가 바뀔 때만 브로드캐스트해서 UI나 로직이 중복 반응하지 않게 함.
 	OnMiniGameStateChanged.Broadcast(CurrentState);

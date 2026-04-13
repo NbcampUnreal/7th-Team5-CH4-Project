@@ -20,6 +20,8 @@ void ADDMiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ADDMiniGameStateBase, ReadyPlayerCount);
 	DOREPLIFETIME(ADDMiniGameStateBase, TotalParticipantCount);
 	DOREPLIFETIME(ADDMiniGameStateBase, ReadyEntries);
+
+	DOREPLIFETIME(ADDMiniGameStateBase, MiniGameID);
 }
 
 void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
@@ -114,11 +116,13 @@ int32 ADDMiniGameStateBase::GetScore(APlayerState* PlayerState) const
 
 void ADDMiniGameStateBase::OnRep_ReadyPlayerCount()
 {
+	UE_LOG(LogTemp, Error, TEXT("[CLIENT] OnRep_ReadyPlayerCount CALLED"));
 	BroadcastReadyStateChanged();
 }
 
 void ADDMiniGameStateBase::OnRep_TotalParticipantCount()
 {
+	UE_LOG(LogTemp, Error, TEXT("[CLIENT] OnRep_TotalParticipantCount CALLED"));
 	BroadcastReadyStateChanged();
 }
 
@@ -139,6 +143,7 @@ void ADDMiniGameStateBase::BroadcastScoreBoardChanged()
 
 void ADDMiniGameStateBase::BroadcastReadyStateChanged()
 {
+	UE_LOG(LogTemp, Error, TEXT("[CLIENT] BroadcastReadyStateChanged"));
 	OnMiniGameReadyStateChanged.Broadcast(ReadyPlayerCount, TotalParticipantCount);
 }
 
@@ -146,3 +151,27 @@ void ADDMiniGameStateBase::BroadcastReadyEntriesChanged()
 {
 	OnMiniGameReadyEntriesChanged.Broadcast(ReadyEntries);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void ADDMiniGameStateBase::OnRep_MiniGameID()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[GameState] MiniGameID Replicated: %s"),
+		*MiniGameID.ToString());
+}
+

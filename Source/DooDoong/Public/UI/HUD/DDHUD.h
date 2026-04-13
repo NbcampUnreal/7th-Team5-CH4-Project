@@ -2,34 +2,87 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "GameplayTagContainer.h"
+#include "UI/TestLogicManager.h"
+#include "UI/UIConfigData.h"   // ⭐ 이거 필수
+#include "AbilitySystemComponent.h"
+#include "Base/Player/DDBasePlayerState.h"
+#include "AbilitySystem/Attributes/DDPointSet.h"
+#include "UI/Widgets/BaseGameWidget.h"
+#include "UI/Widgets/DDMiniGameReadyWidget.h"
 #include "DDHUD.generated.h"
+
+class UUserWidget;
+class UDDMiniGameManager;
+class UBaseGameWidget;
 
 UCLASS()
 class DOODOONG_API ADDHUD : public AHUD
 {
 	GENERATED_BODY()
 
+public:
+	ADDHUD();
+
 protected:
 	virtual void BeginPlay() override;
 
 public:
-	// UI 교체용 (나중 확장)
-	void ShowWidget(TSubclassOf<class UUserWidget> WidgetClass);
-	
-	/** 현재 화면에 띄워진 메인 위젯을 제거하는 함수 */
-    void HideMainWidget();
+	UFUNCTION()
+	void HandleMiniGameStateChanged(FGameplayTag NewState);
+
+	void ApplyInitialHealth(float Value);
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
+
+	UFUNCTION()
+	void HandleReadyStateChanged(int32 ReadyCount, int32 TotalCount);
+
+	void ShowWidget(TSubclassOf<UUserWidget> WidgetClass);
+	void HideMainWidget();
+
+	void ShowMiniGameReadyUI();
+	void HideMiniGameReadyUI();
+
+	void BindToGameState();
+	void BindToPlayerState();
+
+	void OnCoinChanged(const FOnAttributeChangeData& Data);
+
+
+	void TryBindGAS();
+
+	UFUNCTION()
+	void InitHUDDelayed();
+
+
+	void OnGASReady();
+
+	void UpdateHealth(float Value);
+	void UpdateGold(int32 Value);
+
+	UPROPERTY()
+	UBaseGameWidget* MainWidget;
+
+	UPROPERTY()
+	TObjectPtr<UDDMiniGameReadyWidget> MiniGameReadyWidget;
 
 protected:
-	// 로비 UI
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> LobbyWidgetClass;
 
-	// 기본 게임 UI
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> BaseGameWidgetClass;
 
-	// 현재 위젯
 	UPROPERTY()
-	UUserWidget* MainWidgetInstance;
-};
+	UTestLogicManager* TestLogicManager;
 
+	UPROPERTY()
+	TObjectPtr<UUIConfigData> UIConfig;
+
+	UPROPERTY()
+	TObjectPtr<UUserWidget> MainWidgetInstance;
+
+
+
+	UPROPERTY()
+	TObjectPtr<UDDMiniGameManager> MiniGameManager;
+
+	UPROPERTY()
+	FGameplayTag LastState;
+};

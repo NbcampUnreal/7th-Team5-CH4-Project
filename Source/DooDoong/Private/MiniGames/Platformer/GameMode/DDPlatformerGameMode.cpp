@@ -52,7 +52,7 @@ void ADDPlatformerGameMode::BeginPlay()
 		PlatformerGameStateBase = Cast<ADDPlatformerGameState>(GameStateBase);
 	}
 	
-	WaitingTimerStart();
+	//WaitingTimerStart();
 }
 
 void ADDPlatformerGameMode::GameStart()

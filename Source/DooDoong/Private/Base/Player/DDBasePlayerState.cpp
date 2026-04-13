@@ -44,6 +44,7 @@ void ADDBasePlayerState::BeginPlay()
 	Super::BeginPlay();
 	
 	HealthSet->KillLogSignature.AddUObject(this, &ThisClass::MultiCast_BroadcastKillLog);
+
 }
 
 void ADDBasePlayerState::MultiCast_BroadcastKillLog_Implementation(AActor* Victim, AActor* Killer)

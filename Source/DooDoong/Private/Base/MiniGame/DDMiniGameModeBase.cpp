@@ -42,6 +42,14 @@ void ADDMiniGameModeBase::BeginPlay()
 		return;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("[DEBUG] HasActiveMiniGame = %d"),
+		MiniGameManager ? MiniGameManager->HasActiveMiniGame() : -1);
+
+	UE_LOG(LogTemp, Warning, TEXT("[DEBUG] ActiveDefinition = %s"),
+		MiniGameManager && MiniGameManager->GetActiveDefinition()
+		? *MiniGameManager->GetActiveDefinition()->MiniGameID.ToString()
+		: TEXT("NULL"));
+
 	// Seamless Travel 직후 플레이어 배치 및 BeginPlay 초기화가 같은 데이터를 보도록 동기화
 	LoadActiveMiniGameData();
 
@@ -100,7 +108,7 @@ void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 	}
 	
 	// TODO 추후에 UI로 준비완료 로직이 추가되면 삭제해야할 로직.
-	SetPlayerReady(PlayerController->PlayerState, true);
+	//SetPlayerReady(PlayerController->PlayerState, true);
 }
 
 AActor* ADDMiniGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -169,11 +177,36 @@ void ADDMiniGameModeBase::UpdateMiniGameTime()
 void ADDMiniGameModeBase::InitializeMiniGame(const FMiniGameSetup& InSetup,
                                              const TArray<FMiniGameParticipantInfo>& InParticipants)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[DEBUG] InitializeMiniGame CALLED"));
 	ActiveSetup = InSetup;
 	ActiveParticipants = InParticipants;
 	bIsMiniGameStarted = false;
 	bIsMiniGameFinished = false;
 	ElapsedTimeSeconds = 0.f;
+
+	// =========================
+// 🔥 핵심 디버그 추가 구간
+// =========================
+	if (UWorld* World = GetWorld())
+	{
+		if (UGameInstance* GI = World->GetGameInstance())
+		{
+			if (UDDMiniGameManager* Manager =
+				GI->GetSubsystem<UDDMiniGameManager>())
+			{
+				UE_LOG(LogTemp, Warning,
+					TEXT("[DEBUG] HasActiveMiniGame = %d"),
+					Manager->HasActiveMiniGame());
+
+				const UDDMiniGameDefinition* Def =
+					Manager->GetActiveDefinition();
+
+				UE_LOG(LogTemp, Warning,
+					TEXT("[DEBUG] ActiveDefinition = %s"),
+					Def ? *Def->MiniGameID.ToString() : TEXT("NULL"));
+			}
+		}
+	}
 
 	if (UWorld* World = GetWorld())
 	{
@@ -182,6 +215,11 @@ void ADDMiniGameModeBase::InitializeMiniGame(const FMiniGameSetup& InSetup,
 
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
+		MiniGameState->MiniGameID = ActiveSetup.MiniGameID;
+
+		UE_LOG(LogTemp, Warning, TEXT("[DEBUG] Set MiniGameID: %s"),
+			*ActiveSetup.MiniGameID.ToString());
+
 		// 클라이언트가 확인할 초기 상태는 GameState에 복제 가능한 형태로 저장
 		MiniGameState->SetParticipants(ActiveParticipants);
 		MiniGameState->SetRemainingTimeSeconds(ActiveSetup.TimeLimitSeconds);
@@ -190,6 +228,15 @@ void ADDMiniGameModeBase::InitializeMiniGame(const FMiniGameSetup& InSetup,
 		MiniGameState->SetReadyEntries(TArray<FMiniGameReadyEntry>());
 		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 		MiniGameState->SetScoreBoard(TArray<FMiniGameScoreEntry>());
+	}
+
+
+	UE_LOG(LogTemp, Warning, TEXT("=== InitializeMiniGame ==="));
+	UE_LOG(LogTemp, Warning, TEXT("ActiveParticipants Count: %d"), ActiveParticipants.Num());
+
+	for (const FMiniGameParticipantInfo& P : ActiveParticipants)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Init Participant ID: %d"), P.PlayerId);
 	}
 }
 
@@ -238,27 +285,69 @@ bool ADDMiniGameModeBase::ShouldSpawnAsSpectator(const FMiniGameParticipantInfo&
 
 void ADDMiniGameModeBase::StartMiniGame()
 {
+	UE_LOG(LogTemp, Warning, TEXT("===== StartMiniGame CALLED ====="));
+
+	UE_LOG(LogTemp, Warning, TEXT("[StartMiniGame] bIsMiniGameStarted: %s"),
+		bIsMiniGameStarted ? TEXT("TRUE") : TEXT("FALSE"));
+
+	UE_LOG(LogTemp, Warning, TEXT("[StartMiniGame] bIsMiniGameFinished: %s"),
+		bIsMiniGameFinished ? TEXT("TRUE") : TEXT("FALSE"));
+
+	UE_LOG(LogTemp, Warning, TEXT("[StartMiniGame] ActiveParticipants: %d"),
+		ActiveParticipants.Num());
+
+	UE_LOG(LogTemp, Warning, TEXT("[StartMiniGame] ReadyStates Num: %d"),
+		ReadyStates.Num());
+
+	// 1. 중복 방어 체크 직전 상태 확인용
 	if (bIsMiniGameStarted || bIsMiniGameFinished)
 	{
+		UE_LOG(LogTemp, Error, TEXT("[StartMiniGame] EARLY RETURN (already started/finished)"));
 		return;
 	}
 
-	// 플레이 시작 및 시작 시점을 기록
+	// 2. 실제 시작
 	bIsMiniGameStarted = true;
 	ElapsedTimeSeconds = 0.0f;
 
-	// GameState에서 시작 상태 태그를 갱신 & 게임의 남은 시간을 게임 데이터의 제한시간으로 갱신
+	UE_LOG(LogTemp, Warning, TEXT("[StartMiniGame] GAME STARTED FLAG SET"));
+
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[StartMiniGame] GameState Valid"));
+
 		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Playing);
 		MiniGameState->SetRemainingTimeSeconds(ActiveSetup.TimeLimitSeconds);
+
+		UE_LOG(LogTemp, Warning, TEXT("[StartMiniGame] GameState Updated: Playing, TimeLimit=%f"),
+			ActiveSetup.TimeLimitSeconds);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[StartMiniGame] GameState NULL"));
 	}
 
 	if (UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().SetTimer(MiniGameTimerHandle, this, &ADDMiniGameModeBase::UpdateMiniGameTime,
-		                                  TimeUpdateIntervalSeconds, true);
+		if (World->GetTimerManager().IsTimerActive(MiniGameTimerHandle))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[StartMiniGame] Timer already active - clearing first"));
+			World->GetTimerManager().ClearTimer(MiniGameTimerHandle);
+		}
+
+		World->GetTimerManager().SetTimer(
+			MiniGameTimerHandle,
+			this,
+			&ADDMiniGameModeBase::UpdateMiniGameTime,
+			TimeUpdateIntervalSeconds,
+			true
+		);
+
+		UE_LOG(LogTemp, Warning, TEXT("[StartMiniGame] Timer Started (Interval=%f)"),
+			TimeUpdateIntervalSeconds);
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("===== StartMiniGame END ====="));
 }
 
 void ADDMiniGameModeBase::FinishMiniGame()
@@ -476,27 +565,102 @@ void ADDMiniGameModeBase::TryStartMiniGame()
 		return;
 	}
 
+	// 👇 여기부터 추가
+	UE_LOG(LogTemp, Warning, TEXT("=== TryStartMiniGame ==="));
+	UE_LOG(LogTemp, Warning, TEXT("ActiveParticipants Count: %d"), ActiveParticipants.Num());
+	UE_LOG(LogTemp, Warning, TEXT("ReadyStates Count: %d"), ReadyStates.Num());
+
+	for (const FMiniGameParticipantInfo& P : ActiveParticipants)
+	{
+		const bool* bReady = ReadyStates.Find(P.PlayerId);
+		bool bIsReady = bReady && *bReady;
+
+		UE_LOG(LogTemp, Warning, TEXT("Participant ID: %d / Ready: %s"),
+			P.PlayerId,
+			bIsReady ? TEXT("TRUE") : TEXT("FALSE"));
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("AllReady Result: %s"),
+		AreAllParticipantsReady() ? TEXT("TRUE") : TEXT("FALSE"));
+	// 👆 여기까지 추가
+
 	if (AreAllParticipantsReady())
 	{
+		UE_LOG(LogTemp, Warning, TEXT(">>> StartMiniGame CALLED"));
 		StartMiniGame();
 	}
 }
 
 void ADDMiniGameModeBase::SetPlayerReady(APlayerState* PlayerState, bool bReady)
 {
-	if (!HasAuthority() || bIsMiniGameStarted || bIsMiniGameFinished || PlayerState == nullptr)
+	UE_LOG(LogTemp, Warning, TEXT("[SetPlayerReady] CALLED"));
+
+	if (!HasAuthority())
 	{
+		UE_LOG(LogTemp, Error, TEXT("[SetPlayerReady] FAIL: No Authority"));
 		return;
 	}
 
-	if (FindParticipantInfo(PlayerState) == nullptr)
+	UE_LOG(LogTemp, Warning, TEXT("[SetPlayerReady] Authority OK"));
+
+	if (bIsMiniGameStarted)
 	{
+		UE_LOG(LogTemp, Error, TEXT("[SetPlayerReady] FAIL: Already Started"));
 		return;
 	}
+
+	if (bIsMiniGameFinished)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SetPlayerReady] FAIL: Already Finished"));
+		return;
+	}
+
+	if (PlayerState == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SetPlayerReady] FAIL: PlayerState NULL"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[SetPlayerReady] PlayerState Valid: %s (ID: %d)"),
+		*PlayerState->GetName(),
+		PlayerState->GetPlayerId());
+
+	UE_LOG(LogTemp, Warning, TEXT("[SetPlayerReady] Checking Participant Info..."));
+
+	const FMiniGameParticipantInfo* Participant = FindParticipantInfo(PlayerState);
+
+	if (Participant == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SetPlayerReady] FAIL: Participant NOT FOUND"));
+
+		// 추가 디버그 (핵심)
+		for (const FMiniGameParticipantInfo& P : ActiveParticipants)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[ActiveParticipants] PlayerId: %d / PS: %s"),
+				P.PlayerId,
+				P.PlayerState ? *P.PlayerState->GetName() : TEXT("NULL"));
+		}
+
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[SetPlayerReady] Participant FOUND (PlayerId: %d)"), Participant->PlayerId);
+
+	UE_LOG(LogTemp, Warning, TEXT("[SetPlayerReady] Setting Ready: %d -> %s"),
+		PlayerState->GetPlayerId(),
+		bReady ? TEXT("TRUE") : TEXT("FALSE"));
 
 	ReadyStates.FindOrAdd(PlayerState->GetPlayerId()) = bReady;
+
+	UE_LOG(LogTemp, Warning, TEXT("[SetPlayerReady] ReadyStates UPDATED"));
+
 	UpdateReadyState();
+
+	UE_LOG(LogTemp, Warning, TEXT("[SetPlayerReady] UpdateReadyState DONE"));
+
 	TryStartMiniGame();
+
+	UE_LOG(LogTemp, Warning, TEXT("[SetPlayerReady] TryStartMiniGame DONE"));
 }
 
 void ADDMiniGameModeBase::InitializeRuleSet()

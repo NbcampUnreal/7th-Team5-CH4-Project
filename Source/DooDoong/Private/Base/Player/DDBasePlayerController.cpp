@@ -10,6 +10,7 @@
 #include "Common/DDLogManager.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
+#include "UI/GameUIManager.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 
 ADDBasePlayerController::ADDBasePlayerController()
@@ -19,6 +20,9 @@ ADDBasePlayerController::ADDBasePlayerController()
 void ADDBasePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UIManager = NewObject<UGameUIManager>(this);
+	UIManager->Initialize(this, UIConfig);
 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))
@@ -117,6 +121,7 @@ void ADDBasePlayerController::Client_ApplyInput_Implementation(UInputMappingCont
 
 void ADDBasePlayerController::Server_SetMiniGameReady_Implementation(bool bReady)
 {
+	UE_LOG(LogTemp, Error, TEXT("Server_SetMiniGameReady CALLED"));
 	ADDMiniGameModeBase* MiniGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDMiniGameModeBase>() : nullptr;
 	if (MiniGameMode == nullptr)
 	{
@@ -124,6 +129,12 @@ void ADDBasePlayerController::Server_SetMiniGameReady_Implementation(bool bReady
 	}
 
 	MiniGameMode->SetPlayerReady(PlayerState, bReady);
+}
+
+void ADDBasePlayerController::Call_SetReady()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Call_SetReady called"));
+	Server_SetMiniGameReady(true);
 }
 
 void ADDBasePlayerController::OnMouseClick()

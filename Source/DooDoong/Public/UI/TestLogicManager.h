@@ -29,6 +29,8 @@ class DOODOONG_API UTestLogicManager : public UObject
 
 public:
 
+    void SetHealth(int32 PlayerIndex, int32 NewValue);
+
     UPROPERTY(BlueprintReadWrite)
     TArray<FTestPlayerData> Players;
 
