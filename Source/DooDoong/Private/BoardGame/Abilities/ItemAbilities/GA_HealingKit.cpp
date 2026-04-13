@@ -1,7 +1,6 @@
 ﻿#include "BoardGame/Abilities/ItemAbilities/GA_HealingKit.h"
 
 #include "AbilitySystemComponent.h"
-#include "Animation/Notify/AN_SendGameplayEvent.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
@@ -54,7 +53,7 @@ void UGA_HealingKit::ActivateAbility(FGameplayAbilitySpecHandle Handle, const FG
 	}
 
 	SpecHandle.Data->SetSetByCallerMagnitude(
-		FGameplayTag::RequestGameplayTag("Data.Health.Amount"),
+		FGameplayTag::RequestGameplayTag("Data.Health.Heal"),
 		HealAmount
 	);
 
