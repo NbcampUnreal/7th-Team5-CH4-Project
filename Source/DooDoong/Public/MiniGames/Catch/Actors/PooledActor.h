@@ -13,13 +13,25 @@ class DOODOONG_API APooledActor : public AActor
 
 public:
 	APooledActor();
-
+	
 	void SetInUse(bool _InUse);
 	bool IsInUse() const;
-	
+
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* Root;
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* Mesh;
+
 protected:
 	virtual void BeginPlay() override;
 
-private:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+public:
+	UPROPERTY(ReplicatedUsing = OnRep_InUse)
 	bool bInUse;
+
+	UFUNCTION()
+	void OnRep_InUse();
 };

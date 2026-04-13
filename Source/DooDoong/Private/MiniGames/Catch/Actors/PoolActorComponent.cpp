@@ -1,5 +1,7 @@
 ﻿#include "MiniGames/Catch/Actors/PoolActorComponent.h"
 
+#include "Common/DDLogManager.h"
+
 
 UPoolActorComponent::UPoolActorComponent()
 {
@@ -15,13 +17,14 @@ void UPoolActorComponent::BeginPlay()
 	if (GetOwner()->HasAuthority()) // 서버에서만 생성
 	{
 		InitializePool();
+		LOG_CYS(Error, TEXT("[Pool] PoolSize: %d"), PoolSize);
 	}
 }
 
 void UPoolActorComponent::InitializePool()
 {
 	if (!PooledActorClass) return;
-
+	LOG_CYS(Error, TEXT("[Pool] InitializePool 시작"));
 	UWorld* World = GetWorld();
 	if (!World) return;
 
@@ -45,6 +48,15 @@ void UPoolActorComponent::InitializePool()
 
 			ObjectPool.Add(PooledActor);
 		}
+		if (!PooledActor)
+		{
+			LOG_CYS(Error, TEXT("[Pool] SpawnActor 실패!!! Class: %s"), *GetNameSafe(PooledActorClass));
+		}
+		else
+		{
+			LOG_CYS(Error, TEXT("[Pool] Spawn 성공: %s"), *PooledActor->GetName());
+			ObjectPool.Add(PooledActor);
+		}
 	}
 }
 APooledActor* UPoolActorComponent::FindFirstAvailableActor() const
@@ -62,7 +74,7 @@ APooledActor* UPoolActorComponent::FindFirstAvailableActor() const
 	return nullptr;
 }
 
-APooledActor* UPoolActorComponent::SpawnFromPool(const FTransform& SpawnTransform) const
+APooledActor* UPoolActorComponent::SpawnFromPool(const FTransform& SpawnTransform)
 {
 	// 서버에서만 실행
 	if (!GetOwner() || !GetOwner()->HasAuthority())
@@ -74,6 +86,7 @@ APooledActor* UPoolActorComponent::SpawnFromPool(const FTransform& SpawnTransfor
 	APooledActor* Actor = FindFirstAvailableActor();
 	if (!Actor)
 	{
+		LOG_CYS(Error,TEXT("풀 없음"));
 		return nullptr; // 없으면 그냥 종료
 	}
 
