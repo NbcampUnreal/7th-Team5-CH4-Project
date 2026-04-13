@@ -26,6 +26,7 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Shooter_Fire, "Event.Shooter.Fire", "슈터 미니게임 발사 애니메이션 몽타주에서 사용할 발사 이벤트 태그");
 	
 	// Data Tags
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Data_Health_Amount, "Data.Health.Amount", "보드판 위에서 Health 어트리뷰트를 변화시키는 상황에서 쓸 범용 태그")
 	UE_DEFINE_GAMEPLAY_TAG(Data_Health_Damage, "Data.Health.Damage");
 	UE_DEFINE_GAMEPLAY_TAG(Data_Point_Coin, "Data.Point.Coin");
 	UE_DEFINE_GAMEPLAY_TAG(Data_Point_Trophy, "Data.Point.Trophy");

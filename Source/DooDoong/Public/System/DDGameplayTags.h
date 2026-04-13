@@ -28,6 +28,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Shooter_Fire);
 
 	// Data Tags
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Health_Amount);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Health_Damage);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Point_Coin);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Point_Trophy);
