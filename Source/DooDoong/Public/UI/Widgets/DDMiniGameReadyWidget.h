@@ -18,6 +18,8 @@ class DOODOONG_API UDDMiniGameReadyWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
+    const UDDMiniGameDefinition* FallbackDefinition = nullptr;
+
     UFUNCTION(BlueprintCallable)
     void SetMiniGameData(const UDDMiniGameDefinition* Definition);
 

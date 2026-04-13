@@ -17,10 +17,7 @@ void UDDMiniGameReadyWidget::SetMiniGameData(const UDDMiniGameDefinition* Defini
 {
     if (!Definition) return;
 
-    GameName = Definition->DisplayName;
-    Description = Definition->Description;
-    TimeLimit = Definition->DefaultTimeLimitSeconds;
-    Genre = Definition->Genre;
+    FallbackDefinition = Definition;
 
     ApplyToUI();
 }
@@ -67,6 +64,7 @@ void UDDMiniGameReadyWidget::ApplyToUI()
 
     if (!Def)
     {
+        Def = FallbackDefinition;
         UE_LOG(LogTemp, Error, TEXT("[MiniGameUI] Definition LOAD FAILED"));
         return;
     }

@@ -151,9 +151,6 @@ void ADDHUD::ShowMiniGameReadyUI()
 {
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] ShowMiniGameReadyUI CALL"));
 
-	// =========================
-	// 1. PlayerController 체크
-	// =========================
 	APlayerController* PC = GetOwningPlayerController();
 	if (!PC)
 	{
@@ -161,18 +158,13 @@ void ADDHUD::ShowMiniGameReadyUI()
 		return;
 	}
 
-	// =========================
-	// 2. UIConfig 체크
-	// =========================
 	if (!UIConfig || !UIConfig->MiniGameReadyWidget)
 	{
 		UE_LOG(LogDDHUD, Error, TEXT("[HUD] UIConfig ReadyWidget NULL"));
 		return;
 	}
 
-	// =========================
-	// 3. 이미 존재하면 재사용 (중요)
-	// =========================
+	// 이미 존재하면 재사용
 	if (MiniGameReadyWidget)
 	{
 		if (!MiniGameReadyWidget->IsInViewport())
@@ -184,13 +176,10 @@ void ADDHUD::ShowMiniGameReadyUI()
 		{
 			UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Already In Viewport"));
 		}
-
 		return;
 	}
 
-	// =========================
-	// 4. 위젯 생성
-	// =========================
+	// 위젯 생성
 	UDDMiniGameReadyWidget* ReadyWidget =
 		CreateWidget<UDDMiniGameReadyWidget>(
 			PC,
@@ -205,30 +194,9 @@ void ADDHUD::ShowMiniGameReadyUI()
 
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Create ReadyWidget %p"), ReadyWidget);
 
-	// =========================
-	// 5. (디버그용) DataAsset 하드코딩 로드
-	// =========================
-	UDDMiniGameDefinition* Definition =
-		LoadObject<UDDMiniGameDefinition>(
-			nullptr,
-			TEXT("/Game/DooDoong/04_MiniGames/Platformer/Data/DA_Platformer.DA_Platformer")
-		);
+	// ❌ 여기 전체 삭제됨 (Definition Load + SetMiniGameData)
 
-	if (!Definition)
-	{
-		UE_LOG(LogTemp, Error, TEXT("[HUD] Definition LOAD FAIL"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[HUD] Definition LOAD SUCCESS"));
-		UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Definition->DisplayName.ToString());
-
-		ReadyWidget->SetMiniGameData(Definition);
-	}
-
-	// =========================
-	// 6. Viewport 추가 + 저장
-	// =========================
+	// Viewport 추가 + 저장
 	MiniGameReadyWidget = ReadyWidget;
 	MiniGameReadyWidget->AddToViewport(1000);
 
@@ -485,19 +453,6 @@ void ADDHUD::BindToPlayerState()
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][PS] PlayerState READY: %s"), *PS->GetPlayerName());
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
