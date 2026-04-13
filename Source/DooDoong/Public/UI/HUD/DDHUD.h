@@ -21,7 +21,7 @@ public:
 
 public:
 	template<typename T>
-	T* GetMainWidget() const 
+	T* GetCurrentWidget() const 
 	{ 
 		return Cast<T>(CurrentMainWidgetInst); 
 	}

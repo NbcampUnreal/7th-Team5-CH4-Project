@@ -51,9 +51,9 @@ void ADDLobbyPlayerController::Client_ReceiveNicknameFailure_Implementation(cons
 	if (!IsValid(LobbyHUD)) return;
 	
 	// 2. HUD가 관리중인 메인 위젯을 가져와서 실행 
-	if (UDDLobbyWidget* TitleWidget = LobbyHUD->GetMainWidget<UDDLobbyWidget>())
+	if (UDDLobbyWidget* LobbyWidget = LobbyHUD->GetCurrentWidget<UDDLobbyWidget>())
 	{
-		TitleWidget->OnNicknameSubmitResult(false, ErrorMessage);
+		LobbyWidget->OnNicknameSubmitResult(false, ErrorMessage);
 	}
 }
 
