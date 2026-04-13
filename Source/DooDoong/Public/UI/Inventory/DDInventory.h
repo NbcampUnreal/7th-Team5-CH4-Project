@@ -23,17 +23,19 @@ public:
 private:
 	void ConstructGrid();
 	
-	UPROPERTY()
-	TArray<TObjectPtr<UDDInvenGridSlot>> GridSlots;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
-	TArray<UTexture2D*> ItemIcons;
-	
+	/* 인벤토리 슬롯 */
+	/*UPROPERTY()
+	TArray<TObjectPtr<UDDInvenGridSlot>> GridSlots;*/
+
+	/* 인벤토리 슬롯 클래스 */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	TSubclassOf<UDDInvenGridSlot> GridSlotClass;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	TArray<UTexture2D*> ItemIcons;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	int32 Rows;

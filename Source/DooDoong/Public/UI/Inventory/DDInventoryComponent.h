@@ -17,8 +17,11 @@ class DOODOONG_API UDDInventoryComponent : public UActorComponent
 public:
 	UDDInventoryComponent();
 
-protected:
+public:
 	virtual void BeginPlay() override;
+	
+public:
+	void AddItem();
 	
 private:
 	TWeakObjectPtr<ADDBasePlayerController> OwningController;

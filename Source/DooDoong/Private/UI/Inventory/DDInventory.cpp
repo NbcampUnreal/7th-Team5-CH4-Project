@@ -23,8 +23,6 @@ void UDDInventory::NativeConstruct()
 
 void UDDInventory::ConstructGrid()
 {
-	GridSlots.Reserve(Rows * Columns);
-	
 	for (int32 j = 0; j < Rows; ++j)
 	{
 		for (int32 i = 0; i < Columns; ++i)
