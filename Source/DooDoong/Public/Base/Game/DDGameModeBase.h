@@ -27,6 +27,8 @@ public:
 
 	virtual void OnCharacterKilled(AActor* Killer, AActor* Victim);
 	virtual void HandleRespawn(AController* TargetController);
+	
+	virtual void FocusAllCamerasOnTarget(AActor* TargetActor);
 
 protected:
 	/** 플레이어의 AbilitySystemComponent를 가져오는 공통 헬퍼 함수 */

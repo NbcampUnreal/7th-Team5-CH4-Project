@@ -34,7 +34,6 @@ protected:
 	void CalculateFinalWinner();
 	void SortPlayersByTurnOrder();
 	void SetTurnPhase(FGameplayTag NewPhaseTag);
-	void FocusAllCamerasOnTarget(AActor* TargetActor);
 	void ExecuteNextTurnTransition();
 
 protected:

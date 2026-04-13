@@ -125,6 +125,20 @@ void ADDGameModeBase::HandleRespawn(AController* TargetController)
 	}
 }
 
+void ADDGameModeBase::FocusAllCamerasOnTarget(AActor* TargetActor)
+{
+	if (!IsValid(TargetActor)) return;
+
+	for (APlayerController* PlayerController : AlivePlayerControllers)
+	{
+		if (IsValid(PlayerController))
+		{
+			PlayerController->SetViewTargetWithBlend(TargetActor, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
+		}
+	}
+	LOG_CJH(Log, TEXT("[Camera] 모든 플레이어의 화면이 주인공 타겟(%s)을 향합니다."), *TargetActor->GetName());
+}
+
 UAbilitySystemComponent* ADDGameModeBase::GetAbilitySystemComponentFromPlayer(APlayerController* PlayerController)
 {
 	if (!IsValid(PlayerController)) return nullptr;
