@@ -4,6 +4,7 @@
 #include "UI/Inventory/DDInvenGridSlot.h"
 #include "Common/DDLogManager.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 
 void UDDInvenGridSlot::NativeConstruct()
 {
@@ -16,11 +17,9 @@ void UDDInvenGridSlot::NativeConstruct()
 	}
 }
 
-void UDDInvenGridSlot::SetItemInfo(UTexture2D* Image, int32 SetItemID, bool SetbCanUse)
+void UDDInvenGridSlot::SetItemInfo(UTexture2D* Image) const
 {
-	Image_ItemIcon = Image;
-	ItemID = SetItemID;
-	bCanUse = SetbCanUse;
+	Image_ItemIcon->SetBrushFromTexture(Image);
 }
 
 void UDDInvenGridSlot::UseItem()

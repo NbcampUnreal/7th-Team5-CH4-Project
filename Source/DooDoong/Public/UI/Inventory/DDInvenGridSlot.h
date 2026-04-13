@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "DDInvenGridSlot.generated.h"
 
-class UTexture2D;
+class UImage;
 class UButton;
 
 UCLASS()
@@ -14,10 +14,11 @@ class DOODOONG_API UDDInvenGridSlot : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	void SetItemInfo(UTexture2D* Image) const;
+	
 protected:
 	virtual void NativeConstruct() override;
-	
-	void SetItemInfo(UTexture2D* Image, int32 ItemID, bool bCanUse);
 	
 	UFUNCTION()
 	void UseItem();
@@ -27,7 +28,7 @@ private:
 	TObjectPtr<UButton> BT_UseItem;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTexture2D> Image_ItemIcon;
+	TObjectPtr<UImage> Image_ItemIcon;
 	
 	int32 ItemID;
 	

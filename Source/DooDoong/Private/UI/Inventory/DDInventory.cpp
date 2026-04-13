@@ -15,6 +15,12 @@ void UDDInventory::NativeOnInitialized()
 	ConstructGrid();
 }
 
+void UDDInventory::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+}
+
 void UDDInventory::ConstructGrid()
 {
 	GridSlots.Reserve(Rows * Columns);
@@ -31,7 +37,6 @@ void UDDInventory::ConstructGrid()
 			const float SlotSizeY = 150.f;
 			const float SpacingX = 100.f;
 			
-			int32 Index = i + j * Columns;
 			if (CanvasSlot)
 			{
 				CanvasSlot->SetSize(FVector2D(SlotSizeX, SlotSizeY));
@@ -40,6 +45,10 @@ void UDDInventory::ConstructGrid()
 					j * (SlotSizeX) + 25.f
 					));
 			}
+			int32 Index = i + j * Columns;
+			if (!ItemIcons.IsValidIndex(Index)) return;
+			GridSlot->SetItemInfo(ItemIcons[Index]);
+			
 		}
 	}
 }
