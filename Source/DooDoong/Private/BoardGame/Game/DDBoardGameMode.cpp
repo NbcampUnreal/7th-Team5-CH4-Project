@@ -175,6 +175,47 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 	}
 }
 
+void ADDBoardGameMode::Logout(AController* Exiting)
+{
+	APlayerController* ExitingPC = Cast<APlayerController>(Exiting);
+    if (IsValid(ExitingPC))
+    {
+        // 1. 현재 턴인 사람이 나가는 것인지 확인
+        bool bIsCurrentTurnPlayer = false;
+        if (AlivePlayerControllers.IsValidIndex(CurrentTurnPlayerIndex) && 
+            AlivePlayerControllers[CurrentTurnPlayerIndex] == ExitingPC)
+        {
+            bIsCurrentTurnPlayer = true;
+        }
+
+        // 2. 명단에서 제거
+        AlivePlayerControllers.Remove(ExitingPC);
+
+        // 3. 비상 탈출 로직: 나간 사람이 현재 턴의 주인이었다면?
+        if (bIsCurrentTurnPlayer)
+        {
+            LOG_CJH(Warning, TEXT("현재 턴인 플레이어가 이탈했습니다! 강제로 다음 턴으로 넘깁니다."));
+            
+            // 기존 타이머들이 돌고 있다면 모두 취소
+            GetWorldTimerManager().ClearTimer(TurnTransitionTimerHandle);
+            
+            // 배열에서 제거되었으므로, 같은 인덱스를 유지하면 자연스레 다음 사람을 가리킴
+            // (마지막 사람이었다면 RoundEnd로 넘어가도록 조치 필요)
+            if (CurrentTurnPlayerIndex >= AlivePlayerControllers.Num())
+            {
+                CurrentTurnPlayerIndex = 0;
+                SetMatchState(DDGameplayTags::State_BoardGame_RoundEnd);
+            }
+            else
+            {
+                SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
+            }
+        }
+    }
+
+    Super::Logout(Exiting);
+}
+
 void ADDBoardGameMode::CheckWinCondition()
 {
 	LOG_CJH(Log, TEXT("[CheckWinCondition] 승리 조건 및 최대 라운드 도달 여부를 검사합니다."));

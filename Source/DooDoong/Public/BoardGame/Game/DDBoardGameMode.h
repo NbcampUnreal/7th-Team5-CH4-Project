@@ -14,6 +14,7 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void SetMatchState(FGameplayTag NewStateTag) override;
+	virtual void Logout(AController* Exiting) override;
 
 	// ==========================================
 	// 턴 내부 페이즈 진행을 위한 함수들
