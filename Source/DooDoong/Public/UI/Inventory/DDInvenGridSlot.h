@@ -8,6 +8,7 @@
 
 class UImage;
 class UButton;
+class UDDItemUseButtonWidget;
 
 UCLASS()
 class DOODOONG_API UDDInvenGridSlot : public UUserWidget
@@ -29,6 +30,12 @@ private:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_ItemIcon;
+	
+	UPROPERTY()
+	TObjectPtr<UDDItemUseButtonWidget> ItemUseButtonWidget;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
+	TSubclassOf<UDDItemUseButtonWidget> ItemUseButtonWidgetClass;
 	
 	int32 ItemID;
 	

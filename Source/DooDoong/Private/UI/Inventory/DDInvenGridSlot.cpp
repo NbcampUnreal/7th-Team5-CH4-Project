@@ -2,7 +2,7 @@
 
 
 #include "UI/Inventory/DDInvenGridSlot.h"
-#include "Common/DDLogManager.h"
+#include "UI/Inventory/DDItemUseButtonWidget.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 
@@ -24,5 +24,9 @@ void UDDInvenGridSlot::SetItemInfo(UTexture2D* Image) const
 
 void UDDInvenGridSlot::UseItem()
 {
-	LOG_PMJ(Warning, TEXT("OnClicked Event UseItem"));
+	ItemUseButtonWidget = CreateWidget<UDDItemUseButtonWidget>(this, ItemUseButtonWidgetClass);
+	if (ItemUseButtonWidget)
+	{
+		ItemUseButtonWidget->AddToViewport();
+	}
 }
