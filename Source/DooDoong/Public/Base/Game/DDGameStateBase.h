@@ -7,6 +7,8 @@
 
 class ADDTileManager;
 
+DECLARE_MULTICAST_DELEGATE(FOnGameReady);
+
 UCLASS()
 class DOODOONG_API ADDGameStateBase : public AGameStateBase
 {
@@ -26,6 +28,9 @@ public:
     int32 MinPlayerCount = 4;
 	
 public:
+
+	FOnGameReady OnGameReady;
+
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> LevelMainWidgetClass;
 };

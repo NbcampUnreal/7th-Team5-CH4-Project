@@ -37,7 +37,7 @@ void ADDLobbyPlayerController::Client_JoinLobby_Implementation()
     if (IsValid(LobbyHUD))
     {
        // 로비 UI를 화면에서 제거합니다.
-       LobbyHUD->ToggleWidgetVisibility(false);
+		LobbyHUD->HideMainWidget();
     }
 
 	// 닉네임 입력 완료 후 캐릭터 조작 권한 활성화
