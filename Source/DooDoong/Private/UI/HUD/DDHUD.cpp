@@ -100,19 +100,6 @@ void ADDHUD::BeginPlay()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 void ADDHUD::HandleMiniGameStateChanged(FGameplayTag NewState)
 {
 	UE_LOG(LogDDHUD, Warning, TEXT("===================================="));
@@ -219,22 +206,6 @@ void ADDHUD::ShowMiniGameReadyUI()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void ADDHUD::HideMainWidget()
 {
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] HideMainWidget CALL"));
@@ -272,6 +243,7 @@ void ADDHUD::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Creating Widget: %s"),
 		*WidgetClass->GetName());
 
+	// 기존 위젯 제거
 	if (MainWidgetInstance)
 	{
 		UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Removing Old Widget"));
@@ -279,6 +251,7 @@ void ADDHUD::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
 		MainWidgetInstance = nullptr;
 	}
 
+	// 새 위젯 생성
 	MainWidgetInstance = CreateWidget<UUserWidget>(PC, WidgetClass);
 
 	if (!MainWidgetInstance)
@@ -289,37 +262,10 @@ void ADDHUD::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
 
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Widget CREATED OK"));
 
+	// Viewport 추가
 	MainWidgetInstance->AddToViewport();
 
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Widget ADDED TO VIEWPORT"));
-
-
-
-	// =========================
-// 🔥 여기부터 추가
-// =========================
-
-
-	UBaseGameWidget* GameWidget = Cast<UBaseGameWidget>(MainWidgetInstance);
-
-	if (GameWidget)
-	{
-		UE_LOG(LogDDHUD, Warning, TEXT("🔥 INSIDE IF BLOCK"));
-
-		UE_LOG(LogDDHUD, Warning, TEXT("[HUD] BaseGameWidget Detected"));
-
-		AGameStateBase* GS = GetWorld()->GetGameState();
-
-		if (!GS)
-		{
-			UE_LOG(LogDDHUD, Error, TEXT("[HUD] GameState NULL"));
-			return;
-		}
-
-		UE_LOG(LogDDHUD, Warning, TEXT("[HUD] Calling InitHUD, PlayerNum: %d"), GS->PlayerArray.Num());
-
-		//GameWidget->InitHUD(GS->PlayerArray);
-	}
 }
 
 
@@ -364,35 +310,6 @@ void ADDHUD::HideMiniGameReadyUI()
 
 	MiniGameReadyWidget = nullptr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
