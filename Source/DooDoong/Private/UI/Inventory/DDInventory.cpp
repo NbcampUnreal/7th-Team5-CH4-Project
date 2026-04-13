@@ -27,17 +27,17 @@ void UDDInventory::ConstructGrid()
 			UDDInvenGridSlot* GridSlot = CreateWidget<UDDInvenGridSlot>(this, GridSlotClass);
 			UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(CanvasPanel->AddChild(GridSlot));
 			
-			const float SlotSize = 128.f;
-			const float Spacing = 24.f;
-
+			const float SlotSizeX = 200.f;
+			const float SlotSizeY = 150.f;
+			const float SpacingX = 100.f;
 			
 			int32 Index = i + j * Columns;
 			if (CanvasSlot)
 			{
-				CanvasSlot->SetSize(FVector2D(SlotSize, SlotSize));
+				CanvasSlot->SetSize(FVector2D(SlotSizeX, SlotSizeY));
 				CanvasSlot->SetPosition(FVector2D(
-					i * (SlotSize + Spacing),
-					j * (SlotSize + Spacing)
+					i * (SlotSizeX + SpacingX) + 50.f,
+					j * (SlotSizeX) + 25.f
 					));
 			}
 		}
