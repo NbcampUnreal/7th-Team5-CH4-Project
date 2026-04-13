@@ -1,14 +1,10 @@
 ﻿#include "MiniGames/Catch/Actors/PoolActorComponent.h"
-
 #include "Common/DDLogManager.h"
-
 
 UPoolActorComponent::UPoolActorComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
 }
-
 
 void UPoolActorComponent::BeginPlay()
 {
@@ -48,14 +44,9 @@ void UPoolActorComponent::InitializePool()
 
 			ObjectPool.Add(PooledActor);
 		}
-		if (!PooledActor)
+		else if (!PooledActor)
 		{
 			LOG_CYS(Error, TEXT("[Pool] SpawnActor 실패!!! Class: %s"), *GetNameSafe(PooledActorClass));
-		}
-		else
-		{
-			LOG_CYS(Error, TEXT("[Pool] Spawn 성공: %s"), *PooledActor->GetName());
-			ObjectPool.Add(PooledActor);
 		}
 	}
 }
@@ -76,22 +67,15 @@ APooledActor* UPoolActorComponent::FindFirstAvailableActor() const
 
 APooledActor* UPoolActorComponent::SpawnFromPool(const FTransform& SpawnTransform)
 {
-	// 서버에서만 실행
-	if (!GetOwner() || !GetOwner()->HasAuthority())
-	{
-		return nullptr;
-	}
+	if (!GetOwner() || !GetOwner()->HasAuthority()) return nullptr;
 
-	// Find
 	APooledActor* Actor = FindFirstAvailableActor();
-	if (!Actor)
-	{
-		LOG_CYS(Error,TEXT("풀 없음"));
-		return nullptr; // 없으면 그냥 종료
-	}
+	if (!Actor) return nullptr;
 
-	// 재사용 (스폰 대신)
-	Actor->SetActorTransform(SpawnTransform);
+	// 위치 먼저 텔레포트
+	Actor->SetActorTransform(SpawnTransform, false, nullptr, ETeleportType::TeleportPhysics);
+
+	// 활성화 (콜리전 토글 없음)
 	Actor->SetInUse(true);
 
 	return Actor;
