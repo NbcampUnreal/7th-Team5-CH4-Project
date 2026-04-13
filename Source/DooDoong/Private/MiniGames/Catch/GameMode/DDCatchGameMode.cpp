@@ -28,6 +28,7 @@ void ADDCatchGameMode::StartMiniGame()
 
 	if (!FoundCamera) return;
 
+	// 현재 실행 타이밍이 너무 빠를 수 있음. 나중에 플레이어 레디 추가 후 다시 로직 수정할 예정.
 	ADDCatchGameState* GS = GetGameState<ADDCatchGameState>();
 	if (GS)
 	{
