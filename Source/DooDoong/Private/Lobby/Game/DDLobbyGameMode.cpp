@@ -16,6 +16,17 @@ void ADDLobbyGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	AvailableColors = DefaultPlayerColors;
+	
+	ADDGameStateBase* GameStateBase = GetGameState<ADDGameStateBase>();
+	if (AvailableColors.Num() < GameStateBase->MinPlayerCount)
+	{
+		AvailableColors.Add(FLinearColor(0.407f, 0.73f, 0.791f, 1.0f)); // 파랑
+		AvailableColors.Add(FLinearColor(1.0f, 0.711f, 0.186f, 1.0f));  // 노랑
+		AvailableColors.Add(FLinearColor(0.597f, 0.402f, 0.597f, 1.0f));  // 보라
+		AvailableColors.Add(FLinearColor(1.0f, 0.305f, 0.254f, 1.0f));  // 빨강
+	}
+	
 	// 1초마다 대기실 인원 체크 및 카운트다운을 수행하는 타이머 실행
 	GetWorld()->GetTimerManager().SetTimer(
 		MainTimerHandle, 
@@ -36,7 +47,18 @@ void ADDLobbyGameMode::Logout(AController* Exiting)
 	ADDBasePlayerState* PS = PC->GetPlayerState<ADDBasePlayerState>();
 	if (!IsValid(PS)) return;
 	
+	
+	
 	LOG_CJH(Log, TEXT("[%s]님이 게임을 종료하셨습니다."), *PS->PlayerGameData.PlayerDisplayName.ToString());
+	
+	FLinearColor FreedColor = PS->PlayerGameData.PlayerColor;
+    
+    // 다시 캐릭터 색상 후보군에 넣어줍니다 (단, 흰색 같은 예외 색상이 아닐 때만)
+    if (FreedColor != FLinearColor::White)
+    {
+        AvailableColors.AddUnique(FreedColor);
+    }
+	
 	Participants.Remove(PC);
 	Spectators.Remove(PC);
 }
@@ -69,6 +91,10 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(ADDLobbyPlayerController* Reque
 	PS->SetPlayerName(Nickname.ToString());
 	PS->PlayerGameData.PlayerDisplayName = Nickname;
 	
+	// 캐릭터 색상 설정
+	FLinearColor NewRandomColor = GetRandomAvailableColor();
+    PS->SetPlayerColor(NewRandomColor);
+	
 	// 3. 참가자/관전자 판별
 	if (Participants.Num() < GS->MinPlayerCount)
 	{
@@ -76,7 +102,7 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(ADDLobbyPlayerController* Reque
 		Participants.AddUnique(Requester);
 		
 		LOG_CJH(Log, TEXT("[%s]님이 게임에 접속하셨습니다."), *Nickname.ToString());
-		LOG_CJH(Log, TEXT("낭은 인원 수 (%d / %d)"), Participants.Num() +1, GS->MinPlayerCount);
+		LOG_CJH(Log, TEXT("남은 인원 수 (%d / %d)"), Participants.Num(), GS->MinPlayerCount);
 	}
 	else
 	{
@@ -184,4 +210,23 @@ void ADDLobbyGameMode::OnMainTimerElapsed()
 			GetWorld()->ServerTravel(BaseGameMapPath);
 		}
 	}
+}
+
+FLinearColor ADDLobbyGameMode::GetRandomAvailableColor()
+{
+	if (AvailableColors.IsEmpty())
+    {
+        return FLinearColor::White; 
+    }
+
+    // 1. 남은 색상들 중에서 랜덤한 인덱스 번호를 하나 뽑습니다.
+    int32 RandomIndex = FMath::RandRange(0, AvailableColors.Num() - 1);
+
+    // 2. 해당 인덱스의 색상을 변수에 임시 저장합니다.
+    FLinearColor SelectedColor = AvailableColors[RandomIndex];
+
+    // 3. 누군가 이 색상을 가져갔으므로, 목록에서 영구히 삭제하여 중복을 방지합니다.
+    AvailableColors.RemoveAt(RandomIndex);
+
+    return SelectedColor;
 }
