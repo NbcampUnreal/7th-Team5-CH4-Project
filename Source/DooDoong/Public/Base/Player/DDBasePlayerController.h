@@ -38,6 +38,10 @@ public:
 	/** 주현 : 준비완료 상태를 서버에서 호출시키기 위한 Server RPC */
 	UFUNCTION(Server, Reliable)
 	void Server_SetMiniGameReady(bool bReady);
+	
+	/** 준혁 : BoardGameMode에서 플레이어 턴에 맞는 InputMode를 적용하기 위한 Client RPC */
+	UFUNCTION(Client, Reliable)
+	void Client_SetMouseCursorVisible(bool bVisible);
 
 	void OnMouseClick();
 

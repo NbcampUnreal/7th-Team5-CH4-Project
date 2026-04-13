@@ -130,6 +130,21 @@ void ADDBasePlayerController::Server_SetMiniGameReady_Implementation(bool bReady
 	MiniGameMode->SetPlayerReady(PlayerState, bReady);
 }
 
+void ADDBasePlayerController::Client_SetMouseCursorVisible_Implementation(bool bVisible)
+{
+	bShowMouseCursor = bVisible;
+    if (bVisible)
+    {
+        FInputModeGameAndUI Mode;
+        SetInputMode(Mode);
+    }
+    else
+    {
+        FInputModeGameOnly Mode;
+        SetInputMode(Mode);
+    }
+}
+
 void ADDBasePlayerController::OnMouseClick()
 {
 	FHitResult Hit;

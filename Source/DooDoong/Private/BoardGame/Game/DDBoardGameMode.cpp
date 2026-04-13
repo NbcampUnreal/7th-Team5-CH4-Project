@@ -301,12 +301,18 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 				ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 			}
 		}
-
+		
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PlayerController);
 		if (i == CurrentTurnPlayerIndex)
 		{
+			DDPC->Client_SetMouseCursorVisible(true);
 			StateTimer = MaxStateTimer;
 			LOG_CJH(Log, TEXT("▶ [%d]번 플레이어 턴 시작! (제한시간 %d초)"), i, MaxStateTimer);
 			SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
+		}
+		else
+		{
+			DDPC->Client_SetMouseCursorVisible(false);
 		}
 	}
 
