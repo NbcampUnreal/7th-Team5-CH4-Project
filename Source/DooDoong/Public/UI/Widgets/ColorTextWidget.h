@@ -13,7 +13,6 @@ class DOODOONG_API UColorTextWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-
     // 문자 → 텍스처
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Font")
     TMap<FString, UTexture2D*> CharToTexture;

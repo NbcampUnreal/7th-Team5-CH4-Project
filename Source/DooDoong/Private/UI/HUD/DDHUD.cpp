@@ -1,65 +1,48 @@
 ﻿#include "UI/HUD/DDHUD.h"
+#include "Base/Game/DDGameStateBase.h"
 #include "Blueprint/UserWidget.h"
-#include "Kismet/GameplayStatics.h"
+#include "Common/DDLogManager.h"
 
 void ADDHUD::BeginPlay()
 {
 	Super::BeginPlay();
-
-	APlayerController* PC = GetOwningPlayerController();
-	if (!IsValid(PC)) return;
-
-	// 현재 맵 이름 가져오기
-	FString MapName = UGameplayStatics::GetCurrentLevelName(this);
-
-	TSubclassOf<UUserWidget> WidgetToCreate = nullptr;
-
-	// 맵 기준 분기
-	if (MapName.Contains("L_Lobby"))
-	{
-		WidgetToCreate = LobbyWidgetClass;
-	}
-	else if (MapName.Contains("L_BaseGame"))
-	{
-		WidgetToCreate = BaseGameWidgetClass;
-	}
-
-	// 생성
-	ShowWidget(WidgetToCreate);
+	
+	InitializeLevelUI();
 }
 
-void ADDHUD::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
+void ADDHUD::InitializeLevelUI()
 {
-	if (!IsValid(WidgetClass)) return;
-
-	APlayerController* PC = GetOwningPlayerController();
-	if (!IsValid(PC)) return;
-
-	// 기존 UI 제거
-	HideMainWidget();
-
-	// 새 UI 생성
-	MainWidgetInstance = CreateWidget<UUserWidget>(PC, WidgetClass);
-
-	if (MainWidgetInstance)
+	// 1. 기존 위젯이 있으면 제거 
+	if (CurrentMainWidgetInst)
 	{
-		MainWidgetInstance->AddToViewport();
-
-		// 입력 모드 (필요할 때만)
-		FInputModeGameAndUI Mode;
-		Mode.SetWidgetToFocus(MainWidgetInstance->GetCachedWidget());
-
-		PC->SetInputMode(Mode);
-		PC->bShowMouseCursor = true;
+		CurrentMainWidgetInst->RemoveFromParent();
+		CurrentMainWidgetInst = nullptr;
+	}
+	
+	// 2. 현재 맵의 GameState에서 위젯 클래스 가져와서 생성 
+	ADDGameStateBase* GS = GetWorld()->GetGameState<ADDGameStateBase>();
+	if (!IsValid(GS)) return; 
+	
+	if (IsValid(GS->LevelMainWidgetClass))
+	{
+		CurrentMainWidgetInst = CreateWidget<UUserWidget>(GetOwningPlayerController(), GS->LevelMainWidgetClass);
+		if (CurrentMainWidgetInst)
+		{
+			CurrentMainWidgetInst->AddToViewport();
+			LOG_KMS(Warning, TEXT("[HUD] : Successfully Created Level UI"));
+		}
 	}
 }
 
-void ADDHUD::HideMainWidget()
+void ADDHUD::ToggleWidgetVisibility(bool bVisible)
 {
-    if (IsValid(MainWidgetInstance))
-    {
-       MainWidgetInstance->RemoveFromParent();
-       MainWidgetInstance = nullptr;
-    }
+	if (IsValid(CurrentMainWidgetInst))
+	{
+		CurrentMainWidgetInst->SetVisibility(
+			bVisible ? 	
+			ESlateVisibility::Visible :
+			ESlateVisibility::Hidden
+		);
+	}
 }
 

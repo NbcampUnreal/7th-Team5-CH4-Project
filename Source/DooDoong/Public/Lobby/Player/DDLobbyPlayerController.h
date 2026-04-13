@@ -1,7 +1,6 @@
 #pragma once
-
 #include "CoreMinimal.h"
-#include "DDBasePlayerController.h"
+#include "Base/Player/DDBasePlayerController.h"
 #include "DDLobbyPlayerController.generated.h"
 
 class UUserWidget;
@@ -10,6 +9,9 @@ UCLASS()
 class ADDLobbyPlayerController : public ADDBasePlayerController
 {
 	GENERATED_BODY()
+	
+protected:
+	virtual void BeginPlay() override;
 
 public:
 	// 클라이언트가 서버에게 닉네임을 전달하는 RPC
@@ -23,4 +25,8 @@ public:
 	// 중복 닉네임인 경우 실패 통보할 RPC
     UFUNCTION(Client, Reliable)
     void Client_ReceiveNicknameFailure(const FString& ErrorMessage);
+	
+public:
+	// 입력 모드 토글 함수 (UIOnly <-> GameOnly) 
+	void ToggleUIInputMode(bool bUIOnly);	
 };

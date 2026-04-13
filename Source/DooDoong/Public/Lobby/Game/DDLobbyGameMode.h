@@ -4,25 +4,41 @@
 #include "GameFramework/GameModeBase.h"
 #include "DDLobbyGameMode.generated.h"
 
+class ADDLobbyPlayerController;
+
 UCLASS()
 class ADDLobbyGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
+	ADDLobbyGameMode();
+	
 	virtual void BeginPlay() override;
+	
 	virtual void Logout(AController* Exiting) override;
-
-	void ProcessPlayerJoin(class ADDLobbyPlayerController* LobbyPlayerController, const FName& Nickname);
+	
+	/** 플레이어 등록 시도 (성공 시 true) */
+	bool TryRegisterPlayerNickname(ADDLobbyPlayerController* Requester, const FName& Nickname, FString& ErrorMessage);
+	
+	/** 닉네임 중복 여부 확인 */
+	bool IsNicknameAvailable(const FName& InNickname) const;
+	
+	void SetPlayerAsSpectator(APlayerController* InPlayerController);
 	
 protected:
+	
 	UFUNCTION()
 	void OnMainTimerElapsed();
 
 private:
+	UPROPERTY()
 	TArray<TObjectPtr<ADDLobbyPlayerController>> Participants;
+	
+	UPROPERTY()
 	TArray<TObjectPtr<ADDLobbyPlayerController>> Spectators;
 
+private:
 	FTimerHandle MainTimerHandle;
 	
 	bool bIsStarting = false;
@@ -32,6 +48,7 @@ private:
 	
 	int32 WaitingTime = MaxWaitingTime;
 	
+private:
 	UPROPERTY(EditDefaultsOnly, Category = "GameSettings", meta=(DisplayName="보드게임 맵 경로"))
 	FString BaseGameMapPath = TEXT("/Game/DooDoong/Map/L_BaseGame?listen");
 };
