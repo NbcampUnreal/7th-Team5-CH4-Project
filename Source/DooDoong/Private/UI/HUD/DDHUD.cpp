@@ -401,104 +401,6 @@ void ADDHUD::HideMiniGameReadyUI()
 
 
 
-void ADDHUD::OnHealthChanged(const FOnAttributeChangeData& Data)
-{
-	//UpdateHealth(Data.NewValue);
-}
-
-void ADDHUD::OnCoinChanged(const FOnAttributeChangeData& Data)
-{
-	//UpdateGold((int32)Data.NewValue);
-}
-
-
-
-
-void ADDHUD::TryBindGAS()
-{
-	UE_LOG(LogDDHUD, Warning, TEXT("[GAS] TryBindGAS ENTER"));
-
-	APlayerController* PC = GetOwningPlayerController();
-
-	if (!PC)
-	{
-		UE_LOG(LogDDHUD, Error, TEXT("[GAS] PC NULL"));
-		return;
-	}
-	UE_LOG(LogDDHUD, Warning, TEXT("[GAS] PC OK"));
-
-
-
-	ADDBasePlayerState* PS = PC->GetPlayerState<ADDBasePlayerState>();
-	if (!PS)
-	{
-		UE_LOG(LogDDHUD, Error, TEXT("[GAS] PlayerState NOT READY -> retry next tick"));
-		return;
-	}
-	UE_LOG(LogDDHUD, Warning, TEXT("[GAS] PlayerState OK"));
-
-
-
-	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-	if (!ASC)
-	{
-		UE_LOG(LogDDHUD, Error, TEXT("[GAS] ASC NULL"));
-		return;
-	}
-	UE_LOG(LogDDHUD, Warning, TEXT("[GAS] ASC OK"));
-
-
-
-	const UDDHealthSet* HealthSet = PS->GetHealthSet();
-	if (!HealthSet)
-	{
-		UE_LOG(LogDDHUD, Error, TEXT("[GAS] HealthSet NULL"));
-		return;
-	}
-	UE_LOG(LogDDHUD, Warning, TEXT("[GAS] HealthSet OK"));
-
-
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[GAS] READY TO BIND Delegate"));
-
-	ASC->GetGameplayAttributeValueChangeDelegate(
-		HealthSet->GetHealthAttribute()
-	).AddUObject(this, &ADDHUD::OnHealthChanged);
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[GAS] BIND COMPLETE"));
-
-
-
-	// =========================
-	// INITIAL SYNC (핵심)
-	// =========================
-	float CurrentHealth = ASC->GetNumericAttribute(
-		HealthSet->GetHealthAttribute()
-	);
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[GAS] INIT HEALTH = %f"), CurrentHealth);
-
-	ApplyInitialHealth(CurrentHealth);
-}
-
-
-void ADDHUD::ApplyInitialHealth(float Value)
-{
-	int32 InitHealth = FMath::RoundToInt(Value);
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[GAS] INIT SYNC Health = %d"), InitHealth);
-
-	if (TestLogicManager)
-	{
-		TestLogicManager->SetHealth(0, InitHealth);
-	}
-}
-
-
-
-
-
-
 
 void ADDHUD::BindToGameState()
 {
@@ -543,17 +445,6 @@ void ADDHUD::BindToGameState()
 
 
 
-void ADDHUD::UpdateGold(int32 Value)
-{
-
-}
-
-void ADDHUD::UpdateHealth(float Value)
-{
-
-}
-
-
 
 
 
@@ -593,12 +484,6 @@ void ADDHUD::BindToPlayerState()
 
 	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][PS] PlayerState READY: %s"), *PS->GetPlayerName());
 
-	PS->OnGASReady.AddUObject(this, &ADDHUD::OnGASReady);
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][PS] GAS Delegate BOUND"));
-
-
-
 }
 
 
@@ -614,67 +499,6 @@ void ADDHUD::BindToPlayerState()
 
 
 
-void ADDHUD::OnGASReady()
-{
-	UE_LOG(LogDDHUD, Warning, TEXT("================================================"));
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][GAS] OnGASReady TRIGGERED"));
-
-	APlayerController* PC = GetOwningPlayerController();
-	if (!PC)
-	{
-		UE_LOG(LogDDHUD, Error, TEXT("[HUD][GAS] PC NULL"));
-		return;
-	}
-
-	ADDBasePlayerState* PS = PC->GetPlayerState<ADDBasePlayerState>();
-	if (!PS)
-	{
-		UE_LOG(LogDDHUD, Error, TEXT("[HUD][GAS] PS NULL"));
-		return;
-	}
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][GAS] PS OK"));
-
-	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-	if (!ASC)
-	{
-		UE_LOG(LogDDHUD, Error, TEXT("[HUD][GAS] ASC NULL"));
-		return;
-	}
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][GAS] ASC OK"));
-
-	const UDDHealthSet* HealthSet = PS->GetHealthSet();
-	const UDDPointSet* PointSet = PS->GetPointSet();
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][GAS] HealthSet=%s PointSet=%s"),
-		HealthSet ? TEXT("OK") : TEXT("NULL"),
-		PointSet ? TEXT("OK") : TEXT("NULL"));
-
-	if (!HealthSet || !PointSet)
-		return;
-
-	// 초기값
-	float Health = ASC->GetNumericAttribute(HealthSet->GetHealthAttribute());
-	float Coin = ASC->GetNumericAttribute(PointSet->GetCoinAttribute());
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][GAS] INIT Health=%f Coin=%f"), Health, Coin);
-
-	UpdateHealth(Health);
-	UpdateGold((int32)Coin);
-
-	// Delegate
-	ASC->GetGameplayAttributeValueChangeDelegate(
-		HealthSet->GetHealthAttribute()
-	).AddUObject(this, &ADDHUD::OnHealthChanged);
-
-	ASC->GetGameplayAttributeValueChangeDelegate(
-		PointSet->GetCoinAttribute()
-	).AddUObject(this, &ADDHUD::OnCoinChanged);
-
-	UE_LOG(LogDDHUD, Warning, TEXT("[HUD][GAS] Delegate BIND COMPLETE"));
-	UE_LOG(LogDDHUD, Warning, TEXT("================================================"));
-}
 
 
 

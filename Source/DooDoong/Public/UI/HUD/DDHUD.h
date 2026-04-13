@@ -62,16 +62,6 @@ public:
 	UFUNCTION()
 	void HandleReadyStateChanged(int32 ReadyCount, int32 TotalCount);
 
-	// =========================
-	// GAS
-	// =========================
-	void TryBindGAS();
-	void OnGASReady();
-
-	void OnHealthChanged(const FOnAttributeChangeData& Data);
-	void OnCoinChanged(const FOnAttributeChangeData& Data);
-
-	void ApplyInitialHealth(float Value);
 
 	// =========================
 	// UI Update
