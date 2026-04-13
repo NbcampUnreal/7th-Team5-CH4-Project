@@ -13,4 +13,6 @@ public:
 	ADDCatchGameMode();
 	
 	virtual void StartMiniGame() override;
+	
+	virtual void FinishMiniGame() override;
 };
