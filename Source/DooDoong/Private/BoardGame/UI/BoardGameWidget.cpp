@@ -6,7 +6,6 @@ void UBoardGameWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	GetWorld()->GetGameState<ADDBoardGameMode>()
 }
 
 void UBoardGameWidget::NativeDestruct()

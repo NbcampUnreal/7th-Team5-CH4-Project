@@ -38,7 +38,7 @@ void UDDHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, floa
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 	
-	OnHealthChanged.Broadcast(OldValue, GetMaxHealth());
+	OnHealthChanged.Broadcast(GetHealth(), GetMaxHealth());
 }
 
 void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)

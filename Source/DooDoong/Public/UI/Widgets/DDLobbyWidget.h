@@ -7,7 +7,7 @@ class UButton;
 class UEditableText;
 
 UCLASS()
-class UDDLobbyWidget : public UUserWidget
+class DOODOONG_API UDDLobbyWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
