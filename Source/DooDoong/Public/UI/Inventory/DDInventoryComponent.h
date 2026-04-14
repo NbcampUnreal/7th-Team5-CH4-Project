@@ -5,6 +5,8 @@
 #include "Components/ActorComponent.h"
 #include "DDInventoryComponent.generated.h"
 
+struct FItemTableRow;
+class UDataTable;
 class UDDInventory;
 class ADDBasePlayerController;
 class UDDInventoryBase;
@@ -22,6 +24,12 @@ public:
 	
 public:
 	void AddItem();
+	
+	const FItemTableRow* GetItemData(FName RowName) const;
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category= "Inventory|Data")
+	TObjectPtr<UDataTable> ItemDataTable;
 	
 private:
 	TWeakObjectPtr<ADDBasePlayerController> OwningController;
