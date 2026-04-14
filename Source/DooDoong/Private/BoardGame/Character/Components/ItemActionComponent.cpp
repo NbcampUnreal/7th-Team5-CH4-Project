@@ -4,8 +4,6 @@
 #include "Data/DDItemDataTypes.h"
 #include "System/DDGameplayTags.h"
 
-
-
 UItemActionComponent::UItemActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -17,19 +15,22 @@ void UItemActionComponent::BeginItemAction(FName ItemID, const FItemTableRow& It
 	ActiveItemType = ItemRow.ItemType;
 	ActiveItemAbility = ItemRow.ItemAbility;
 	
-	switch (ActiveItemType)
+	if (ActiveItemType == DDGameplayTags::Item_Activate_Instant)
 	{
-	case DDGameplayTags::Item_Activate_Instant:
 		StartInstantAction();
 		return;
-	case DDGameplayTags::Item_Activate_Targeting:
+	}
+
+	if (ActiveItemType == DDGameplayTags::Item_Activate_Targeting)
+	{
 		StartTargetingAction();
 		return;
-	case DDGameplayTags::Item_Activate_Range:
+	}
+
+	if (ActiveItemType == DDGameplayTags::Item_Activate_Range)
+	{
 		StartRangeAction();
 		return;
-	default:
-		break;
 	}
 	
 	CancelItemAction();
