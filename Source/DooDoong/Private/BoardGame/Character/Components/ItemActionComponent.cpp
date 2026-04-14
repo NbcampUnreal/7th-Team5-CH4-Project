@@ -33,7 +33,7 @@ void UItemActionComponent::BeginItemAction(FName ItemID, const FItemTableRow& It
 		return;
 	}
 	
-	CancelItemAction();
+	ResetItemAction();
 }
 
 void UItemActionComponent::ConfirmItemAction()
@@ -58,9 +58,9 @@ void UItemActionComponent::ConfirmItemAction()
 
 void UItemActionComponent::CancelItemAction()
 {
-	// TODO 아이템 사용을 Cancel
+	// TODO 카메라가 이동되어 있다면 원상복구하고, 범위표시가 있다면 제거하고, 다시 인벤토리 창 띄우기....
 	
-	// TODO 다시 인벤토리 창 띄우기
+	ResetItemAction();
 }
 
 void UItemActionComponent::StartInstantAction()
@@ -72,11 +72,9 @@ void UItemActionComponent::StartInstantAction()
 void UItemActionComponent::StartTargetingAction()
 {
 	CurrentActionMode = EItemActionMode::Targeting;
-	
-	CandidateTargets.Reset();
 	SelectedTargetIndex = INDEX_NONE;
 	
-	//TODO 모든 플레이어 컨트롤러슬 순회해서 Owner와 비교해서 다르면 후보자로 추가해야할 것 같음.
+	BuildTargetCandidates();
 	
 	if (CandidateTargets.IsEmpty())
 	{
@@ -97,7 +95,42 @@ void UItemActionComponent::StartRangeAction()
 
 void UItemActionComponent::BuildTargetCandidates()
 {
-	// TODO 타겟 후보 만들기. 범위에 따라 너무 멀면 타겟 후보에서 제외하는 로직이 필요할 것 같음.
+	CandidateTargets.Reset();
+	
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	
+	AActor* OwnerCharacter = GetOwner();
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	
+	// 월드의 플레이어 컨트롤러를 순회해서 해당 컨트롤러의 Pawn을 OwnerCharacter와 비교한 뒤 다른 Pawn만 후보자로 추가
+	for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PlayerController = It->Get();
+		if (!PlayerController)
+		{
+			continue;
+		}
+		
+		APawn* CandidatePawn = PlayerController->GetPawn();
+		if (!CandidatePawn)
+		{
+			continue;
+		}
+		
+		if (CandidatePawn == OwnerCharacter)
+		{
+			continue;
+		}
+		
+		CandidateTargets.Add(CandidatePawn);
+	}
 }
 
 void UItemActionComponent::SelectNextTarget()
