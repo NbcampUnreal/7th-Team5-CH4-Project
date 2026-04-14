@@ -1,6 +1,7 @@
 ﻿#include "BoardGame/Character/Components/ItemActionComponent.h"
 
 #include "GameplayTagContainer.h"
+#include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Data/DDItemDataTypes.h"
 #include "System/DDGameplayTags.h"
 
@@ -38,6 +39,12 @@ void UItemActionComponent::BeginItemAction(FName ItemID, const FItemTableRow& It
 
 void UItemActionComponent::ConfirmItemAction()
 {
+	if (!ActiveItemAbility)
+	{
+		CancelItemAction();
+		return;
+	}
+	
 	switch (CurrentActionMode)
 	{
 	case EItemActionMode::Instant:
@@ -118,18 +125,18 @@ void UItemActionComponent::BuildTargetCandidates()
 			continue;
 		}
 		
-		APawn* CandidatePawn = PlayerController->GetPawn();
-		if (!CandidatePawn)
+		ADDBoardGameCharacter* CandidateCharacter = Cast<ADDBoardGameCharacter>(PlayerController->GetPawn());
+		if (!CandidateCharacter)
 		{
 			continue;
 		}
 		
-		if (CandidatePawn == OwnerCharacter)
+		if (CandidateCharacter == OwnerCharacter)
 		{
 			continue;
 		}
 		
-		CandidateTargets.Add(CandidatePawn);
+		CandidateTargets.Add(CandidateCharacter);
 	}
 }
 
