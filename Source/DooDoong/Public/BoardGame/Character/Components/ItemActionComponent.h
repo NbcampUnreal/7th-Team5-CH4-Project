@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/DDItemDataTypes.h"
 #include "ItemActionComponent.generated.h"
 
 class UGameplayAbility;
@@ -24,17 +25,18 @@ public:
 	UItemActionComponent();
 	
 public:
-	void BeginItemAction(const FName ItemID);
+	void BeginItemAction(FName ItemID, const FItemTableRow& ItemRow);
 	
 	void TryActivateItem();
-	
-	void SelectNextTarget();
-	
-	void SelectPreviousTarget();
 	
 	void ConfirmItemAction();
 	
 	void CancelItemAction();
+	
+protected:
+	void BuildTargetCandidates();
+	void SelectNextTarget();
+	void SelectPreviousTarget();
 	
 protected:
 	UPROPERTY()
@@ -42,16 +44,19 @@ protected:
 	
 	UPROPERTY()
 	EItemActionMode CurrentActionMode = EItemActionMode::None;
-
+	
 	UPROPERTY()
 	FName ActiveItemID = NAME_None;
-
+	
+	UPROPERTY()
+	FGameplayTag ActiveItemType;
+	
 	UPROPERTY()
 	TSubclassOf<UGameplayAbility> ActiveItemAbility;
-
+	
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> CandidateTargets;
-
+	
 	UPROPERTY()
 	int32 SelectedTargetIndex = INDEX_NONE;
 	
