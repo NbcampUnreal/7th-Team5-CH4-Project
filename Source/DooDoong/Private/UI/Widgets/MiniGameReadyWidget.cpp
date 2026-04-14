@@ -2,7 +2,7 @@
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "Base/MiniGame/DDMiniGameStateBase.h"
 #include "Components/Image.h"
-#include "Components/MultiLineEditableText.h"
+#include "Components/MultiLineEditableTextBox.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 #include "Components/TextBlock.h"
 
@@ -31,9 +31,9 @@ void UMiniGameReadyWidget::NativeConstruct()
 			DescriptionText->SetText(Definition->Description);
 		}
 		
-		if (MiniGameImage)
+		if (ThumbnailImage)
 		{
-			MiniGameImage->SetBrushFromTexture(Definition->MiniGameThumbnail);
+			ThumbnailImage->SetBrushFromTexture(Definition->MiniGameThumbnail);
 		}
 	}
 }

@@ -7,7 +7,7 @@
 class UButton; 
 class UTextBlock; 
 class UImage;
-class UMultiLineEditableText; 
+class UMultiLineEditableTextBox; 
 class ADDMiniGameStateBase;
 
 UCLASS()
@@ -41,10 +41,10 @@ public:
 	UTextBlock* ButtonText;
 	
 	UPROPERTY(meta = (BindWidget))
-	UImage* MiniGameImage;
+	UImage* ThumbnailImage;
 	
 	UPROPERTY(meta = (BindWidget))
-	UMultiLineEditableText* DescriptionText;
+	UMultiLineEditableTextBox* DescriptionText;
 	
 private:
 	UPROPERTY()
