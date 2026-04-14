@@ -339,6 +339,17 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 		Participant.SlotIndex = Index;
 		Participant.Id = Index;
 		Participant.bReady = true;
+
+		if (const ADDBasePlayerState* DDPlayerState = Cast<ADDBasePlayerState>(Players[Index]))
+		{
+			Participant.DisplayName = !DDPlayerState->PlayerGameData.PlayerDisplayName.IsNone()
+				                          ? DDPlayerState->PlayerGameData.PlayerDisplayName
+				                          : FName(*Players[Index]->GetPlayerName());
+		}
+		else
+		{
+			Participant.DisplayName = FName(*Players[Index]->GetPlayerName());
+		}
 		
 		// 참가자 정보는 맵 이동 후 GameMode와 GameState를 초기화할 때 재사용
 		ActiveParticipants.Add(Participant);
