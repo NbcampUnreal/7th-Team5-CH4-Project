@@ -4,6 +4,16 @@
 #include "Components/ActorComponent.h"
 #include "ItemActionComponent.generated.h"
 
+class UGameplayAbility;
+
+UENUM(BlueprintType)
+enum class EItemActionMode : uint8
+{
+	None,
+	Instant,
+	Targeting,
+	Range
+};
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class DOODOONG_API UItemActionComponent : public UActorComponent
@@ -18,16 +28,31 @@ public:
 	
 	void TryActivateItem();
 	
-	void SelectNextTarget(AActor* Target);
+	void SelectNextTarget();
 	
-	void SelectPreviousTarget(AActor* Target);
+	void SelectPreviousTarget();
 	
 	void ConfirmItemAction();
 	
 	void CancelItemAction();
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemActionComp")
-	TObjectPtr<UDataTable> ItemData;
+	UPROPERTY()
+	TObjectPtr<UDataTable> ItemData;	
+	
+	UPROPERTY()
+	EItemActionMode CurrentActionMode = EItemActionMode::None;
+
+	UPROPERTY()
+	FName ActiveItemID = NAME_None;
+
+	UPROPERTY()
+	TSubclassOf<UGameplayAbility> ActiveItemAbility;
+
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> CandidateTargets;
+
+	UPROPERTY()
+	int32 SelectedTargetIndex = INDEX_NONE;
 	
 };

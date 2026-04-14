@@ -1,10 +1,10 @@
 ﻿#include "BoardGame/Character/Components/ItemActionComponent.h"
 
 #include "GameplayTagContainer.h"
-#include "SEditorViewportToolBarMenu.h"
 #include "Data/DDItemDataTypes.h"
-#include "DSP/AudioDebuggingUtilities.h"
 #include "System/DDGameplayTags.h"
+
+
 
 UItemActionComponent::UItemActionComponent()
 {
@@ -13,10 +13,12 @@ UItemActionComponent::UItemActionComponent()
 
 void UItemActionComponent::BeginItemAction(const FName ItemID)
 {
-	// TODO 아이템 사용을 시작
-	
+	if (!ItemData)
+	{
+		return;
+	}
+
 	FItemTableRow* Row = ItemData->FindRow<FItemTableRow>(ItemID, TEXT(""));
-	
 	if (!Row)
 	{
 		return;
@@ -34,17 +36,17 @@ void UItemActionComponent::BeginItemAction(const FName ItemID)
 
 void UItemActionComponent::TryActivateItem()
 {
-	// TODO 키 입력에 따른 카메라이동 구현. (이건 Tick???)
+	// TODO 키 입력에 따른 카메라이동 구현. (이건 Tick???) 
 	
 	
 }
 
-void UItemActionComponent::SelectNextTarget(AActor* Target)
+void UItemActionComponent::SelectNextTarget()
 {
 	// TODO E를 누르면 다음 타겟으로 이동. 이동 텀이 있어야함. 0.5f초임
 }
 
-void UItemActionComponent::SelectPreviousTarget(AActor* Target)
+void UItemActionComponent::SelectPreviousTarget()
 {
 	// TODO Q를 누르면 이전 타겟으로 이동
 }
