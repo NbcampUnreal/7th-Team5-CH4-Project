@@ -1,11 +1,12 @@
 ﻿
 #include "UI/Inventory/DDInventoryComponent.h"
-#include "UI/Inventory/DDInventory.h"
+#include "UI/Inventory/DDInventoryWidget.h"
 
 #include "Base/Player/DDBasePlayerController.h"
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
 #include "UI/Inventory/DDInventoryBase.h"
+#include "UI/Inventory/DDItemUseButtonWidget.h"
 
 
 UDDInventoryComponent::UDDInventoryComponent()
@@ -20,6 +21,7 @@ void UDDInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 	ConstructInventory();
 	AddItem("HealingKit"); // 테스트용
+	
 }
 
 void UDDInventoryComponent::AddItem(FName ItemName)
@@ -33,6 +35,18 @@ void UDDInventoryComponent::AddItem(FName ItemName)
 	}
 	
 	
+}
+
+void UDDInventoryComponent::ToggleInventory()
+{
+	if (bInventoryOpen)
+	{
+		CloseInventory();
+	}
+	else
+	{
+		OpenInventory();
+	}
 }
 
 FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
@@ -59,7 +73,25 @@ void UDDInventoryComponent::ConstructInventory()
 		ItemNames.Add(ItemPair.Key);
 	}
 	
-	InventoryWidget = CreateWidget<UDDInventory>(OwningController.Get(), InventoryWidgetClass);
+	InventoryWidget = CreateWidget<UDDInventoryWidget>(OwningController.Get(), InventoryWidgetClass);
 	InventoryWidget->AddToViewport();
+	CloseInventory();
+}
+
+void UDDInventoryComponent::OpenInventory()
+{
+	if (!IsValid(InventoryWidget)) return;
 	
+	InventoryWidget->SetVisibility(ESlateVisibility::Visible);
+	InventoryWidget->RefreshGrid();
+	bInventoryOpen = true;
+}
+
+void UDDInventoryComponent::CloseInventory()
+{
+	if (!IsValid(InventoryWidget)) return;
+	
+	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
+	InventoryWidget->RefreshGrid();
+	bInventoryOpen = false;
 }

@@ -11,15 +11,9 @@ void UDDInvenGridSlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	if (ItemCount != 0)
-	{
-		bCanUse = true;
-	}
-	
 	if (BT_ClickItem)
 	{
 		BT_ClickItem->OnClicked.AddDynamic(this, &UDDInvenGridSlot::UseItem);
-		BT_ClickItem->SetIsEnabled(bCanUse);
 	}
 }
 
@@ -42,6 +36,12 @@ void UDDInvenGridSlot::UpdateItemInfo(const TMap<FName, int32>& InventoryItemDat
 			ItemCount = ItemPair.Value;
 		}
 	}
+	
+	if (ItemCount > 0)
+	{
+		bCanUse = true;
+	}
+	BT_ClickItem->SetIsEnabled(bCanUse);
 }
 
 void UDDInvenGridSlot::UseItem()
