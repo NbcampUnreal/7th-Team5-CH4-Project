@@ -65,4 +65,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> BoardGameIMC;
+	
+	
+	/** 민재 : 인벤토리 관련 로직 */
+	
 };

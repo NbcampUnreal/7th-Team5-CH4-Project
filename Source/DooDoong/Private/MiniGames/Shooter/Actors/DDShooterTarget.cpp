@@ -1,5 +1,6 @@
 #include "MiniGames/Shooter/Actors/DDShooterTarget.h"
 
+#include "Base/Player/DDBasePlayerState.h"
 #include "Common/DDLogManager.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -65,9 +66,14 @@ bool ADDShooterTarget::HandleProjectileHit(ADDShotProjectile* ShotProjectile)
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ShooterGameMode->AddScore(ShooterPlayerState, ScoreValue);
 	Destroy();
+
+	const ADDBasePlayerState* ShooterDDPlayerState = Cast<ADDBasePlayerState>(ShooterPlayerState);
+	const FName ShooterDisplayName = ShooterDDPlayerState != nullptr
+		                                 ? ShooterDDPlayerState->PlayerGameData.PlayerDisplayName
+		                                 : NAME_None;
 	
 	LOG_JJH(Warning, TEXT("플레이어 : %s, 획득 점수 : %d"),
-	        *ShooterPlayerState->GetPlayerName(),
+	        *ShooterDisplayName.ToString(),
 	        ScoreValue);
 	return true;
 }

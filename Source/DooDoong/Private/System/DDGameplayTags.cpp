@@ -20,12 +20,14 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Character_Stun, "State.Character.Stun");
 	
 	// Event Tags 
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Health_Heal, "Event.Health.Heal", "캐릭터의 Health가 양변화 되는 경우 사용할 이벤트 태그");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Character_Death, "Event.Character.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_Start, "Event.Trace.Start");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_End, "Event.Trace.End");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Shooter_Fire, "Event.Shooter.Fire", "슈터 미니게임 발사 애니메이션 몽타주에서 사용할 발사 이벤트 태그");
 	
 	// Data Tags
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Data_Health_Heal, "Data.Health.Heal", "Health Attribute를 양변화 시키는 경우 사용할 태그")
 	UE_DEFINE_GAMEPLAY_TAG(Data_Health_Damage, "Data.Health.Damage");
 	UE_DEFINE_GAMEPLAY_TAG(Data_Point_Coin, "Data.Point.Coin");
 	UE_DEFINE_GAMEPLAY_TAG(Data_Point_Trophy, "Data.Point.Trophy");

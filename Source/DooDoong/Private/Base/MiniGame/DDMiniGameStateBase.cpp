@@ -1,5 +1,6 @@
 ﻿#include "Base/MiniGame/DDMiniGameStateBase.h"
 
+#include "Base/Player/DDBasePlayerState.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
 
@@ -73,6 +74,12 @@ void ADDMiniGameStateBase::AddScore(APlayerState* PlayerState, int32 DeltaScore)
 		return;
 	}
 
+	FName DisplayName = NAME_None;
+	if (const ADDBasePlayerState* DDPlayerState = Cast<ADDBasePlayerState>(PlayerState))
+	{
+		DisplayName = DDPlayerState->PlayerGameData.PlayerDisplayName;
+	}
+
 	// 플레이어의 기존 점수 기록이 이미 ScoreBoard에 있는지 확인하는 작업.
 	FMiniGameScoreEntry* ExistingEntry = ScoreBoard.FindByPredicate([PlayerState](const FMiniGameScoreEntry& Entry)
 	{
@@ -84,14 +91,16 @@ void ADDMiniGameStateBase::AddScore(APlayerState* PlayerState, int32 DeltaScore)
 	{
 		FMiniGameScoreEntry NewEntry;
 		NewEntry.PlayerState = PlayerState;
-		NewEntry.PlayerName = PlayerState->GetPlayerName();
+		NewEntry.PlayerId = PlayerState->GetPlayerId();
+		NewEntry.DisplayName = DisplayName;
 		NewEntry.Score = DeltaScore;
 		ScoreBoard.Add(NewEntry);
 		return;
 	}
 	
 	// 이미 점수를 획득했던 플레이어는 해당하는 점수판에 점수를 계속 누적하는 방식
-	ExistingEntry->PlayerName = PlayerState->GetPlayerName();
+	ExistingEntry->PlayerId = PlayerState->GetPlayerId();
+	ExistingEntry->DisplayName = DisplayName;
 	ExistingEntry->Score += DeltaScore;
 }
 
