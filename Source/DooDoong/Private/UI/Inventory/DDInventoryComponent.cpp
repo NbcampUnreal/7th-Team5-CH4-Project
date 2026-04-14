@@ -18,15 +18,8 @@ UDDInventoryComponent::UDDInventoryComponent()
 void UDDInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (!ItemDataTable) return;
-	const TArray<FName> AllItemNames = ItemDataTable->GetRowNames();
-	for (const FName& ItemName : AllItemNames)
-	{
-		InventoryItems.Add(ItemName, 0);
-	}
-	
 	ConstructInventory();
+	AddItem("HealingKit"); // 테스트용
 }
 
 void UDDInventoryComponent::AddItem(FName ItemName)
@@ -38,6 +31,8 @@ void UDDInventoryComponent::AddItem(FName ItemName)
 			ItemPair.Value++;
 		}
 	}
+	
+	
 }
 
 FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
@@ -51,6 +46,18 @@ void UDDInventoryComponent::ConstructInventory()
 	OwningController = Cast<ADDBasePlayerController>(GetOwner());
 	checkf(OwningController.IsValid(), TEXT("플레이어의 인벤토리가 유효하지않습니다."));
 	if (!OwningController->IsLocalController()) return;
+	
+	if (!ItemDataTable) return;
+	const TArray<FName> AllItemNames = ItemDataTable->GetRowNames();
+	for (const FName& ItemName : AllItemNames)
+	{
+		InventoryItems.Add(ItemName, 0);
+	}
+	
+	for (const TPair<FName,int32>& ItemPair : InventoryItems)
+	{
+		ItemNames.Add(ItemPair.Key);
+	}
 	
 	InventoryWidget = CreateWidget<UDDInventory>(OwningController.Get(), InventoryWidgetClass);
 	InventoryWidget->AddToViewport();

@@ -25,15 +25,17 @@ public:
 public:
 	void AddItem(FName ItemName);
 	
+	UPROPERTY(VisibleAnywhere, Category= "Inventory|Items")
+	TMap<FName, int32> InventoryItems;
+	
+	UPROPERTY(VisibleAnywhere, Category= "Inventory|Items")
+	TArray<FName> ItemNames;
+	
 	FItemTableRow* GetItemData(FName RowName) const;
 	
-
 protected:
 	UPROPERTY(EditDefaultsOnly, Category= "Inventory|Data")
 	TObjectPtr<UDataTable> ItemDataTable;
-	
-	UPROPERTY(VisibleAnywhere, Category= "Inventory|Items")
-	TMap<FName, int32> InventoryItems;
 	
 private:
 	TWeakObjectPtr<ADDBasePlayerController> OwningController;
