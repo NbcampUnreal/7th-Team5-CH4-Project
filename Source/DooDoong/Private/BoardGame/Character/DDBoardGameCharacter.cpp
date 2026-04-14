@@ -181,6 +181,12 @@ void ADDBoardGameCharacter::Multicast_ShowTileContentAboveHead_Implementation(FG
 		LOG_CYS(Error, TEXT("무브 머리 위!"));
 		SpawnClass = MoveClass;
 	}
+	else if (TileTag.MatchesTag(DDGameplayTags::Tile_Ability_Damage))
+	{
+		// 데미지
+		LOG_CYS(Error, TEXT("데미지 머리 위!"));
+		SpawnClass = DamageClass;
+	}
 
 	if (!SpawnClass)
 	{

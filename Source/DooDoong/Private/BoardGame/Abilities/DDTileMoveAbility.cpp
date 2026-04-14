@@ -36,7 +36,7 @@ void UDDTileMoveAbility::ActivateAbility(
 	if (!Tile) return;
 
 	// 타일 정보 가져옴 
-	AddMove = Tile->TileData.MoveEffect;
+	AddMove = Tile->TileData.Effect;
 	
 	// UX 지시
 	ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(ActorInfo->AvatarActor.Get());

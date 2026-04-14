@@ -163,6 +163,10 @@ void ADDTile::OnCharacterArrived(ADDBoardGameCharacter* Character) const
 		Tag = DDGameplayTags::Tile_Ability_Move;
 		LOG_CYS(Warning, TEXT("[Tile][%s] OnCharacterArrived"), *Tag.ToString());
 		break;
+	case ETileType::Damage:
+		Tag = DDGameplayTags::Tile_Ability_Damage;
+		LOG_CYS(Warning, TEXT("[Tile][%s] OnCharacterArrived"), *Tag.ToString());
+		break;
 
 	default:
 		LOG_CYS(Warning, TEXT("[Tile] OnCharacterArrived No Event"));
