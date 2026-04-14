@@ -334,6 +334,18 @@ void ADDBoardGameMode::NotifyMovementFinished()
 	                                TurnTransitionTimer, false);
 }
 
+void ADDBoardGameMode::HandleRespawn(AController* TargetController)
+{
+	Super::HandleRespawn(TargetController);
+	// State의 currentTile을 Tile01로
+	if (!TargetController) return;
+
+	ADDBasePlayerState* PS = TargetController->GetPlayerState<ADDBasePlayerState>();
+	if (!PS) return;
+	PS->StartTileName = FName("Tile01");
+	PS->InitTile();
+}
+
 void ADDBoardGameMode::ExecuteNextTurnTransition()
 {
 	LOG_CJH(Log, TEXT("[Timer] %d초 대기 완료. 다음 플레이어로 턴을 전환합니다."), TurnTransitionTimer);
