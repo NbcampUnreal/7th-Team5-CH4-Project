@@ -36,6 +36,8 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Coin);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Item);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Move);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Damage);
+	
 
 	// 미니게임 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_MiniGame_Idle);
