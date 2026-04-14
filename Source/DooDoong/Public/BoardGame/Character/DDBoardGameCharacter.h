@@ -74,6 +74,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="Object")
 	TSubclassOf<class AActor> MoveClass;
 	
+	UPROPERTY(EditAnywhere, Category="Object")
+	TSubclassOf<class AActor> DamageClass;
 	
 	UPROPERTY()
 	ADDDiceActor* Dice;
