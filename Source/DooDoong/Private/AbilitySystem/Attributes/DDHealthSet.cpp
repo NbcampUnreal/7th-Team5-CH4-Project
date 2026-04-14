@@ -37,6 +37,8 @@ void UDDHealthSet::PreAttributeChange(const FGameplayAttribute& Attribute, float
 void UDDHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+	
+	OnHealthChanged.Broadcast(OldValue, GetMaxHealth());
 }
 
 void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
@@ -70,7 +72,6 @@ void UDDHealthSet::PostGameplayEffectExecute(const struct FGameplayEffectModCall
 				FGameplayEventData Payload;
 				Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
 				Payload.Target = Data.Target.GetAvatarActor();
-				
 				
 				TargetASC->HandleGameplayEvent(DDGameplayTags::Event_Character_Death, &Payload);
 				LOG_KMS(Warning, TEXT("Character Death %s"), *TargetASC->GetAvatarActor()->GetName());
