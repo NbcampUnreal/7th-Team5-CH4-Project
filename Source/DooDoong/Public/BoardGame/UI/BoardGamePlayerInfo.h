@@ -5,6 +5,7 @@
 #include "BoardGamePlayerInfo.generated.h"
 
 class UTextBlock; 
+class ADDBasePlayerState;
 
 UCLASS()
 class DOODOONG_API UBoardGamePlayerInfo : public UUserWidget
@@ -13,6 +14,20 @@ class DOODOONG_API UBoardGamePlayerInfo : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+	
+	void InitializePlayerInfo(APlayerState* PlayerState);
+	
+	virtual void NativeDestruct() override;
+	
+protected:
+	UFUNCTION()
+	void UpdateHealth(int32 Cur, int32 Max);
+	
+	UFUNCTION()
+	void UpdateCoinCount(int32 Coin);
+	
+	UFUNCTION()
+	void UpdateTrophyCount(int32 Trophy);
 	
 public:
 	UPROPERTY(meta = (BindWidget))
@@ -27,5 +42,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CoinText;
 	
+protected:
+	UPROPERTY()
+	TObjectPtr<ADDBasePlayerState> CurrentPlayerState;
 	
 };
