@@ -12,9 +12,6 @@ class UDDLobbyWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UDDLobbyWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
-protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
