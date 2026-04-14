@@ -5,6 +5,7 @@
 #include "DDHealthSet.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FKillLogSignature, AActor* /*Killer*/, AActor* /*Victim*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, int32 /*Cur*/, int32 /*Max*/);
 
 UCLASS()
 class DOODOONG_API UDDHealthSet : public UAttributeSet
@@ -41,4 +42,6 @@ private:
 	
 public:
 	FKillLogSignature KillLogSignature;
+	
+	FOnHealthChanged OnHealthChanged;
 };

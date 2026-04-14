@@ -84,7 +84,4 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="UX")
 	float HeadOffset = 70.f;
-private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attribute", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UDDHealthSet> AttributeSet;
 };

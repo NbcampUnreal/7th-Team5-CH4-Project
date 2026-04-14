@@ -4,6 +4,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystem/DDAbilitySystemComponent.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
+#include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/DDSelectableTileActor.h"
 #include "BoardGame/Abilities/DDMoveTileStepTask.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
@@ -175,6 +176,17 @@ void ADDBasePlayerController::Server_SelectTile_Implementation(ADDSelectableTile
 	{
 		BoardCharacter->CurrentMoveTask->SelectNextTile(SelectableTileActor->TargetTile);
 	}
+}
+
+void ADDBasePlayerController::Server_RequestPlayerReady_Implementation()
+{
+	ADDMiniGameModeBase* GM = GetWorld()->GetAuthGameMode<ADDMiniGameModeBase>();
+	if (!IsValid(GM)) return;
+	
+	ADDBasePlayerState* PS = GetPlayerState<ADDBasePlayerState>();
+	if (!IsValid(PS)) return;
+	
+	GM->SetPlayerReady(PS, true);
 }
 
 void ADDBasePlayerController::Input_Move(const FInputActionValue& Value)

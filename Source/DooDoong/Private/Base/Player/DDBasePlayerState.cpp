@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Base/Game/DDGameStateBase.h"
 #include "BoardGame/DDTile.h"
+#include "Base/MiniGame/DDMiniGameStateBase.h"
 #include "BoardGame/DDTileManager.h"
 #include "Common/DDLogManager.h"
 #include "GameFramework/Character.h"

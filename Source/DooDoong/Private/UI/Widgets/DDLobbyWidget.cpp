@@ -4,11 +4,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Lobby/Player/DDLobbyPlayerController.h"
 
-UDDLobbyWidget::UDDLobbyWidget(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
-{
-}
-
 void UDDLobbyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();

@@ -83,10 +83,13 @@ protected:
 	FColor HitColor; 
 	
 private:
+	UPROPERTY()
 	ACharacter* CachedCharacter; 
 	
+	UPROPERTY()
 	UAbilitySystemComponent* CachedAbilitySystemComponent;
 	
+	UPROPERTY()
 	TSet<AActor*> HitActors; 
 	
 	FTimerHandle TraceTimerHandle; 
