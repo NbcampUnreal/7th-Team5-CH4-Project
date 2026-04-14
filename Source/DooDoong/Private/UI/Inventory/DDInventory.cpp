@@ -2,32 +2,42 @@
 
 
 #include "UI/Inventory/DDInventory.h"
+
+#include "Base/Player/DDBasePlayerController.h"
 #include "UI/Inventory/DDInvenGridSlot.h"
 #include "Common/DDLogManager.h"
-
+#include "UI/Inventory/DDInventoryComponent.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Data/DDItemDataTypes.h"
 
 void UDDInventory::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
-	ConstructGrid();
+	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(GetOwningPlayer());
+	if (IsValid(DDPC) == true)
+	{
+		InventoryComponent = DDPC->GetComponentByClass<UDDInventoryComponent>();
+	}
+	Columns = InventoryComponent->InventoryItems.Num();
+	Rows = 1;
+	GenerationGrid();	
 }
 
 void UDDInventory::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+	RefreshGrid();
 }
 
-void UDDInventory::ConstructGrid()
+void UDDInventory::GenerationGrid()
 {
+	GridSlots.Reserve(Rows * Columns);
+	
 	for (int32 j = 0; j < Rows; ++j)
 	{
 		for (int32 i = 0; i < Columns; ++i)
 		{
-			LOG_PMJ(Warning, TEXT("Create GridSlot"));
 			UDDInvenGridSlot* GridSlot = CreateWidget<UDDInvenGridSlot>(this, GridSlotClass);
 			UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(CanvasPanel->AddChild(GridSlot));
 			
@@ -40,13 +50,24 @@ void UDDInventory::ConstructGrid()
 				CanvasSlot->SetSize(FVector2D(SlotSizeX, SlotSizeY));
 				CanvasSlot->SetPosition(FVector2D(
 					i * (SlotSizeX + SpacingX) + 50.f,
-					j * (SlotSizeX) + 25.f
+					j * (SlotSizeX) + 50.f
 					));
 			}
 			int32 Index = i + j * Columns;
-			if (!ItemIcons.IsValidIndex(Index)) return;
-			GridSlot->SetItemInfo(ItemIcons[Index]);
-			
+			if (!InventoryComponent->ItemNames.IsValidIndex(Index)) return;
+			FName ItemName = InventoryComponent->ItemNames[Index];
+			FItemTableRow* ItemData = InventoryComponent->GetItemData(ItemName);
+			GridSlot->SetItemInfo(ItemData);
+			GridSlots.Add(GridSlot);
 		}
 	}
 }
+
+void UDDInventory::RefreshGrid()
+{
+	for (const auto& GridSlot : GridSlots)
+	{
+		GridSlot->UpdateItemInfo(InventoryComponent->InventoryItems);
+	}
+}
+

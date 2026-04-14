@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "DDInventory.generated.h"
 
+class UDDInventoryComponent;
 class UCanvasPanel;
 class UDDInvenGridSlot;
 
@@ -21,11 +22,16 @@ public:
 	virtual void NativeConstruct() override;
 	
 private:
-	void ConstructGrid();
+	void GenerationGrid();
+	
+	void RefreshGrid();
 	
 	/* 인벤토리 슬롯 */
-	/*UPROPERTY()
-	TArray<TObjectPtr<UDDInvenGridSlot>> GridSlots;*/
+	UPROPERTY()
+	TArray<UDDInvenGridSlot*> GridSlots;
+	
+	UPROPERTY()
+	TObjectPtr<UDDInventoryComponent> InventoryComponent;
 
 	/* 인벤토리 슬롯 클래스 */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
