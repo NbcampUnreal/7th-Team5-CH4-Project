@@ -3,6 +3,7 @@
 #include "AbilitySystem/Attributes/DDPointSet.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/DDTile.h"
+#include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
 
@@ -32,7 +33,7 @@ void UDDTileCoinAbility::ActivateAbility(
 	if (!Tile) return;
 
 	// 타일 정보 가져옴 
-	int32 AddCoin = Tile->TileData.CoinEffect;
+	int32 AddCoin = Tile->TileData.Effect;
 
 	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
 	if (!ASC) return;
