@@ -18,21 +18,29 @@ UDDInventoryComponent::UDDInventoryComponent()
 void UDDInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (ItemDataTable)
+	
+	if (!ItemDataTable) return;
+	const TArray<FName> AllItemNames = ItemDataTable->GetRowNames();
+	for (const FName& ItemName : AllItemNames)
 	{
-		LOG_PMJ(Warning, TEXT("ItemDataTable %s"), *ItemDataTable->GetName());
+		InventoryItems.Add(ItemName, 0);
 	}
 	
-	if (const FItemTableRow* Row = GetItemData(TEXT("HealingKit")))
-	{
-		LOG_PMJ(Warning, TEXT("%s"), *Row->DisplayName.ToString());
-	}
-	
-	ConstructInventory();	
+	ConstructInventory();
 }
 
-const FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
+void UDDInventoryComponent::AddItem(FName ItemName)
+{
+	for (TPair<FName,int32>& ItemPair : InventoryItems)
+	{
+		if(ItemPair.Key == ItemName)
+		{
+			ItemPair.Value++;
+		}
+	}
+}
+
+FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
 {
 	if (!ItemDataTable) return nullptr;
 	return ItemDataTable->FindRow<FItemTableRow>(RowName, TEXT("Item"));

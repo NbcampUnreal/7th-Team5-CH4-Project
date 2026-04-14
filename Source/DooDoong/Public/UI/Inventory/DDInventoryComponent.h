@@ -23,13 +23,17 @@ public:
 	virtual void BeginPlay() override;
 	
 public:
-	void AddItem();
+	void AddItem(FName ItemName);
 	
-	const FItemTableRow* GetItemData(FName RowName) const;
+	FItemTableRow* GetItemData(FName RowName) const;
 	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category= "Inventory|Data")
 	TObjectPtr<UDataTable> ItemDataTable;
+	
+	UPROPERTY(VisibleAnywhere, Category= "Inventory|Items")
+	TMap<FName, int32> InventoryItems;
 	
 private:
 	TWeakObjectPtr<ADDBasePlayerController> OwningController;
