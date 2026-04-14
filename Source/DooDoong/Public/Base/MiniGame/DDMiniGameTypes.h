@@ -46,9 +46,6 @@ struct DOODOONG_API FMiniGameScoreEntry
 	UPROPERTY(BlueprintReadOnly)
 	FName DisplayName = NAME_None;
 
-	UPROPERTY(BlueprintReadOnly)
-	FString PlayerName;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 Score = 0;
 
@@ -129,7 +126,7 @@ struct FMiniGameReadyEntry
 	int32 PlayerId = INDEX_NONE;
 
 	UPROPERTY(BlueprintReadOnly, Category="MiniGame|Ready")
-	FString PlayerName;
+	FName DisplayName = NAME_None;
 
 	UPROPERTY(BlueprintReadOnly, Category="MiniGame|Ready")
 	bool bReady = false;

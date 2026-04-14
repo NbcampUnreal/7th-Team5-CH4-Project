@@ -342,13 +342,7 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 
 		if (const ADDBasePlayerState* DDPlayerState = Cast<ADDBasePlayerState>(Players[Index]))
 		{
-			Participant.DisplayName = !DDPlayerState->PlayerGameData.PlayerDisplayName.IsNone()
-				                          ? DDPlayerState->PlayerGameData.PlayerDisplayName
-				                          : FName(*Players[Index]->GetPlayerName());
-		}
-		else
-		{
-			Participant.DisplayName = FName(*Players[Index]->GetPlayerName());
+			Participant.DisplayName = DDPlayerState->PlayerGameData.PlayerDisplayName;
 		}
 		
 		// 참가자 정보는 맵 이동 후 GameMode와 GameState를 초기화할 때 재사용
