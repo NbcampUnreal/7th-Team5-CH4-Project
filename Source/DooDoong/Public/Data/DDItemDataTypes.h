@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataTable.h"
 #include "DDItemDataTypes.generated.h"
 
@@ -14,6 +15,10 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	/** 아이템 ID */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName ItemID;
+	
+	/** 아이템 타입 태그 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag ItemType;
 	
 	/** 표시될 아이템 이름 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
