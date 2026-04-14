@@ -5,6 +5,9 @@
 #include "AbilitySystemComponent.h"
 #include "DDPointSet.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPointChanged, int32);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTrophyChanged, int32);
+
 UCLASS()
 class DOODOONG_API UDDPointSet : public UAttributeSet
 {
@@ -36,4 +39,9 @@ private:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Coin", meta = (AllowPrivateAccess = true), ReplicatedUsing = OnRep_Coin)
 	FGameplayAttributeData Coin; 
+	
+public:
+	FOnPointChanged OnPointChanged;
+	
+	FOnTrophyChanged OnTrophyChanged;
 };

@@ -24,6 +24,16 @@ void UDDPointSet::PreAttributeChange(const FGameplayAttribute& Attribute, float&
 void UDDPointSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+	
+	if (Attribute == GetCoinAttribute())
+	{
+		OnPointChanged.Broadcast(NewValue);
+	}
+	else if (Attribute == GetTrophyAttribute())
+	{
+		OnTrophyChanged.Broadcast(NewValue);	
+	}
+	
 }
 
 void UDDPointSet::OnRep_Trophy(const FGameplayAttributeData& OldTrophy)
