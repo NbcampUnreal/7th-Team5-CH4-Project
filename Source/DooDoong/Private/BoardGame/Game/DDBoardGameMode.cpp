@@ -13,6 +13,7 @@
 #include "System/DDGameplayTags.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "GameplayEffect.h"
+#include "BoardGame/DDTile.h"
 
 ADDBoardGameMode::ADDBoardGameMode()
 {
@@ -172,6 +173,24 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 	{
 		StateTimer = 3;
 		LOG_CJH(Log, TEXT("[라운드 종료] 3초 뒤 미니게임으로 이동합니다."));
+		// 현재 타일 위치 시작 위치로 초기화
+		for (APlayerController* PC : AlivePlayerControllers)
+		{
+			if (auto PS = PC->GetPlayerState<ADDBasePlayerState>())
+			{
+				if (IsValid(PS->CurrentTile))
+				{
+					PS->StartTileName = PS->CurrentTile->TileRowName;
+
+					LOG_CYS(Log, TEXT("[RoundEnd] Save Tile: %s"),
+						*PS->StartTileName.ToString());
+				}
+				else
+				{
+					LOG_CYS(Error, TEXT("[RoundEnd] CurrentTile INVALID"));
+				}
+			}
+		}
 	}
 }
 
