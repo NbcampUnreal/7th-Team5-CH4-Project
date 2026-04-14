@@ -25,6 +25,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameLoop|TurnPhase")
 	void NotifyMovementFinished();
 
+	virtual void HandleRespawn(AController* TargetController) override;
+	
 protected:
 	UFUNCTION()
 	void OnMainTimerElapsed();
