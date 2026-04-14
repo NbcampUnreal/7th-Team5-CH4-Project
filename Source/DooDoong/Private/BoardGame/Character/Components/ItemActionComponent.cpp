@@ -2,12 +2,15 @@
 
 #include "GameplayTagContainer.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
+#include "BoardGame/Game/DDBoardGameMode.h"
+#include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
 #include "System/DDGameplayTags.h"
 
 UItemActionComponent::UItemActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	SetIsReplicatedByDefault(true);
 }
 
 void UItemActionComponent::BeginItemAction(FName ItemID, const FItemTableRow& ItemRow)
@@ -48,15 +51,21 @@ void UItemActionComponent::ConfirmItemAction()
 	switch (CurrentActionMode)
 	{
 	case EItemActionMode::Instant:
-		// 인스턴트 아이템 확정을 서버에 요청해야할듯. Ability가 Attribute를 변화시킴. ServerOnly.
+		Server_ConfirmInstantItem(ActiveItemID);
+		ResetItemAction();
 		break;
 
 	case EItemActionMode::Targeting:
-		// 
+		if (AActor* TargetActor = GetSelectedTarget())
+		{
+			Server_ConfirmTargetingItem(ActiveItemID, TargetActor);
+			ResetItemAction();
+		}
 		break;
 
 	case EItemActionMode::Range:
-		//
+		Server_ConfirmRangeItem(ActiveItemID);
+		ResetItemAction();
 		break;
 	default:
 		break;
@@ -91,6 +100,7 @@ void UItemActionComponent::StartTargetingAction()
 	
 	// 첫 번째 타겟을 한 번 지정.
 	SelectedTargetIndex = 0;
+	Server_FocusItemTarget(GetSelectedTarget());
 }
 
 void UItemActionComponent::StartRangeAction()
@@ -165,6 +175,45 @@ void UItemActionComponent::ChangeTarget(int32 Offset)
 	// 목록을 원형으로 순환하기 위한 계산 : (현재인덱스 + 방향 + 목록사이즈) % 목록사이즈
 	// -1 방향으로도 가기 때문에 Index가 음수가 되지 않기 위해서 사이즈를 한 번 더함
 	SelectedTargetIndex = (SelectedTargetIndex + Offset + CandidateTargets.Num()) % CandidateTargets.Num();
+	Server_FocusItemTarget(GetSelectedTarget());
+}
+
+AActor* UItemActionComponent::GetSelectedTarget() const
+{
+	return CandidateTargets.IsValidIndex(SelectedTargetIndex)
+		       ? CandidateTargets[SelectedTargetIndex].Get()
+		       : nullptr;
+}
+
+void UItemActionComponent::Server_FocusItemTarget_Implementation(AActor* TargetActor)
+{
+	if (!IsValid(TargetActor))
+	{
+		return;
+	}
+
+	ADDBoardGameMode* BoardGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDBoardGameMode>() : nullptr;
+	if (!BoardGameMode)
+	{
+		return;
+	}
+
+	BoardGameMode->FocusAllCamerasOnTarget(TargetActor);
+}
+
+void UItemActionComponent::Server_ConfirmInstantItem_Implementation(FName ItemID)
+{
+	LOG_JJH(Warning, TEXT("[아이템 액션] 즉시사용 아이템 액션 : %s"), *ItemID.ToString());
+}
+
+void UItemActionComponent::Server_ConfirmTargetingItem_Implementation(FName ItemID, AActor* TargetActor)
+{
+	LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 액션 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
+}
+
+void UItemActionComponent::Server_ConfirmRangeItem_Implementation(FName ItemID)
+{
+	LOG_JJH(Warning, TEXT("[아이템 액션] 범위 아이템 액션 : %s"), *ItemID.ToString());
 }
 
 void UItemActionComponent::ResetItemAction()

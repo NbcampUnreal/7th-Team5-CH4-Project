@@ -33,6 +33,14 @@ public:
 	
 	/** 아이템 사용을 취소하고 인벤토리 창을 다시 띄움 */
 	void CancelItemAction();
+
+	/** 다음 타겟 선택 */
+	void SelectNextTarget();
+
+	/** 이전 타겟 선택 */
+	void SelectPreviousTarget();
+
+	bool IsItemActionActive() const { return CurrentActionMode != EItemActionMode::None; }
 	
 protected:
 	/** 즉시사용 아이템 액션 */
@@ -48,12 +56,22 @@ protected:
 	/** 타겟 후보 대상을 순회해서 지정해주는 헬퍼 */
 	void BuildTargetCandidates();
 	
-	/** 다음 타겟 선택 */
-	void SelectNextTarget();
-	/** 이전 타겟 선택 */
-	void SelectPreviousTarget();
 	/** Index를 원형으로 순회할 수 있도록 하는 계산 헬퍼 */
 	void ChangeTarget(int32 Offset);
+
+	AActor* GetSelectedTarget() const;
+
+	UFUNCTION(Server, Reliable)
+	void Server_FocusItemTarget(AActor* TargetActor);
+
+	UFUNCTION(Server, Reliable)
+	void Server_ConfirmInstantItem(FName ItemID);
+
+	UFUNCTION(Server, Reliable)
+	void Server_ConfirmTargetingItem(FName ItemID, AActor* TargetActor);
+
+	UFUNCTION(Server, Reliable)
+	void Server_ConfirmRangeItem(FName ItemID);
 	
 	/** 아이템 액션값들을 초기화 */
 	void ResetItemAction();
