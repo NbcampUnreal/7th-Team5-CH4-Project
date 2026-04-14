@@ -5,11 +5,9 @@
 #include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
-#include "UI/Inventory/DDInventoryComponent.h"
 
 ADDBoardGameCharacter::ADDBoardGameCharacter()
 {
-	InventoryComp = CreateDefaultSubobject<UDDInventoryComponent>(TEXT("InventoryComp"));
 	ItemActionComp = CreateDefaultSubobject<UItemActionComponent>(TEXT("ItemActionComp"));
 }
 

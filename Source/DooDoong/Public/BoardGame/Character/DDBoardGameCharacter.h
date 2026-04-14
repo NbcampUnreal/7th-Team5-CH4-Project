@@ -60,9 +60,6 @@ public:
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Comp")
-	TObjectPtr<UDDInventoryComponent> InventoryComp;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Comp")
 	TObjectPtr<UItemActionComponent> ItemActionComp;
 	
 private:
