@@ -12,7 +12,8 @@ enum class ETileType : uint8
 	Move,
 	Coin,
 	Item,
-}; // 기본, 시작, 목표, 이동, 코인, 아이템 
+	Damage,
+}; // 기본, 시작, 목표, 이동, 코인, 아이템, 데미지 
 
 USTRUCT(BlueprintType)
 struct FTileRowData : public FTableRowBase
@@ -22,9 +23,7 @@ struct FTileRowData : public FTableRowBase
 	UPROPERTY(EditAnywhere)
 	ETileType TileType = ETileType::Normal;
 	UPROPERTY(EditAnywhere)
-	int32 MoveEffect = 0;
-	UPROPERTY(EditAnywhere)
-	int32 CoinEffect = 0;
+	int32 Effect = 0;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FName> NextTiles;
