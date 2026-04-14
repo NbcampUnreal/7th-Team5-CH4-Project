@@ -166,8 +166,9 @@ void ADDMiniGameModeBase::UpdateMiniGameTime()
 	}
 }
 
-void ADDMiniGameModeBase::InitializeMiniGame(const FMiniGameSetup& InSetup,
-                                             const TArray<FMiniGameParticipantInfo>& InParticipants)
+void ADDMiniGameModeBase::InitializeMiniGame(
+	const FMiniGameSetup& InSetup,
+	const TArray<FMiniGameParticipantInfo>& InParticipants)
 {
 	ActiveSetup = InSetup;
 	ActiveParticipants = InParticipants;
@@ -498,6 +499,19 @@ void ADDMiniGameModeBase::SetPlayerReady(APlayerState* PlayerState, bool bReady)
 	UpdateReadyState();
 	TryStartMiniGame();
 }
+
+void ADDMiniGameModeBase::HandlePlayerReady(APlayerController* PlayerController, bool bReady)
+{
+	if (!HasAuthority() || bIsMiniGameStarted || bIsMiniGameFinished || PlayerController == nullptr)
+	{
+		return;
+	}
+	
+	APlayerState* PS = PlayerController->GetPlayerState<APlayerState>(); 
+	
+	SetPlayerReady(PS, bReady);
+}
+
 
 void ADDMiniGameModeBase::InitializeRuleSet()
 {

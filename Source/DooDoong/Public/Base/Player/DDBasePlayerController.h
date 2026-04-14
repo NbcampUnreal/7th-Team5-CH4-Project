@@ -47,6 +47,10 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_SelectTile(ADDSelectableTileActor* TileActor);
+	
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_RequestPlayerReady(); 
 
 protected:
 	void Input_Move(const FInputActionValue& Value);

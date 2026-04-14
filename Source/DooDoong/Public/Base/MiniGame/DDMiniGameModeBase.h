@@ -95,7 +95,7 @@ protected:
 	
 	/** 타이머 주기마다 미니게임 시간을 갱신하는 헬퍼 */
 	void UpdateMiniGameTime();
-	
+
 protected:
 	/** 런타임 미니게임 데이터 */
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "MiniGame")
@@ -136,4 +136,7 @@ public:
 	/** 참가자의 준비 상태를 갱신 */
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category="MiniGame|Ready")
 	void SetPlayerReady(APlayerState* PlayerState, bool bReady);
+	
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category="MiniGame|Ready")
+	void HandlePlayerReady(APlayerController* PlayerController, bool bReady);
 };

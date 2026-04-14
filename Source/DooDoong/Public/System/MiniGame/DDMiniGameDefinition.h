@@ -9,9 +9,6 @@
 #include "Input/DDInputConfig.h"
 #include "DDMiniGameDefinition.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class DOODOONG_API UDDMiniGameDefinition : public UPrimaryDataAsset
 {
@@ -29,6 +26,10 @@ public:
 	/** 표시될 미니게임 설명 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
 	FText Description;
+	
+	/** 표시될 미니게임 이미지 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
+	UTexture2D* MiniGameThumbnail;
 
 	/** 미니게임 장르 태그 : 기본값 None */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.Genre"))
