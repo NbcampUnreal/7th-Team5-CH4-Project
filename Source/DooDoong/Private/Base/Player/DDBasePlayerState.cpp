@@ -61,7 +61,7 @@ void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 		NewPlayerState->PlayerGameData.PlayerColor = this->PlayerGameData.PlayerColor;
 		NewPlayerState->bIsParticipant = this->bIsParticipant;
 		NewPlayerState->PlayerGameData.TurnOrder = this->PlayerGameData.TurnOrder;
-		NewPlayerState->StartTileName = this->CurrentTile->TileRowName; // 시작 타일 변경
+		NewPlayerState->StartTileName = this->StartTileName; 
 	}
 }
 
