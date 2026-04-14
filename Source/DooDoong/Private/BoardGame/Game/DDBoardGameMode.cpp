@@ -449,7 +449,7 @@ void ADDBoardGameMode::SortPlayersByTurnOrder()
 		{
 			if (BasePlayerState->PlayerGameData.TurnOrder < 0)
 			{
-				BasePlayerState->PlayerGameData.TurnOrder = i;
+				BasePlayerState->PlayerGameData.TurnOrder = i + 100;
 			}
 		}
 	}

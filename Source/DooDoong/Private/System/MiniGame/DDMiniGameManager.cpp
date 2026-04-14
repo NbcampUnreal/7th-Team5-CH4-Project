@@ -171,6 +171,12 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 	SetCurrentState(DDGameplayTags::State_MiniGame_Completed);
 	OnMiniGameResultCommitted.Broadcast(Result);
 	
+	for (const FMiniGameScoreEntry& Rank : Result.ScoreBoard)
+	{
+		ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(Rank.PlayerState);
+		PS->PlayerGameData.TurnOrder = Rank.Rank - 1;
+	}
+	
 	if (ReturnMapPackageName.IsEmpty())
 	{
 		ClearActiveSession();
