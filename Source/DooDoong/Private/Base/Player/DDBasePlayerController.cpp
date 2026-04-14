@@ -10,6 +10,7 @@
 #include "Common/DDLogManager.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
+#include "UI/Inventory/DDInventoryComponent.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 
 ADDBasePlayerController::ADDBasePlayerController()
@@ -30,6 +31,8 @@ void ADDBasePlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(DefaultIMC, 0);
 	}
+	
+	InventoryComponent = FindComponentByClass<UDDInventoryComponent>();
 	
 }
 
@@ -69,6 +72,16 @@ void ADDBasePlayerController::SetupInputComponent()
 			ETriggerEvent::Started,
 			this,
 			&ThisClass::OnMouseClick,
+			true
+		);
+		
+		// Bind Inven InputActor
+		DDInputComponent->BindNativeAction(
+			InputConfig,
+			DDGameplayTags::Input_Native_Inventory,
+			ETriggerEvent::Started,
+			this,
+			&ThisClass::ToggleInventoryMenu,
 			true
 		);
 		
@@ -220,5 +233,11 @@ void ADDBasePlayerController::Input_AbilityReleased(FGameplayTag InputTag)
 			DDASC->AbilityInputTagReleased(InputTag);
 		}
 	}
+}
+
+void ADDBasePlayerController::ToggleInventoryMenu()
+{
+	if (!InventoryComponent.IsValid()) return;
+	InventoryComponent->ToggleInventory();
 }
 

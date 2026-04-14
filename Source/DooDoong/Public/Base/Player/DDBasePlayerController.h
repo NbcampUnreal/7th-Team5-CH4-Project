@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "DDBasePlayerController.generated.h"
 
+class UDDInventoryComponent;
 struct FInputActionValue;
 
 class UInputMappingContext;
@@ -56,7 +57,9 @@ protected:
 	void Input_AbilityPressed(FGameplayTag InputTag);
 
 	void Input_AbilityReleased(FGameplayTag InputTag);
-
+	
+	void ToggleInventoryMenu();
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UDDInputConfig> InputConfig;
 
@@ -66,4 +69,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> BoardGameIMC;
 	
+private:
+	TWeakObjectPtr<UDDInventoryComponent> InventoryComponent;
 };

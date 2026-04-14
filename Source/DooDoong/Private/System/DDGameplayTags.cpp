@@ -7,6 +7,7 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Move, "Input.Native.Move");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Look, "Input.Native.Look");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Click, "Input.Native.Click");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Inventory, "Input.Native.Inventory");
 	
 	// Ability Input Tags 
 	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_Jump, "Input.Ability.Jump"); 
