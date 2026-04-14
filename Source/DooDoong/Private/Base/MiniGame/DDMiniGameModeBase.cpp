@@ -440,7 +440,7 @@ void ADDMiniGameModeBase::UpdateReadyState()
 
 		FMiniGameReadyEntry ReadyEntry;
 		ReadyEntry.PlayerId = Participant.PlayerId;
-		ReadyEntry.PlayerName = Participant.PlayerState != nullptr ? Participant.PlayerState->GetPlayerName() : FString();
+		ReadyEntry.DisplayName = Participant.DisplayName;
 		ReadyEntry.bReady = bIsReady;
 		ReadyEntries.Add(ReadyEntry);
 	}
