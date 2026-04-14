@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "DDInvenGridSlot.generated.h"
 
+struct FItemTableRow;
+class UTextBlock;
 class UImage;
 class UButton;
 class UDDItemUseButtonWidget;
@@ -16,8 +18,9 @@ class DOODOONG_API UDDInvenGridSlot : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void SetItemInfo(UTexture2D* Image) const;
+	void SetItemInfo(FItemTableRow* ItemTableRow);
 	
+	void UpdateItemInfo(const TMap<FName, int32>& InventoryItemData);
 protected:
 	virtual void NativeConstruct() override;
 	
@@ -26,10 +29,13 @@ protected:
 	
 private:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UButton> BT_UseItem;
+	TObjectPtr<UButton> BT_ClickItem;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_ItemIcon;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> TextBlock_ItemCount;
 	
 	UPROPERTY()
 	TObjectPtr<UDDItemUseButtonWidget> ItemUseButtonWidget;
@@ -37,9 +43,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
 	TSubclassOf<UDDItemUseButtonWidget> ItemUseButtonWidgetClass;
 	
-	int32 ItemID;
-	
-	/* 버튼동작확인 임시 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "GridSlot|Bool", meta=(AllowPrivateAccess = true))
+	FName ItemName;
+	int32 ItemCount;
 	bool bCanUse;
 };
