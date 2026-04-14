@@ -13,6 +13,7 @@ void ADDBoardGameCharacter::InitLocation()
 {
 	ADDBasePlayerState* BasePlayerState = GetPlayerState<ADDBasePlayerState>();
 	if (!BasePlayerState) return;
+	if (BasePlayerState->StartTileName == FName("Tile01")) return; // 최초 시작 시 건너 뜀
 	if (BasePlayerState->CurrentTile)
 	{
 		LOG_CYS(Warning, TEXT("[BC]SetActorLocation"));
