@@ -17,19 +17,16 @@ void UItemActionComponent::BeginItemAction(FName ItemID, const FItemTableRow& It
 	ActiveItemType = ItemRow.ItemType;
 	ActiveItemAbility = ItemRow.ItemAbility;
 	
-	switch (CurrentActionMode)
+	switch (ActiveItemType)
 	{
-	case EItemActionMode::Instant:
-		CurrentActionMode = EItemActionMode::Instant;
-		ConfirmItemAction();
+	case DDGameplayTags::Item_Activate_Instant:
+		StartInstantAction();
 		return;
-	case EItemActionMode::Targeting:
-		CurrentActionMode = EItemActionMode::Targeting;
-		TryActivateItem();
+	case DDGameplayTags::Item_Activate_Targeting:
+		StartTargetingAction();
 		return;
-	case EItemActionMode::Range:
-		CurrentActionMode = EItemActionMode::Range;
-		TryActivateItem();
+	case DDGameplayTags::Item_Activate_Range:
+		StartRangeAction();
 		return;
 	default:
 		break;
@@ -38,27 +35,24 @@ void UItemActionComponent::BeginItemAction(FName ItemID, const FItemTableRow& It
 	CancelItemAction();
 }
 
-void UItemActionComponent::TryActivateItem()
-{
-	if (CurrentActionMode == EItemActionMode::Targeting)
-	{
-		//TODO 타게팅 관련 카메라이동 모드 활성화
-		
-		return;
-	}
-	
-	if (CurrentActionMode == EItemActionMode::Range)
-	{
-		//TODO 범위 표시 관련 모드 활성화
-		
-		return;
-	}
-	
-}
-
 void UItemActionComponent::ConfirmItemAction()
 {
-	// TODO 아이템 사용을 Confirm
+	switch (CurrentActionMode)
+	{
+	case EItemActionMode::Instant:
+		// 인스턴트 아이템 확정을 서버에 요청해야할듯. Ability가 Attribute를 변화시킴. ServerOnly.
+		break;
+
+	case EItemActionMode::Targeting:
+		// 
+		break;
+
+	case EItemActionMode::Range:
+		//
+		break;
+	default:
+		break;
+	}
 }
 
 void UItemActionComponent::CancelItemAction()
@@ -66,6 +60,36 @@ void UItemActionComponent::CancelItemAction()
 	// TODO 아이템 사용을 Cancel
 	
 	// TODO 다시 인벤토리 창 띄우기
+}
+
+void UItemActionComponent::StartInstantAction()
+{
+	CurrentActionMode = EItemActionMode::Instant;
+	ConfirmItemAction();
+}
+
+void UItemActionComponent::StartTargetingAction()
+{
+	CurrentActionMode = EItemActionMode::Targeting;
+	
+	CandidateTargets.Reset();
+	SelectedTargetIndex = INDEX_NONE;
+	
+	//TODO 모든 플레이어 컨트롤러슬 순회해서 Owner와 비교해서 다르면 후보자로 추가해야할 것 같음.
+	
+	if (CandidateTargets.IsEmpty())
+	{
+		CancelItemAction();
+		return;
+	}
+	
+	// 첫 번째 타겟을 한 번 지정.
+	SelectedTargetIndex = 0;
+}
+
+void UItemActionComponent::StartRangeAction()
+{
+	CurrentActionMode = EItemActionMode::Range;
 }
 
 void UItemActionComponent::BuildTargetCandidates()

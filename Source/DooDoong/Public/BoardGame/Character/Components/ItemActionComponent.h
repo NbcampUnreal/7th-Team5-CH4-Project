@@ -27,21 +27,21 @@ public:
 public:
 	void BeginItemAction(FName ItemID, const FItemTableRow& ItemRow);
 	
-	void TryActivateItem();
-	
 	void ConfirmItemAction();
 	
 	void CancelItemAction();
+	
+protected:
+	void StartInstantAction();
+	void StartTargetingAction();
+	void StartRangeAction();
 	
 protected:
 	void BuildTargetCandidates();
 	void SelectNextTarget();
 	void SelectPreviousTarget();
 	
-protected:
-	UPROPERTY()
-	TObjectPtr<UDataTable> ItemData;	
-	
+protected:	
 	UPROPERTY()
 	EItemActionMode CurrentActionMode = EItemActionMode::None;
 	
