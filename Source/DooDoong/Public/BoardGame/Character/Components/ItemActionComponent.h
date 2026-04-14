@@ -25,21 +25,38 @@ public:
 	UItemActionComponent();
 	
 public:
+	/** 아이템 사용 시작지점 */
 	void BeginItemAction(FName ItemID, const FItemTableRow& ItemRow);
 	
+	/** 최종적으로 아이템을 사용 == 아이템의 어빌리티를 실행, 아이템 수 감소 */
 	void ConfirmItemAction();
 	
+	/** 아이템 사용을 취소하고 인벤토리 창을 다시 띄움 */
 	void CancelItemAction();
 	
 protected:
+	/** 즉시사용 아이템 액션 */
 	void StartInstantAction();
+	
+	/** 타게팅 아이템 액션 */
 	void StartTargetingAction();
+	
+	/** 범위 아이템 액션 */
 	void StartRangeAction();
 	
 protected:
+	/** 타겟 후보 대상을 순회해서 지정해주는 헬퍼 */
 	void BuildTargetCandidates();
+	
+	/** 다음 타겟 선택 */
 	void SelectNextTarget();
+	/** 이전 타겟 선택 */
 	void SelectPreviousTarget();
+	/** Index를 원형으로 순회할 수 있도록 하는 계산 헬퍼 */
+	void ChangeTarget(int32 Offset);
+	
+	/** 아이템 액션값들을 초기화 */
+	void ResetItemAction();
 	
 protected:	
 	UPROPERTY()

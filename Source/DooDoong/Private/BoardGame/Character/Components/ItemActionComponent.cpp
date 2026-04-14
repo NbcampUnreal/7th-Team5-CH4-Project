@@ -91,6 +91,8 @@ void UItemActionComponent::StartTargetingAction()
 void UItemActionComponent::StartRangeAction()
 {
 	CurrentActionMode = EItemActionMode::Range;
+	
+	// TODO 범위를 표시하고, 해당 범위 내의 플레이어를 순회해서 Owner와 비교한 뒤 후보자에 추가
 }
 
 void UItemActionComponent::BuildTargetCandidates()
@@ -100,10 +102,37 @@ void UItemActionComponent::BuildTargetCandidates()
 
 void UItemActionComponent::SelectNextTarget()
 {
-	// TODO E를 누르면 다음 타겟으로 이동. 이동 텀이 있어야함. 0.5f초
+	ChangeTarget(1);
 }
 
 void UItemActionComponent::SelectPreviousTarget()
 {
-	// TODO Q를 누르면 이전 타겟으로 이동
+	ChangeTarget(-1);
+}
+
+void UItemActionComponent::ChangeTarget(int32 Offset)
+{
+	if (CurrentActionMode != EItemActionMode::Targeting)
+	{
+		return;
+	}
+	
+	if (CandidateTargets.IsEmpty())
+	{
+		return;
+	}
+	
+	// 목록을 원형으로 순환하기 위한 계산 : (현재인덱스 + 방향 + 목록사이즈) % 목록사이즈
+	// -1 방향으로도 가기 때문에 Index가 음수가 되지 않기 위해서 사이즈를 한 번 더함
+	SelectedTargetIndex = (SelectedTargetIndex + Offset + CandidateTargets.Num()) % CandidateTargets.Num();
+}
+
+void UItemActionComponent::ResetItemAction()
+{
+	CurrentActionMode = EItemActionMode::None;
+	ActiveItemID = NAME_None;
+	ActiveItemType = FGameplayTag();
+	ActiveItemAbility = nullptr;
+	CandidateTargets.Reset();
+	SelectedTargetIndex = INDEX_NONE;
 }
