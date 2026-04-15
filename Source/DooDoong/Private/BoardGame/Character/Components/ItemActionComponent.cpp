@@ -1,6 +1,7 @@
 ﻿#include "BoardGame/Character/Components/ItemActionComponent.h"
 
 #include "AbilitySystemComponent.h"
+#include "EngineUtils.h"
 #include "Abilities/GameplayAbility.h"
 #include "GameplayTagContainer.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
@@ -206,16 +207,10 @@ void UItemActionComponent::BuildTargetCandidates()
 	}
 	
 	// 월드의 플레이어 컨트롤러를 순회해서 해당 컨트롤러의 Pawn을 OwnerCharacter와 비교한 뒤 다른 Pawn만 후보자로 추가
-	for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
+	for (TActorIterator<ADDBoardGameCharacter> It(World); It; ++It)
 	{
-		APlayerController* PlayerController = It->Get();
-		if (!PlayerController)
-		{
-			continue;
-		}
-		
-		ADDBoardGameCharacter* CandidateCharacter = Cast<ADDBoardGameCharacter>(PlayerController->GetPawn());
-		if (!CandidateCharacter)
+		ADDBoardGameCharacter* CandidateCharacter = *It;
+		if (!CandidateCharacter || CandidateCharacter == OwnerCharacter)
 		{
 			continue;
 		}
