@@ -16,6 +16,12 @@ UItemActionComponent::UItemActionComponent()
 
 void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 {
+	if (IsItemActionActive())
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 이미 아이템 액션 중입니다."));
+		return;
+	}
+	
 	ActiveItemID = ItemRow.ItemID;
 	ActiveItemType = ItemRow.ItemType;
 	ActiveItemAbility = ItemRow.ItemAbility;
@@ -75,7 +81,11 @@ void UItemActionComponent::ConfirmItemAction()
 
 void UItemActionComponent::CancelItemAction()
 {
-	// TODO 카메라가 이동되어 있다면 원상복구하고, 범위표시가 있다면 제거하고, 다시 인벤토리 창 띄우기....
+	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 : %s"), *ActiveItemID.ToString());
+	
+	Server_FocusItemTarget(GetOwner());
+	
+	// TODO 범위표시가 있다면 제거하고, 다시 인벤토리 창 띄우기....	
 	
 	ResetItemAction();
 }
@@ -130,6 +140,8 @@ void UItemActionComponent::StartTargetingAction()
 	SelectedTargetIndex = INDEX_NONE;
 	
 	BuildTargetCandidates();
+	
+	LOG_JJH(Warning, TEXT("[아이템 액션] 타겟 후보 수 : %d"), CandidateTargets.Num());
 	
 	if (CandidateTargets.IsEmpty())
 	{
