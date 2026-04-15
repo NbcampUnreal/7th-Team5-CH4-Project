@@ -27,10 +27,19 @@ void ADDBoardGameMode::BeginPlay()
 	// 시작할 때 미리 캐싱
     CachedBoardGameState = GetGameState<ADDBoardGameState>();
 
-    // 캐싱 확인 (로그)
-    if (!CachedBoardGameState)
+    if (CachedBoardGameState)
     {
-        UE_LOG(LogTemp, Error, TEXT("DDBoardGameState 캐싱 실패!"));
+        // [Bridge 패턴] GameInstance에서 GameState로 데이터 복사
+        if (UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance()))
+        {
+            CachedBoardGameState->CurrentRound = GameInstance->CurrentRound;
+            CachedBoardGameState->MaxTrophy = GameInstance->MaxTrophy;
+            CachedBoardGameState->MaxRound = GameInstance->MaxRound;
+        }
+    }
+    else
+    {
+        LOG_CJH(Log, TEXT("DDBoardGameState 캐싱 실패!"));
     }
 	
 	LOG_CJH(Log, TEXT("[BeginPlay] 보드게임 맵 진입 완료. 메인 타이머 시작."));
@@ -72,6 +81,11 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 			CachedBoardGameState->StateTimer--;
 			LOG_CJH(Log, TEXT("현재 턴 남은 시간: %d"), CachedBoardGameState->StateTimer);
 
+			if (GetNetMode() != NM_DedicatedServer)
+			{
+				CachedBoardGameState->OnStateTimerChanged.Broadcast(CachedBoardGameState->StateTimer);
+			}
+			
 			if (CachedBoardGameState->StateTimer == 0)
 			{
 				LOG_CJH(Log, TEXT("[TimeOut] 턴 제한 시간 초과! 다음 플레이어로 턴을 강제 전환합니다."));
@@ -292,6 +306,10 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 		if (IsValid(GameInstance))
 		{
 			GameInstance->CurrentRound++;
+			if (CachedBoardGameState)
+			{
+				CachedBoardGameState->CurrentRound = GameInstance->CurrentRound;
+			}
 			LOG_CJH(Log, TEXT("모든 플레이어의 턴 종료. 라운드를 넘깁니다."));
 		}
 
