@@ -11,6 +11,7 @@ struct FInputActionValue;
 
 class UInputMappingContext;
 class UDDInputConfig;
+class UItemActionComponent;
 
 UCLASS()
 class DOODOONG_API ADDBasePlayerController : public APlayerController
@@ -61,9 +62,29 @@ protected:
 	void Input_AbilityPressed(FGameplayTag InputTag);
 
 	void Input_AbilityReleased(FGameplayTag InputTag);
+
+protected:
+	/** 주현 : ItemActionComponent 관련 */
 	
+	/** 다음 타겟 선택 */
+	void Input_ItemNextTarget();
+
+	/** 이전 타겟 선택 */
+	void Input_ItemPreviousTarget();
+
+	/** 아이템 사용 확정 */
+	void Input_ItemConfirm();
+
+	/** 아이템 사용 취소 */
+	void Input_ItemCancel();
+
+	/** 아이템 액션 컴포넌트를 매번 가져올 때 방어코드 작성하는게 코드를 지저분하게 만들어서 만든 헬퍼 */
+	UItemActionComponent* GetItemActionComponentFromPawn() const;
+	
+protected:
 	void ToggleInventoryMenu();
 	
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UDDInputConfig> InputConfig;
 

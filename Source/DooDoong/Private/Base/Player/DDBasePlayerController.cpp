@@ -8,6 +8,7 @@
 #include "BoardGame/DDSelectableTileActor.h"
 #include "BoardGame/Abilities/DDMoveTileStepTask.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
+#include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
@@ -83,6 +84,42 @@ void ADDBasePlayerController::SetupInputComponent()
 			ETriggerEvent::Started,
 			this,
 			&ThisClass::ToggleInventoryMenu,
+			true
+		);
+
+		DDInputComponent->BindNativeAction(
+			InputConfig,
+			DDGameplayTags::Input_Native_ItemNextTarget,
+			ETriggerEvent::Started,
+			this,
+			&ThisClass::Input_ItemNextTarget,
+			true
+		);
+
+		DDInputComponent->BindNativeAction(
+			InputConfig,
+			DDGameplayTags::Input_Native_ItemPreviousTarget,
+			ETriggerEvent::Started,
+			this,
+			&ThisClass::Input_ItemPreviousTarget,
+			true
+		);
+
+		DDInputComponent->BindNativeAction(
+			InputConfig,
+			DDGameplayTags::Input_Native_ItemConfirm,
+			ETriggerEvent::Started,
+			this,
+			&ThisClass::Input_ItemConfirm,
+			true
+		);
+
+		DDInputComponent->BindNativeAction(
+			InputConfig,
+			DDGameplayTags::Input_Native_ItemCancel,
+			ETriggerEvent::Started,
+			this,
+			&ThisClass::Input_ItemCancel,
 			true
 		);
 		
@@ -227,6 +264,14 @@ void ADDBasePlayerController::Input_Look(const FInputActionValue& Value)
 
 void ADDBasePlayerController::Input_AbilityPressed(FGameplayTag InputTag)
 {
+	if (UItemActionComponent* ItemActionComponent = GetItemActionComponentFromPawn())
+	{
+		if (ItemActionComponent->IsItemActionActive())
+		{
+			return;
+		}
+	}
+
 	if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(GetPawn()))
 	{
 		if (UDDAbilitySystemComponent* DDASC = Cast<UDDAbilitySystemComponent>(ASI->GetAbilitySystemComponent()))
@@ -245,6 +290,56 @@ void ADDBasePlayerController::Input_AbilityReleased(FGameplayTag InputTag)
 			DDASC->AbilityInputTagReleased(InputTag);
 		}
 	}
+}
+
+void ADDBasePlayerController::Input_ItemNextTarget()
+{
+	if (UItemActionComponent* ItemActionComponent = GetItemActionComponentFromPawn())
+	{
+		if (ItemActionComponent->IsItemActionActive())
+		{
+			ItemActionComponent->SelectNextTarget();
+		}
+	}
+}
+
+void ADDBasePlayerController::Input_ItemPreviousTarget()
+{
+	if (UItemActionComponent* ItemActionComponent = GetItemActionComponentFromPawn())
+	{
+		if (ItemActionComponent->IsItemActionActive())
+		{
+			ItemActionComponent->SelectPreviousTarget();
+		}
+	}
+}
+
+void ADDBasePlayerController::Input_ItemConfirm()
+{
+	if (UItemActionComponent* ItemActionComponent = GetItemActionComponentFromPawn())
+	{
+		if (ItemActionComponent->IsItemActionActive())
+		{
+			ItemActionComponent->ConfirmItemAction();
+		}
+	}
+}
+
+void ADDBasePlayerController::Input_ItemCancel()
+{
+	if (UItemActionComponent* ItemActionComponent = GetItemActionComponentFromPawn())
+	{
+		if (ItemActionComponent->IsItemActionActive())
+		{
+			ItemActionComponent->CancelItemAction();
+		}
+	}
+}
+
+UItemActionComponent* ADDBasePlayerController::GetItemActionComponentFromPawn() const
+{
+	const APawn* ControlledPawn = GetPawn();
+	return ControlledPawn ? ControlledPawn->FindComponentByClass<UItemActionComponent>() : nullptr;
 }
 
 void ADDBasePlayerController::ToggleInventoryMenu()
