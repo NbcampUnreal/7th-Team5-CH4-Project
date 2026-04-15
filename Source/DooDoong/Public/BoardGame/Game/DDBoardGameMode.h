@@ -42,25 +42,16 @@ protected:
 	/** 메인 게임 루프 타이머 관리 핸들 */
 	FTimerHandle MainTimerHandle;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="각 턴당 주어지는 최대 제한 시간"))
-	int32 MaxStateTimer = 30;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="현재 상태에서 남은 제한 시간"))
-	int32 StateTimer = 0;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="현재 누구의 턴인지 추적하는 인덱스"))
 	int32 CurrentTurnPlayerIndex = 0;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameData", meta=(DisplayName="우승에 필요한 목표 트로피 개수"))
-	int32 MaxTrophy = 1;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameData", meta=(DisplayName="게임이 종료되는 최대 라운드 수"))
-	int32 MaxRound = 10;
-
 	UPROPERTY(EditDefaultsOnly, Category = "GameData", meta=(DisplayName="N초 대기 후 다음 턴 넘기기"))
-	int32 TurnTransitionTimer = 3.0f;
+	float TurnTransitionTimer = 3.0f;
 
 	FTimerHandle TurnTransitionTimerHandle;
+	
+	UPROPERTY()
+    class ADDBoardGameState* CachedBoardGameState;
 
 private:
 	FGameplayTagContainer CurrentAppliedTags;
