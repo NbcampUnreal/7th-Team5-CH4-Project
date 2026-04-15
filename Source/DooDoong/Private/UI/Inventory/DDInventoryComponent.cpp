@@ -15,7 +15,7 @@
 UDDInventoryComponent::UDDInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	
+	SetIsReplicatedByDefault(true);
 }
 
 
@@ -23,9 +23,10 @@ void UDDInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	ConstructInventory();
-	AddItem("HealingKit"); // 테스트용
-	AddItem("TargetingItem1");
 	
+	/* 테스트용 아이템추가 */
+	AddItem("HealingKit"); 
+	AddItem("TargetingItem1");
 }
 
 void UDDInventoryComponent::AddItem(FName ItemName)
