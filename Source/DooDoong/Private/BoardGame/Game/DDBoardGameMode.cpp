@@ -159,6 +159,15 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 		}
 
 		LOG_CYS(Warning, TEXT("[GM] 보드게임 전체 초기화 완료"));
+
+		UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
+
+		if (IsValid(GameInstance) && GameInstance->CurrentRound == 1)
+		{
+			//1라운드 시퀀서 재생 지시
+			LOG_CYS(Warning, TEXT("1라운드 인트로 시퀀서 재생해라"));
+			//GameStateBase->Multicast_PlaySequence();
+		}
 		CheckWinCondition();
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
@@ -233,6 +242,7 @@ void ADDBoardGameMode::Logout(AController* Exiting)
     }
 
     Super::Logout(Exiting);
+	Super::Logout(Exiting);
 }
 
 void ADDBoardGameMode::CheckWinCondition()
@@ -321,6 +331,7 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 			}
 		}
 		
+
 		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PlayerController);
 		if (i == CurrentTurnPlayerIndex)
 		{
