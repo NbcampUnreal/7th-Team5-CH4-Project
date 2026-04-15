@@ -145,7 +145,8 @@ void ADDTile::OnCharacterArrived(ADDBoardGameCharacter* Character) const
 	switch (TileData.TileType)
 	{
 	case ETileType::Goal:
-		// TODO: 게임모드에 알림, 게임 승리 판정
+		// 트로피 획득
+		Tag = DDGameplayTags::Tile_Ability_Goal;
 		LOG_CYS(Warning, TEXT("[Tile] OnCharacterArrived Goal!!"), *Tag.ToString());
 		break;
 		
