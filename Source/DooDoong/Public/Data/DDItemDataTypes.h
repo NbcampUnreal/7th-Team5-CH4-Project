@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataTable.h"
 #include "DDItemDataTypes.generated.h"
 
@@ -14,6 +15,10 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	/** 아이템 ID */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName ItemID;
+	
+	/** 아이템 타입 태그 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag ItemType;
 	
 	/** 표시될 아이템 이름 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -33,10 +38,5 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	
 	/** 아이템을 사용하면 갈아끼울 메쉬 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UStaticMesh> StaticMesh;
-	
-	/** 메쉬로 갈아끼우는게 불가능하면 액터를 붙히는 방식으로 교체 예정
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<AActor> MeshActor;
-	*/
+	TSubclassOf<AActor> DisplayActor;
 };

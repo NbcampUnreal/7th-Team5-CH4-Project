@@ -8,6 +8,10 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Look, "Input.Native.Look");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Click, "Input.Native.Click");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Inventory, "Input.Native.Inventory");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Native_ItemNextTarget, "Input.Native.ItemNextTarget");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Native_ItemPreviousTarget, "Input.Native.ItemPreviousTarget");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Native_ItemConfirm, "Input.Native.ItemConfirm");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Native_ItemCancel, "Input.Native.ItemCancel");
 	
 	// Ability Input Tags 
 	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_Jump, "Input.Ability.Jump"); 
@@ -88,5 +92,14 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_Moving, "State.TurnPhase.Moving", "보드판 이동 중 (모든 조작 불가)");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_SelectTile, "State.TurnPhase.SelectTile", "이동 중 타일 선택 (마우스 허용)");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_TurnPhase_Event, "State.TurnPhase.Event", "이동 완료 후 (상점 이용 및 트로피 획득 판정 중)");
+	
+	// 아이템 타입 태그
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Instant, "Item.Activate.Instant", "즉시사용 아이템");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Targeting, "Item.Activate.Targeting", "타게팅 아이템");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Range, "Item.Activate.Range", "범위 아이템");
+	
+	// 아이템 액션 상태 태그
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Targeting, "State.ItemAction.Targeting", "아이템 타겟 선택 중");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Range, "State.ItemAction.Range", "아이템 범위 표시/선택 중");
 }
 

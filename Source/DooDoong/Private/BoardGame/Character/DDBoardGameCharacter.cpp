@@ -2,11 +2,13 @@
 #include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/DDDiceActor.h"
 #include "BoardGame/DDTile.h"
+#include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
 
 ADDBoardGameCharacter::ADDBoardGameCharacter()
 {
+	ItemActionComp = CreateDefaultSubobject<UItemActionComponent>(TEXT("ItemActionComp"));
 }
 
 void ADDBoardGameCharacter::InitLocation()

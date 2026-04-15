@@ -4,6 +4,8 @@
 #include "Base/Character/DDBaseCharacter.h"
 #include "DDBoardGameCharacter.generated.h"
 
+class UDDInventoryComponent;
+class UItemActionComponent;
 class UDDMoveTileStepTask;
 class UDDBoardGameAttributeSet;
 class UDDHealthSet;
@@ -55,6 +57,11 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category="Object")
 	TSubclassOf<class AActor> SelectableActorClass;
+	
+protected:
+	/** 주현 : ItemActionComp 추가 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Comp")
+	TObjectPtr<UItemActionComponent> ItemActionComp;
 	
 private:
 	FVector MoveStartLocation;

@@ -10,6 +10,10 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Look);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Click);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Inventory);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemNextTarget);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemPreviousTarget);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemConfirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemCancel);
 	
 	// Ability Input Tags 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Jump);
@@ -91,4 +95,13 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_Moving);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_SelectTile);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_TurnPhase_Event);
+	
+	// 아이템 타입 태그
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Instant);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Targeting);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Range);
+	
+	// 아이템 액션 상태 태그
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Targeting);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Range);
 }
