@@ -53,14 +53,6 @@ public:
 	
 	FItemTableRow* GetItemData(FName RowName) const;
 	
-
-	/* 클라이언트 전용 복제 변수 */
-	UPROPERTY(ReplicatedUsing=OnRep_ClientInventoryData)
-	TArray<FInventoryItemReplicator> ClientInventoryData;
-	
-	UFUNCTION()
-	void OnRep_ClientInventoryData();	
-	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category= "Inventory|Data")
 	TObjectPtr<UDataTable> ItemDataTable;
