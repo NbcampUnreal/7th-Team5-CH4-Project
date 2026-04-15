@@ -50,7 +50,7 @@ private:
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "GameSettings", meta=(DisplayName="보드게임 맵 경로"))
-	FString BaseGameMapPath = TEXT("/Game/DooDoong/Map/L_BaseGame?listen");
+	FString BaseGameMapPath = TEXT("/Game/DooDoong/Map/L_BoardMap?listen");
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "GameSettings|Color", meta=(DisplayName="기본 플레이어 색상 목록"))
