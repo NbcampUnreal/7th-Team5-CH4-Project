@@ -19,5 +19,9 @@ public:
 		const FGameplayEventData* TriggerEventData) override;
 	
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GiveBomb")
+	TSubclassOf<UGameplayEffect> DamageEffect;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GiveBomb")
+	float Damage;
 };
