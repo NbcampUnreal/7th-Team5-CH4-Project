@@ -17,7 +17,7 @@ void UDDPointSet::PreAttributeChange(const FGameplayAttribute& Attribute, float&
 	
 	if (Attribute == GetCoinAttribute() || Attribute == GetTrophyAttribute()) 
 	{
-		NewValue = FMath::Max(NewValue, 1.0f);
+		NewValue = FMath::Max(NewValue, 0.0f);
 	}
 }
 
