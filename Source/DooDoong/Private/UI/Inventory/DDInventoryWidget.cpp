@@ -56,7 +56,7 @@ void UDDInventoryWidget::GenerationGrid()
 			int32 Index = i + j * Columns;
 			if (!InventoryComponent->ItemNames.IsValidIndex(Index)) return;
 			FName ItemName = InventoryComponent->ItemNames[Index];
-			FItemTableRow* ItemData = InventoryComponent->GetItemData(ItemName);
+			FItemTableRow& ItemData = *InventoryComponent->GetItemData(ItemName);
 			GridSlot->SetItemInfo(ItemData);
 			GridSlots.Add(GridSlot);
 		}
