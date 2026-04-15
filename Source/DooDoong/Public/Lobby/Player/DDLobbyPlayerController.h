@@ -26,6 +26,10 @@ public:
     UFUNCTION(Client, Reliable)
     void Client_ReceiveNicknameFailure(const FString& ErrorMessage);
 	
+	// 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_RequestReady(bool bIsReady); 
+	
 public:
 	// 입력 모드 토글 함수 (UIOnly <-> GameOnly) 
 	void ToggleUIInputMode(bool bUIOnly);	

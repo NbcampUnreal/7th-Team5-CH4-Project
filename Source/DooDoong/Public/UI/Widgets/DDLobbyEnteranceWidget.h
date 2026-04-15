@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "DDLobbyWidget.generated.h"
+#include "DDLobbyEnteranceWidget.generated.h"
 
 class UButton;
 class UEditableText;
 
 UCLASS()
-class DOODOONG_API UDDLobbyWidget : public UUserWidget
+class DOODOONG_API UDDLobbyEnteranceWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

@@ -1,7 +1,7 @@
 #include "Lobby/Player/DDLobbyPlayerController.h"
 #include "Lobby/Game/DDLobbyGameMode.h"
 #include "UI/HUD/DDHUD.h"
-#include "UI/Widgets/DDLobbyWidget.h"
+#include "UI/Widgets/DDLobbyEnteranceWidget.h"
 
 void ADDLobbyPlayerController::BeginPlay()
 {
@@ -50,11 +50,23 @@ void ADDLobbyPlayerController::Client_ReceiveNicknameFailure_Implementation(cons
 	if (!IsValid(LobbyHUD)) return;
 	
 	// 2. HUD가 관리중인 메인 위젯을 가져와서 실행 
-	if (UDDLobbyWidget* LobbyWidget = LobbyHUD->GetCurrentWidget<UDDLobbyWidget>())
+	if (UDDLobbyEnteranceWidget* LobbyWidget = LobbyHUD->GetCurrentWidget<UDDLobbyEnteranceWidget>())
 	{
 		LobbyWidget->OnNicknameSubmitResult(false, ErrorMessage);
 	}
 }
+
+bool ADDLobbyPlayerController::Server_RequestReady_Validate(bool bIsReady)
+{
+	return true; 
+}
+
+
+void ADDLobbyPlayerController::Server_RequestReady_Implementation(bool bIsReady)
+{
+	// 서버에다가 Ready 요청 
+}
+
 
 void ADDLobbyPlayerController::ToggleUIInputMode(bool bUIOnly)
 {

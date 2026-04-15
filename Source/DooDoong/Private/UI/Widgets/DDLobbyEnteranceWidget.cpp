@@ -1,10 +1,10 @@
-#include "UI/Widgets/DDLobbyWidget.h"
+#include "UI/Widgets/DDLobbyEnteranceWidget.h"
 #include "Components/Button.h"
 #include "Components/EditableText.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Lobby/Player/DDLobbyPlayerController.h"
 
-void UDDLobbyWidget::NativeConstruct()
+void UDDLobbyEnteranceWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -17,12 +17,12 @@ void UDDLobbyWidget::NativeConstruct()
 	PlayButton->SetIsEnabled(false);
 }
 
-void UDDLobbyWidget::OnNicknameTextChanged(const FText& Text)
+void UDDLobbyEnteranceWidget::OnNicknameTextChanged(const FText& Text)
 {
 	PlayButton->SetIsEnabled(!Text.IsEmpty());
 }
 
-void UDDLobbyWidget::OnNicknameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
+void UDDLobbyEnteranceWidget::OnNicknameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
 {
     if (CommitMethod == ETextCommit::OnEnter)
     {
@@ -33,7 +33,7 @@ void UDDLobbyWidget::OnNicknameTextCommitted(const FText& Text, ETextCommit::Typ
     }
 }
 
-void UDDLobbyWidget::OnNicknameSubmitResult(bool bSuccess, const FString& ErrorMessage)
+void UDDLobbyEnteranceWidget::OnNicknameSubmitResult(bool bSuccess, const FString& ErrorMessage)
 {
 	if (bSuccess)
     {
@@ -47,7 +47,7 @@ void UDDLobbyWidget::OnNicknameSubmitResult(bool bSuccess, const FString& ErrorM
     }
 }
 
-void UDDLobbyWidget::OnPlayButtonClicked()
+void UDDLobbyEnteranceWidget::OnPlayButtonClicked()
 {
 	ADDLobbyPlayerController* LobbyPlayerController = GetOwningPlayer<ADDLobbyPlayerController>();
 	if (IsValid(LobbyPlayerController))
@@ -60,7 +60,7 @@ void UDDLobbyWidget::OnPlayButtonClicked()
 	}
 }
 
-void UDDLobbyWidget::OnExitButtonClicked()
+void UDDLobbyEnteranceWidget::OnExitButtonClicked()
 {
 	UKismetSystemLibrary::QuitGame(
 		this,
