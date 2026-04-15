@@ -28,6 +28,8 @@ public:
 	
 	void ToggleInventory();
 	
+	void UseItem(const FName& ItemSlotName);
+	
 	UPROPERTY(VisibleAnywhere, Category= "Inventory|Items")
 	TMap<FName, int32> InventoryItems;
 	
