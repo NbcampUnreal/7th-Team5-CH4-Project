@@ -23,5 +23,5 @@ protected:
 	TSubclassOf<UGameplayEffect> DamageEffect;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GiveBomb")
-	float Damage;
+	float Damage = 20.f;
 };
