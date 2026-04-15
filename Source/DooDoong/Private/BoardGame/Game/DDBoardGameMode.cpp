@@ -191,9 +191,17 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 		{
 			//1라운드 시퀀서 재생 지시
 			LOG_CYS(Warning, TEXT("1라운드 인트로 시퀀서 재생해라"));
-			//GameStateBase->Multicast_PlaySequence();
+			ADDBoardGameState* GS = GetGameState<ADDBoardGameState>();
+			if (GS)
+			{
+				GS->Multicast_PlaySequence();
+				// 시퀀서 끝나면 GS에서 턴 지시함.
+			}
 		}
-		CheckWinCondition();
+		else
+		{
+			CheckWinCondition();
+		}
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
 	{
@@ -217,7 +225,7 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 					PS->StartTileName = PS->CurrentTile->TileRowName;
 
 					LOG_CYS(Log, TEXT("[RoundEnd] Save Tile: %s"),
-						*PS->StartTileName.ToString());
+					        *PS->StartTileName.ToString());
 				}
 				else
 				{

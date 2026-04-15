@@ -4,6 +4,7 @@
 #include "Base/Game/DDGameStateBase.h"
 #include "DDBoardGameState.generated.h"
 
+class ALevelSequenceActor;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateTimerChanged, int32, NewTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoundChanged, int32, NewRound);
 
@@ -16,6 +17,14 @@ public:
 	ADDBoardGameState();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void BeginPlay() override;
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlaySequence();
+	
+	UFUNCTION()
+	void OnSequenceFinished();
+	
 public:
 	// --- 동기화 데이터 (DDBoardGameMode에서 세팅) ---
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "GameData",
@@ -44,7 +53,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnRoundChanged OnRoundChanged;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ALevelSequenceActor* LevelSequenceActor;
+	
 protected:
 	UFUNCTION()
 	void OnRep_StateTimer();
