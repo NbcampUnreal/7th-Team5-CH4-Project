@@ -8,6 +8,7 @@
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
 #include "System/DDGameplayTags.h"
+#include "UI/Inventory/DDInventoryComponent.h"
 
 UItemActionComponent::UItemActionComponent()
 {
@@ -85,6 +86,8 @@ void UItemActionComponent::CancelItemAction()
 	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 : %s"), *ActiveItemID.ToString());
 	
 	Server_FocusItemTarget(GetOwner());
+	
+	RestoreCanceledItem(ActiveItemID);
 	
 	// TODO 범위표시가 있다면 제거하고, 다시 인벤토리 창 띄우기....
 	
@@ -307,6 +310,39 @@ bool UItemActionComponent::TryActivateItemAbility(FName ItemID, TSubclassOf<UGam
 	        *GetNameSafe(TargetActor));
 	
 	return true;
+}
+
+void UItemActionComponent::RestoreCanceledItem(FName ItemID)
+{
+	if (ItemID.IsNone())
+	{
+		return;
+	}
+	
+	const ADDBoardGameCharacter* OwnerCharacter = Cast<ADDBoardGameCharacter>(GetOwner());
+	if (!OwnerCharacter)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 취소 아이템 복구 실패: OwnerCharacter가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return;
+	}
+	
+	AController* OwnerController = OwnerCharacter->GetController();
+	if (!OwnerController)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 취소 아이템 복구 실패: Controller가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return;
+	}
+	
+	UDDInventoryComponent* InventoryComponent = OwnerController->FindComponentByClass<UDDInventoryComponent>();
+	if (!InventoryComponent)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 취소 아이템 복구 실패: InventoryComponent가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return;
+	}
+	
+	// InventoryComponent가 BeginItemAction 호출 전에 수량을 1개 선차감하므로, 취소 시 다시 1개를 더한다.
+	InventoryComponent->AddItem(ItemID);
+	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 아이템 복구 : %s"), *ItemID.ToString());
 }
 
 void UItemActionComponent::ResetItemAction()

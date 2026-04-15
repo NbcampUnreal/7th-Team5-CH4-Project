@@ -88,6 +88,9 @@ protected:
 
 	/** 서버에서 아이템 Ability를 1회성으로 부여하고 실행 */
 	bool TryActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
+
+	/** 취소 시 인벤토리에서 선차감한 아이템 수량을 복구 */
+	void RestoreCanceledItem(FName ItemID);
 	
 	/** 아이템 액션값들을 초기화 */
 	void ResetItemAction();
