@@ -5,21 +5,43 @@
 #include "UI/Inventory/DDItemUseButtonWidget.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Data/DDItemDataTypes.h"
 
 void UDDInvenGridSlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	if (BT_UseItem)
+	if (BT_ClickItem)
 	{
-		BT_UseItem->OnClicked.AddDynamic(this, &UDDInvenGridSlot::UseItem);
-		BT_UseItem->SetIsEnabled(bCanUse);
+		BT_ClickItem->OnClicked.AddDynamic(this, &UDDInvenGridSlot::UseItem);
 	}
 }
 
-void UDDInvenGridSlot::SetItemInfo(UTexture2D* Image) const
+void UDDInvenGridSlot::SetItemInfo(FItemTableRow* ItemTableRow)
 {
-	Image_ItemIcon->SetBrushFromTexture(Image);
+	// ItemTable 가져와서 처음 아이콘 이랑 아이템ID 설정
+	if (ItemTableRow == nullptr) return;
+	UTexture2D* ItemIcon = ItemTableRow->Icon.LoadSynchronous();
+	Image_ItemIcon->SetBrushFromTexture(ItemIcon);
+	ItemName = ItemTableRow->ItemID;
+}
+
+void UDDInvenGridSlot::UpdateItemInfo(const TMap<FName, int32>& InventoryItemData)
+{
+	// 인벤토리 열릴때마다 인벤토리내부 데이터 전달받아서 아이템이름확인하고 갯수맞춰주기
+	for (const TPair<FName, int32>& ItemPair : InventoryItemData)
+	{
+		if (ItemName == ItemPair.Key)
+		{
+			ItemCount = ItemPair.Value;
+		}
+	}
+	
+	if (ItemCount > 0)
+	{
+		bCanUse = true;
+	}
+	BT_ClickItem->SetIsEnabled(bCanUse);
 }
 
 void UDDInvenGridSlot::UseItem()

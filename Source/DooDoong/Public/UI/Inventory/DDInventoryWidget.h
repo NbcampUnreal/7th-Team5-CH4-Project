@@ -4,15 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "DDInventory.generated.h"
+#include "DDInventoryWidget.generated.h"
 
+class UDDInventoryComponent;
 class UCanvasPanel;
 class UDDInvenGridSlot;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
 
 UCLASS()
-class DOODOONG_API UDDInventory : public UUserWidget
+class DOODOONG_API UDDInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
@@ -20,23 +21,27 @@ public:
 	
 	virtual void NativeConstruct() override;
 	
+	void RefreshGrid();
 private:
-	void ConstructGrid();
+	void GenerationGrid();
 	
-	/* 인벤토리 슬롯 */
-	/*UPROPERTY()
-	TArray<TObjectPtr<UDDInvenGridSlot>> GridSlots;*/
+	/* 인벤토리 그리드 슬롯 */
+	UPROPERTY()
+	TArray<UDDInvenGridSlot*> GridSlots;
+	
+	/* 인벤토리 컴포넌트 */
+	UPROPERTY()
+	TObjectPtr<UDDInventoryComponent> InventoryComponent;
 
 	/* 인벤토리 슬롯 클래스 */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	TSubclassOf<UDDInvenGridSlot> GridSlotClass;
 	
+	/* 캔버스 패널 */
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
-	TArray<UTexture2D*> ItemIcons;
-	
+	/* 인벤토리 슬롯개수*/
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	int32 Rows;
 	

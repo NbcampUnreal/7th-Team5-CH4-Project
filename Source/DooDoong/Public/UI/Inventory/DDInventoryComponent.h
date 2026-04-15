@@ -5,7 +5,10 @@
 #include "Components/ActorComponent.h"
 #include "DDInventoryComponent.generated.h"
 
-class UDDInventory;
+class UDDItemUseButtonWidget;
+struct FItemTableRow;
+class UDataTable;
+class UDDInventoryWidget;
 class ADDBasePlayerController;
 class UDDInventoryBase;
 
@@ -21,7 +24,21 @@ public:
 	virtual void BeginPlay() override;
 	
 public:
-	void AddItem();
+	void AddItem(FName ItemName);
+	
+	void ToggleInventory();
+	
+	UPROPERTY(VisibleAnywhere, Category= "Inventory|Items")
+	TMap<FName, int32> InventoryItems;
+	
+	UPROPERTY(VisibleAnywhere, Category= "Inventory|Items")
+	TArray<FName> ItemNames;
+	
+	FItemTableRow* GetItemData(FName RowName) const;
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category= "Inventory|Data")
+	TObjectPtr<UDataTable> ItemDataTable;
 	
 private:
 	TWeakObjectPtr<ADDBasePlayerController> OwningController;
@@ -29,9 +46,13 @@ private:
 	void ConstructInventory();
 	
 	UPROPERTY()
-	TObjectPtr<UDDInventory> InventoryWidget;
+	TObjectPtr<UDDInventoryWidget> InventoryWidget;
 	
 	UPROPERTY(EditDefaultsOnly, Category= "Inventory")
-	TSubclassOf<UDDInventory> InventoryWidgetClass;
+	TSubclassOf<UDDInventoryWidget> InventoryWidgetClass;
+	
+	bool bInventoryOpen;
+	void OpenInventory();
+	void CloseInventory();
 	
 };
