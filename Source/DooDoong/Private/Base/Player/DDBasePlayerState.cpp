@@ -55,15 +55,45 @@ void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);
 
-	if (ADDBasePlayerState* NewPlayerState = Cast<ADDBasePlayerState>(PlayerState))
-	{
-		// 커스텀 데이터 복제
-		NewPlayerState->PlayerGameData.PlayerDisplayName = this->PlayerGameData.PlayerDisplayName;
-		NewPlayerState->PlayerGameData.PlayerColor = this->PlayerGameData.PlayerColor;
-		NewPlayerState->bIsParticipant = this->bIsParticipant;
-		NewPlayerState->PlayerGameData.TurnOrder = this->PlayerGameData.TurnOrder;
-		NewPlayerState->StartTileName = this->StartTileName; 
-	}
+if (ADDBasePlayerState* NewPlayerState = Cast<ADDBasePlayerState>(PlayerState))
+    {
+       // ========================================================
+       // 1. 일반 변수 및 구조체 복사
+       // ========================================================
+       NewPlayerState->PlayerGameData.PlayerDisplayName = this->PlayerGameData.PlayerDisplayName;
+       NewPlayerState->PlayerGameData.PlayerColor = this->PlayerGameData.PlayerColor;
+       NewPlayerState->PlayerGameData.TurnOrder = this->PlayerGameData.TurnOrder;
+       NewPlayerState->PlayerGameData.SlotIndex = this->PlayerGameData.SlotIndex;
+       NewPlayerState->PlayerGameData.bPlayerIsDead = this->PlayerGameData.bPlayerIsDead;
+       
+       NewPlayerState->bIsParticipant = this->bIsParticipant;
+       NewPlayerState->StartTileName = this->StartTileName; 
+       
+       // ========================================================
+       // 2. GAS AttributeSet 깊은 복사
+       // ========================================================
+       
+       // [DDHealthSet 복사]
+       if (this->HealthSet && NewPlayerState->HealthSet)
+       {
+           NewPlayerState->HealthSet->SetHealth(this->HealthSet->GetHealth());
+           NewPlayerState->HealthSet->SetMaxHealth(this->HealthSet->GetMaxHealth());
+       }
+
+       // [DDPointSet 복사]
+       if (this->PointSet && NewPlayerState->PointSet)
+       {
+           NewPlayerState->PointSet->SetTrophy(this->PointSet->GetTrophy());
+           NewPlayerState->PointSet->SetCoin(this->PointSet->GetCoin());
+       }
+
+       // [DDMovementSet 복사]
+       if (this->MovementSet && NewPlayerState->MovementSet)
+       {
+           NewPlayerState->MovementSet->SetMoveSpeed(this->MovementSet->GetMoveSpeed());
+           NewPlayerState->MovementSet->SetJumpSpeed(this->MovementSet->GetJumpSpeed());
+       }
+    }
 }
 
 void ADDBasePlayerState::InitTile()
