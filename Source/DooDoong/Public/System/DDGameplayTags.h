@@ -40,6 +40,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Point_Trophy);
 
 	// Ability Tile Event Tags
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Goal);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Coin);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Item);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tile_Ability_Move);
