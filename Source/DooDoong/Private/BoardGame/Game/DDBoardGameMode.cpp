@@ -14,6 +14,7 @@
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "GameplayEffect.h"
 #include "BoardGame/DDTile.h"
+#include "BoardGame/Game/DDBoardGameState.h"
 
 ADDBoardGameMode::ADDBoardGameMode()
 {
@@ -22,6 +23,25 @@ ADDBoardGameMode::ADDBoardGameMode()
 void ADDBoardGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// 시작할 때 미리 캐싱
+    CachedBoardGameState = GetGameState<ADDBoardGameState>();
+
+    if (CachedBoardGameState)
+    {
+        // [Bridge 패턴] GameInstance에서 GameState로 데이터 복사
+        if (UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance()))
+        {
+            CachedBoardGameState->CurrentRound = GameInstance->CurrentRound;
+            CachedBoardGameState->MaxTrophy = GameInstance->MaxTrophy;
+            CachedBoardGameState->MaxRound = GameInstance->MaxRound;
+        }
+    }
+    else
+    {
+        LOG_CJH(Log, TEXT("DDBoardGameState 캐싱 실패!"));
+    }
+	
 	LOG_CJH(Log, TEXT("[BeginPlay] 보드게임 맵 진입 완료. 메인 타이머 시작."));
 	GetWorld()->GetTimerManager().SetTimer(MainTimerHandle, this, &ThisClass::OnMainTimerElapsed, 1.f, true);
 }
@@ -56,12 +76,17 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 
 	if (GameStateBase->MatchStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
 	{
-		if (StateTimer > 0)
+		if (CachedBoardGameState->StateTimer > 0)
 		{
-			StateTimer--;
-			LOG_CJH(Log, TEXT("현재 턴 남은 시간: %d"), StateTimer);
+			CachedBoardGameState->StateTimer--;
+			LOG_CJH(Log, TEXT("현재 턴 남은 시간: %d"), CachedBoardGameState->StateTimer);
 
-			if (StateTimer == 0)
+			if (GetNetMode() != NM_DedicatedServer)
+			{
+				CachedBoardGameState->OnStateTimerChanged.Broadcast(CachedBoardGameState->StateTimer);
+			}
+			
+			if (CachedBoardGameState->StateTimer == 0)
 			{
 				LOG_CJH(Log, TEXT("[TimeOut] 턴 제한 시간 초과! 다음 플레이어로 턴을 강제 전환합니다."));
 				CurrentTurnPlayerIndex++;
@@ -71,10 +96,10 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 	}
 	else if (GameStateBase->MatchStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
 	{
-		if (StateTimer > 0)
+		if (CachedBoardGameState->StateTimer > 0)
 		{
-			StateTimer--;
-			if (StateTimer == 0)
+			CachedBoardGameState->StateTimer--;
+			if (CachedBoardGameState->StateTimer == 0)
 			{
 				LOG_CJH(Log, TEXT("[Travel] 대기 시간 종료. 미니게임을 시작합니다."));
 
@@ -171,7 +196,7 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
 	{
-		StateTimer = 3;
+		CachedBoardGameState->StateTimer = 3;
 		LOG_CJH(Log, TEXT("[라운드 종료] 3초 뒤 미니게임으로 이동합니다."));
 		// 현재 타일 위치 시작 위치로 초기화
 		for (APlayerController* PC : AlivePlayerControllers)
@@ -249,7 +274,7 @@ void ADDBoardGameMode::CheckWinCondition()
 	{
 		if (ADDBasePlayerState* BasePlayerState = Cast<ADDBasePlayerState>(PlayerState))
 		{
-			if (BasePlayerState->GetPointSet() && BasePlayerState->GetPointSet()->GetTrophy() >= MaxTrophy)
+			if (BasePlayerState->GetPointSet() && BasePlayerState->GetPointSet()->GetTrophy() >= CachedBoardGameState->MaxTrophy)
 			{
 				LOG_CJH(Log, TEXT("목표 트로피 도달자 발생! (닉네임: %s)"),
 				        *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString());
@@ -259,7 +284,7 @@ void ADDBoardGameMode::CheckWinCondition()
 		}
 	}
 
-	if (bHasTrophyWinner || GameInstance->CurrentRound > MaxRound)
+	if (bHasTrophyWinner || GameInstance->CurrentRound > CachedBoardGameState->MaxRound)
 	{
 		LOG_CJH(Log, TEXT("[CheckWinCondition] 게임 종료 조건 충족. Ending 페이즈로 전환합니다."));
 		SetMatchState(DDGameplayTags::State_BoardGame_Ending);
@@ -281,6 +306,10 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 		if (IsValid(GameInstance))
 		{
 			GameInstance->CurrentRound++;
+			if (CachedBoardGameState)
+			{
+				CachedBoardGameState->CurrentRound = GameInstance->CurrentRound;
+			}
 			LOG_CJH(Log, TEXT("모든 플레이어의 턴 종료. 라운드를 넘깁니다."));
 		}
 
@@ -322,17 +351,21 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 		}
 		
 		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PlayerController);
-		if (i == CurrentTurnPlayerIndex)
+		if (IsValid(DDPC))
 		{
-			DDPC->Client_SetMouseCursorVisible(true);
-			StateTimer = MaxStateTimer;
-			LOG_CJH(Log, TEXT("▶ [%d]번 플레이어 턴 시작! (제한시간 %d초)"), i, MaxStateTimer);
-			SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
+			if (i == CurrentTurnPlayerIndex)
+			{
+				DDPC->Client_SetMouseCursorVisible(true);
+				CachedBoardGameState->StateTimer = CachedBoardGameState->MaxStateTimer;
+				LOG_CJH(Log, TEXT("▶ [%d]번 플레이어 턴 시작! (제한시간 %d초)"), i, CachedBoardGameState->MaxStateTimer);
+				SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
+			}
+			else
+			{
+				DDPC->Client_SetMouseCursorVisible(false);
+			}
 		}
-		else
-		{
-			DDPC->Client_SetMouseCursorVisible(false);
-		}
+
 	}
 
 	Super::FocusAllCamerasOnTarget(ActivePawn);
@@ -342,12 +375,12 @@ void ADDBoardGameMode::NotifyDiceRolled()
 {
 	LOG_CJH(Log, TEXT("[Notify] 주사위 굴림. BeforeDice를 제거하고 Moving 페이즈로 전환."));
 	SetTurnPhase(DDGameplayTags::State_TurnPhase_Moving);
-	StateTimer = -1;
+	CachedBoardGameState->StateTimer = -1;
 }
 
 void ADDBoardGameMode::NotifyMovementFinished()
 {
-	LOG_CJH(Log, TEXT("[Notify] 이동 완료. Moving 태그를 제거하고 %d초 뒤 턴을 넘깁니다."), TurnTransitionTimer);
+	LOG_CJH(Log, TEXT("[Notify] 이동 완료. Moving 태그를 제거하고 %.0f초 뒤 턴을 넘깁니다."), TurnTransitionTimer);
 	SetTurnPhase(FGameplayTag::EmptyTag);
 	GetWorldTimerManager().SetTimer(TurnTransitionTimerHandle, this, &ThisClass::ExecuteNextTurnTransition,
 	                                TurnTransitionTimer, false);
@@ -367,7 +400,7 @@ void ADDBoardGameMode::HandleRespawn(AController* TargetController)
 
 void ADDBoardGameMode::ExecuteNextTurnTransition()
 {
-	LOG_CJH(Log, TEXT("[Timer] %d초 대기 완료. 다음 플레이어로 턴을 전환합니다."), TurnTransitionTimer);
+	LOG_CJH(Log, TEXT("[Timer] %.0f초 대기 완료. 다음 플레이어로 턴을 전환합니다."), TurnTransitionTimer);
 	CurrentTurnPlayerIndex++;
 	SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 }
@@ -428,7 +461,7 @@ void ADDBoardGameMode::CalculateFinalWinner()
 				float CurrentTrophy = BasePlayerState->GetPointSet()->GetTrophy();
 				float CurrentCoin = BasePlayerState->GetPointSet()->GetCoin();
 
-				LOG_CJH(Log, TEXT(" - 참여자 [%s] | 트로피: %f | 코인: %f"),
+				LOG_CJH(Log, TEXT(" - 참여자 [%s] | 트로피: %.0f | 코인: %.0f"),
 				        *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString(), CurrentTrophy, CurrentCoin);
 
 				if (CurrentTrophy > HighestTrophy)

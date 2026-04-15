@@ -13,8 +13,7 @@ void ADDLobbyPlayerController::BeginPlay()
 
 bool ADDLobbyPlayerController::Server_SubmitNickname_Validate(const FName& InNickname)
 {
-	// 닉네임 길이 검사 
-	return !InNickname.IsNone() && InNickname.ToString().Len() <= 12;
+	return true;
 }
 
 void ADDLobbyPlayerController::Server_SubmitNickname_Implementation(const FName& InNickname)

@@ -100,10 +100,14 @@ void ADDBasePlayerState::UpdateCharacterVisuals()
 	{
 		USkeletalMeshComponent* Mesh = Character->GetMesh();
 
-		UMaterialInstanceDynamic* DynMaterial = Mesh->CreateDynamicMaterialInstance(0);
-		if (DynMaterial)
+		if (!CachedColorMaterial || Mesh->GetMaterial(0) != CachedColorMaterial)
+        {
+            CachedColorMaterial = Mesh->CreateDynamicMaterialInstance(0);
+        }
+		
+		if (CachedColorMaterial)
 		{
-			DynMaterial->SetVectorParameterValue(TEXT("PlayerColor"), PlayerGameData.PlayerColor);
+			CachedColorMaterial->SetVectorParameterValue(TEXT("PlayerColor"), PlayerGameData.PlayerColor);
 		}
 	}
 }

@@ -97,4 +97,8 @@ public:
     void OnRep_PlayerGameData();
 	
 	void UpdateCharacterVisuals();
+	
+protected:
+	UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> CachedColorMaterial;
 };

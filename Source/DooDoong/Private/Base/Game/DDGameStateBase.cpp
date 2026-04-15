@@ -3,6 +3,11 @@
 #include "BoardGame/DDTileManager.h"
 #include "Kismet/GameplayStatics.h"
 
+ADDGameStateBase::ADDGameStateBase()
+{
+	bReplicates = true;
+}
+
 void ADDGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();

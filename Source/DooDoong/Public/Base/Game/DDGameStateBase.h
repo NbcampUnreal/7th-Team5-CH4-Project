@@ -13,6 +13,7 @@ class DOODOONG_API ADDGameStateBase : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+	ADDGameStateBase();
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

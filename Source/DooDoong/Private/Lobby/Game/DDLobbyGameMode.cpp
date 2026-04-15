@@ -73,10 +73,9 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(ADDLobbyPlayerController* Reque
 		return false; 
 	}
 	
-	if (!IsNicknameAvailable(Nickname))
+	if (!IsNicknameAvailable(Nickname, ErrorMessage))
 	{
-		ErrorMessage = TEXT("중복된 닉네임 입니다."); 
-		return false; 
+		return false;
 	}
 	
 	ADDBasePlayerState* PS = Requester->GetPlayerState<ADDBasePlayerState>();
@@ -119,7 +118,7 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(ADDLobbyPlayerController* Reque
 	return true; 
 }
 
-bool ADDLobbyGameMode::IsNicknameAvailable(const FName& InNickname) const
+bool ADDLobbyGameMode::IsNicknameAvailable(const FName& InNickname, FString& ErrorMessage) const
 {
 	if (!IsValid(GameState)) return false;  
 	
@@ -128,9 +127,17 @@ bool ADDLobbyGameMode::IsNicknameAvailable(const FName& InNickname) const
 		ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(PS);
 		if (DDPS && DDPS->PlayerGameData.PlayerDisplayName == InNickname)
 		{
-			LOG_KMS(Warning, TEXT("중복된 닉네임입니다."));
+			ErrorMessage = TEXT("중복된 닉네임입니다.");
 			return false; 
 		}
+		
+		if (InNickname.IsNone() || InNickname.ToString().Len() > 6)
+		{
+			ErrorMessage = TEXT("닉네임은 1자 이상, 6자 이하로 입력해주세요.");
+			return false;
+		}
+		
+		
 	}
 	
 	return true; 
