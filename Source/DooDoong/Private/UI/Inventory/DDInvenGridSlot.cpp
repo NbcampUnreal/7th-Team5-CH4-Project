@@ -17,13 +17,12 @@ void UDDInvenGridSlot::NativeConstruct()
 	}
 }
 
-void UDDInvenGridSlot::SetItemInfo(FItemTableRow* ItemTableRow)
+void UDDInvenGridSlot::SetItemInfo(const FItemTableRow& ItemTableRow)
 {
 	// ItemTable 가져와서 처음 아이콘 이랑 아이템ID 설정
-	if (ItemTableRow == nullptr) return;
-	UTexture2D* ItemIcon = ItemTableRow->Icon.LoadSynchronous();
+	UTexture2D* ItemIcon = ItemTableRow.Icon.LoadSynchronous();
 	Image_ItemIcon->SetBrushFromTexture(ItemIcon);
-	ItemName = ItemTableRow->ItemID;
+	ItemName = ItemTableRow.ItemID;
 }
 
 void UDDInvenGridSlot::UpdateItemInfo(const TMap<FName, int32>& InventoryItemData)
@@ -41,6 +40,10 @@ void UDDInvenGridSlot::UpdateItemInfo(const TMap<FName, int32>& InventoryItemDat
 	{
 		bCanUse = true;
 	}
+	else
+	{
+		bCanUse = false;
+	}
 	BT_ClickItem->SetIsEnabled(bCanUse);
 }
 
@@ -50,5 +53,6 @@ void UDDInvenGridSlot::UseItem()
 	if (ItemUseButtonWidget)
 	{
 		ItemUseButtonWidget->AddToViewport();
+		ItemUseButtonWidget->InitializeGridSlotData(ItemName);
 	}
 }
