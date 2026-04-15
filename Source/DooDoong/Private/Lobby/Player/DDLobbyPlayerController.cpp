@@ -18,13 +18,6 @@ bool ADDLobbyPlayerController::Server_SubmitNickname_Validate(const FName& InNic
 
 void ADDLobbyPlayerController::Server_SubmitNickname_Implementation(const FName& InNickname)
 {
-	if (InNickname.IsNone() || InNickname.ToString().Len() > 6)
-	{
-		Client_ReceiveNicknameFailure(TEXT("닉네임은 1자 이상, 6자 이하로 입력해주세요."));
-		return;
-	}
-	
-	
 	ADDLobbyGameMode* LobbyGameMode = GetWorld()->GetAuthGameMode<ADDLobbyGameMode>();
 	if (!IsValid(LobbyGameMode)) return; 
 	

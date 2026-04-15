@@ -22,7 +22,7 @@ public:
 	bool TryRegisterPlayerNickname(ADDLobbyPlayerController* Requester, const FName& Nickname, FString& ErrorMessage);
 	
 	/** 닉네임 중복 여부 확인 */
-	bool IsNicknameAvailable(const FName& InNickname) const;
+	bool IsNicknameAvailable(const FName& InNickname, FString& ErrorMessage) const;
 	
 	void SetPlayerAsSpectator(APlayerController* InPlayerController);
 	
