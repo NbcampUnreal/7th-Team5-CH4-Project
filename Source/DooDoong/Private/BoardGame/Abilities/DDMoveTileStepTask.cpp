@@ -109,7 +109,7 @@ void UDDMoveTileStepTask::SpawnSelectableActors(const TArray<ADDTile*>& Tiles)
 	for (ADDTile* Tile : Tiles)
 	{
 		FVector Loc = Tile->GetActorLocation();
-		Loc.Z += 50.f;
+		Loc.Z += 250.f;
 
 		ADDSelectableTileActor* Actor =
 			GetWorld()->SpawnActor<ADDSelectableTileActor>(Character->SelectableActorClass, Loc, FRotator::ZeroRotator);
