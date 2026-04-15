@@ -14,9 +14,9 @@ UItemActionComponent::UItemActionComponent()
 	SetIsReplicatedByDefault(true);
 }
 
-void UItemActionComponent::BeginItemAction(FName ItemID, const FItemTableRow& ItemRow)
+void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 {
-	ActiveItemID = ItemID;
+	ActiveItemID = ItemRow.ItemID;
 	ActiveItemType = ItemRow.ItemType;
 	ActiveItemAbility = ItemRow.ItemAbility;
 	
@@ -99,16 +99,19 @@ void UItemActionComponent::Server_FocusItemTarget_Implementation(AActor* TargetA
 void UItemActionComponent::Server_ConfirmInstantItem_Implementation(FName ItemID)
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 즉시사용 아이템 액션 : %s"), *ItemID.ToString());
+	//TODO 사용까지 구현
 }
 
 void UItemActionComponent::Server_ConfirmTargetingItem_Implementation(FName ItemID, AActor* TargetActor)
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 액션 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
+	//TODO 사용까지 구현
 }
 
 void UItemActionComponent::Server_ConfirmRangeItem_Implementation(FName ItemID)
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 범위 아이템 액션 : %s"), *ItemID.ToString());
+	//TODO 사용까지 구현
 }
 
 void UItemActionComponent::StartInstantAction()
@@ -119,6 +122,9 @@ void UItemActionComponent::StartInstantAction()
 
 void UItemActionComponent::StartTargetingAction()
 {
+	
+	LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 액션 시작"));
+	
 	CurrentActionMode = EItemActionMode::Targeting;
 	ApplyItemActionTag();
 	SelectedTargetIndex = INDEX_NONE;
@@ -247,11 +253,11 @@ void UItemActionComponent::ApplyItemActionTag()
 	
 	if (CurrentActionMode == EItemActionMode::Targeting)
 	{
-		AbilitySystemComp->AddLooseGameplayTag(DDGameplayTags::Item_Activate_Targeting);
+		AbilitySystemComp->AddLooseGameplayTag(DDGameplayTags::State_ItemAction_Targeting);
 	}
 	else if (CurrentActionMode == EItemActionMode::Range)
 	{
-		AbilitySystemComp->AddLooseGameplayTag(DDGameplayTags::Item_Activate_Range);
+		AbilitySystemComp->AddLooseGameplayTag(DDGameplayTags::State_ItemAction_Range);
 	}
 }
 
@@ -269,6 +275,6 @@ void UItemActionComponent::RemoveItemActionTag()
 		return;
 	}
 	
-	AbilitySystemComp->RemoveLooseGameplayTag(DDGameplayTags::Item_Activate_Targeting);
-	AbilitySystemComp->RemoveLooseGameplayTag(DDGameplayTags::Item_Activate_Range);
+	AbilitySystemComp->RemoveLooseGameplayTag(DDGameplayTags::State_ItemAction_Targeting);
+	AbilitySystemComp->RemoveLooseGameplayTag(DDGameplayTags::State_ItemAction_Range);
 }

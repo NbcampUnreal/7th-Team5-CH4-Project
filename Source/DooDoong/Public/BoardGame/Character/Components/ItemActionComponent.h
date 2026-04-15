@@ -27,7 +27,7 @@ public:
 public:
 	/** 아이템 사용 시작지점 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
-	void BeginItemAction(FName ItemID, const FItemTableRow& ItemRow);
+	void BeginItemAction(const FItemTableRow& ItemRow);
 	
 	/** 최종적으로 아이템을 사용 == 아이템의 어빌리티를 실행, 아이템 수 감소 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
