@@ -1,12 +1,14 @@
 ﻿#include "BoardGame/Character/Components/ItemActionComponent.h"
 
 #include "AbilitySystemComponent.h"
+#include "Abilities/GameplayAbility.h"
 #include "GameplayTagContainer.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "BoardGame/Game/DDBoardGameMode.h"
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
 #include "System/DDGameplayTags.h"
+#include "UI/Inventory/DDInventoryComponent.h"
 
 UItemActionComponent::UItemActionComponent()
 {
@@ -16,6 +18,12 @@ UItemActionComponent::UItemActionComponent()
 
 void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 {
+	if (IsItemActionActive())
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 이미 아이템 액션 중입니다."));
+		return;
+	}
+	
 	ActiveItemID = ItemRow.ItemID;
 	ActiveItemType = ItemRow.ItemType;
 	ActiveItemAbility = ItemRow.ItemAbility;
@@ -52,20 +60,20 @@ void UItemActionComponent::ConfirmItemAction()
 	switch (CurrentActionMode)
 	{
 	case EItemActionMode::Instant:
-		Server_ConfirmInstantItem(ActiveItemID);
+		Server_ConfirmInstantItem(ActiveItemID, ActiveItemAbility);
 		ResetItemAction();
 		break;
 
 	case EItemActionMode::Targeting:
 		if (AActor* TargetActor = GetSelectedTarget())
 		{
-			Server_ConfirmTargetingItem(ActiveItemID, TargetActor);
+			Server_ConfirmTargetingItem(ActiveItemID, ActiveItemAbility, TargetActor);
 			ResetItemAction();
 		}
 		break;
 
 	case EItemActionMode::Range:
-		Server_ConfirmRangeItem(ActiveItemID);
+		Server_ConfirmRangeItem(ActiveItemID, ActiveItemAbility);
 		ResetItemAction();
 		break;
 	default:
@@ -75,7 +83,13 @@ void UItemActionComponent::ConfirmItemAction()
 
 void UItemActionComponent::CancelItemAction()
 {
-	// TODO 카메라가 이동되어 있다면 원상복구하고, 범위표시가 있다면 제거하고, 다시 인벤토리 창 띄우기....
+	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 : %s"), *ActiveItemID.ToString());
+	
+	Server_FocusItemTarget(GetOwner());
+	
+	RestoreCanceledItem(ActiveItemID);
+	
+	// TODO 범위표시가 있다면 제거하고, 다시 인벤토리 창 띄우기....
 	
 	ResetItemAction();
 }
@@ -96,22 +110,45 @@ void UItemActionComponent::Server_FocusItemTarget_Implementation(AActor* TargetA
 	BoardGameMode->FocusAllCamerasOnTarget(TargetActor);
 }
 
-void UItemActionComponent::Server_ConfirmInstantItem_Implementation(FName ItemID)
+void UItemActionComponent::Server_ConfirmInstantItem_Implementation(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility)
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 즉시사용 아이템 액션 : %s"), *ItemID.ToString());
-	//TODO 사용까지 구현
+	
+	if (!TryActivateItemAbility(ItemID, ItemAbility, nullptr))
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 즉시사용 아이템 Ability 실행 실패 : %s"), *ItemID.ToString());
+		return;
+	}
 }
 
-void UItemActionComponent::Server_ConfirmTargetingItem_Implementation(FName ItemID, AActor* TargetActor)
+void UItemActionComponent::Server_ConfirmTargetingItem_Implementation(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 액션 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
-	//TODO 사용까지 구현
+	
+	if (!IsValid(TargetActor))
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 TargetActor가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return;
+	}
+	
+	if (!TryActivateItemAbility(ItemID, ItemAbility, TargetActor))
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 Ability 실행 실패 : %s"), *ItemID.ToString());
+		return;
+	}
 }
 
-void UItemActionComponent::Server_ConfirmRangeItem_Implementation(FName ItemID)
+void UItemActionComponent::Server_ConfirmRangeItem_Implementation(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility)
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 범위 아이템 액션 : %s"), *ItemID.ToString());
-	//TODO 사용까지 구현
+	
+	if (!TryActivateItemAbility(ItemID, ItemAbility, nullptr))
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 범위 아이템 Ability 실행 실패 : %s"), *ItemID.ToString());
+		return;
+	}
+	
+	// TODO 범위 내 대상 목록을 EventData에 담는 방식이 정해지면 TargetActor 대신 TargetData 구조로 확장
 }
 
 void UItemActionComponent::StartInstantAction()
@@ -130,6 +167,8 @@ void UItemActionComponent::StartTargetingAction()
 	SelectedTargetIndex = INDEX_NONE;
 	
 	BuildTargetCandidates();
+	
+	LOG_JJH(Warning, TEXT("[아이템 액션] 타겟 후보 수 : %d"), CandidateTargets.Num());
 	
 	if (CandidateTargets.IsEmpty())
 	{
@@ -223,6 +262,87 @@ AActor* UItemActionComponent::GetSelectedTarget() const
 	return CandidateTargets.IsValidIndex(SelectedTargetIndex)
 		       ? CandidateTargets[SelectedTargetIndex].Get()
 		       : nullptr;
+}
+
+bool UItemActionComponent::TryActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
+{
+	if (!ItemAbility)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] ItemAbility가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return false;
+	}
+	
+	ADDBoardGameCharacter* OwnerCharacter = Cast<ADDBoardGameCharacter>(GetOwner());
+	if (!OwnerCharacter)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] OwnerCharacter가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return false;
+	}
+	
+	UAbilitySystemComponent* AbilitySystemComp = OwnerCharacter->GetAbilitySystemComponent();
+	if (!AbilitySystemComp)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] AbilitySystemComponent가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return false;
+	}
+	
+	// 타게팅 아이템 Ability는 EventData->Target에서 선택 대상을 읽으면 되는 방식.
+	FGameplayEventData EventData;
+	EventData.EventTag = DDGameplayTags::Event_Item_Activate;
+	EventData.Instigator = OwnerCharacter;
+	EventData.Target = TargetActor;
+	EventData.OptionalObject = this;
+	
+	FGameplayAbilitySpec AbilitySpec(ItemAbility, 1, INDEX_NONE, this);
+	// 아이템 Ability는 사용 시점에 1회성으로 부여하고 즉시 실행
+	const FGameplayAbilitySpecHandle ActivatedHandle = AbilitySystemComp->GiveAbilityAndActivateOnce(AbilitySpec, &EventData);
+	if (!ActivatedHandle.IsValid())
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] GiveAbilityAndActivateOnce 실패. ItemID: %s, Ability: %s"),
+		        *ItemID.ToString(),
+		        *GetNameSafe(ItemAbility.Get()));
+		return false;
+	}
+	
+	LOG_JJH(Warning, TEXT("[아이템 액션] Ability 실행 성공. ItemID: %s, Ability: %s, Target: %s"),
+	        *ItemID.ToString(),
+	        *GetNameSafe(ItemAbility.Get()),
+	        *GetNameSafe(TargetActor));
+	
+	return true;
+}
+
+void UItemActionComponent::RestoreCanceledItem(FName ItemID)
+{
+	if (ItemID.IsNone())
+	{
+		return;
+	}
+	
+	const ADDBoardGameCharacter* OwnerCharacter = Cast<ADDBoardGameCharacter>(GetOwner());
+	if (!OwnerCharacter)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 취소 아이템 복구 실패: OwnerCharacter가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return;
+	}
+	
+	AController* OwnerController = OwnerCharacter->GetController();
+	if (!OwnerController)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 취소 아이템 복구 실패: Controller가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return;
+	}
+	
+	UDDInventoryComponent* InventoryComponent = OwnerController->FindComponentByClass<UDDInventoryComponent>();
+	if (!InventoryComponent)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] 취소 아이템 복구 실패: InventoryComponent가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		return;
+	}
+	
+	// InventoryComponent가 BeginItemAction 호출 전에 수량을 1개 선차감하므로, 취소 시 다시 1개를 더한다.
+	InventoryComponent->AddItem(ItemID);
+	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 아이템 복구 : %s"), *ItemID.ToString());
 }
 
 void UItemActionComponent::ResetItemAction()

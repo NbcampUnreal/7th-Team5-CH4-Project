@@ -56,15 +56,15 @@ public:
 
 	/** 즉시사용 아이템 액션 서버 RPC */
 	UFUNCTION(Server, Reliable)
-	void Server_ConfirmInstantItem(FName ItemID);
+	void Server_ConfirmInstantItem(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility);
 
 	/** 타게팅 아이템 액션 서버 RPC */
 	UFUNCTION(Server, Reliable)
-	void Server_ConfirmTargetingItem(FName ItemID, AActor* TargetActor);
+	void Server_ConfirmTargetingItem(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
 
 	/** 범위 아이템 액션 서버 RPC */
 	UFUNCTION(Server, Reliable)
-	void Server_ConfirmRangeItem(FName ItemID);
+	void Server_ConfirmRangeItem(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility);
 
 protected:
 	/** 즉시사용 아이템 액션 */
@@ -85,6 +85,12 @@ protected:
 
 	/** 선택된 타겟 Getter */
 	AActor* GetSelectedTarget() const;
+
+	/** 서버에서 아이템 Ability를 1회성으로 부여하고 실행 */
+	bool TryActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
+
+	/** 취소 시 인벤토리에서 선차감한 아이템 수량을 복구 */
+	void RestoreCanceledItem(FName ItemID);
 	
 	/** 아이템 액션값들을 초기화 */
 	void ResetItemAction();
