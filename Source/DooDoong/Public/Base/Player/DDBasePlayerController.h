@@ -6,11 +6,11 @@
 #include "GameFramework/PlayerController.h"
 #include "DDBasePlayerController.generated.h"
 
-class UDDInventoryComponent;
 struct FInputActionValue;
 
 class UInputMappingContext;
 class UDDInputConfig;
+class UDDInventoryComponent;
 class UItemActionComponent;
 
 UCLASS()
@@ -95,5 +95,6 @@ protected:
 	TObjectPtr<UInputMappingContext> BoardGameIMC;
 	
 private:
-	TWeakObjectPtr<UDDInventoryComponent> InventoryComponent;
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TObjectPtr<UDDInventoryComponent> InventoryComponent;
 };
