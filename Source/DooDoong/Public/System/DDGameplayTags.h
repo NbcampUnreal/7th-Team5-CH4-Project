@@ -10,6 +10,10 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Look);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Click);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Inventory);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemNextTarget);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemPreviousTarget);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemConfirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemCancel);
 	
 	// Ability Input Tags 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Jump);
