@@ -1,18 +1,21 @@
 ﻿
 #include "UI/Inventory/DDInventoryComponent.h"
 #include "UI/Inventory/DDInventoryWidget.h"
+#include "UI/Inventory/DDInventoryBase.h"
 
+#include "Base/Character/DDBaseCharacter.h"
 #include "Base/Player/DDBasePlayerController.h"
+
+#include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
-#include "UI/Inventory/DDInventoryBase.h"
 #include "UI/Inventory/DDItemUseButtonWidget.h"
 
 
 UDDInventoryComponent::UDDInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	
+	SetIsReplicatedByDefault(true);
 }
 
 
@@ -20,8 +23,10 @@ void UDDInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	ConstructInventory();
-	AddItem("HealingKit"); // 테스트용
 	
+	/* 테스트용 아이템추가 */
+	AddItem("HealingKit"); 
+	AddItem("TargetingItem1");
 }
 
 void UDDInventoryComponent::AddItem(FName ItemName)
@@ -33,8 +38,6 @@ void UDDInventoryComponent::AddItem(FName ItemName)
 			ItemPair.Value++;
 		}
 	}
-	
-	
 }
 
 void UDDInventoryComponent::ToggleInventory()
@@ -76,6 +79,23 @@ void UDDInventoryComponent::ConstructInventory()
 	InventoryWidget = CreateWidget<UDDInventoryWidget>(OwningController.Get(), InventoryWidgetClass);
 	InventoryWidget->AddToViewport();
 	CloseInventory();
+}
+
+void UDDInventoryComponent::UseItem(const FName& ItemSlotName)
+{
+	if (ItemSlotName.IsNone()) return;
+	for (TPair<FName,int32>& ItemPair : InventoryItems)
+	{
+		if (ItemPair.Key == ItemSlotName)
+		{
+			UItemActionComponent* ISC = OwningController->GetPawn()->FindComponentByClass<UItemActionComponent>();
+			if (!IsValid(ISC)) return;
+			FItemTableRow& CurrentItemDataRow = *GetItemData(ItemPair.Key);
+			ISC->BeginItemAction(CurrentItemDataRow);
+			ItemPair.Value--;
+			InventoryWidget->RefreshGrid();
+		}
+	}
 }
 
 void UDDInventoryComponent::OpenInventory()

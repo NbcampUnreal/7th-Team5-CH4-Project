@@ -18,7 +18,7 @@ class DOODOONG_API UDDInvenGridSlot : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void SetItemInfo(FItemTableRow* ItemTableRow);
+	void SetItemInfo(const FItemTableRow& ItemTableRow);
 	
 	void UpdateItemInfo(const TMap<FName, int32>& InventoryItemData);
 protected:

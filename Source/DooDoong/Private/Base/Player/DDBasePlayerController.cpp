@@ -17,7 +17,7 @@
 
 ADDBasePlayerController::ADDBasePlayerController()
 {
-	
+	InventoryComponent = CreateDefaultSubobject<UDDInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 void ADDBasePlayerController::BeginPlay()
@@ -33,8 +33,6 @@ void ADDBasePlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(DefaultIMC, 0);
 	}
-	
-	InventoryComponent = FindComponentByClass<UDDInventoryComponent>();
 	
 }
 
@@ -344,7 +342,7 @@ UItemActionComponent* ADDBasePlayerController::GetItemActionComponentFromPawn() 
 
 void ADDBasePlayerController::ToggleInventoryMenu()
 {
-	if (!InventoryComponent.IsValid()) return;
+	if (!InventoryComponent) return;
 	InventoryComponent->ToggleInventory();
 }
 
