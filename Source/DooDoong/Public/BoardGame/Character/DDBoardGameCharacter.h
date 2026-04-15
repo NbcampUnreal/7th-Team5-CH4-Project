@@ -59,6 +59,7 @@ public:
 	TSubclassOf<class AActor> SelectableActorClass;
 	
 protected:
+	/** 주현 : ItemActionComp 추가 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Comp")
 	TObjectPtr<UItemActionComponent> ItemActionComp;
 	

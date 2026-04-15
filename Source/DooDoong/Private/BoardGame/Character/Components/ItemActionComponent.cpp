@@ -79,6 +79,37 @@ void UItemActionComponent::CancelItemAction()
 	ResetItemAction();
 }
 
+void UItemActionComponent::Server_FocusItemTarget_Implementation(AActor* TargetActor)
+{
+	if (!IsValid(TargetActor))
+	{
+		return;
+	}
+
+	ADDBoardGameMode* BoardGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDBoardGameMode>() : nullptr;
+	if (!BoardGameMode)
+	{
+		return;
+	}
+
+	BoardGameMode->FocusAllCamerasOnTarget(TargetActor);
+}
+
+void UItemActionComponent::Server_ConfirmInstantItem_Implementation(FName ItemID)
+{
+	LOG_JJH(Warning, TEXT("[아이템 액션] 즉시사용 아이템 액션 : %s"), *ItemID.ToString());
+}
+
+void UItemActionComponent::Server_ConfirmTargetingItem_Implementation(FName ItemID, AActor* TargetActor)
+{
+	LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 액션 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
+}
+
+void UItemActionComponent::Server_ConfirmRangeItem_Implementation(FName ItemID)
+{
+	LOG_JJH(Warning, TEXT("[아이템 액션] 범위 아이템 액션 : %s"), *ItemID.ToString());
+}
+
 void UItemActionComponent::StartInstantAction()
 {
 	CurrentActionMode = EItemActionMode::Instant;
@@ -183,37 +214,6 @@ AActor* UItemActionComponent::GetSelectedTarget() const
 	return CandidateTargets.IsValidIndex(SelectedTargetIndex)
 		       ? CandidateTargets[SelectedTargetIndex].Get()
 		       : nullptr;
-}
-
-void UItemActionComponent::Server_FocusItemTarget_Implementation(AActor* TargetActor)
-{
-	if (!IsValid(TargetActor))
-	{
-		return;
-	}
-
-	ADDBoardGameMode* BoardGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDBoardGameMode>() : nullptr;
-	if (!BoardGameMode)
-	{
-		return;
-	}
-
-	BoardGameMode->FocusAllCamerasOnTarget(TargetActor);
-}
-
-void UItemActionComponent::Server_ConfirmInstantItem_Implementation(FName ItemID)
-{
-	LOG_JJH(Warning, TEXT("[아이템 액션] 즉시사용 아이템 액션 : %s"), *ItemID.ToString());
-}
-
-void UItemActionComponent::Server_ConfirmTargetingItem_Implementation(FName ItemID, AActor* TargetActor)
-{
-	LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 액션 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
-}
-
-void UItemActionComponent::Server_ConfirmRangeItem_Implementation(FName ItemID)
-{
-	LOG_JJH(Warning, TEXT("[아이템 액션] 범위 아이템 액션 : %s"), *ItemID.ToString());
 }
 
 void UItemActionComponent::ResetItemAction()
