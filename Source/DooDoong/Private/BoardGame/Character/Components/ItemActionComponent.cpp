@@ -1,5 +1,6 @@
 ﻿#include "BoardGame/Character/Components/ItemActionComponent.h"
 
+#include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "BoardGame/Game/DDBoardGameMode.h"
@@ -119,6 +120,7 @@ void UItemActionComponent::StartInstantAction()
 void UItemActionComponent::StartTargetingAction()
 {
 	CurrentActionMode = EItemActionMode::Targeting;
+	ApplyItemActionTag();
 	SelectedTargetIndex = INDEX_NONE;
 	
 	BuildTargetCandidates();
@@ -137,6 +139,7 @@ void UItemActionComponent::StartTargetingAction()
 void UItemActionComponent::StartRangeAction()
 {
 	CurrentActionMode = EItemActionMode::Range;
+	ApplyItemActionTag();
 	
 	// TODO 범위를 표시하고, 해당 범위 내의 플레이어를 순회해서 Owner와 비교한 뒤 후보자에 추가
 }
@@ -218,10 +221,54 @@ AActor* UItemActionComponent::GetSelectedTarget() const
 
 void UItemActionComponent::ResetItemAction()
 {
+	RemoveItemActionTag();
+	
 	CurrentActionMode = EItemActionMode::None;
 	ActiveItemID = NAME_None;
 	ActiveItemType = FGameplayTag();
 	ActiveItemAbility = nullptr;
 	CandidateTargets.Reset();
 	SelectedTargetIndex = INDEX_NONE;
+}
+
+void UItemActionComponent::ApplyItemActionTag()
+{
+	ADDBoardGameCharacter* OwnerCharacter = Cast<ADDBoardGameCharacter>(GetOwner());
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	
+	UAbilitySystemComponent* AbilitySystemComp = OwnerCharacter->GetAbilitySystemComponent();
+	if (!AbilitySystemComp)
+	{
+		return;
+	}
+	
+	if (CurrentActionMode == EItemActionMode::Targeting)
+	{
+		AbilitySystemComp->AddLooseGameplayTag(DDGameplayTags::Item_Activate_Targeting);
+	}
+	else if (CurrentActionMode == EItemActionMode::Range)
+	{
+		AbilitySystemComp->AddLooseGameplayTag(DDGameplayTags::Item_Activate_Range);
+	}
+}
+
+void UItemActionComponent::RemoveItemActionTag()
+{
+	ADDBoardGameCharacter* OwnerCharacter = Cast<ADDBoardGameCharacter>(GetOwner());
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	
+	UAbilitySystemComponent* AbilitySystemComp = OwnerCharacter->GetAbilitySystemComponent();
+	if (!AbilitySystemComp)
+	{
+		return;
+	}
+	
+	AbilitySystemComp->RemoveLooseGameplayTag(DDGameplayTags::Item_Activate_Targeting);
+	AbilitySystemComp->RemoveLooseGameplayTag(DDGameplayTags::Item_Activate_Range);
 }

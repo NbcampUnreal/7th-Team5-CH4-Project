@@ -89,6 +89,13 @@ protected:
 	/** 아이템 액션값들을 초기화 */
 	void ResetItemAction();
 	
+protected:
+	/** 아이템 액션 상태 태그 추가 */
+	void ApplyItemActionTag();
+	
+	/** 아이템 액션 상태 태그 제거 */
+	void RemoveItemActionTag();
+	
 protected:	
 	UPROPERTY()
 	EItemActionMode CurrentActionMode = EItemActionMode::None;
