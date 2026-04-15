@@ -96,4 +96,8 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Instant);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Targeting);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Range);
+	
+	// 아이템 액션 상태 태그
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Targeting);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Range);
 }
