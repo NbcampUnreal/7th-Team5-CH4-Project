@@ -32,6 +32,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_Start);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_End);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Shooter_Fire);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Activate);
 
 	// Data Tags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Health_Heal);
