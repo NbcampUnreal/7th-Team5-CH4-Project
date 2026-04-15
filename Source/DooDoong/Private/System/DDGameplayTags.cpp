@@ -38,6 +38,7 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Data_Point_Trophy, "Data.Point.Trophy");
 
 	// Ability Tile Event Tags
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tile_Ability_Goal, "Tile.Ability.Goal", "도착 이벤트 타일 어빌리티");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tile_Ability_Coin, "Tile.Ability.Coin", "코인 이벤트 타일 어빌리티");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tile_Ability_Item, "Tile.Ability.Item", "아이템 이벤트 타일 어빌리티");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tile_Ability_Move, "Tile.Ability.Move", "이동 이벤트 타일 어빌리티");
