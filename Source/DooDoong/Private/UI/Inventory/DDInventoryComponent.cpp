@@ -26,7 +26,7 @@ void UDDInventoryComponent::BeginPlay()
 	
 	/* 테스트용 아이템추가 */
 	AddItem("HealingKit"); 
-	AddItem("TargetingItem1");
+	AddItem("GiveBomb");
 }
 
 void UDDInventoryComponent::AddItem(FName ItemName)
