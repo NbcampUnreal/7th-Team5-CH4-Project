@@ -1,24 +1,20 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/GameplayAbility.h"
+#include "BoardGame/Abilities/ItemAbilities/ItemBase/GA_TargetingItemBase.h"
 #include "GA_GiveBomb.generated.h"
 
 UCLASS()
-class DOODOONG_API UGA_GiveBomb : public UGameplayAbility
+class DOODOONG_API UGA_GiveBomb : public UGA_TargetingItemBase
 {
 	GENERATED_BODY()
 	
 public:
 	UGA_GiveBomb();
 	
-	virtual void ActivateAbility(
-		FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData) override;
-	
 protected:
+	virtual bool ExecuteTargetingItem(AActor* TargetActor) override;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GiveBomb")
 	TSubclassOf<UGameplayEffect> DamageEffect;
 	
