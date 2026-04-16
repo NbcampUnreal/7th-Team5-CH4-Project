@@ -1,10 +1,10 @@
 #include "Lobby/Game/DDLobbyGameMode.h"
 #include "Base/Player/DDBasePlayerState.h"
-#include "GameFramework/SpectatorPawn.h"
-#include "TimerManager.h"
-#include "Base/Game/DDGameStateBase.h"
-#include "Common/DDLogManager.h"
+#include "Lobby/Game/DDLobbyGameState.h"
 #include "Lobby/Player/DDLobbyPlayerController.h"
+#include "GameFramework/SpectatorPawn.h"
+#include "Common/DDLogManager.h"
+
 
 ADDLobbyGameMode::ADDLobbyGameMode()
 {
@@ -12,29 +12,22 @@ ADDLobbyGameMode::ADDLobbyGameMode()
 	bUseSeamlessTravel = true;
 }
 
-void ADDLobbyGameMode::BeginPlay()
+void ADDLobbyGameMode::GenericPlayerInitialization(AController* C)
 {
-	Super::BeginPlay();
+	Super::GenericPlayerInitialization(C);
 	
-	AvailableColors = DefaultPlayerColors;
+	// 1. 플레이어 입장 
+	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(C);
+	if (!DDPC) return;
 	
-	ADDGameStateBase* GameStateBase = GetGameState<ADDGameStateBase>();
-	if (AvailableColors.Num() < GameStateBase->MinPlayerCount)
+	ADDBasePlayerState* PS = DDPC->GetPlayerState<ADDBasePlayerState>();
+	if (!PS) return;
+	
+	// 2. 입장 시 닉네임 입력창띄우기
+	if (LobbyUIConfig)
 	{
-		AvailableColors.Add(FLinearColor(0.407f, 0.73f, 0.791f, 1.0f)); // 파랑
-		AvailableColors.Add(FLinearColor(1.0f, 0.711f, 0.186f, 1.0f));  // 노랑
-		AvailableColors.Add(FLinearColor(0.597f, 0.402f, 0.597f, 1.0f));  // 보라
-		AvailableColors.Add(FLinearColor(1.0f, 0.305f, 0.254f, 1.0f));  // 빨강
+		DDPC->Client_SetUIConfig(LobbyUIConfig); 
 	}
-	
-	// 1초마다 대기실 인원 체크 및 카운트다운을 수행하는 타이머 실행
-	GetWorld()->GetTimerManager().SetTimer(
-		MainTimerHandle, 
-		this, 
-		&ThisClass::OnMainTimerElapsed, 
-		1.f, 
-		true
-	);
 }
 
 void ADDLobbyGameMode::Logout(AController* Exiting)
@@ -47,23 +40,24 @@ void ADDLobbyGameMode::Logout(AController* Exiting)
 	ADDBasePlayerState* PS = PC->GetPlayerState<ADDBasePlayerState>();
 	if (!IsValid(PS)) return;
 	
-	
-	
 	LOG_CJH(Log, TEXT("[%s]님이 게임을 종료하셨습니다."), *PS->PlayerGameData.PlayerDisplayName.ToString());
 	
+	// 나간 플레이어 색 반납 
 	FLinearColor FreedColor = PS->PlayerGameData.PlayerColor;
-    
-    // 다시 캐릭터 색상 후보군에 넣어줍니다 (단, 흰색 같은 예외 색상이 아닐 때만)
     if (FreedColor != FLinearColor::White)
     {
         AvailableColors.AddUnique(FreedColor);
     }
 	
 	Participants.Remove(PC);
+	if (CachedGameState) CachedGameState->ParticipantCount =  Participants.Num();
+	
 	Spectators.Remove(PC);
 }
 
-bool ADDLobbyGameMode::TryRegisterPlayerNickname(ADDLobbyPlayerController* Requester, const FName& Nickname,
+bool ADDLobbyGameMode::TryRegisterPlayerNickname(
+	ADDLobbyPlayerController* Requester, 
+	const FName& Nickname,
 	FString& ErrorMessage)
 {
 	// 1. 유효성 및 중복 체크
@@ -79,8 +73,7 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(ADDLobbyPlayerController* Reque
 	}
 	
 	ADDBasePlayerState* PS = Requester->GetPlayerState<ADDBasePlayerState>();
-	ADDGameStateBase* GS = GetGameState<ADDGameStateBase>();
-	if (!IsValid(PS) || !IsValid(GS))
+	if (!IsValid(PS) || !IsValid(CachedGameState))
 	{
 		ErrorMessage = TEXT("시스템 오류가 발생했습니다."); 
 		return false; 
@@ -90,18 +83,19 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(ADDLobbyPlayerController* Reque
 	PS->SetPlayerName(Nickname.ToString());
 	PS->PlayerGameData.PlayerDisplayName = Nickname;
 	
-	// 캐릭터 색상 설정
+	// 3. 캐릭터 색상 설정
 	FLinearColor NewRandomColor = GetRandomAvailableColor();
-    PS->SetPlayerColor(NewRandomColor);
+	PS->SetPlayerColor(NewRandomColor);
 	
-	// 3. 참가자/관전자 판별
-	if (Participants.Num() < GS->MinPlayerCount)
+	// 4. 참가자/관전자 판별
+	if (Participants.Num() < CachedGameState->RequiredPlayerCount)
 	{
 		PS->bIsParticipant = true;
 		Participants.AddUnique(Requester);
+		CachedGameState->ParticipantCount = Participants.Num(); 
 		
 		LOG_CJH(Log, TEXT("[%s]님이 게임에 접속하셨습니다."), *Nickname.ToString());
-		LOG_CJH(Log, TEXT("남은 인원 수 (%d / %d)"), Participants.Num(), GS->MinPlayerCount);
+		LOG_CJH(Log, TEXT("현재 인원 수 (%d / %d)"), Participants.Num(), CachedGameState->MaxPlayerCount);
 	}
 	else
 	{
@@ -118,9 +112,53 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(ADDLobbyPlayerController* Reque
 	return true; 
 }
 
+void ADDLobbyGameMode::RequestPlayerReady(ADDLobbyPlayerController* Requester, bool bReady)
+{
+	if (!Participants.Contains(Requester)) return;
+	
+	if(!CachedGameState) return;
+	
+	if (bReady)
+	{
+		ReadyParticipants.AddUnique(Requester);
+		CachedGameState->ReadyCount++;
+		
+		if (ReadyParticipants.Num() == Participants.Num())
+		{
+			StartPlayCountDown(StartCountdownSeconds); 
+		}
+	}
+	else
+	{
+		ReadyParticipants.Remove(Requester);
+		CachedGameState->ReadyCount--;
+		
+		GetWorld()->GetTimerManager().ClearTimer(StartTimerHandle);
+	}
+}
+
+void ADDLobbyGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	AvailableColors = DefaultPlayerColors;
+	
+	CachedGameState = GetGameState<ADDLobbyGameState>();
+}
+
 bool ADDLobbyGameMode::IsNicknameAvailable(const FName& InNickname, FString& ErrorMessage) const
 {
-	if (!IsValid(GameState)) return false;  
+	if (!IsValid(CachedGameState))
+	{
+		ErrorMessage = TEXT("시스템 오류"); 
+		return false;
+	}  
+	
+	if (InNickname.IsNone() || InNickname.ToString().Len() > 6)
+	{
+		ErrorMessage = TEXT("닉네임은 1자 이상, 6자 이하로 입력해주세요.");
+		return false;
+	}
 	
 	for (APlayerState* PS : GameState->PlayerArray)
 	{
@@ -128,12 +166,6 @@ bool ADDLobbyGameMode::IsNicknameAvailable(const FName& InNickname, FString& Err
 		if (DDPS && DDPS->PlayerGameData.PlayerDisplayName == InNickname)
 		{
 			ErrorMessage = TEXT("중복된 닉네임입니다.");
-			return false; 
-		}
-		
-		if (InNickname.IsNone() || InNickname.ToString().Len() > 6)
-		{
-			ErrorMessage = TEXT("닉네임은 1자 이상, 6자 이하로 입력해주세요.");
 			return false;
 		}
 	}
@@ -181,54 +213,81 @@ void ADDLobbyGameMode::SetPlayerAsSpectator(APlayerController* InPlayerControlle
 	}
 }
 
-void ADDLobbyGameMode::GenericPlayerInitialization(AController* C)
+void ADDLobbyGameMode::StartPlayCountDown(float InSeconds)
 {
-	Super::GenericPlayerInitialization(C);
+	CachedGameState->CountDown = InSeconds;
+	LOG_CJH(Log, TEXT("곧 게임을 시작합니다."));
 	
-	// 입장 시 닉네임 입력창띄우기
-	if (LobbyUIConfig)
-	{
-		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(C))
-		{
-			DDPC->Client_SetUIConfig(LobbyUIConfig); 
-		}
-	}
+	// 1초마다 대기실 인원 체크 및 카운트다운을 수행하는 타이머 실행
+	GetWorld()->GetTimerManager().SetTimer(
+		StartTimerHandle, 
+		this, 
+		&ThisClass::OnMainTimerElapsed, 
+		1.f, 
+		true
+	);
 }
 
 void ADDLobbyGameMode::OnMainTimerElapsed()
 {
-	ADDGameStateBase* GS = GetGameState<ADDGameStateBase>();
-	if (!GS) return; 
+	if (!CachedGameState) return; 
 	
-	if (!bIsStarting)
+	CachedGameState->CountDown--;
+	LOG_CJH(Log, TEXT("%d초 후 게임에 진입합니다."), CachedGameState->CountDown);
+	
+	if (CachedGameState->CountDown <= 0)
 	{
-		if (Participants.Num() >= GS->MinPlayerCount)
-		{
-			LOG_CJH(Log, TEXT("곧 게임을 시작합니다."));
-			bIsStarting = true;
-		}
-	}
-	else
-	{
-		if (Participants.Num() < GS->MinPlayerCount)
-		{
-			LOG_CJH(Log, TEXT("플레이어가 이탈하여 게임 시작이 취소되었습니다."));
-			bIsStarting = false;
-			WaitingTime = MaxWaitingTime;
-			return;
-		}
-
-		LOG_CJH(Log, TEXT("%d초 후 게임에 진입합니다."), WaitingTime);
-		--WaitingTime;
+		GetWorld()->GetTimerManager().ClearTimer(StartTimerHandle);
+		LOG_CJH(Log, TEXT("보드게임에 진입합니다."));
 		
-		if (WaitingTime <= 0)
-		{
-			GetWorld()->GetTimerManager().ClearTimer(MainTimerHandle);
-			LOG_CJH(Log, TEXT("보드게임에 진입합니다."), WaitingTime);
-			
-			GetWorld()->ServerTravel(BaseGameMapPath);
-		}
+		TryStartBoardGame(); 
 	}
+}
+
+bool ADDLobbyGameMode::CanStartBoardGame(FString& ErrorMessage)
+{
+	if (!CachedGameState)
+	{
+		ErrorMessage = TEXT("시스템 오류"); 
+		return false; 
+	}
+	
+	if (Participants.Num() < CachedGameState->RequiredPlayerCount)
+	{
+		ErrorMessage = FString::Printf(
+			TEXT("시작할려면 최소 %d 이상 되어야 합니다."),
+			CachedGameState->RequiredPlayerCount
+		);
+		
+		return false; 
+	}
+	
+	if (ReadyParticipants.Num() < CachedGameState->RequiredPlayerCount)
+	{
+		ErrorMessage = FString::Printf(
+		TEXT("모든 플레이어가 준비해야 합니다. (준비 %d / %d명)"),
+			ReadyParticipants.Num(),
+			Participants.Num()
+		);
+		
+		return false;
+	}
+	
+	return true; 
+}
+
+void ADDLobbyGameMode::TryStartBoardGame()
+{
+	FString ErrorMessage; 
+	if (!CanStartBoardGame(ErrorMessage))
+	{
+		LOG_KMS(Warning, TEXT("%s"), *ErrorMessage);
+		return; 
+	}
+	
+	LOG_KMS(Log, TEXT("게임이 시작됩니다.")); 
+	
+	GetWorld()->ServerTravel(BoardGameMapPath);
 }
 
 FLinearColor ADDLobbyGameMode::GetRandomAvailableColor()
