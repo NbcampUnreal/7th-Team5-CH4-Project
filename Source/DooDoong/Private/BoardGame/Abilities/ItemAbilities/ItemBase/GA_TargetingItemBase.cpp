@@ -8,7 +8,7 @@
 
 UGA_TargetingItemBase::UGA_TargetingItemBase()
 {
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 }
 
 void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
@@ -20,6 +20,8 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 	AActor* InitialTarget = TriggerEventData ? const_cast<AActor*>(TriggerEventData->Target.Get()) : nullptr;
 	if (IsValid(InitialTarget))
 	{
+		bSelectingTarget = false;
+
 		if (!CommitItemAbility(Handle, ActorInfo, ActivationInfo))
 		{
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
@@ -31,12 +33,13 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 		return;
 	}
 
-	if (HasAuthority(&ActivationInfo))
+	if (!HasAuthority(&ActivationInfo))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
+	bSelectingTarget = true;
 	SelectedTargetIndex = INDEX_NONE;
 	BuildTargetCandidates();
 
@@ -101,8 +104,14 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 void UGA_TargetingItemBase::EndAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	if (bSelectingTarget && ItemActionComponent)
+	{
+		ItemActionComponent->Server_FocusItemTarget(GetAvatarActorFromActorInfo());
+	}
+
 	CandidateTargets.Reset();
 	SelectedTargetIndex = INDEX_NONE;
+	bSelectingTarget = false;
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -126,15 +135,14 @@ void UGA_TargetingItemBase::OnTargetConfirm(FGameplayEventData Payload)
 		return;
 	}
 
-	if (!HasAuthority(&CurrentActivationInfo))
+	if (bSelectingTarget)
 	{
-		if (ItemActionComponent)
+		const bool bCommitted = CommitItemAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+		if (!bCommitted)
 		{
-			ItemActionComponent->ConfirmTargetingItem(TargetActor);
+			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+			return;
 		}
-
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-		return;
 	}
 
 	const bool bExecuted = ExecuteTargetingItem(TargetActor);

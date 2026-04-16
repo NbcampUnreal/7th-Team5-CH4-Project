@@ -5,6 +5,7 @@
 #include "GA_ItemBase.generated.h"
 
 class ADDBoardGameCharacter;
+class UAbilitySystemComponent;
 class UItemActionComponent;
 
 UCLASS(Abstract)

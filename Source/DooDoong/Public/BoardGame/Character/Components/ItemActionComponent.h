@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Data/DDItemDataTypes.h"
+#include "GameplayTagContainer.h"
 #include "ItemActionComponent.generated.h"
 
 class UGameplayAbility;
@@ -64,6 +65,10 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_ActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
 
+	/** 서버에서 진행 중인 타게팅 Ability에 입력 이벤트를 전달 */
+	UFUNCTION(Server, Reliable)
+	void Server_SendTargetingInputEvent(FGameplayTag EventTag);
+
 protected:
 	/** 즉시사용 아이템 액션 */
 	void StartInstantAction();
@@ -80,6 +85,8 @@ protected:
 
 	/** 취소 시 인벤토리에서 선차감한 아이템 수량을 복구 */
 	void RestoreCanceledItem(FName ItemID);
+
+	void DispatchTargetingInputEvent(FGameplayTag EventTag);
 	
 	/** 아이템 액션값들을 초기화 */
 	void ResetItemAction();

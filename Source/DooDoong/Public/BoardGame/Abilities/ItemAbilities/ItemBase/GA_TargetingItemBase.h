@@ -51,4 +51,7 @@ protected:
 
 	UPROPERTY()
 	int32 SelectedTargetIndex = INDEX_NONE;
+
+	UPROPERTY()
+	bool bSelectingTarget = false;
 };

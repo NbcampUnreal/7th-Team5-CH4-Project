@@ -7,7 +7,6 @@
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "BoardGame/Game/DDBoardGameMode.h"
 #include "Common/DDLogManager.h"
-#include "Data/DDItemDataTypes.h"
 #include "System/DDGameplayTags.h"
 #include "UI/Inventory/DDInventoryComponent.h"
 
@@ -148,10 +147,7 @@ void UItemActionComponent::StartTargetingAction()
 	CurrentActionMode = EItemActionMode::Targeting;
 	ApplyItemActionTag();
 
-	if (!TryGiveAndActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr))
-	{
-		CancelItemAction();
-	}
+	Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr);
 }
 
 void UItemActionComponent::StartRangeAction()
@@ -185,6 +181,21 @@ void UItemActionComponent::SendTargetingInputEvent(FGameplayTag EventTag)
 		return;
 	}
 
+	Server_SendTargetingInputEvent(EventTag);
+}
+
+void UItemActionComponent::Server_SendTargetingInputEvent_Implementation(FGameplayTag EventTag)
+{
+	DispatchTargetingInputEvent(EventTag);
+}
+
+void UItemActionComponent::DispatchTargetingInputEvent(FGameplayTag EventTag)
+{
+	if (!EventTag.IsValid())
+	{
+		return;
+	}
+
 	AActor* OwnerActor = GetOwner();
 	if (!IsValid(OwnerActor))
 	{
@@ -207,6 +218,7 @@ void UItemActionComponent::ConfirmTargetingItem(AActor* TargetActor)
 	}
 
 	Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, TargetActor);
+	ResetItemAction();
 }
 
 bool UItemActionComponent::TryGiveAndActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
@@ -231,7 +243,6 @@ bool UItemActionComponent::TryGiveAndActivateItemAbility(FName ItemID, TSubclass
 		return false;
 	}
 	
-	// 타게팅 아이템 Ability는 EventData->Target에서 선택 대상을 읽으면 되는 방식.
 	FGameplayEventData EventData;
 	EventData.EventTag = DDGameplayTags::Event_Item_Activate;
 	EventData.Instigator = OwnerCharacter;
