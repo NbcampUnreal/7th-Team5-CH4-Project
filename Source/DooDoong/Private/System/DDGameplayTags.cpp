@@ -31,6 +31,8 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_End, "Event.Trace.End");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Shooter_Fire, "Event.Shooter.Fire", "슈터 미니게임 발사 애니메이션 몽타주에서 사용할 발사 이벤트 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Activate, "Event.Item.Activate", "아이템 Ability 실행 시 전달하는 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_TargetConfirmed, "Event.Item.TargetConfirmed", "아이템 타게팅 확정 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_TargetCanceled, "Event.Item.TargetCanceled", "아이템 타게팅 취소 이벤트 태그");
 	
 	// Data Tags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Data_Health_Heal, "Data.Health.Heal", "Health Attribute를 양변화 시키는 경우 사용할 태그")
