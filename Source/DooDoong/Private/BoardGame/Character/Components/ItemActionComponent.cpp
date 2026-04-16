@@ -67,6 +67,7 @@ void UItemActionComponent::ConfirmItemAction()
 		break;
 
 	case EItemActionMode::Targeting:
+		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Confirm);
 		if (AActor* TargetActor = GetSelectedTarget())
 		{
 			Server_ConfirmTargetingItem(ActiveItemID, ActiveItemAbility, TargetActor);
@@ -86,6 +87,11 @@ void UItemActionComponent::ConfirmItemAction()
 void UItemActionComponent::CancelItemAction()
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 : %s"), *ActiveItemID.ToString());
+
+	if (CurrentActionMode == EItemActionMode::Targeting)
+	{
+		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Cancel);
+	}
 	
 	// 카메라 원상복구
 	Server_FocusItemTarget(GetOwner());
@@ -237,11 +243,19 @@ void UItemActionComponent::BuildTargetCandidates()
 
 void UItemActionComponent::SelectNextTarget()
 {
+	if (CurrentActionMode == EItemActionMode::Targeting)
+	{
+		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Next);
+	}
 	ChangeTarget(1);
 }
 
 void UItemActionComponent::SelectPreviousTarget()
 {
+	if (CurrentActionMode == EItemActionMode::Targeting)
+	{
+		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Previous);
+	}
 	ChangeTarget(-1);
 }
 
