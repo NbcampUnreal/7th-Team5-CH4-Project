@@ -22,8 +22,9 @@ public:
 	void ShowOverlay(TSubclassOf<UUserWidget> WidgetClass);
 	void HideOverlay();
 	
-	void TogglePopup(FGameplayTag PopupTag);
-	void HidePopup();
+	void DrawPopup(FGameplayTag PopupTag);
+	void HidePopup(FGameplayTag PopupTag);
+	void HideAllPopups();
 
 	template<typename T>
 	T* GetGameLayer() const { return Cast<T>(GameLayerWidget); }
@@ -35,16 +36,16 @@ public:
 	
 private:
 	UUserWidget* CreateUIWidget(TSubclassOf<UUserWidget> WidgetClass);
-
+	
+	UPROPERTY()
+	TObjectPtr<UDDUIConfig> UIConfig;
+	
 	UPROPERTY()
 	TObjectPtr<UUserWidget> GameLayerWidget;
 
 	UPROPERTY()
 	TObjectPtr<UUserWidget> OverlayWidget;
-
-	UPROPERTY()
-	TObjectPtr<UUserWidget> PopupWidget;
 	
 	UPROPERTY()
-	TObjectPtr<UDDUIConfig> UIConfig;
+	TMap<FGameplayTag, TObjectPtr<UUserWidget>> PopupWidgets;
 };
