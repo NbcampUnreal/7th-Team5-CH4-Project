@@ -211,6 +211,19 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 	{
 		CalculateFinalWinner();
 	}
+	else if (NewStateTag == DDGameplayTags::State_BoardGame_End)
+	{
+		LOG_CJH(Log, TEXT("게임이 종료되었습니다. 10초 후 로비로 이동합니다."));
+        
+        // 10초 타이머 설정
+        GetWorldTimerManager().SetTimer(
+            ReturnToLobbyTimerHandle, 
+            this, 
+            &ADDBoardGameMode::TravelToLobby, 
+            10.0f, 
+            false
+        );
+	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
 	{
 		// 1. 승리 조건(목표 트로피 달성)을 먼저 검사합니다.
@@ -447,6 +460,15 @@ void ADDBoardGameMode::ExecuteNextTurnTransition()
 	LOG_CJH(Log, TEXT("[Timer] %.0f초 대기 완료. 다음 플레이어로 턴을 전환합니다."), TurnTransitionTimer);
 	CurrentTurnPlayerIndex++;
 	SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
+}
+
+void ADDBoardGameMode::TravelToLobby()
+{
+	if (GetWorld())
+    {
+        LOG_CJH(Log, TEXT("로비로 ServerTravel을 시작합니다."));
+        GetWorld()->ServerTravel(LobbyMapPath);
+    }
 }
 
 void ADDBoardGameMode::SetTurnPhase(FGameplayTag NewPhaseTag)
