@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "LobbyWidget.generated.h"
+#include "DDLobbyWidget.generated.h"
 
 class UButton;
 class UTextBlock; 
 
 UCLASS()
-class DOODOONG_API ULobbyWidget : public UUserWidget
+class DOODOONG_API UDDLobbyWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	

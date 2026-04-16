@@ -1,10 +1,10 @@
-#include "Lobby/UI/LobbyWidget.h"
+#include "Lobby/UI/DDLobbyWidget.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Lobby/Player/DDLobbyPlayerController.h"
 
-void ULobbyWidget::NativeConstruct()
+void UDDLobbyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
@@ -13,12 +13,12 @@ void ULobbyWidget::NativeConstruct()
 	if (QuitButton) QuitButton->OnClicked.AddDynamic(this, &ThisClass::OnClickQuitButton);
 }
 
-void ULobbyWidget::NativeDestruct()
+void UDDLobbyWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
 
-void ULobbyWidget::OnClickReadButton()
+void UDDLobbyWidget::OnClickReadButton()
 {
 	bIsReady = !bIsReady;
 
@@ -30,15 +30,15 @@ void ULobbyWidget::OnClickReadButton()
 	 if (PC) PC->Server_RequestReady(bIsReady); 
 }
 
-void ULobbyWidget::OnClickQuitButton()
+void UDDLobbyWidget::OnClickQuitButton()
 {
 }
 
-void ULobbyWidget::UpdatePlayerCount()
+void UDDLobbyWidget::UpdatePlayerCount()
 {
 }
 
-void ULobbyWidget::UpdateReadyCount()
+void UDDLobbyWidget::UpdateReadyCount()
 {
 	
 }
