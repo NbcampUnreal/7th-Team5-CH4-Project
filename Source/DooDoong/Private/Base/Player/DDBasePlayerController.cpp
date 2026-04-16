@@ -12,6 +12,7 @@
 #include "Common/DDLogManager.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
+#include "System/DDUIManagerSubsystem.h"
 #include "UI/Inventory/DDInventoryComponent.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 
@@ -210,6 +211,14 @@ void ADDBasePlayerController::OnMouseClick()
 	LOG_CYS(Warning, TEXT("Hit: %s"), *GetNameSafe(Hit.GetActor()));
 	// 서버로 전달
 	Server_SelectTile(SelectableTileActor);
+}
+
+void ADDBasePlayerController::Client_SetUIConfig_Implementation(UDDUIConfig* InConfig)
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager) return;
+	
+	UIManager->SetUIConfig(InConfig);
 }
 
 void ADDBasePlayerController::Server_SelectTile_Implementation(ADDSelectableTileActor* SelectableTileActor)

@@ -50,6 +50,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_SelectTile(ADDSelectableTileActor* TileActor);
 	
+	UFUNCTION(Client, Reliable)
+	void Client_SetUIConfig(UDDUIConfig* InConfig);
+	
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_RequestPlayerReady(); 
