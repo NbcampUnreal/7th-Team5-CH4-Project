@@ -12,6 +12,7 @@ class UInputMappingContext;
 class UDDInputConfig;
 class UDDInventoryComponent;
 class UItemActionComponent;
+class UDDUIConfig;
 
 UCLASS()
 class DOODOONG_API ADDBasePlayerController : public APlayerController
@@ -50,8 +51,18 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_SelectTile(ADDSelectableTileActor* TileActor);
 	
+public:
 	UFUNCTION(Client, Reliable)
 	void Client_SetUIConfig(UDDUIConfig* InConfig);
+	
+	UFUNCTION(Client, Reliable)
+	void Client_OpenPopUp(FGameplayTag Tag);
+	
+	UFUNCTION(Client, Reliable)
+	void Client_ClosePopUp(FGameplayTag Tag);
+	
+	UFUNCTION(Client, Reliable)
+	void Client_CloseAllPopUps();
 	
 public:
 	UFUNCTION(Server, Reliable)

@@ -246,6 +246,30 @@ void ADDBasePlayerController::Server_RequestPlayerReady_Implementation()
 	GM->SetPlayerReady(PS, true);
 }
 
+void ADDBasePlayerController::Client_OpenPopUp_Implementation(FGameplayTag Tag)
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager || !Tag.IsValid()) return;
+	
+	UIManager->DrawPopup(Tag); 
+}
+
+void ADDBasePlayerController::Client_ClosePopUp_Implementation(FGameplayTag Tag)
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager || !Tag.IsValid()) return;
+	
+	UIManager->HidePopup(Tag);
+}
+
+void ADDBasePlayerController::Client_CloseAllPopUps_Implementation()
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager) return;
+	
+	UIManager->HideAllPopups();
+}
+
 void ADDBasePlayerController::Input_Move(const FInputActionValue& Value)
 {
 	APawn* ControlledPawn = GetPawn();
