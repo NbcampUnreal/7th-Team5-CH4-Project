@@ -52,6 +52,16 @@ void UDDInventoryComponent::ToggleInventory()
 	}
 }
 
+void UDDInventoryComponent::RequestOpenInventory()
+{
+	OpenInventory();
+}
+
+void UDDInventoryComponent::RequestCloseInventory()
+{
+	CloseInventory();
+}
+
 FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
 {
 	if (!ItemDataTable) return nullptr;
@@ -91,6 +101,7 @@ void UDDInventoryComponent::UseItem(const FName& ItemSlotName)
 			UItemActionComponent* ISC = OwningController->GetPawn()->FindComponentByClass<UItemActionComponent>();
 			if (!IsValid(ISC)) return;
 			FItemTableRow& CurrentItemDataRow = *GetItemData(ItemPair.Key);
+			CloseInventory(); // 아이템 사용 시 인벤토리 창을 닫음.
 			ISC->BeginItemAction(CurrentItemDataRow);
 			ItemPair.Value--;
 			InventoryWidget->RefreshGrid();

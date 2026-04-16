@@ -39,6 +39,12 @@ public:
 	void AddItem(FName ItemName);
 	
 	void ToggleInventory();
+
+	/** 주현 : 인벤토리 Open이 Private이라 한 번 감싸서 호출가능하게 요청하는 함수 */
+	void RequestOpenInventory();
+
+	/** 주현 : 인벤토리 Close도 Private이라 한 번 감싸서 호출가능하게 요청하는 함수 */
+	void RequestCloseInventory();
 	
 	void UseItem(const FName& ItemSlotName);
 	

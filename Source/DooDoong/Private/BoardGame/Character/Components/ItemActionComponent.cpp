@@ -86,11 +86,21 @@ void UItemActionComponent::CancelItemAction()
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 : %s"), *ActiveItemID.ToString());
 	
+	// 카메라 원상복구
 	Server_FocusItemTarget(GetOwner());
-	
+	// 아이템 수 원상복구
 	RestoreCanceledItem(ActiveItemID);
-	
-	// TODO 범위표시가 있다면 제거하고, 다시 인벤토리 창 띄우기....
+	// 다시 인벤토리 창 띄우기
+	if (const ADDBoardGameCharacter* OwnerCharacter = Cast<ADDBoardGameCharacter>(GetOwner()))
+	{
+		if (AController* OwnerController = OwnerCharacter->GetController())
+		{
+			if (UDDInventoryComponent* InventoryComponent = OwnerController->FindComponentByClass<UDDInventoryComponent>())
+			{
+				InventoryComponent->RequestOpenInventory();
+			}
+		}
+	}
 	
 	ResetItemAction();
 }
