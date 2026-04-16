@@ -213,8 +213,33 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
 	{
+		// 1. 승리 조건(목표 트로피 달성)을 먼저 검사합니다.
+	    bool bHasTrophyWinner = false;
+	    for (APlayerController* PC : AlivePlayerControllers)
+	    {
+	        if (ADDBasePlayerState* PS = PC->GetPlayerState<ADDBasePlayerState>())
+	        {
+	            if (PS->GetPointSet() && PS->GetPointSet()->GetTrophy() >= CachedBoardGameState->MaxTrophy)
+	            {
+	                LOG_CJH(Log, TEXT("[승자 발생] %s님이 목표 트로피를 달성했습니다!"), *PS->PlayerGameData.PlayerDisplayName.ToString());
+	                bHasTrophyWinner = true;
+	                break;
+	            }
+	        }
+	    }
+		
+		// 2. 승자가 있다면 즉시 Ending 상태로 전환하고 함수를 종료(return)합니다.
+	    if (bHasTrophyWinner)
+	    {
+	        LOG_CJH(Log, TEXT("미니게임을 건너뛰고 결과 화면으로 이동합니다."));
+	        SetMatchState(DDGameplayTags::State_BoardGame_Ending);
+	        return;
+	    }
+		
+		// 3. 승자가 없을 경우에만 기존의 라운드 종료(미니게임 준비) 로직을 수행합니다.
 		CachedBoardGameState->StateTimer = 3;
 		LOG_CJH(Log, TEXT("[라운드 종료] 3초 뒤 미니게임으로 이동합니다."));
+		
 		// 현재 타일 위치 시작 위치로 초기화
 		for (APlayerController* PC : AlivePlayerControllers)
 		{
