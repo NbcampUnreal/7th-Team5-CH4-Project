@@ -2,7 +2,6 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "EngineUtils.h"
 #include "Abilities/GameplayAbility.h"
 #include "GameplayTagContainer.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
@@ -68,11 +67,7 @@ void UItemActionComponent::ConfirmItemAction()
 
 	case EItemActionMode::Targeting:
 		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Confirm);
-		if (AActor* TargetActor = GetSelectedTarget())
-		{
-			Server_ConfirmTargetingItem(ActiveItemID, ActiveItemAbility, TargetActor);
-			ResetItemAction();
-		}
+		ResetItemAction();
 		break;
 
 	case EItemActionMode::Range:
@@ -182,21 +177,11 @@ void UItemActionComponent::StartTargetingAction()
 	
 	CurrentActionMode = EItemActionMode::Targeting;
 	ApplyItemActionTag();
-	SelectedTargetIndex = INDEX_NONE;
-	
-	BuildTargetCandidates();
-	
-	LOG_JJH(Warning, TEXT("[아이템 액션] 타겟 후보 수 : %d"), CandidateTargets.Num());
-	
-	if (CandidateTargets.IsEmpty())
+
+	if (!TryActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr))
 	{
 		CancelItemAction();
-		return;
 	}
-	
-	// 첫 번째 타겟을 한 번 지정.
-	SelectedTargetIndex = 0;
-	Server_FocusItemTarget(GetSelectedTarget());
 }
 
 void UItemActionComponent::StartRangeAction()
@@ -207,47 +192,12 @@ void UItemActionComponent::StartRangeAction()
 	// TODO 범위를 표시하고, 해당 범위 내의 플레이어를 순회해서 Owner와 비교한 뒤 후보자에 추가
 }
 
-void UItemActionComponent::BuildTargetCandidates()
-{
-	CandidateTargets.Reset();
-	
-	UWorld* World = GetWorld();
-	if (!World)
-	{
-		return;
-	}
-	
-	AActor* OwnerCharacter = GetOwner();
-	if (!OwnerCharacter)
-	{
-		return;
-	}
-	
-	// 월드의 플레이어 컨트롤러를 순회해서 해당 컨트롤러의 Pawn을 OwnerCharacter와 비교한 뒤 다른 Pawn만 후보자로 추가
-	for (TActorIterator<ADDBoardGameCharacter> It(World); It; ++It)
-	{
-		ADDBoardGameCharacter* CandidateCharacter = *It;
-		if (!CandidateCharacter || CandidateCharacter == OwnerCharacter)
-		{
-			continue;
-		}
-		
-		if (CandidateCharacter == OwnerCharacter)
-		{
-			continue;
-		}
-		
-		CandidateTargets.Add(CandidateCharacter);
-	}
-}
-
 void UItemActionComponent::SelectNextTarget()
 {
 	if (CurrentActionMode == EItemActionMode::Targeting)
 	{
 		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Next);
 	}
-	ChangeTarget(1);
 }
 
 void UItemActionComponent::SelectPreviousTarget()
@@ -256,7 +206,6 @@ void UItemActionComponent::SelectPreviousTarget()
 	{
 		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Previous);
 	}
-	ChangeTarget(-1);
 }
 
 void UItemActionComponent::SendTargetingInputEvent(FGameplayTag EventTag)
@@ -280,29 +229,14 @@ void UItemActionComponent::SendTargetingInputEvent(FGameplayTag EventTag)
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OwnerActor, EventTag, Payload);
 }
 
-void UItemActionComponent::ChangeTarget(int32 Offset)
+void UItemActionComponent::ConfirmTargetingItem(AActor* TargetActor)
 {
 	if (CurrentActionMode != EItemActionMode::Targeting)
 	{
 		return;
 	}
-	
-	if (CandidateTargets.IsEmpty())
-	{
-		return;
-	}
-	
-	// 목록을 원형으로 순환하기 위한 계산 : (현재인덱스 + 방향 + 목록사이즈) % 목록사이즈
-	// -1 방향으로도 가기 때문에 Index가 음수가 되지 않기 위해서 사이즈를 한 번 더함
-	SelectedTargetIndex = (SelectedTargetIndex + Offset + CandidateTargets.Num()) % CandidateTargets.Num();
-	Server_FocusItemTarget(GetSelectedTarget());
-}
 
-AActor* UItemActionComponent::GetSelectedTarget() const
-{
-	return CandidateTargets.IsValidIndex(SelectedTargetIndex)
-		       ? CandidateTargets[SelectedTargetIndex].Get()
-		       : nullptr;
+	Server_ConfirmTargetingItem(ActiveItemID, ActiveItemAbility, TargetActor);
 }
 
 bool UItemActionComponent::TryActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
@@ -394,8 +328,6 @@ void UItemActionComponent::ResetItemAction()
 	ActiveItemID = NAME_None;
 	ActiveItemTag = FGameplayTag();
 	ActiveItemAbility = nullptr;
-	CandidateTargets.Reset();
-	SelectedTargetIndex = INDEX_NONE;
 }
 
 void UItemActionComponent::ApplyItemActionTag()

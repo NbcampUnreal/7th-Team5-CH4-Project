@@ -6,23 +6,34 @@
 #include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "System/DDGameplayTags.h"
 
+UGA_TargetingItemBase::UGA_TargetingItemBase()
+{
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+}
+
 void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo, FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (!CommitItemAbility(Handle, ActorInfo, ActivationInfo))
-	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-		return;
-	}
-
 	AActor* InitialTarget = TriggerEventData ? const_cast<AActor*>(TriggerEventData->Target.Get()) : nullptr;
 	if (IsValid(InitialTarget))
 	{
+		if (!CommitItemAbility(Handle, ActorInfo, ActivationInfo))
+		{
+			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+			return;
+		}
+
 		const bool bExecuted = ExecuteTargetingItem(InitialTarget);
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, !bExecuted);
+		return;
+	}
+
+	if (HasAuthority(&ActivationInfo))
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
@@ -31,6 +42,10 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 
 	if (CandidateTargets.IsEmpty())
 	{
+		if (ItemActionComponent)
+		{
+			ItemActionComponent->CancelItemAction();
+		}
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -108,6 +123,17 @@ void UGA_TargetingItemBase::OnTargetConfirm(FGameplayEventData Payload)
 	if (!IsValid(TargetActor))
 	{
 		OnTargetCancel(Payload);
+		return;
+	}
+
+	if (!HasAuthority(&CurrentActivationInfo))
+	{
+		if (ItemActionComponent)
+		{
+			ItemActionComponent->ConfirmTargetingItem(TargetActor);
+		}
+
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 		return;
 	}
 

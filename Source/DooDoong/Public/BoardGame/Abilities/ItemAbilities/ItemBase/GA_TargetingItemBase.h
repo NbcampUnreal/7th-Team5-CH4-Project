@@ -10,6 +10,8 @@ class DOODOONG_API UGA_TargetingItemBase : public UGA_ItemBase
 	GENERATED_BODY()
 
 public:
+	UGA_TargetingItemBase();
+
 	virtual void ActivateAbility(
 		FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,

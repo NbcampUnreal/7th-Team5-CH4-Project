@@ -48,6 +48,9 @@ public:
 	/** 아이템 타게팅 이벤트를 전달하는 헬퍼 */
 	void SendTargetingInputEvent(FGameplayTag EventTag);
 
+	/** 선택된 타겟으로 타게팅 아이템을 서버에서 확정 */
+	void ConfirmTargetingItem(AActor* TargetActor);
+
 	/** 아이템 액션이 진행중인지 확인 : 타게팅할 때 + 범위표시할 때 아이템 액션 중인지 확인하고 수행 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	bool IsItemActionActive() const { return CurrentActionMode != EItemActionMode::None; }
@@ -80,15 +83,6 @@ protected:
 	void StartRangeAction();
 	
 protected:
-	/** 타겟 후보 대상을 순회해서 지정해주는 헬퍼 */
-	void BuildTargetCandidates();
-	
-	/** Index를 원형으로 순회할 수 있도록 하는 계산 헬퍼 */
-	void ChangeTarget(int32 Offset);
-
-	/** 선택된 타겟 Getter */
-	AActor* GetSelectedTarget() const;
-
 	/** 서버에서 아이템 Ability를 1회성으로 부여하고 실행 */
 	bool TryActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
 
@@ -117,10 +111,4 @@ protected:
 	
 	UPROPERTY()
 	TSubclassOf<UGameplayAbility> ActiveItemAbility;
-	
-	UPROPERTY()
-	TArray<TObjectPtr<AActor>> CandidateTargets;
-	
-	UPROPERTY()
-	int32 SelectedTargetIndex = INDEX_NONE;
 };
