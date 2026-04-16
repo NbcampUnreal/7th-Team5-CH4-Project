@@ -1,5 +1,6 @@
 ﻿#include "BoardGame/Character/Components/ItemActionComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "EngineUtils.h"
 #include "Abilities/GameplayAbility.h"
@@ -242,6 +243,27 @@ void UItemActionComponent::SelectNextTarget()
 void UItemActionComponent::SelectPreviousTarget()
 {
 	ChangeTarget(-1);
+}
+
+void UItemActionComponent::SendTargetingInputEvent(FGameplayTag EventTag)
+{
+	if (!EventTag.IsValid())
+	{
+		return;
+	}
+
+	AActor* OwnerActor = GetOwner();
+	if (!IsValid(OwnerActor))
+	{
+		return;
+	}
+
+	FGameplayEventData Payload;
+	Payload.EventTag = EventTag;
+	Payload.Instigator = OwnerActor;
+	Payload.OptionalObject = this;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OwnerActor, EventTag, Payload);
 }
 
 void UItemActionComponent::ChangeTarget(int32 Offset)

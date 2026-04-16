@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	void SelectPreviousTarget();
 
+	/** 아이템 타게팅 이벤트를 전달하는 헬퍼 */
+	void SendTargetingInputEvent(FGameplayTag EventTag);
+
 	/** 아이템 액션이 진행중인지 확인 : 타게팅할 때 + 범위표시할 때 아이템 액션 중인지 확인하고 수행 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	bool IsItemActionActive() const { return CurrentActionMode != EItemActionMode::None; }
