@@ -17,6 +17,15 @@ enum class EItemActionMode : uint8
 	Range
 };
 
+UENUM(BlueprintType)
+enum class EItemTargetingInput : uint8
+{
+	Next,
+	Previous,
+	Confirm,
+	Cancel
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class DOODOONG_API UItemActionComponent : public UActorComponent
 {
@@ -30,34 +39,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	void BeginItemAction(const FItemTableRow& ItemRow);
 	
-	/** 최종적으로 아이템을 사용 == 아이템의 어빌리티를 실행 */
+	/** 현재 아이템 액션을 확정 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
-	void ConfirmItemAction();
+	void ConfirmCurrentItemAction();
 	
-	/** 아이템 사용을 취소하고 인벤토리 창을 다시 띄움 + 선차감된 아이템 수 복구 */
+	/** 현재 아이템 액션을 취소하고 인벤토리 창을 다시 띄움 + 선차감된 아이템 수 복구 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
-	void CancelItemAction();
+	void CancelCurrentItemAction();
 
-	/** 다음 타겟 선택 */
+	/** 타게팅 Ability에 입력 이벤트 전달 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
-	void SelectNextTarget();
-
-	/** 이전 타겟 선택 */
-	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
-	void SelectPreviousTarget();
-
-	/** 아이템 타게팅 이벤트를 전달하는 헬퍼 */
-	void SendTargetingInputEvent(FGameplayTag EventTag);
+	void SendTargetingInput(EItemTargetingInput Input);
 
 	/** 아이템 액션 중인지 확인 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	bool IsItemActionActive() const { return CurrentActionMode != EItemActionMode::None; }
 	
 public:
-	/** 타겟 아이템으로 카메라를 이동하는 서버 RPC */
-	UFUNCTION(Server, Reliable)
-	void Server_FocusItemTarget(AActor* TargetActor);
-
 	/** 서버에서 아이템 Ability를 1회성으로 부여하고 실행 */
 	UFUNCTION(Server, Reliable)
 	void Server_ActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
@@ -67,24 +65,11 @@ public:
 	void Server_SendTargetingInputEvent(FGameplayTag EventTag);
 
 protected:
-	/** 즉시사용 아이템 액션 */
-	void StartInstantAction();
-	
-	/** 타게팅 아이템 액션 */
-	void StartTargetingAction();
-	
-	/** 범위 아이템 액션 */
-	void StartRangeAction();
-	
-protected:
 	/** 서버에서 아이템 Ability를 임시로 1회 부여하고 EventData를 보내면서 실행 */
 	bool TryGiveAndActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
 
 	/** 취소 시 인벤토리에서 선차감한 아이템 수량을 복구 */
 	void RestoreCanceledItem(FName ItemID);
-
-	/** 서버 AbilitySystem으로 GameplayEvent를 발송 */
-	void DispatchTargetingInputEvent(FGameplayTag EventTag);
 	
 	/** 아이템 액션값들을 초기화 */
 	void ResetItemAction();

@@ -5,7 +5,6 @@
 #include "Abilities/GameplayAbility.h"
 #include "GameplayTagContainer.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
-#include "BoardGame/Game/DDBoardGameMode.h"
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
 #include "UI/Inventory/DDInventoryComponent.h"
@@ -30,33 +29,37 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 	
 	if (ActiveItemTag == DDGameplayTags::Item_Activate_Instant)
 	{
-		// 즉시사용 아이템 액션 시작
-		StartInstantAction();
+		CurrentActionMode = EItemActionMode::Instant;
+		ConfirmCurrentItemAction();
 		return;
 	}
 
 	if (ActiveItemTag == DDGameplayTags::Item_Activate_Targeting)
 	{
-		// 타게팅 아이템 액션 시작
-		StartTargetingAction();
+		LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 액션 시작"));
+
+		CurrentActionMode = EItemActionMode::Targeting;
+		ApplyItemActionTag();
+		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr);
 		return;
 	}
 
 	if (ActiveItemTag == DDGameplayTags::Item_Activate_Range)
 	{
-		// 범위 아이템 액션 시작
-		StartRangeAction();
+		CurrentActionMode = EItemActionMode::Range;
+		ApplyItemActionTag();
+		// TODO 범위를 표시하고, 해당 범위 내의 플레이어를 순회해서 Owner와 비교한 뒤 후보자에 추가
 		return;
 	}
 	
 	ResetItemAction();
 }
 
-void UItemActionComponent::ConfirmItemAction()
+void UItemActionComponent::ConfirmCurrentItemAction()
 {
 	if (!ActiveItemAbility)
 	{
-		CancelItemAction();
+		CancelCurrentItemAction();
 		return;
 	}
 	
@@ -69,8 +72,7 @@ void UItemActionComponent::ConfirmItemAction()
 		break;
 
 	case EItemActionMode::Targeting:
-		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Confirm);
-		ResetItemAction();
+		SendTargetingInput(EItemTargetingInput::Confirm);
 		break;
 
 	case EItemActionMode::Range:
@@ -82,17 +84,15 @@ void UItemActionComponent::ConfirmItemAction()
 	}
 }
 
-void UItemActionComponent::CancelItemAction()
+void UItemActionComponent::CancelCurrentItemAction()
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 : %s"), *ActiveItemID.ToString());
 
 	if (CurrentActionMode == EItemActionMode::Targeting)
 	{
-		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Cancel);
+		Server_SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Cancel);
 	}
 	
-	// 카메라 원상복구
-	Server_FocusItemTarget(GetOwner());
 	// 아이템 수 원상복구
 	RestoreCanceledItem(ActiveItemID);
 	// 다시 인벤토리 창 띄우기
@@ -110,22 +110,6 @@ void UItemActionComponent::CancelItemAction()
 	ResetItemAction();
 }
 
-void UItemActionComponent::Server_FocusItemTarget_Implementation(AActor* TargetActor)
-{
-	if (!IsValid(TargetActor))
-	{
-		return;
-	}
-
-	ADDBoardGameMode* BoardGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDBoardGameMode>() : nullptr;
-	if (!BoardGameMode)
-	{
-		return;
-	}
-
-	BoardGameMode->FocusAllCamerasOnTarget(TargetActor);
-}
-
 void UItemActionComponent::Server_ActivateItemAbility_Implementation(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 아이템 Ability 실행 요청 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
@@ -138,72 +122,47 @@ void UItemActionComponent::Server_ActivateItemAbility_Implementation(FName ItemI
 	}
 }
 
-void UItemActionComponent::StartInstantAction()
+void UItemActionComponent::SendTargetingInput(EItemTargetingInput Input)
 {
-	CurrentActionMode = EItemActionMode::Instant;
-	// 즉시 아이템 어빌리티 실행
-	ConfirmItemAction();
-}
-
-void UItemActionComponent::StartTargetingAction()
-{
-	
-	LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 액션 시작"));
-	
-	CurrentActionMode = EItemActionMode::Targeting;
-	ApplyItemActionTag();
-
-	Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr);
-}
-
-void UItemActionComponent::StartRangeAction()
-{
-	CurrentActionMode = EItemActionMode::Range;
-	ApplyItemActionTag();
-	
-	// TODO 범위를 표시하고, 해당 범위 내의 플레이어를 순회해서 Owner와 비교한 뒤 후보자에 추가
-}
-
-void UItemActionComponent::SelectNextTarget()
-{
-	if (CurrentActionMode == EItemActionMode::Targeting)
+	if (CurrentActionMode != EItemActionMode::Targeting)
 	{
-		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Next);
+		return;
 	}
-}
 
-void UItemActionComponent::SelectPreviousTarget()
-{
-	if (CurrentActionMode == EItemActionMode::Targeting)
+	if (Input == EItemTargetingInput::Cancel)
 	{
-		SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Previous);
+		CancelCurrentItemAction();
+		return;
 	}
-}
 
-void UItemActionComponent::SendTargetingInputEvent(FGameplayTag EventTag)
-{
-	if (!EventTag.IsValid())
+	FGameplayTag EventTag;
+	switch (Input)
 	{
+	case EItemTargetingInput::Next:
+		EventTag = DDGameplayTags::Event_Item_Target_Next;
+		break;
+	case EItemTargetingInput::Previous:
+		EventTag = DDGameplayTags::Event_Item_Target_Previous;
+		break;
+	case EItemTargetingInput::Confirm:
+		EventTag = DDGameplayTags::Event_Item_Target_Confirm;
+		break;
+	default:
 		return;
 	}
 
 	Server_SendTargetingInputEvent(EventTag);
+
+	if (Input == EItemTargetingInput::Confirm)
+	{
+		ResetItemAction();
+	}
 }
 
 void UItemActionComponent::Server_SendTargetingInputEvent_Implementation(FGameplayTag EventTag)
 {
-	DispatchTargetingInputEvent(EventTag);
-}
-
-void UItemActionComponent::DispatchTargetingInputEvent(FGameplayTag EventTag)
-{
-	if (!EventTag.IsValid())
-	{
-		return;
-	}
-
 	AActor* OwnerActor = GetOwner();
-	if (!IsValid(OwnerActor))
+	if (!EventTag.IsValid() || !IsValid(OwnerActor))
 	{
 		return;
 	}

@@ -4,6 +4,7 @@
 #include "EngineUtils.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "BoardGame/Character/Components/ItemActionComponent.h"
+#include "BoardGame/Game/DDBoardGameMode.h"
 #include "System/DDGameplayTags.h"
 
 UGA_TargetingItemBase::UGA_TargetingItemBase()
@@ -47,7 +48,7 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 	{
 		if (ItemActionComponent)
 		{
-			ItemActionComponent->CancelItemAction();
+			ItemActionComponent->CancelCurrentItemAction();
 		}
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
@@ -104,9 +105,9 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 void UGA_TargetingItemBase::EndAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	if (bSelectingTarget && ItemActionComponent)
+	if (bSelectingTarget)
 	{
-		ItemActionComponent->Server_FocusItemTarget(GetAvatarActorFromActorInfo());
+		FocusCameraOnTarget(GetAvatarActorFromActorInfo());
 	}
 
 	CandidateTargets.Reset();
@@ -200,10 +201,23 @@ void UGA_TargetingItemBase::ChangeTarget(int32 Offset)
 
 void UGA_TargetingItemBase::FocusSelectedTarget()
 {
-	if (ItemActionComponent)
+	FocusCameraOnTarget(GetSelectedTarget());
+}
+
+void UGA_TargetingItemBase::FocusCameraOnTarget(AActor* TargetActor)
+{
+	if (!IsValid(TargetActor))
 	{
-		ItemActionComponent->Server_FocusItemTarget(GetSelectedTarget());
+		return;
 	}
+
+	ADDBoardGameMode* BoardGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ADDBoardGameMode>() : nullptr;
+	if (!BoardGameMode)
+	{
+		return;
+	}
+
+	BoardGameMode->FocusAllCamerasOnTarget(TargetActor);
 }
 
 AActor* UGA_TargetingItemBase::GetSelectedTarget() const

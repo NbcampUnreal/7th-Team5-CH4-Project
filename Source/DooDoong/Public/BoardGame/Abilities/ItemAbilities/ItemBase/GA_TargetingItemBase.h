@@ -58,6 +58,9 @@ protected:
 	/** 선택된 후보에게 카메라 포커스를 이동 */
 	void FocusSelectedTarget();
 
+	/** 보드게임 카메라를 지정한 대상에게 포커스 */
+	void FocusCameraOnTarget(AActor* TargetActor);
+
 	/** 현재 선택된 타겟을 반환 */
 	AActor* GetSelectedTarget() const;
 
