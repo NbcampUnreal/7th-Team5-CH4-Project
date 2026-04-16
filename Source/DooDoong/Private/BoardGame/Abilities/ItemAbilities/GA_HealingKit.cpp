@@ -10,6 +10,7 @@ UGA_HealingKit::UGA_HealingKit()
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 
+	AbilityTags.AddTag(DDGameplayTags::Item_Ability_HealingKit);
 	ActivationBlockedTags.AddTag(DDGameplayTags::State_Character_Death);
 }
 

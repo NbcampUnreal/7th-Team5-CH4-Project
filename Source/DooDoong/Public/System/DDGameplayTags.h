@@ -102,6 +102,13 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Instant);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Targeting);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Range);
+
+	// 아이템 액션 어빌리티 태그
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(ItemAction_Ability_Targeting);
+	
+	// 아이템 어빌리티 태그
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_HealingKit);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_GiveBomb);
 	
 	// 아이템 액션 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Targeting);

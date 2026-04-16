@@ -99,6 +99,13 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Instant, "Item.Activate.Instant", "즉시사용 아이템");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Targeting, "Item.Activate.Targeting", "타게팅 아이템");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Range, "Item.Activate.Range", "범위 아이템");
+
+	// 아이템 액션 어빌리티 태그
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(ItemAction_Ability_Targeting, "ItemAction.Ability.Targeting", "타게팅 아이템 액션 어빌리티");
+	
+	// 아이템 어빌리티 태그
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_HealingKit, "Item.Ability.HealingKit", "힐링 키트 아이템 어빌리티");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_GiveBomb, "Item.Ability.GiveBomb", "폭탄 넘기기 아이템 어빌리티");
 	
 	// 아이템 액션 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Targeting, "State.ItemAction.Targeting", "아이템 타겟 선택 중");

@@ -16,10 +16,6 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName ItemID;
 	
-	/** 아이템 타입 태그 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag ItemType;
-	
 	/** 표시될 아이템 이름 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText DisplayName;
@@ -28,9 +24,13 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Description;
 	
+	/** 아이템 타입 태그 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag ItemTag;
+	
 	/** 아이템 어빌리티 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UGameplayAbility> ItemAbility;
+	FGameplayTag AbilityTag;
 	
 	/** 표시될 아이템 아이콘 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
