@@ -542,6 +542,8 @@ void ADDBoardGameMode::CalculateFinalWinner()
     TArray<FFinalRankData> FinalResults;
     for (int32 i = 0; i < RankCandidates.Num(); ++i)
     {
+    	RankCandidates[i]->PlayerGameData.bIsGameFinished = true;
+    	
         FFinalRankData Data;
         Data.Rank = i + 1;
         Data.PlayerName = RankCandidates[i]->PlayerGameData.PlayerDisplayName;

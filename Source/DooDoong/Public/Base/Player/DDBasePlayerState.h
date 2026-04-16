@@ -31,6 +31,10 @@ struct FPlayerGameplayInfo
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     int32 TurnOrder = -1;
+	
+	// 게임 진행 중에는 false, 게임 종료 후 true
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    bool bIsGameFinished = false;
 };
 
 UCLASS()
