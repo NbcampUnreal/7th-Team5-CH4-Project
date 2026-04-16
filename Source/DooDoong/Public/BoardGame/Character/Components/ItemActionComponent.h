@@ -110,7 +110,7 @@ protected:
 	FName ActiveItemID = NAME_None;
 	
 	UPROPERTY()
-	FGameplayTag ActiveItemType;
+	FGameplayTag ActiveItemTag;
 	
 	UPROPERTY()
 	TSubclassOf<UGameplayAbility> ActiveItemAbility;

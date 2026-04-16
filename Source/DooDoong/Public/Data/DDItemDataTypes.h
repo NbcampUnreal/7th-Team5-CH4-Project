@@ -30,7 +30,7 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	
 	/** 아이템 어빌리티 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag AbilityTag;
+	TSubclassOf<UGameplayAbility> ItemAbility;
 	
 	/** 표시될 아이템 아이콘 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

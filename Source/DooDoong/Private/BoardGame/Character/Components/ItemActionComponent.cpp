@@ -26,22 +26,22 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 	}
 	
 	ActiveItemID = ItemRow.ItemID;
-	ActiveItemType = ItemRow.ItemType;
+	ActiveItemTag = ItemRow.ItemTag;
 	ActiveItemAbility = ItemRow.ItemAbility;
 	
-	if (ActiveItemType == DDGameplayTags::Item_Activate_Instant)
+	if (ActiveItemTag == DDGameplayTags::Item_Activate_Instant)
 	{
 		StartInstantAction();
 		return;
 	}
 
-	if (ActiveItemType == DDGameplayTags::Item_Activate_Targeting)
+	if (ActiveItemTag == DDGameplayTags::Item_Activate_Targeting)
 	{
 		StartTargetingAction();
 		return;
 	}
 
-	if (ActiveItemType == DDGameplayTags::Item_Activate_Range)
+	if (ActiveItemTag == DDGameplayTags::Item_Activate_Range)
 	{
 		StartRangeAction();
 		return;
@@ -346,7 +346,7 @@ void UItemActionComponent::ResetItemAction()
 	
 	CurrentActionMode = EItemActionMode::None;
 	ActiveItemID = NAME_None;
-	ActiveItemType = FGameplayTag();
+	ActiveItemTag = FGameplayTag();
 	ActiveItemAbility = nullptr;
 	CandidateTargets.Reset();
 	SelectedTargetIndex = INDEX_NONE;
