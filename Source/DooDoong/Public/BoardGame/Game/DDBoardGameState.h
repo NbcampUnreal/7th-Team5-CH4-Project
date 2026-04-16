@@ -4,6 +4,27 @@
 #include "Base/Game/DDGameStateBase.h"
 #include "DDBoardGameState.generated.h"
 
+// 1. UI 전달 전용 결과 데이터 구조체
+USTRUCT(BlueprintType)
+struct FFinalRankData
+{
+    GENERATED_BODY()
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RankData")
+    int32 Rank = 0;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RankData")
+    FName PlayerName = NAME_None;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RankData")
+    int32 Trophy = 0;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RankData")
+    int32 Coin = 0;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFinalRankingsUpdated, const TArray<FFinalRankData>&, Rankings);
+
 class ALevelSequenceActor;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateTimerChanged, int32, NewTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoundChanged, int32, NewRound);
@@ -46,13 +67,6 @@ public:
 
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentRound, VisibleAnywhere, BlueprintReadOnly, Category = "GameData")
 	int32 CurrentRound = 1;
-
-	// --- 이벤트 델리게이트 (위젯에서 바인딩) ---
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnStateTimerChanged OnStateTimerChanged;
-
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnRoundChanged OnRoundChanged;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ALevelSequenceActor* LevelSequenceActor;
@@ -63,4 +77,23 @@ protected:
 
 	UFUNCTION()
 	void OnRep_CurrentRound();
+	
+public:
+	// 3. 순위표 데이터 복제 배열
+    UPROPERTY(ReplicatedUsing = OnRep_FinalRankings, VisibleAnywhere, BlueprintReadOnly, Category = "GameData")
+    TArray<FFinalRankData> FinalRankings;
+	
+	// --- 이벤트 델리게이트 (위젯에서 바인딩) ---
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnStateTimerChanged OnStateTimerChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnRoundChanged OnRoundChanged;
+
+    UPROPERTY(BlueprintAssignable, Category = "Events")
+    FOnFinalRankingsUpdated OnFinalRankingsUpdated;
+	
+protected:
+    UFUNCTION()
+    void OnRep_FinalRankings();
 };
