@@ -1,8 +1,8 @@
-#include "BoardGame/Abilities/ItemAbilities/GA_TargetingBase.h"
+#include "BoardGame/Abilities/ItemAbilities/GA_Targeting.h"
 
 #include "System/DDGameplayTags.h"
 
-UGA_TargetingBase::UGA_TargetingBase()
+UGA_Targeting::UGA_Targeting()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
