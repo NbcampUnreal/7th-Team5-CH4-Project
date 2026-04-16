@@ -60,17 +60,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_FocusItemTarget(AActor* TargetActor);
 
-	/** 즉시사용 아이템 액션 서버 RPC */
+	/** 서버에서 아이템 Ability를 1회성으로 부여하고 실행 */
 	UFUNCTION(Server, Reliable)
-	void Server_ConfirmInstantItem(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility);
-
-	/** 타게팅 아이템 액션 서버 RPC */
-	UFUNCTION(Server, Reliable)
-	void Server_ConfirmTargetingItem(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
-
-	/** 범위 아이템 액션 서버 RPC */
-	UFUNCTION(Server, Reliable)
-	void Server_ConfirmRangeItem(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility);
+	void Server_ActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
 
 protected:
 	/** 즉시사용 아이템 액션 */
@@ -83,8 +75,8 @@ protected:
 	void StartRangeAction();
 	
 protected:
-	/** 서버에서 아이템 Ability를 1회성으로 부여하고 실행 */
-	bool TryActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
+	/** 아이템 Ability를 1회성으로 부여하고 실행 */
+	bool TryGiveAndActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
 
 	/** 취소 시 인벤토리에서 선차감한 아이템 수량을 복구 */
 	void RestoreCanceledItem(FName ItemID);

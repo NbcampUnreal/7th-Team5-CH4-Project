@@ -61,7 +61,7 @@ void UItemActionComponent::ConfirmItemAction()
 	switch (CurrentActionMode)
 	{
 	case EItemActionMode::Instant:
-		Server_ConfirmInstantItem(ActiveItemID, ActiveItemAbility);
+		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr);
 		ResetItemAction();
 		break;
 
@@ -71,7 +71,7 @@ void UItemActionComponent::ConfirmItemAction()
 		break;
 
 	case EItemActionMode::Range:
-		Server_ConfirmRangeItem(ActiveItemID, ActiveItemAbility);
+		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr);
 		ResetItemAction();
 		break;
 	default:
@@ -123,45 +123,15 @@ void UItemActionComponent::Server_FocusItemTarget_Implementation(AActor* TargetA
 	BoardGameMode->FocusAllCamerasOnTarget(TargetActor);
 }
 
-void UItemActionComponent::Server_ConfirmInstantItem_Implementation(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility)
+void UItemActionComponent::Server_ActivateItemAbility_Implementation(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
 {
-	LOG_JJH(Warning, TEXT("[아이템 액션] 즉시사용 아이템 액션 : %s"), *ItemID.ToString());
+	LOG_JJH(Warning, TEXT("[아이템 액션] 아이템 Ability 실행 요청 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
 	
-	if (!TryActivateItemAbility(ItemID, ItemAbility, nullptr))
+	if (!TryGiveAndActivateItemAbility(ItemID, ItemAbility, TargetActor))
 	{
-		LOG_JJH(Warning, TEXT("[아이템 액션] 즉시사용 아이템 Ability 실행 실패 : %s"), *ItemID.ToString());
+		LOG_JJH(Warning, TEXT("[아이템 액션] 아이템 Ability 실행 실패 : %s"), *ItemID.ToString());
 		return;
 	}
-}
-
-void UItemActionComponent::Server_ConfirmTargetingItem_Implementation(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
-{
-	LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 액션 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
-	
-	if (!IsValid(TargetActor))
-	{
-		LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 TargetActor가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
-		return;
-	}
-	
-	if (!TryActivateItemAbility(ItemID, ItemAbility, TargetActor))
-	{
-		LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 아이템 Ability 실행 실패 : %s"), *ItemID.ToString());
-		return;
-	}
-}
-
-void UItemActionComponent::Server_ConfirmRangeItem_Implementation(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility)
-{
-	LOG_JJH(Warning, TEXT("[아이템 액션] 범위 아이템 액션 : %s"), *ItemID.ToString());
-	
-	if (!TryActivateItemAbility(ItemID, ItemAbility, nullptr))
-	{
-		LOG_JJH(Warning, TEXT("[아이템 액션] 범위 아이템 Ability 실행 실패 : %s"), *ItemID.ToString());
-		return;
-	}
-	
-	// TODO 범위 내 대상 목록을 EventData에 담는 방식이 정해지면 TargetActor 대신 TargetData 구조로 확장
 }
 
 void UItemActionComponent::StartInstantAction()
@@ -178,7 +148,7 @@ void UItemActionComponent::StartTargetingAction()
 	CurrentActionMode = EItemActionMode::Targeting;
 	ApplyItemActionTag();
 
-	if (!TryActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr))
+	if (!TryGiveAndActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr))
 	{
 		CancelItemAction();
 	}
@@ -236,10 +206,10 @@ void UItemActionComponent::ConfirmTargetingItem(AActor* TargetActor)
 		return;
 	}
 
-	Server_ConfirmTargetingItem(ActiveItemID, ActiveItemAbility, TargetActor);
+	Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, TargetActor);
 }
 
-bool UItemActionComponent::TryActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
+bool UItemActionComponent::TryGiveAndActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
 {
 	if (!ItemAbility)
 	{
