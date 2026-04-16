@@ -37,8 +37,6 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Previous, "Event.Item.Target.Previous", "아이템 타게팅 이전 대상 선택 입력 이벤트 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Confirm, "Event.Item.Target.Confirm", "아이템 타게팅 확정 입력 이벤트 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Cancel, "Event.Item.Target.Cancel", "아이템 타게팅 취소 입력 이벤트 태그");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_TargetConfirmed, "Event.Item.TargetConfirmed", "아이템 타게팅 확정 이벤트 태그");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_TargetCanceled, "Event.Item.TargetCanceled", "아이템 타게팅 취소 이벤트 태그");
 	
 	// Data Tags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Data_Health_Heal, "Data.Health.Heal", "Health Attribute를 양변화 시키는 경우 사용할 태그")
@@ -109,8 +107,6 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Range, "Item.Activate.Range", "범위 아이템");
 
 	// 아이템 액션 어빌리티 태그
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(ItemAction_Ability_Targeting, "ItemAction.Ability.Targeting", "타게팅 아이템 액션 어빌리티");
-	
 	// 아이템 어빌리티 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_HealingKit, "Item.Ability.HealingKit", "힐링 키트 아이템 어빌리티");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_GiveBomb, "Item.Ability.GiveBomb", "폭탄 넘기기 아이템 어빌리티");
