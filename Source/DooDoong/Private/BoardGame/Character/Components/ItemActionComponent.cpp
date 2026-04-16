@@ -30,18 +30,21 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 	
 	if (ActiveItemTag == DDGameplayTags::Item_Activate_Instant)
 	{
+		// 즉시사용 아이템 액션 시작
 		StartInstantAction();
 		return;
 	}
 
 	if (ActiveItemTag == DDGameplayTags::Item_Activate_Targeting)
 	{
+		// 타게팅 아이템 액션 시작
 		StartTargetingAction();
 		return;
 	}
 
 	if (ActiveItemTag == DDGameplayTags::Item_Activate_Range)
 	{
+		// 범위 아이템 액션 시작
 		StartRangeAction();
 		return;
 	}
@@ -60,6 +63,7 @@ void UItemActionComponent::ConfirmItemAction()
 	switch (CurrentActionMode)
 	{
 	case EItemActionMode::Instant:
+		// 서버에서 아이템 어빌리티를 활성화하도록 요청
 		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr);
 		ResetItemAction();
 		break;
@@ -126,6 +130,7 @@ void UItemActionComponent::Server_ActivateItemAbility_Implementation(FName ItemI
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 아이템 Ability 실행 요청 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
 	
+	// 아이템 실행
 	if (!TryGiveAndActivateItemAbility(ItemID, ItemAbility, TargetActor))
 	{
 		LOG_JJH(Warning, TEXT("[아이템 액션] 아이템 Ability 실행 실패 : %s"), *ItemID.ToString());
@@ -136,6 +141,7 @@ void UItemActionComponent::Server_ActivateItemAbility_Implementation(FName ItemI
 void UItemActionComponent::StartInstantAction()
 {
 	CurrentActionMode = EItemActionMode::Instant;
+	// 즉시 아이템 어빌리티 실행
 	ConfirmItemAction();
 }
 
@@ -210,17 +216,6 @@ void UItemActionComponent::DispatchTargetingInputEvent(FGameplayTag EventTag)
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OwnerActor, EventTag, Payload);
 }
 
-void UItemActionComponent::ConfirmTargetingItem(AActor* TargetActor)
-{
-	if (CurrentActionMode != EItemActionMode::Targeting)
-	{
-		return;
-	}
-
-	Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, TargetActor);
-	ResetItemAction();
-}
-
 bool UItemActionComponent::TryGiveAndActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
 {
 	if (!ItemAbility)
@@ -243,6 +238,7 @@ bool UItemActionComponent::TryGiveAndActivateItemAbility(FName ItemID, TSubclass
 		return false;
 	}
 	
+	// 아이템 확성화 이벤트 태그를 발송
 	FGameplayEventData EventData;
 	EventData.EventTag = DDGameplayTags::Event_Item_Activate;
 	EventData.Instigator = OwnerCharacter;

@@ -30,11 +30,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	void BeginItemAction(const FItemTableRow& ItemRow);
 	
-	/** 최종적으로 아이템을 사용 == 아이템의 어빌리티를 실행, 아이템 수 감소 */
+	/** 최종적으로 아이템을 사용 == 아이템의 어빌리티를 실행 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	void ConfirmItemAction();
 	
-	/** 아이템 사용을 취소하고 인벤토리 창을 다시 띄움 */
+	/** 아이템 사용을 취소하고 인벤토리 창을 다시 띄움 + 선차감된 아이템 수 복구 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	void CancelItemAction();
 
@@ -49,10 +49,7 @@ public:
 	/** 아이템 타게팅 이벤트를 전달하는 헬퍼 */
 	void SendTargetingInputEvent(FGameplayTag EventTag);
 
-	/** 선택된 타겟으로 타게팅 아이템을 서버에서 확정 */
-	void ConfirmTargetingItem(AActor* TargetActor);
-
-	/** 아이템 액션이 진행중인지 확인 : 타게팅할 때 + 범위표시할 때 아이템 액션 중인지 확인하고 수행 */
+	/** 아이템 액션 중인지 확인 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	bool IsItemActionActive() const { return CurrentActionMode != EItemActionMode::None; }
 	
@@ -80,12 +77,13 @@ protected:
 	void StartRangeAction();
 	
 protected:
-	/** 아이템 Ability를 1회성으로 부여하고 실행 */
+	/** 서버에서 아이템 Ability를 임시로 1회 부여하고 EventData를 보내면서 실행 */
 	bool TryGiveAndActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
 
 	/** 취소 시 인벤토리에서 선차감한 아이템 수량을 복구 */
 	void RestoreCanceledItem(FName ItemID);
 
+	/** 서버 AbilitySystem으로 GameplayEvent를 발송 */
 	void DispatchTargetingInputEvent(FGameplayTag EventTag);
 	
 	/** 아이템 액션값들을 초기화 */
