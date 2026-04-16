@@ -32,7 +32,15 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_Start);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_End);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Shooter_Fire);
+	
+	// 아이템 관련 이벤트 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Activate);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Target_Next);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Target_Previous);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Target_Confirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Target_Cancel);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_TargetConfirmed);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_TargetCanceled);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_TargetConfirmed);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_TargetCanceled);
 

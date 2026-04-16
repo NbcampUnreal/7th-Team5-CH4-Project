@@ -30,7 +30,13 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_Start, "Event.Trace.Start");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_End, "Event.Trace.End");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Shooter_Fire, "Event.Shooter.Fire", "슈터 미니게임 발사 애니메이션 몽타주에서 사용할 발사 이벤트 태그");
+	
+	// 아이템 관련 이벤트 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Activate, "Event.Item.Activate", "아이템 Ability 실행 시 전달하는 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Next, "Event.Item.Target.Next", "아이템 타게팅 다음 대상 선택 입력 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Previous, "Event.Item.Target.Previous", "아이템 타게팅 이전 대상 선택 입력 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Confirm, "Event.Item.Target.Confirm", "아이템 타게팅 확정 입력 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Cancel, "Event.Item.Target.Cancel", "아이템 타게팅 취소 입력 이벤트 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_TargetConfirmed, "Event.Item.TargetConfirmed", "아이템 타게팅 확정 이벤트 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_TargetCanceled, "Event.Item.TargetCanceled", "아이템 타게팅 취소 이벤트 태그");
 	
