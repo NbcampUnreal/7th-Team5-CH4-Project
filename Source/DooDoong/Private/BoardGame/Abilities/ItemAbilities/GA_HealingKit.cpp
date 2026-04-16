@@ -1,66 +1,35 @@
-﻿#include "BoardGame/Abilities/ItemAbilities/GA_HealingKit.h"
+#include "BoardGame/Abilities/ItemAbilities/GA_HealingKit.h"
 
 #include "AbilitySystemComponent.h"
-#include "Base/Player/DDBasePlayerState.h"
 #include "Common/DDLogManager.h"
 #include "System/DDGameplayTags.h"
 
 UGA_HealingKit::UGA_HealingKit()
 {
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
-
 	AbilityTags.AddTag(DDGameplayTags::Item_Ability_HealingKit);
-	ActivationBlockedTags.AddTag(DDGameplayTags::State_Character_Death);
 }
 
-void UGA_HealingKit::ActivateAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-                                     FGameplayAbilityActivationInfo ActivationInfo,
-                                     const FGameplayEventData* TriggerEventData)
+bool UGA_HealingKit::ExecuteInstantItem(const FGameplayEventData* TriggerEventData)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (!HasAuthority(&ActivationInfo))
-	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-		return;
-	}
-
-	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
-	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-		return;
-	}
-
-	ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(ActorInfo->OwnerActor.Get());
-	if (!PS)
-	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-		return;
-	}
-
-	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+	UAbilitySystemComponent* ASC = GetBoardGameAbilitySystemComponent();
 	if (!ASC)
 	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-		return;
+		return false;
 	}
 
 	FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(HealingEffect, 1.f);
 	if (!SpecHandle.IsValid())
 	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-		return;
+		return false;
 	}
 
 	SpecHandle.Data->SetSetByCallerMagnitude(
-		FGameplayTag::RequestGameplayTag("Data.Health.Heal"),
+		DDGameplayTags::Data_Health_Heal,
 		HealAmount
 	);
 
 	LOG_JJH(Warning, TEXT("Heal : %f"), HealAmount);
 
 	ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
-	
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+	return true;
 }

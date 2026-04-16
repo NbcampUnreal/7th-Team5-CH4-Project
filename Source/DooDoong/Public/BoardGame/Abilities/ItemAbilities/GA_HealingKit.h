@@ -1,24 +1,20 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/GameplayAbility.h"
+#include "BoardGame/Abilities/ItemAbilities/ItemBase/GA_InstantItemBase.h"
 #include "GA_HealingKit.generated.h"
 
 UCLASS()
-class DOODOONG_API UGA_HealingKit : public UGameplayAbility
+class DOODOONG_API UGA_HealingKit : public UGA_InstantItemBase
 {
 	GENERATED_BODY()
 
 public:
 	UGA_HealingKit();
 
-	virtual void ActivateAbility(
-		FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData) override;
-
 protected:
+	virtual bool ExecuteInstantItem(const FGameplayEventData* TriggerEventData) override;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HealingKit")
 	TSubclassOf<UGameplayEffect> HealingEffect;
 
