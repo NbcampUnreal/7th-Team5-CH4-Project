@@ -22,7 +22,12 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 	{
 		bSelectingTarget = false;
 
-		if (!CommitItemAbility(Handle, ActorInfo, ActivationInfo))
+		if (!HasAuthority(&ActivationInfo))
+		{
+			return;
+		}
+		
+		if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 		{
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 			return;
@@ -130,10 +135,10 @@ void UGA_TargetingItemBase::OnTargetConfirm(FGameplayEventData Payload)
 		OnTargetCancel(Payload);
 		return;
 	}
-
+	
 	if (bSelectingTarget)
 	{
-		const bool bCommitted = CommitItemAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+		const bool bCommitted = CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
 		if (!bCommitted)
 		{
 			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);

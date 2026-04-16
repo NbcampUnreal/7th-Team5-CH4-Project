@@ -28,14 +28,3 @@ UAbilitySystemComponent* UGA_ItemBase::GetBoardGameAbilitySystemComponent() cons
 	const ADDBoardGameCharacter* BoardGameCharacter = GetBoardGameCharacter();
 	return BoardGameCharacter ? BoardGameCharacter->GetAbilitySystemComponent() : nullptr;
 }
-
-bool UGA_ItemBase::CommitItemAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	FGameplayAbilityActivationInfo ActivationInfo)
-{
-	if (!HasAuthority(&ActivationInfo))
-	{
-		return false;
-	}
-
-	return CommitAbility(Handle, ActorInfo, ActivationInfo);
-}

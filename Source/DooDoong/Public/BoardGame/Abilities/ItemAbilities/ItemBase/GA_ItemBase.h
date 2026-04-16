@@ -24,12 +24,7 @@ public:
 protected:
 	/** 아이템을 사용하는 보드게임 캐릭터 Getter */
 	ADDBoardGameCharacter* GetBoardGameCharacter() const;
-
+protected:
 	/** 보드게임 캐릭터가 사용하는 ASC Getter */
 	UAbilitySystemComponent* GetBoardGameAbilitySystemComponent() const;
-
-protected:
-	/** 서버 권한 확인 후 CommitAbility를 수행 */
-	bool CommitItemAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-		FGameplayAbilityActivationInfo ActivationInfo);
 };
