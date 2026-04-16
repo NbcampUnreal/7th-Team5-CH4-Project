@@ -5,8 +5,6 @@
 #include "Engine/DataTable.h"
 #include "DDItemDataTypes.generated.h"
 
-class UGameplayAbility;
-
 USTRUCT(BlueprintType)
 struct DOODOONG_API FItemTableRow : public FTableRowBase
 {
@@ -28,9 +26,9 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag ItemTag;
 	
-	/** 아이템 어빌리티 */
+	/** 실행할 아이템 어빌리티 태그 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UGameplayAbility> ItemAbility;
+	FGameplayTag ItemAbilityTag;
 	
 	/** 표시될 아이템 아이콘 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

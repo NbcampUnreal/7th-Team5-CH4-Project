@@ -6,8 +6,6 @@
 #include "GameplayTagContainer.h"
 #include "ItemActionComponent.generated.h"
 
-class UGameplayAbility;
-
 UENUM(BlueprintType)
 enum class EItemActionMode : uint8
 {
@@ -56,17 +54,17 @@ public:
 	bool IsItemActionActive() const { return CurrentActionMode != EItemActionMode::None; }
 	
 public:
-	/** 서버에서 아이템 Ability를 1회성으로 부여하고 실행 */
+	/** 서버에서 이미 부여된 아이템 Ability를 이벤트로 실행 */
 	UFUNCTION(Server, Reliable)
-	void Server_ActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
+	void Server_ActivateItemAbility(FName ItemID, FGameplayTag ItemAbilityTag, AActor* TargetActor);
 
 	/** 서버에서 진행 중인 타게팅 Ability에 입력 이벤트를 전달 */
 	UFUNCTION(Server, Reliable)
 	void Server_SendTargetingInputEvent(FGameplayTag EventTag);
 
 protected:
-	/** 서버에서 아이템 Ability를 임시로 1회 부여하고 EventData를 보내면서 실행 */
-	bool TryGiveAndActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
+	/** 서버에서 이미 부여된 아이템 Ability를 찾아 EventData를 보내면서 실행 */
+	bool TryActivateItemAbility(FName ItemID, FGameplayTag ItemAbilityTag, AActor* TargetActor);
 
 	/** 취소 시 인벤토리에서 선차감한 아이템 수량을 복구 */
 	void RestoreCanceledItem(FName ItemID);
@@ -92,5 +90,5 @@ protected:
 	FGameplayTag ActiveItemTag;
 	
 	UPROPERTY()
-	TSubclassOf<UGameplayAbility> ActiveItemAbility;
+	FGameplayTag ActiveItemAbilityTag;
 };

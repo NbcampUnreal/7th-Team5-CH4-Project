@@ -8,7 +8,6 @@
 
 UGA_TargetingItemBase::UGA_TargetingItemBase()
 {
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 }
 
 void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
@@ -40,7 +39,6 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 
 	if (!HasAuthority(&ActivationInfo))
 	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 

@@ -2,7 +2,6 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "Abilities/GameplayAbility.h"
 #include "GameplayTagContainer.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Common/DDLogManager.h"
@@ -25,7 +24,7 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 	
 	ActiveItemID = ItemRow.ItemID;
 	ActiveItemTag = ItemRow.ItemTag;
-	ActiveItemAbility = ItemRow.ItemAbility;
+	ActiveItemAbilityTag = ItemRow.ItemAbilityTag;
 	
 	if (ActiveItemTag == DDGameplayTags::Item_Activate_Instant)
 	{
@@ -40,7 +39,7 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 
 		CurrentActionMode = EItemActionMode::Targeting;
 		ApplyItemActionTag();
-		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr);
+		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbilityTag, nullptr);
 		return;
 	}
 
@@ -57,7 +56,7 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 
 void UItemActionComponent::ConfirmCurrentItemAction()
 {
-	if (!ActiveItemAbility)
+	if (!ActiveItemAbilityTag.IsValid())
 	{
 		CancelCurrentItemAction();
 		return;
@@ -67,7 +66,7 @@ void UItemActionComponent::ConfirmCurrentItemAction()
 	{
 	case EItemActionMode::Instant:
 		// 서버에서 아이템 어빌리티를 활성화하도록 요청
-		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr);
+		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbilityTag, nullptr);
 		ResetItemAction();
 		break;
 
@@ -76,7 +75,7 @@ void UItemActionComponent::ConfirmCurrentItemAction()
 		break;
 
 	case EItemActionMode::Range:
-		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbility, nullptr);
+		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbilityTag, nullptr);
 		ResetItemAction();
 		break;
 	default:
@@ -110,12 +109,12 @@ void UItemActionComponent::CancelCurrentItemAction()
 	ResetItemAction();
 }
 
-void UItemActionComponent::Server_ActivateItemAbility_Implementation(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
+void UItemActionComponent::Server_ActivateItemAbility_Implementation(FName ItemID, FGameplayTag ItemAbilityTag, AActor* TargetActor)
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 아이템 Ability 실행 요청 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
 	
 	// 아이템 실행
-	if (!TryGiveAndActivateItemAbility(ItemID, ItemAbility, TargetActor))
+	if (!TryActivateItemAbility(ItemID, ItemAbilityTag, TargetActor))
 	{
 		LOG_JJH(Warning, TEXT("[아이템 액션] 아이템 Ability 실행 실패 : %s"), *ItemID.ToString());
 		return;
@@ -175,11 +174,11 @@ void UItemActionComponent::Server_SendTargetingInputEvent_Implementation(FGamepl
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OwnerActor, EventTag, Payload);
 }
 
-bool UItemActionComponent::TryGiveAndActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor)
+bool UItemActionComponent::TryActivateItemAbility(FName ItemID, FGameplayTag ItemAbilityTag, AActor* TargetActor)
 {
-	if (!ItemAbility)
+	if (!ItemAbilityTag.IsValid())
 	{
-		LOG_JJH(Warning, TEXT("[아이템 액션] ItemAbility가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
+		LOG_JJH(Warning, TEXT("[아이템 액션] ItemAbilityTag가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
 		return false;
 	}
 	
@@ -196,6 +195,24 @@ bool UItemActionComponent::TryGiveAndActivateItemAbility(FName ItemID, TSubclass
 		LOG_JJH(Warning, TEXT("[아이템 액션] AbilitySystemComponent가 유효하지 않습니다. ItemID: %s"), *ItemID.ToString());
 		return false;
 	}
+
+	FGameplayAbilitySpec* ItemAbilitySpec = nullptr;
+	for (FGameplayAbilitySpec& AbilitySpec : AbilitySystemComp->GetActivatableAbilities())
+	{
+		if (AbilitySpec.Ability && AbilitySpec.Ability->GetAssetTags().HasTagExact(ItemAbilityTag))
+		{
+			ItemAbilitySpec = &AbilitySpec;
+			break;
+		}
+	}
+
+	if (!ItemAbilitySpec)
+	{
+		LOG_JJH(Warning, TEXT("[아이템 액션] ItemAbilityTag에 맞는 Ability가 ASC에 부여되어 있지 않습니다. AbilitySet 등록 필요. ItemID: %s, Tag: %s"),
+		        *ItemID.ToString(),
+		        *ItemAbilityTag.ToString());
+		return false;
+	}
 	
 	// 아이템 확성화 이벤트 태그를 발송
 	FGameplayEventData EventData;
@@ -203,21 +220,25 @@ bool UItemActionComponent::TryGiveAndActivateItemAbility(FName ItemID, TSubclass
 	EventData.Instigator = OwnerCharacter;
 	EventData.Target = TargetActor;
 	EventData.OptionalObject = this;
-	
-	FGameplayAbilitySpec AbilitySpec(ItemAbility, 1, INDEX_NONE, this);
-	// 아이템 Ability는 사용 시점에 1회성으로 부여하고 즉시 실행
-	const FGameplayAbilitySpecHandle ActivatedHandle = AbilitySystemComp->GiveAbilityAndActivateOnce(AbilitySpec, &EventData);
-	if (!ActivatedHandle.IsValid())
+
+	const bool bTriggered = AbilitySystemComp->TriggerAbilityFromGameplayEvent(
+		ItemAbilitySpec->Handle,
+		AbilitySystemComp->AbilityActorInfo.Get(),
+		DDGameplayTags::Event_Item_Activate,
+		&EventData,
+		*AbilitySystemComp
+	);
+	if (!bTriggered)
 	{
-		LOG_JJH(Warning, TEXT("[아이템 액션] GiveAbilityAndActivateOnce 실패. ItemID: %s, Ability: %s"),
+		LOG_JJH(Warning, TEXT("[아이템 액션] Ability 이벤트 트리거 실패. ItemID: %s, Tag: %s"),
 		        *ItemID.ToString(),
-		        *GetNameSafe(ItemAbility.Get()));
+		        *ItemAbilityTag.ToString());
 		return false;
 	}
 	
-	LOG_JJH(Warning, TEXT("[아이템 액션] Ability 실행 성공. ItemID: %s, Ability: %s, Target: %s"),
+	LOG_JJH(Warning, TEXT("[아이템 액션] Ability 실행 성공. ItemID: %s, Tag: %s, Target: %s"),
 	        *ItemID.ToString(),
-	        *GetNameSafe(ItemAbility.Get()),
+	        *ItemAbilityTag.ToString(),
 	        *GetNameSafe(TargetActor));
 	
 	return true;
@@ -263,7 +284,7 @@ void UItemActionComponent::ResetItemAction()
 	CurrentActionMode = EItemActionMode::None;
 	ActiveItemID = NAME_None;
 	ActiveItemTag = FGameplayTag();
-	ActiveItemAbility = nullptr;
+	ActiveItemAbilityTag = FGameplayTag();
 }
 
 void UItemActionComponent::ApplyItemActionTag()

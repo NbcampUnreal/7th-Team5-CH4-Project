@@ -7,7 +7,12 @@
 UGA_ItemBase::UGA_ItemBase()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+
+	FAbilityTriggerData TriggerData;
+	TriggerData.TriggerTag = DDGameplayTags::Event_Item_Activate;
+	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+	AbilityTriggers.Add(TriggerData);
 
 	ActivationBlockedTags.AddTag(DDGameplayTags::State_Character_Death);
 }
