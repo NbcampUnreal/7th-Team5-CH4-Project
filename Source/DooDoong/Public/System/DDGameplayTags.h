@@ -117,4 +117,6 @@ namespace DDGameplayTags
 	// 아이템 액션 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Targeting);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Range);
+	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoardGame_UI_PlayerTurn); 
 }
