@@ -1,5 +1,6 @@
 #include "Lobby/Player/DDLobbyPlayerController.h"
 #include "Lobby/Game/DDLobbyGameMode.h"
+#include "System/DDUIManagerSubsystem.h"
 #include "UI/HUD/DDHUD.h"
 #include "UI/Widgets/DDLobbyEnteranceWidget.h"
 
@@ -31,14 +32,16 @@ void ADDLobbyPlayerController::Server_SubmitNickname_Implementation(const FName&
 
 void ADDLobbyPlayerController::Client_JoinLobby_Implementation()
 {
-	ADDHUD* LobbyHUD = Cast<ADDHUD>(GetHUD());
-    
-    if (IsValid(LobbyHUD))
-    {
-       // 로비 UI를 화면에서 제거합니다.
-       LobbyHUD->ToggleWidgetVisibility(false);
-    }
-
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager) return;
+	
+	// 닉네임 입력창 닫기 
+	UIManager->HideOverlay();
+	
+	// 로비 메인 위젯 열기
+	if (LobbyWidgetClass)	
+		UIManager->ShowOverlay(LobbyWidgetClass);
+	
 	// 닉네임 입력 완료 후 캐릭터 조작 권한 활성화
 	ToggleUIInputMode(false);
 }

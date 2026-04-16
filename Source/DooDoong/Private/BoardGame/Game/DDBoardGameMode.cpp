@@ -43,7 +43,13 @@ void ADDBoardGameMode::BeginPlay()
     }
 	
 	LOG_CJH(Log, TEXT("[BeginPlay] 보드게임 맵 진입 완료. 메인 타이머 시작."));
-	GetWorld()->GetTimerManager().SetTimer(MainTimerHandle, this, &ThisClass::OnMainTimerElapsed, 1.f, true);
+	GetWorld()->GetTimerManager().SetTimer(
+		MainTimerHandle, 
+		this,
+		&ThisClass::OnMainTimerElapsed, 
+		1.f, 
+		true
+	);
 }
 
 void ADDBoardGameMode::OnMainTimerElapsed()

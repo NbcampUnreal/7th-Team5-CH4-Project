@@ -69,11 +69,20 @@ void ADDGameModeBase::HandleSeamlessTravelPlayer(AController*& ParticipantContro
 void ADDGameModeBase::GenericPlayerInitialization(AController* C)
 {
 	Super::GenericPlayerInitialization(C);
+	
 	APlayerController* PlayerController = Cast<APlayerController>(C);
 	if (IsValid(PlayerController))
 	{
 		AlivePlayerControllers.AddUnique(PlayerController);
 		LOG_CJH(Log, TEXT("[GenericPlayerInitialization] 참여자 접속. 현재 접속 수: %d"), AlivePlayerControllers.Num());
+	}
+	
+	if (CurrentUIConfig)
+	{
+		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(C))
+		{
+			DDPC->Client_SetUIConfig(CurrentUIConfig); 
+		}
 	}
 }
 
@@ -181,5 +190,16 @@ void ADDGameModeBase::SpawnSpectatorPawn(APlayerController* PlayerController)
 		ASpectatorPawn::StaticClass(), SpectatorLocation, SpectatorRotation, SpawnParams))
 	{
 		PlayerController->Possess(SpectatorPawn);
+	}
+}
+
+void ADDGameModeBase::BroadcastToAllPlayers(TFunctionRef<void(ADDBasePlayerController*)> Func)
+{
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC))
+		{
+			Func(DDPC);
+		}
 	}
 }

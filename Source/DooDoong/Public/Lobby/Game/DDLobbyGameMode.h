@@ -4,6 +4,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "DDLobbyGameMode.generated.h"
 
+class UDDUIConfig;
 class ADDLobbyPlayerController;
 
 UCLASS()
@@ -26,6 +27,7 @@ public:
 	
 	void SetPlayerAsSpectator(APlayerController* InPlayerController);
 	
+	virtual void GenericPlayerInitialization(AController* C) override;
 protected:
 	
 	UFUNCTION()
@@ -61,4 +63,8 @@ protected:
 	
 	/** 중복되지 않는 랜덤 색상을 반환하고 배열에서 제거하는 함수 */
 	FLinearColor GetRandomAvailableColor();
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category= "UI")
+	TObjectPtr<UDDUIConfig> LobbyUIConfig;
 };

@@ -136,8 +136,6 @@ bool ADDLobbyGameMode::IsNicknameAvailable(const FName& InNickname, FString& Err
 			ErrorMessage = TEXT("닉네임은 1자 이상, 6자 이하로 입력해주세요.");
 			return false;
 		}
-		
-		
 	}
 	
 	return true; 
@@ -180,6 +178,20 @@ void ADDLobbyGameMode::SetPlayerAsSpectator(APlayerController* InPlayerControlle
 	if (IsValid(SpectatorPawn))
 	{
 		InPlayerController->Possess(SpectatorPawn);
+	}
+}
+
+void ADDLobbyGameMode::GenericPlayerInitialization(AController* C)
+{
+	Super::GenericPlayerInitialization(C);
+	
+	// 입장 시 닉네임 입력창띄우기
+	if (LobbyUIConfig)
+	{
+		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(C))
+		{
+			DDPC->Client_SetUIConfig(LobbyUIConfig); 
+		}
 	}
 }
 
