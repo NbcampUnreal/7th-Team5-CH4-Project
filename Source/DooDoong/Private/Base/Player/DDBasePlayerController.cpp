@@ -296,7 +296,7 @@ void ADDBasePlayerController::Input_ItemNextTarget()
 	{
 		if (ItemActionComponent->IsItemActionActive())
 		{
-			ItemActionComponent->SelectNextTarget();
+			ItemActionComponent->SendTargetingInput(EItemTargetingInput::Next);
 		}
 	}
 }
@@ -307,7 +307,7 @@ void ADDBasePlayerController::Input_ItemPreviousTarget()
 	{
 		if (ItemActionComponent->IsItemActionActive())
 		{
-			ItemActionComponent->SelectPreviousTarget();
+			ItemActionComponent->SendTargetingInput(EItemTargetingInput::Previous);
 		}
 	}
 }
@@ -318,7 +318,7 @@ void ADDBasePlayerController::Input_ItemConfirm()
 	{
 		if (ItemActionComponent->IsItemActionActive())
 		{
-			ItemActionComponent->ConfirmItemAction();
+			ItemActionComponent->ConfirmCurrentItemAction();
 		}
 	}
 }
@@ -329,7 +329,7 @@ void ADDBasePlayerController::Input_ItemCancel()
 	{
 		if (ItemActionComponent->IsItemActionActive())
 		{
-			ItemActionComponent->CancelItemAction();
+			ItemActionComponent->CancelCurrentItemAction();
 		}
 	}
 }

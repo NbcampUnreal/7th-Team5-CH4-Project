@@ -30,7 +30,13 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_Start, "Event.Trace.Start");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_End, "Event.Trace.End");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Shooter_Fire, "Event.Shooter.Fire", "슈터 미니게임 발사 애니메이션 몽타주에서 사용할 발사 이벤트 태그");
+	
+	// 아이템 관련 이벤트 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Activate, "Event.Item.Activate", "아이템 Ability 실행 시 전달하는 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Next, "Event.Item.Target.Next", "아이템 타게팅 다음 대상 선택 입력 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Previous, "Event.Item.Target.Previous", "아이템 타게팅 이전 대상 선택 입력 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Confirm, "Event.Item.Target.Confirm", "아이템 타게팅 확정 입력 이벤트 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Target_Cancel, "Event.Item.Target.Cancel", "아이템 타게팅 취소 입력 이벤트 태그");
 	
 	// Data Tags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Data_Health_Heal, "Data.Health.Heal", "Health Attribute를 양변화 시키는 경우 사용할 태그")
@@ -99,6 +105,11 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Instant, "Item.Activate.Instant", "즉시사용 아이템");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Targeting, "Item.Activate.Targeting", "타게팅 아이템");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Range, "Item.Activate.Range", "범위 아이템");
+
+	// 아이템 액션 어빌리티 태그
+	// 아이템 어빌리티 태그
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_HealingKit, "Item.Ability.HealingKit", "힐링 키트 아이템 어빌리티");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_GiveBomb, "Item.Ability.GiveBomb", "폭탄 넘기기 아이템 어빌리티");
 	
 	// 아이템 액션 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Targeting, "State.ItemAction.Targeting", "아이템 타겟 선택 중");

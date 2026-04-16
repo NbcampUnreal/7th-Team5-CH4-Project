@@ -32,7 +32,13 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_Start);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_End);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Shooter_Fire);
+	
+	// 아이템 관련 이벤트 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Activate);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Target_Next);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Target_Previous);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Target_Confirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Target_Cancel);
 
 	// Data Tags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Health_Heal);
@@ -102,6 +108,11 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Instant);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Targeting);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Activate_Range);
+
+	// 아이템 액션 어빌리티 태그
+	// 아이템 어빌리티 태그
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_HealingKit);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_GiveBomb);
 	
 	// 아이템 액션 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Targeting);

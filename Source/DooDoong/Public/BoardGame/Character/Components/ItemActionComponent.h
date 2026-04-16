@@ -3,9 +3,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Data/DDItemDataTypes.h"
+#include "GameplayTagContainer.h"
 #include "ItemActionComponent.generated.h"
-
-class UGameplayAbility;
 
 UENUM(BlueprintType)
 enum class EItemActionMode : uint8
@@ -14,6 +13,15 @@ enum class EItemActionMode : uint8
 	Instant,
 	Targeting,
 	Range
+};
+
+UENUM(BlueprintType)
+enum class EItemTargetingInput : uint8
+{
+	Next,
+	Previous,
+	Confirm,
+	Cancel
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -29,65 +37,34 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	void BeginItemAction(const FItemTableRow& ItemRow);
 	
-	/** 최종적으로 아이템을 사용 == 아이템의 어빌리티를 실행, 아이템 수 감소 */
+	/** 현재 아이템 액션을 확정 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
-	void ConfirmItemAction();
+	void ConfirmCurrentItemAction();
 	
-	/** 아이템 사용을 취소하고 인벤토리 창을 다시 띄움 */
+	/** 현재 아이템 액션을 취소하고 인벤토리 창을 다시 띄움 + 선차감된 아이템 수 복구 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
-	void CancelItemAction();
+	void CancelCurrentItemAction();
 
-	/** 다음 타겟 선택 */
+	/** 타게팅 Ability에 입력 이벤트 전달 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
-	void SelectNextTarget();
+	void SendTargetingInput(EItemTargetingInput Input);
 
-	/** 이전 타겟 선택 */
-	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
-	void SelectPreviousTarget();
-
-	/** 아이템 액션이 진행중인지 확인 : 타게팅할 때 + 범위표시할 때 아이템 액션 중인지 확인하고 수행 */
+	/** 아이템 액션 중인지 확인 */
 	UFUNCTION(BlueprintCallable, Category = "ItemActionComp")
 	bool IsItemActionActive() const { return CurrentActionMode != EItemActionMode::None; }
 	
 public:
-	/** 타겟 아이템으로 카메라를 이동하는 서버 RPC */
+	/** 서버에서 이미 부여된 아이템 Ability를 이벤트로 실행 */
 	UFUNCTION(Server, Reliable)
-	void Server_FocusItemTarget(AActor* TargetActor);
+	void Server_ActivateItemAbility(FName ItemID, FGameplayTag ItemAbilityTag, AActor* TargetActor);
 
-	/** 즉시사용 아이템 액션 서버 RPC */
+	/** 서버에서 진행 중인 타게팅 Ability에 입력 이벤트를 전달 */
 	UFUNCTION(Server, Reliable)
-	void Server_ConfirmInstantItem(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility);
-
-	/** 타게팅 아이템 액션 서버 RPC */
-	UFUNCTION(Server, Reliable)
-	void Server_ConfirmTargetingItem(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
-
-	/** 범위 아이템 액션 서버 RPC */
-	UFUNCTION(Server, Reliable)
-	void Server_ConfirmRangeItem(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility);
+	void Server_SendTargetingInputEvent(FGameplayTag EventTag);
 
 protected:
-	/** 즉시사용 아이템 액션 */
-	void StartInstantAction();
-	
-	/** 타게팅 아이템 액션 */
-	void StartTargetingAction();
-	
-	/** 범위 아이템 액션 */
-	void StartRangeAction();
-	
-protected:
-	/** 타겟 후보 대상을 순회해서 지정해주는 헬퍼 */
-	void BuildTargetCandidates();
-	
-	/** Index를 원형으로 순회할 수 있도록 하는 계산 헬퍼 */
-	void ChangeTarget(int32 Offset);
-
-	/** 선택된 타겟 Getter */
-	AActor* GetSelectedTarget() const;
-
-	/** 서버에서 아이템 Ability를 1회성으로 부여하고 실행 */
-	bool TryActivateItemAbility(FName ItemID, TSubclassOf<UGameplayAbility> ItemAbility, AActor* TargetActor);
+	/** 서버에서 이미 부여된 아이템 Ability를 찾아 EventData를 보내면서 실행 */
+	bool TryActivateItemAbility(FName ItemID, FGameplayTag ItemAbilityTag, AActor* TargetActor);
 
 	/** 취소 시 인벤토리에서 선차감한 아이템 수량을 복구 */
 	void RestoreCanceledItem(FName ItemID);
@@ -110,14 +87,8 @@ protected:
 	FName ActiveItemID = NAME_None;
 	
 	UPROPERTY()
-	FGameplayTag ActiveItemType;
+	FGameplayTag ActiveItemTag;
 	
 	UPROPERTY()
-	TSubclassOf<UGameplayAbility> ActiveItemAbility;
-	
-	UPROPERTY()
-	TArray<TObjectPtr<AActor>> CandidateTargets;
-	
-	UPROPERTY()
-	int32 SelectedTargetIndex = INDEX_NONE;
+	FGameplayTag ActiveItemAbilityTag;
 };
