@@ -2,7 +2,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
-#include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "System/DDGameplayTags.h"
 
 UGA_ItemBase::UGA_ItemBase()
@@ -17,14 +16,6 @@ void UGA_ItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle, const FGam
 	FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	AActor* AvatarActor = ActorInfo ? ActorInfo->AvatarActor.Get() : nullptr;
-	ItemActionComponent = AvatarActor ? AvatarActor->FindComponentByClass<UItemActionComponent>() : nullptr;
-}
-
-UItemActionComponent* UGA_ItemBase::GetItemActionComponent() const
-{
-	return ItemActionComponent.Get();
 }
 
 ADDBoardGameCharacter* UGA_ItemBase::GetBoardGameCharacter() const

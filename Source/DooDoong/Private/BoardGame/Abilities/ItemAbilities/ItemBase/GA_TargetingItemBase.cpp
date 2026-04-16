@@ -3,7 +3,6 @@
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "EngineUtils.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
-#include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "BoardGame/Game/DDBoardGameMode.h"
 #include "System/DDGameplayTags.h"
 
@@ -46,10 +45,6 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 
 	if (CandidateTargets.IsEmpty())
 	{
-		if (ItemActionComponent)
-		{
-			ItemActionComponent->CancelCurrentItemAction();
-		}
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}

@@ -6,7 +6,6 @@
 
 class ADDBoardGameCharacter;
 class UAbilitySystemComponent;
-class UItemActionComponent;
 
 UCLASS(Abstract)
 class DOODOONG_API UGA_ItemBase : public UGameplayAbility
@@ -23,10 +22,7 @@ public:
 		const FGameplayEventData* TriggerEventData) override;
 
 protected:
-	/** ItemActionComponent Getter */
-	UItemActionComponent* GetItemActionComponent() const;
-
-	/** 아이템을 사용한 보드게임 캐릭터 Getter */
+	/** 아이템을 사용하는 보드게임 캐릭터 Getter */
 	ADDBoardGameCharacter* GetBoardGameCharacter() const;
 
 	/** 보드게임 캐릭터가 사용하는 ASC Getter */
@@ -36,9 +32,4 @@ protected:
 	/** 서버 권한 확인 후 CommitAbility를 수행 */
 	bool CommitItemAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 		FGameplayAbilityActivationInfo ActivationInfo);
-
-protected:
-	/** InventoryActionComponent 참조 (사실 이래도 되나 싶음) */
-	UPROPERTY()
-	TObjectPtr<UItemActionComponent> ItemActionComponent;
 };
