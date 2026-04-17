@@ -58,6 +58,7 @@ void UBoardGameWidget::BindToGameState()
 void UBoardGameWidget::UpdateTimeText(int32 InTime)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[UI] 화면 글자 업데이트 실행! 받아온 시간: %d"), InTime);
+	InTime = FMath::Max(0, InTime);
 	
 	if (IsValid(RemainTimeText))
 	{
@@ -68,9 +69,11 @@ void UBoardGameWidget::UpdateTimeText(int32 InTime)
 
 void UBoardGameWidget::UpdateRemainTurn(int32 InRemainTurn)
 {
+	InRemainTurn = FMath::Max(0, InRemainTurn);
+	
 	if (IsValid(RemainTurnText))
 	{
-		FString TurnString = FString::Printf(TEXT("남은 턴 : %d"), InRemainTurn);
+		FString TurnString = FString::Printf(TEXT("남은 라운드 : %d"), InRemainTurn);
 		RemainTurnText->SetText(FText::FromString(TurnString));
 	}
 }
