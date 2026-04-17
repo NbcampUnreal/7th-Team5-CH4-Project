@@ -49,7 +49,7 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 	{
 		CurrentActionMode = EItemActionMode::Range;
 		ApplyItemActionTag();
-		// TODO 범위를 표시하고, 해당 범위 내의 플레이어를 순회해서 Owner와 비교한 뒤 후보자에 추가
+		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbilityTag, nullptr);
 		return;
 	}
 	
@@ -87,8 +87,7 @@ void UItemActionComponent::ConfirmCurrentItemAction()
 		break;
 
 	case EItemActionMode::Range:
-		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbilityTag, nullptr);
-		ResetItemAction();
+		Server_SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Confirm);
 		break;
 	default:
 		break;
