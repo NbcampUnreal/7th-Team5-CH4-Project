@@ -66,7 +66,7 @@ public:
 	int32 StateTimer = 0;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentRound, VisibleAnywhere, BlueprintReadOnly, Category = "GameData")
-	int32 CurrentRound = 1;
+	int32 CurrentRound = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ALevelSequenceActor* LevelSequenceActor;

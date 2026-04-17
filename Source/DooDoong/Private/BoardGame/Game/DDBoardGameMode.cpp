@@ -191,7 +191,7 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 
 		UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
 
-		if (IsValid(GameInstance) && GameInstance->CurrentRound == 1)
+		if (IsValid(GameInstance) && GameInstance->CurrentRound == 0)
 		{
 			//1라운드 시퀀서 재생 지시
 			LOG_CYS(Warning, TEXT("1라운드 인트로 시퀀서 재생해라"));
