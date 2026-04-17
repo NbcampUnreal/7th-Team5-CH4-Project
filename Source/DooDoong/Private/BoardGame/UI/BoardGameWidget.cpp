@@ -37,7 +37,7 @@ void UBoardGameWidget::BindToGameState()
 
         // 2. 초기값 즉시 반영
         UpdateTimeText(CurrentGameState->StateTimer);
-        UpdateRemainTurn(CurrentGameState->CurrentRound);
+        UpdateRemainTurn(CurrentGameState->MaxRound - CurrentGameState->CurrentRound);
     }
     else
     {
