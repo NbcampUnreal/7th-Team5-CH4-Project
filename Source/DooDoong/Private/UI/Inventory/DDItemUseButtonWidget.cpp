@@ -4,10 +4,7 @@
 #include "UI/Inventory/DDItemUseButtonWidget.h"
 #include "UI/Inventory/DDInventoryComponent.h"
 #include "UI/Inventory/DDInventoryWidget.h"
-
-#include "Base/Player/DDBasePlayerController.h"
 #include "Components/Button.h"
-#include "Data/DDItemDataTypes.h"
 
 void UDDItemUseButtonWidget::NativeOnInitialized()
 {
