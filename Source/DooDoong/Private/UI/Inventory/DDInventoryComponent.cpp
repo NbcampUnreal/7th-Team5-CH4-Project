@@ -9,6 +9,7 @@
 #include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
+#include "Net/UnrealNetwork.h"
 #include "UI/Inventory/DDItemUseButtonWidget.h"
 
 
@@ -22,44 +23,46 @@ UDDInventoryComponent::UDDInventoryComponent()
 void UDDInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	ConstructInventory();
+	if (GetOwner()->HasAuthority())
+	{
+		InitializeInventoryData();
+		/* 테스트용 아이템추가 */
+		ServerRPCAddItem("HealingKit"); 
+		ServerRPCAddItem("GiveBomb");
+	}
 	
-	/* 테스트용 아이템추가 */
-	AddItem("HealingKit"); 
-	AddItem("GiveBomb");
+	InitializeInventoryUI();
+	
 }
 
-void UDDInventoryComponent::AddItem(FName ItemName)
+void UDDInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
-	for (TPair<FName,int32>& ItemPair : InventoryItems)
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(ThisClass, InventoryItemDatas);
+}
+
+void UDDInventoryComponent::InitializeInventoryData()
+{
+	if (!ItemDataTable) return;
+	const TArray<FName> AllItemNames = ItemDataTable->GetRowNames();
+	for (int32 i = 0; i < AllItemNames.Num(); ++i)
 	{
-		if(ItemPair.Key == ItemName)
-		{
-			ItemPair.Value++;
-		}
+		FInventoryItemData InventoryItemData;
+		InventoryItemData.ItemName = AllItemNames[i];
+		InventoryItemData.Count = 0;
+		InventoryItemDatas.Add(InventoryItemData);
 	}
 }
 
-void UDDInventoryComponent::ToggleInventory()
+void UDDInventoryComponent::InitializeInventoryUI()
 {
-	if (bInventoryOpen)
+	OwningController = Cast<ADDBasePlayerController>(GetOwner());
+	if (OwningController == nullptr) return;
+	if (OwningController->IsLocalController())
 	{
-		CloseInventory();
+		OwningController->Client_CreateInventoryUI();
 	}
-	else
-	{
-		OpenInventory();
-	}
-}
-
-void UDDInventoryComponent::RequestOpenInventory()
-{
-	OpenInventory();
-}
-
-void UDDInventoryComponent::RequestCloseInventory()
-{
-	CloseInventory();
 }
 
 FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
@@ -68,61 +71,44 @@ FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
 	return ItemDataTable->FindRow<FItemTableRow>(RowName, TEXT("Item"));
 }
 
-void UDDInventoryComponent::ConstructInventory()
+void UDDInventoryComponent::OnRep_ClientInventoryData()
 {
-	OwningController = Cast<ADDBasePlayerController>(GetOwner());
-	checkf(OwningController.IsValid(), TEXT("플레이어의 인벤토리가 유효하지않습니다."));
-	if (!OwningController->IsLocalController()) return;
-	
-	if (!ItemDataTable) return;
-	const TArray<FName> AllItemNames = ItemDataTable->GetRowNames();
-	for (const FName& ItemName : AllItemNames)
-	{
-		InventoryItems.Add(ItemName, 0);
-	}
-	
-	for (const TPair<FName,int32>& ItemPair : InventoryItems)
-	{
-		ItemNames.Add(ItemPair.Key);
-	}
-	
-	InventoryWidget = CreateWidget<UDDInventoryWidget>(OwningController.Get(), InventoryWidgetClass);
-	InventoryWidget->AddToViewport();
-	CloseInventory();
+	LOG_PMJ(Warning, TEXT("OnRep_ClientInventoryData"));
 }
 
-void UDDInventoryComponent::UseItem(const FName& ItemSlotName)
+
+
+void UDDInventoryComponent::ServerRPCAddItem_Implementation(FName ItemName)
 {
-	if (ItemSlotName.IsNone()) return;
-	for (TPair<FName,int32>& ItemPair : InventoryItems)
+	if (!(GetOwner()->HasAuthority())) return;
+	LOG_PMJ(Warning, TEXT("ServerRPCAddItem 진입"));
+	if (InventoryItemDatas.IsEmpty())
 	{
-		if (ItemPair.Key == ItemSlotName)
+		LOG_PMJ(Warning, TEXT("인벤데이터가 비어있습니다"));
+		return;
+	}
+	for (FInventoryItemData& InventoryItemData : InventoryItemDatas)
+	{
+		if (InventoryItemData.ItemName == ItemName)
 		{
-			UItemActionComponent* ISC = OwningController->GetPawn()->FindComponentByClass<UItemActionComponent>();
-			if (!IsValid(ISC)) return;
-			FItemTableRow& CurrentItemDataRow = *GetItemData(ItemPair.Key);
-			CloseInventory(); // 아이템 사용 시 인벤토리 창을 닫음.
-			ISC->BeginItemAction(CurrentItemDataRow);
-			ItemPair.Value--;
-			InventoryWidget->RefreshGrid();
+			LOG_PMJ(Error, TEXT("====== 아이템 갯수 + 1 ======"));
+			InventoryItemData.Count++;
 		}
 	}
 }
 
-void UDDInventoryComponent::OpenInventory()
+void UDDInventoryComponent::ServerRPCUseItem_Implementation(const FName& ItemSlotName)
 {
-	if (!IsValid(InventoryWidget)) return;
-	
-	InventoryWidget->SetVisibility(ESlateVisibility::Visible);
-	InventoryWidget->RefreshGrid();
-	bInventoryOpen = true;
-}
-
-void UDDInventoryComponent::CloseInventory()
-{
-	if (!IsValid(InventoryWidget)) return;
-	
-	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
-	InventoryWidget->RefreshGrid();
-	bInventoryOpen = false;
+	if (ItemSlotName.IsNone()) return;
+	for (FInventoryItemData& ItemDatas : InventoryItemDatas)
+	{
+		if (ItemDatas.ItemName == ItemSlotName)
+		{
+			UItemActionComponent* ISC = OwningController->GetPawn()->FindComponentByClass<UItemActionComponent>();
+			if (!IsValid(ISC)) return;
+			FItemTableRow& CurrentItemDataRow = *GetItemData(ItemDatas.ItemName);
+			ISC->BeginItemAction(CurrentItemDataRow);
+			ItemDatas.Count--;
+		}
+	}
 }
