@@ -16,6 +16,8 @@ class DOODOONG_API ADDLobbyGameMode : public AGameModeBase
 public:
 	ADDLobbyGameMode();
 	
+	virtual void InitGameState() override;
+	
 	virtual void GenericPlayerInitialization(AController* C) override;
 	
 	virtual void Logout(AController* Exiting) override;
@@ -29,8 +31,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
+	ADDLobbyGameState* GetLobbyGameState();
+	
 	/** 닉네임 중복 여부 확인 */
-	bool IsNicknameAvailable(const FName& InNickname, FString& ErrorMessage) const;
+	bool IsNicknameAvailable(const FName& InNickname, FString& ErrorMessage);
 	
 	/** 관전자로 전환*/
 	void SetPlayerAsSpectator(APlayerController* InPlayerController);

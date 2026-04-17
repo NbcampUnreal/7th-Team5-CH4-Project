@@ -4,6 +4,7 @@
 #include "Lobby/Player/DDLobbyPlayerController.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "Common/DDLogManager.h"
+#include "System/DDGameplayTags.h"
 
 
 ADDLobbyGameMode::ADDLobbyGameMode()
@@ -12,21 +13,33 @@ ADDLobbyGameMode::ADDLobbyGameMode()
 	bUseSeamlessTravel = true;
 }
 
+void ADDLobbyGameMode::InitGameState()
+{
+	Super::InitGameState();
+	
+	CachedGameState = GetGameState<ADDLobbyGameState>();
+	LOG_KMS(Error, TEXT("CachedGameState: %s"), *GetNameSafe(CachedGameState));
+}
+
 void ADDLobbyGameMode::GenericPlayerInitialization(AController* C)
 {
 	Super::GenericPlayerInitialization(C);
 	
 	// 1. 플레이어 입장 
-	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(C);
-	if (!DDPC) return;
-	
-	ADDBasePlayerState* PS = DDPC->GetPlayerState<ADDBasePlayerState>();
+	ADDLobbyPlayerController* LobbyPC = Cast<ADDLobbyPlayerController>(C); 
+	if (!IsValid(LobbyPC)) return;
+
+	ADDBasePlayerState* PS = LobbyPC->GetPlayerState<ADDBasePlayerState>();
 	if (!PS) return;
 	
-	// 2. 입장 시 닉네임 입력창띄우기
+	// 2. UI 그리기 
 	if (LobbyUIConfig)
 	{
-		DDPC->Client_SetUIConfig(LobbyUIConfig); 
+		// 메인 UI 
+		LobbyPC->Client_SetUIConfig(LobbyUIConfig); 
+		
+		// 닉네임 입력창
+		LobbyPC->Client_OpenPopUp(DDGameplayTags::Lobby_UI_NicknamePopup); 
 	}
 }
 
@@ -50,7 +63,7 @@ void ADDLobbyGameMode::Logout(AController* Exiting)
     }
 	
 	Participants.Remove(PC);
-	if (CachedGameState) CachedGameState->ParticipantCount =  Participants.Num();
+	GetLobbyGameState()->PlayerCount = Participants.Num();
 	
 	Spectators.Remove(PC);
 }
@@ -73,9 +86,16 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(
 	}
 	
 	ADDBasePlayerState* PS = Requester->GetPlayerState<ADDBasePlayerState>();
-	if (!IsValid(PS) || !IsValid(CachedGameState))
+	if (!IsValid(PS))
 	{
-		ErrorMessage = TEXT("시스템 오류가 발생했습니다."); 
+		ErrorMessage = TEXT("시스템 오류가 발생했습니다. : PlayerState가 유효하지 않음."); 
+		return false; 
+		
+	}
+	
+	if (!IsValid(GetLobbyGameState()))
+	{
+		ErrorMessage = TEXT("시스템 오류가 발생했습니다. GameState가 유효하지않음."); 
 		return false; 
 	}
 	
@@ -88,11 +108,11 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(
 	PS->SetPlayerColor(NewRandomColor);
 	
 	// 4. 참가자/관전자 판별
-	if (Participants.Num() < CachedGameState->RequiredPlayerCount)
+	if (Participants.Num() < GetLobbyGameState()->RequiredPlayerCount)
 	{
 		PS->bIsParticipant = true;
 		Participants.AddUnique(Requester);
-		CachedGameState->ParticipantCount = Participants.Num(); 
+		CachedGameState->PlayerCount = Participants.Num(); 
 		
 		LOG_CJH(Log, TEXT("[%s]님이 게임에 접속하셨습니다."), *Nickname.ToString());
 		LOG_CJH(Log, TEXT("현재 인원 수 (%d / %d)"), Participants.Num(), CachedGameState->MaxPlayerCount);
@@ -123,7 +143,8 @@ void ADDLobbyGameMode::RequestPlayerReady(ADDLobbyPlayerController* Requester, b
 		ReadyParticipants.AddUnique(Requester);
 		CachedGameState->ReadyCount++;
 		
-		if (ReadyParticipants.Num() == Participants.Num())
+		if (ReadyParticipants.Num() == Participants.Num() &&
+			ReadyParticipants.Num() >= GetLobbyGameState()->RequiredPlayerCount)
 		{
 			StartPlayCountDown(StartCountdownSeconds); 
 		}
@@ -134,6 +155,11 @@ void ADDLobbyGameMode::RequestPlayerReady(ADDLobbyPlayerController* Requester, b
 		CachedGameState->ReadyCount--;
 		
 		GetWorld()->GetTimerManager().ClearTimer(StartTimerHandle);
+		
+		for (auto PC : Participants)
+		{
+			PC->Client_ClosePopUp(DDGameplayTags::Lobby_UI_CountDown);
+		}
 	}
 }
 
@@ -142,15 +168,20 @@ void ADDLobbyGameMode::BeginPlay()
 	Super::BeginPlay();
 	
 	AvailableColors = DefaultPlayerColors;
-	
-	CachedGameState = GetGameState<ADDLobbyGameState>();
 }
 
-bool ADDLobbyGameMode::IsNicknameAvailable(const FName& InNickname, FString& ErrorMessage) const
+ADDLobbyGameState* ADDLobbyGameMode::GetLobbyGameState()
+{ 
+	if (!CachedGameState) CachedGameState = GetGameState<ADDLobbyGameState>();
+	
+	return CachedGameState;
+}
+
+bool ADDLobbyGameMode::IsNicknameAvailable(const FName& InNickname, FString& ErrorMessage) 
 {
-	if (!IsValid(CachedGameState))
+	if (!IsValid(GetLobbyGameState()))
 	{
-		ErrorMessage = TEXT("시스템 오류"); 
+		ErrorMessage = TEXT("시스템 오류가 발생했습니다. 오류 : GameState가 유효하지 않음."); 
 		return false;
 	}  
 	
@@ -215,8 +246,14 @@ void ADDLobbyGameMode::SetPlayerAsSpectator(APlayerController* InPlayerControlle
 
 void ADDLobbyGameMode::StartPlayCountDown(float InSeconds)
 {
-	CachedGameState->CountDown = InSeconds;
+	GetLobbyGameState()->CountDown = InSeconds;
 	LOG_CJH(Log, TEXT("곧 게임을 시작합니다."));
+	
+	// 카운트다운 ui 열기 
+	for (auto PC : Participants)
+	{
+		PC->Client_OpenPopUp(DDGameplayTags::Lobby_UI_CountDown); 
+	}
 	
 	// 1초마다 대기실 인원 체크 및 카운트다운을 수행하는 타이머 실행
 	GetWorld()->GetTimerManager().SetTimer(
@@ -230,7 +267,7 @@ void ADDLobbyGameMode::StartPlayCountDown(float InSeconds)
 
 void ADDLobbyGameMode::OnMainTimerElapsed()
 {
-	if (!CachedGameState) return; 
+	if (!IsValid(GetLobbyGameState())) return; 
 	
 	CachedGameState->CountDown--;
 	LOG_CJH(Log, TEXT("%d초 후 게임에 진입합니다."), CachedGameState->CountDown);
@@ -246,9 +283,14 @@ void ADDLobbyGameMode::OnMainTimerElapsed()
 
 bool ADDLobbyGameMode::CanStartBoardGame(FString& ErrorMessage)
 {
-	if (!CachedGameState)
+	for (auto PC : Participants)
 	{
-		ErrorMessage = TEXT("시스템 오류"); 
+		PC->Client_ClosePopUp(DDGameplayTags::Lobby_UI_CountDown);
+	}
+	
+	if (!IsValid(GetLobbyGameState()))
+	{
+		ErrorMessage = TEXT("시스템 오류가 발생했습니다. 오류 : GameState가 유효하지 않음.");
 		return false; 
 	}
 	

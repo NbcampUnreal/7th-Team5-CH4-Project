@@ -33,8 +33,6 @@ protected:
 	
 	UFUNCTION()
 	void UpdateReadyCount(int32 NewCount); 
-
-	
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
