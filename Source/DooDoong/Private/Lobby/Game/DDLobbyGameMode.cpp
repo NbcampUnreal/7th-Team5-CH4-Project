@@ -28,9 +28,6 @@ void ADDLobbyGameMode::GenericPlayerInitialization(AController* C)
 	// 1. 플레이어 입장 
 	ADDLobbyPlayerController* LobbyPC = Cast<ADDLobbyPlayerController>(C); 
 	if (!IsValid(LobbyPC)) return;
-
-	ADDBasePlayerState* PS = LobbyPC->GetPlayerState<ADDBasePlayerState>();
-	if (!PS) return;
 	
 	// 2. UI 그리기 
 	if (LobbyUIConfig)
