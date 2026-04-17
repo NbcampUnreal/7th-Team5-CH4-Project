@@ -3,8 +3,10 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
+#include "Base/Player/DDBasePlayerController.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Common/DDLogManager.h"
+#include "Net/UnrealNetwork.h"
 #include "System/DDGameplayTags.h"
 #include "UI/Inventory/DDInventoryComponent.h"
 
@@ -54,6 +56,16 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 	ResetItemAction();
 }
 
+void UItemActionComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, CurrentActionMode);
+	DOREPLIFETIME(ThisClass, ActiveItemID);
+	DOREPLIFETIME(ThisClass, ActiveItemTag);
+	DOREPLIFETIME(ThisClass, ActiveItemAbilityTag);
+}
+
 void UItemActionComponent::ConfirmCurrentItemAction()
 {
 	if (!ActiveItemAbilityTag.IsValid())
@@ -99,10 +111,8 @@ void UItemActionComponent::CancelCurrentItemAction()
 	{
 		if (AController* OwnerController = OwnerCharacter->GetController())
 		{
-			if (UDDInventoryComponent* InventoryComponent = OwnerController->FindComponentByClass<UDDInventoryComponent>())
-			{
-				InventoryComponent->RequestOpenInventory();
-			}
+			ADDBasePlayerController* PC = Cast<ADDBasePlayerController>(OwnerController);
+			PC->Client_OpenInventory();
 		}
 	}
 	
@@ -172,6 +182,12 @@ void UItemActionComponent::Server_SendTargetingInputEvent_Implementation(FGamepl
 	Payload.OptionalObject = this;
 
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OwnerActor, EventTag, Payload);
+
+	if (EventTag == DDGameplayTags::Event_Item_Target_Confirm ||
+		EventTag == DDGameplayTags::Event_Item_Target_Cancel)
+	{
+		ResetItemAction();
+	}
 }
 
 bool UItemActionComponent::TryActivateItemAbility(FName ItemID, FGameplayTag ItemAbilityTag, AActor* TargetActor)

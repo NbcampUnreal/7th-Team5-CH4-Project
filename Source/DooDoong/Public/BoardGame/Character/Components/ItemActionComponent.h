@@ -31,6 +31,8 @@ class DOODOONG_API UItemActionComponent : public UActorComponent
 
 public:
 	UItemActionComponent();
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:
 	/** 아이템 사용 시작지점 */
@@ -80,15 +82,15 @@ protected:
 	void RemoveItemActionTag();
 	
 protected:	
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	EItemActionMode CurrentActionMode = EItemActionMode::None;
 	
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	FName ActiveItemID = NAME_None;
 	
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	FGameplayTag ActiveItemTag;
 	
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	FGameplayTag ActiveItemAbilityTag;
 };
