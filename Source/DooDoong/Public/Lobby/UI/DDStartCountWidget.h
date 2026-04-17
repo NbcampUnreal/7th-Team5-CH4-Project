@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "DDStartCountWidget.generated.h"
 
+class ADDLobbyGameState;
 class UTextBlock;
 
 UCLASS()
@@ -24,4 +25,7 @@ protected:
 protected:
 	UPROPERTY(meta =(BindWidget))
 	UTextBlock* CountText;
+	
+	UPROPERTY()
+	TObjectPtr<ADDLobbyGameState> CurrentGameState;
 };
