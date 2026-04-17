@@ -26,13 +26,13 @@ protected:
 	
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 public:
 	UFUNCTION()
 	void OnRep_Trophy(const FGameplayAttributeData& OldTrophy);
 
 	UFUNCTION()
 	void OnRep_Coin(const FGameplayAttributeData& OldCoin);
-	
 private:
 	UPROPERTY(BlueprintReadOnly, Category = "Trophy", meta = (AllowPrivateAccess = true), ReplicatedUsing = OnRep_Trophy)
 	FGameplayAttributeData Trophy; 
@@ -44,4 +44,6 @@ public:
 	FOnPointChanged OnPointChanged;
 	
 	FOnTrophyChanged OnTrophyChanged;
+	
+	float LastCoinLose;
 };

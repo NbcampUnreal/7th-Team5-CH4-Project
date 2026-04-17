@@ -62,7 +62,7 @@ public:
 
 	/** 서버에서 진행 중인 타게팅 Ability에 입력 이벤트를 전달 */
 	UFUNCTION(Server, Reliable)
-	void Server_SendTargetingInputEvent(FGameplayTag EventTag);
+	void Server_SendInputEvent(FGameplayTag EventTag);
 
 protected:
 	/** 서버에서 이미 부여된 아이템 Ability를 찾아 EventData를 보내면서 실행 */
