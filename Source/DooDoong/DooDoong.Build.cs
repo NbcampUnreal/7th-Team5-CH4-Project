@@ -19,7 +19,9 @@ public class DooDoong : ModuleRules
 			"GameplayTasks",
 			"GameplayTags",
 			/* 레벨 시퀀서 */
-			"LevelSequence", "MovieScene"
+			"LevelSequence", "MovieScene",
+			/* 나이아가라 */
+			"Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
