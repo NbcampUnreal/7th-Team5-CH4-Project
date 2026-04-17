@@ -10,10 +10,12 @@
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
+#include "Components/SlateWrapperTypes.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
 #include "System/DDUIManagerSubsystem.h"
 #include "UI/Inventory/DDInventoryComponent.h"
+#include "UI/Inventory/DDInventoryWidget.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 
 ADDBasePlayerController::ADDBasePlayerController()
@@ -34,7 +36,6 @@ void ADDBasePlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(DefaultIMC, 0);
 	}
-	
 }
 
 void ADDBasePlayerController::SetupInputComponent()
@@ -384,7 +385,41 @@ UItemActionComponent* ADDBasePlayerController::GetItemActionComponentFromPawn() 
 
 void ADDBasePlayerController::ToggleInventoryMenu()
 {
-	if (!InventoryComponent) return;
-	InventoryComponent->ToggleInventory();
+	if (!InventoryComponent || !IsLocalController()) return;
+	if (bInventoryOpen)
+	{
+		Client_CloseInventory();
+	}
+	else
+	{
+		Client_OpenInventory();
+	}
+}
+
+void ADDBasePlayerController::Client_OpenInventory_Implementation()
+{
+	if (!InventoryWidget || !IsLocalController()) return;
+	
+	InventoryWidget->SetVisibility(ESlateVisibility::Visible);
+	InventoryWidget->Client_RefreshGrid();
+	bInventoryOpen = true;
+}
+
+void ADDBasePlayerController::Client_CloseInventory_Implementation()
+{
+	if (!InventoryWidget || !IsLocalController()) return;
+	
+	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
+	InventoryWidget->Client_RefreshGrid();
+	bInventoryOpen = false;
+}
+
+void ADDBasePlayerController::Client_CreateInventoryUI_Implementation()
+{
+	if (!InventoryWidgetClass || !IsLocalController()) return;
+	InventoryWidget = CreateWidget<UDDInventoryWidget>(this, InventoryWidgetClass);
+	if (!InventoryWidget) return;
+	InventoryWidget->AddToViewport();
+	Client_CloseInventory();
 }
 
