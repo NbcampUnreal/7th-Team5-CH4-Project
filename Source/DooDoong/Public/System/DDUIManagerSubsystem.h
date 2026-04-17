@@ -36,6 +36,8 @@ public:
 
 	void SetUIConfig(UDDUIConfig* InUIConfig);
 	
+	void DrawErrorMessage(const FString& ErrorMessage, float Duration);
+	
 private:
 	UUserWidget* CreateUIWidget(TSubclassOf<UUserWidget> WidgetClass);
 	

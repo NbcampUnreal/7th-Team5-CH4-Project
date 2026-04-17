@@ -3,6 +3,7 @@
 #include "Common/DDLogManager.h"
 #include "Data/DDUIConfig.h"
 #include "Engine/LocalPlayer.h"
+#include "Lobby/UI/DDErrorMessageWidget.h"
 
 void UDDUIManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -118,7 +119,6 @@ void UDDUIManagerSubsystem::HideAllPopups()
 	PopupWidgets.Empty();
 }
 
-
 void UDDUIManagerSubsystem::SetUIConfig(UDDUIConfig* InUIConfig)
 {
 	if (!InUIConfig) return;
@@ -129,6 +129,41 @@ void UDDUIManagerSubsystem::SetUIConfig(UDDUIConfig* InUIConfig)
 	{
 		ShowOverlay(UIConfig->DefaultOverlayClass);
 	}
+}
+
+void UDDUIManagerSubsystem::DrawErrorMessage(const FString& ErrorMessage, float Duration)
+{
+	if (!UIConfig || !UIConfig->ErrorMessageWidget) return;
+	
+	// 에러 메시지 위젯 생성 
+	UDDErrorMessageWidget* ErrorMessageWidget = 
+		Cast<UDDErrorMessageWidget>(CreateUIWidget(UIConfig->ErrorMessageWidget));
+	if (!ErrorMessageWidget)
+	{
+		LOG_KMS(Warning, TEXT("[UI Manager] : Fail to Draw Error Message"));
+		return; 
+	}
+	
+	// 에러 메시지 입력 
+	LOG_KMS(Warning, TEXT("[UI Manager] : Draw Error Message"));
+	ErrorMessageWidget->UpdateErrorMessage(ErrorMessage);
+	
+	ErrorMessageWidget->AddToViewport(50); 
+	
+	// 위젯 제거 타이머 시작 
+	FTimerHandle ErrorTimerHandle;
+	TWeakObjectPtr<UUserWidget> WeakWidget = ErrorMessageWidget;
+	GetWorld()->GetTimerManager().SetTimer(
+		ErrorTimerHandle,
+		FTimerDelegate::CreateWeakLambda(this, [WeakWidget]()
+		{
+			if (WeakWidget.IsValid()) WeakWidget->RemoveFromParent();
+			
+			LOG_KMS(Warning, TEXT("[UI Manager] : Remove Error Message"));
+		}),
+		Duration,
+		false
+	);
 }
 
 UUserWidget* UDDUIManagerSubsystem::CreateUIWidget(TSubclassOf<UUserWidget> WidgetClass)
