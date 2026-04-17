@@ -118,5 +118,10 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Targeting);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Range);
 	
+	// UI 태그 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoardGame_UI_PlayerTurn); 
+	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lobby_UI_NicknamePopup);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lobby_UI_Main);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lobby_UI_CountDown);
 }
