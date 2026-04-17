@@ -43,7 +43,13 @@ void ADDBoardGameMode::BeginPlay()
     }
 	
 	LOG_CJH(Log, TEXT("[BeginPlay] 보드게임 맵 진입 완료. 메인 타이머 시작."));
-	GetWorld()->GetTimerManager().SetTimer(MainTimerHandle, this, &ThisClass::OnMainTimerElapsed, 1.f, true);
+	GetWorld()->GetTimerManager().SetTimer(
+		MainTimerHandle, 
+		this,
+		&ThisClass::OnMainTimerElapsed, 
+		1.f, 
+		true
+	);
 }
 
 void ADDBoardGameMode::OnMainTimerElapsed()
@@ -313,7 +319,6 @@ void ADDBoardGameMode::Logout(AController* Exiting)
     }
 
     Super::Logout(Exiting);
-	Super::Logout(Exiting);
 }
 
 void ADDBoardGameMode::CheckWinCondition()
@@ -391,9 +396,8 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 		TurnTagsToRemove.AddTag(DDGameplayTags::State_BoardGame_HasUsedItem);
 		ASC->RemoveActiveEffectsWithGrantedTags(TurnTagsToRemove);
 
-		TSubclassOf<UGameplayEffect> EffectToApply = (i == CurrentTurnPlayerIndex)
-			                                             ? TurnActiveEffectClass
-			                                             : TurnWaitingEffectClass;
+		TSubclassOf<UGameplayEffect> EffectToApply = 
+			(i == CurrentTurnPlayerIndex) ? TurnActiveEffectClass : TurnWaitingEffectClass;
 
 		if (EffectToApply)
 		{
@@ -406,7 +410,6 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 			}
 		}
 		
-
 		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PlayerController);
 		if (IsValid(DDPC))
 		{
@@ -416,13 +419,15 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 				CachedBoardGameState->StateTimer = CachedBoardGameState->MaxStateTimer;
 				LOG_CJH(Log, TEXT("▶ [%d]번 플레이어 턴 시작! (제한시간 %d초)"), i, CachedBoardGameState->MaxStateTimer);
 				SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
+				
+				// 현재 턴인 플레이어 한테 턴 ui 그리기
+				DDPC->Client_OpenPopUp(DDGameplayTags::BoardGame_UI_PlayerTurn); 
 			}
 			else
 			{
 				DDPC->Client_SetMouseCursorVisible(false);
 			}
 		}
-
 	}
 
 	Super::FocusAllCamerasOnTarget(ActivePawn);
@@ -439,8 +444,14 @@ void ADDBoardGameMode::NotifyMovementFinished()
 {
 	LOG_CJH(Log, TEXT("[Notify] 이동 완료. Moving 태그를 제거하고 %.0f초 뒤 턴을 넘깁니다."), TurnTransitionTimer);
 	SetTurnPhase(FGameplayTag::EmptyTag);
-	GetWorldTimerManager().SetTimer(TurnTransitionTimerHandle, this, &ThisClass::ExecuteNextTurnTransition,
-	                                TurnTransitionTimer, false);
+	
+	GetWorldTimerManager().SetTimer(
+		TurnTransitionTimerHandle, 
+		this, 
+		&ThisClass::ExecuteNextTurnTransition,
+		TurnTransitionTimer,
+		false
+	);
 }
 
 void ADDBoardGameMode::HandleRespawn(AController* TargetController)
@@ -458,6 +469,15 @@ void ADDBoardGameMode::HandleRespawn(AController* TargetController)
 void ADDBoardGameMode::ExecuteNextTurnTransition()
 {
 	LOG_CJH(Log, TEXT("[Timer] %.0f초 대기 완료. 다음 플레이어로 턴을 전환합니다."), TurnTransitionTimer);
+	
+	if (!AlivePlayerControllers.IsValidIndex(CurrentTurnPlayerIndex)) return;
+	
+	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[CurrentTurnPlayerIndex]);
+	if (!DDPC) return;
+	
+	// 턴 팝업 제거 
+	DDPC->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_PlayerTurn);
+	
 	CurrentTurnPlayerIndex++;
 	SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 }

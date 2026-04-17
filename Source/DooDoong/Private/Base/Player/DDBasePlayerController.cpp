@@ -12,6 +12,7 @@
 #include "Common/DDLogManager.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
+#include "System/DDUIManagerSubsystem.h"
 #include "UI/Inventory/DDInventoryComponent.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 
@@ -212,6 +213,22 @@ void ADDBasePlayerController::OnMouseClick()
 	Server_SelectTile(SelectableTileActor);
 }
 
+void ADDBasePlayerController::Client_SwitchGameLayer_Implementation(FGameplayTag Tag)
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager) return;
+	
+	UIManager->SwitchGameLayer(Tag);
+}
+
+void ADDBasePlayerController::Client_SetUIConfig_Implementation(UDDUIConfig* InConfig)
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager) return;
+	
+	UIManager->SetUIConfig(InConfig);
+}
+
 void ADDBasePlayerController::Server_SelectTile_Implementation(ADDSelectableTileActor* SelectableTileActor)
 {
 	if (!SelectableTileActor) return;
@@ -235,6 +252,31 @@ void ADDBasePlayerController::Server_RequestPlayerReady_Implementation()
 	if (!IsValid(PS)) return;
 	
 	GM->SetPlayerReady(PS, true);
+}
+
+void ADDBasePlayerController::Client_OpenPopUp_Implementation(FGameplayTag Tag)
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager || !Tag.IsValid()) return;
+	
+	UIManager->DrawPopup(Tag); 
+}
+
+void ADDBasePlayerController::Client_ClosePopUp_Implementation(FGameplayTag Tag)
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager || !Tag.IsValid()) return;
+	
+	UIManager->HidePopup(Tag);
+	
+}
+
+void ADDBasePlayerController::Client_CloseAllPopUps_Implementation()
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager) return;
+	
+	UIManager->HideAllPopups();
 }
 
 void ADDBasePlayerController::Input_Move(const FInputActionValue& Value)

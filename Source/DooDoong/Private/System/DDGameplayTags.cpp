@@ -114,5 +114,11 @@ namespace DDGameplayTags
 	// 아이템 액션 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Targeting, "State.ItemAction.Targeting", "아이템 타겟 선택 중");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Range, "State.ItemAction.Range", "아이템 범위 표시/선택 중");
+	
+	// UI 태그 
+	UE_DEFINE_GAMEPLAY_TAG(BoardGame_UI_PlayerTurn, "BoardGame.UI.PlayerTurn"); 
+	UE_DEFINE_GAMEPLAY_TAG(Lobby_UI_NicknamePopup, "Lobby.UI.NicknamePopup"); 
+	UE_DEFINE_GAMEPLAY_TAG(Lobby_UI_Main, "Lobby.UI.Main"); 
+	UE_DEFINE_GAMEPLAY_TAG(Lobby_UI_CountDown, "Lobby.UI.CountDown");
 }
 

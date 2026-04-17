@@ -7,8 +7,10 @@
 
 class APlayerController;
 class UAbilitySystemComponent;
+class ADDBasePlayerController; 
 class UGameplayEffect;
-
+class UDDUIConfig; 
+	
 UCLASS()
 class ADDGameModeBase : public AGameModeBase
 {
@@ -35,6 +37,8 @@ protected:
 	UAbilitySystemComponent* GetAbilitySystemComponentFromPlayer(APlayerController* PlayerController);
 	virtual void SpawnSpectatorPawn(APlayerController* PlayerController);
 
+	void BroadcastToAllPlayers(TFunctionRef<void(ADDBasePlayerController*)> Func);
+	
 protected:
 	/** 본 게임에 참여 중인 플레이어 컨트롤러 목록 (관전자 제외) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="참여 중인 플레이어 컨트롤러 목록"))
@@ -43,4 +47,9 @@ protected:
 	/** 공통 리스폰 시 부여할 이펙트들 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Response")
 	TArray<TSubclassOf<UGameplayEffect>> ReSpawnEffectClasses;
+	
+protected:
+	/**각 컨트롤러에 보여줄 UI 정보 */
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TObjectPtr<UDDUIConfig> CurrentUIConfig;
 };

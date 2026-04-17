@@ -1,19 +1,21 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "DDLobbyWidget.generated.h"
+#include "DDLobbyNicknameSubmitWidget.generated.h"
 
 class UButton;
 class UEditableText;
 
 UCLASS()
-class DOODOONG_API UDDLobbyWidget : public UUserWidget
+class DOODOONG_API UDDLobbyNicknameSubmitWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
 	virtual void NativeConstruct() override;
 
+	virtual void NativeDestruct() override;
+	
 	UFUNCTION()
 	void OnPlayButtonClicked();
 
