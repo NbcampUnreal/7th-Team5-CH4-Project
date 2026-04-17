@@ -6,6 +6,7 @@
 
 class UButton;
 class UTextBlock; 
+class ADDLobbyGameState;
 
 UCLASS()
 class DOODOONG_API UDDLobbyWidget : public UUserWidget
@@ -24,13 +25,17 @@ protected:
 
 	UFUNCTION()
 	void OnClickQuitButton(); 
-	
-	UFUNCTION()
-	void UpdatePlayerCount(); 
-	
-	UFUNCTION()
-	void UpdateReadyCount(); 
 
+protected:
+	
+	UFUNCTION()
+	void UpdatePlayerCount(int32 NewCount); 
+	
+	UFUNCTION()
+	void UpdateReadyCount(int32 NewCount); 
+
+	
+	
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> PlayerCountText;
@@ -48,16 +53,20 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> ReadyCountText; 
 	
-	UPROPERTY(EditDefaultsOnly, Category = "UI|Style")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,  Category = "UI|Style")
 	FButtonStyle NormalStyle;  
 
-	UPROPERTY(EditDefaultsOnly, Category = "UI|Style")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,  Category = "UI|Style")
 	FButtonStyle ReadyStyle; 
 	
 	bool bIsReady = false; 
 	
+	int32 PlayerCount = 0;
+	
+	int32 ReadyCount = 0; 
+	
 protected:
 	
-	// UPROPERTY(meta = (BindWidget))
-	// TObjectPtr<UDDLobbyGameState> CurrentGameState;
+	UPROPERTY()
+	TObjectPtr<ADDLobbyGameState> CurrentGameState;
 };
