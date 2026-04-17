@@ -105,18 +105,6 @@ void UDDUIManagerSubsystem::HidePopup(FGameplayTag PopupTag)
 		(*Widget)->RemoveFromParent();
 		PopupWidgets.Remove(PopupTag);
 	}
-	
-	TSubclassOf<UUserWidget>* WidgetClass = UIConfig->PopupWidgetMap.Find(PopupTag);
-	if (!WidgetClass) return;
-	
-	UUserWidget* NewWidget = CreateUIWidget(*WidgetClass);
-	if (NewWidget)
-	{
-		NewWidget->AddToViewport(10);
-		PopupWidgets.Add(PopupTag, NewWidget);
-		LOG_KMS(Warning, TEXT("[UI Manager] : Open New Popup Widget"));
-	}
-	
 }
 
 void UDDUIManagerSubsystem::HideAllPopups()

@@ -50,7 +50,7 @@ void ADDLobbyPlayerController::Server_SubmitNickname_Implementation(const FName&
 		return; 
 	}
 	
-	// 로비 팝업 제거 
+	// 닉네임 입력 팝업 제거 
 	Client_ClosePopUp(DDGameplayTags::Lobby_UI_NicknamePopup); 
 }
 

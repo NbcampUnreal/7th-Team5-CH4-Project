@@ -268,6 +268,7 @@ void ADDBasePlayerController::Client_ClosePopUp_Implementation(FGameplayTag Tag)
 	if (!UIManager || !Tag.IsValid()) return;
 	
 	UIManager->HidePopup(Tag);
+	
 }
 
 void ADDBasePlayerController::Client_CloseAllPopUps_Implementation()
