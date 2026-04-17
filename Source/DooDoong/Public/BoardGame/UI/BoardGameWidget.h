@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "BoardGameWidget.generated.h"
 
+class ADDBoardGameState;
 class UBoardGamePlayerInfo;
 class UTextBlock;
 
@@ -16,7 +17,8 @@ public:
 	virtual void NativeConstruct() override;
 	
 	virtual void NativeDestruct() override;
-	
+	void BindToGameState();
+
 	UFUNCTION()
 	void UpdateTimeText(int32 InTime);
 	
@@ -31,10 +33,10 @@ protected:
 	UPROPERTY(meta =(BindWidget))
 	UTextBlock* RemainTurnText;
 	
-	UPROPERTY(meta =(BindWidget))
-	UTextBlock* MyTurnText;
-	
 	// UPROPERTY(meta =(BindWidget))
 	// TArray<UBoardGamePlayerInfo*> PlayerInfos;
+	
+	UPROPERTY()
+	TObjectPtr<ADDBoardGameState> CurrentGameState;
 	
 };

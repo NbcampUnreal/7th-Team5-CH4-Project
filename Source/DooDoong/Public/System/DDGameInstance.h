@@ -15,7 +15,7 @@ public:
 	// ==========================================
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Global Data", meta=(DisplayName = "현재 보드판 라운드 진행도"))
-	int32 CurrentRound = 1;
+	int32 CurrentRound = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Global Data", meta=(DisplayName= "우승에 필요한 목표 트로피 개수"))
 	int32 MaxTrophy = 1;
