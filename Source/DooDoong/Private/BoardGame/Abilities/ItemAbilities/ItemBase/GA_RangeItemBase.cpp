@@ -27,6 +27,16 @@ void UGA_RangeItemBase::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	LOG_CYS(Warning,TEXT("범위 아이템 어빌리티 실행"));
 	TotalDrainedAmount = 0;
 	
+	if (HasAuthority(&CurrentActivationInfo))
+	{
+		ADDBoardGameCharacter* MyChar = GetBoardGameCharacter();
+		if (MyChar)
+		{
+			MyChar->bShowRangeIndicator = true;
+			MyChar->OnRep_RangeIndicator(); // 서버에서도 즉시 반영
+		}
+	}
+	
 	// 타겟 업데이트
 	GetWorld()->GetTimerManager().SetTimer(
 		UpdateTimer,
@@ -66,6 +76,16 @@ void UGA_RangeItemBase::EndAbility(
 {
 	GetWorld()->GetTimerManager().ClearTimer(UpdateTimer);
 
+	if (HasAuthority(&CurrentActivationInfo))
+	{
+		ADDBoardGameCharacter* MyChar =GetBoardGameCharacter();
+		if (MyChar)
+		{
+			MyChar->bShowRangeIndicator = false;
+			MyChar->OnRep_RangeIndicator();
+		}
+	}
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -139,7 +159,7 @@ void UGA_RangeItemBase::OnConfirm(FGameplayEventData Payload)
 	{
 		return;
 	}
-	LOG_CYS(Warning,TEXT("컨펌"));
+	LOG_CYS(Warning,TEXT("범위 어빌리티 컨펌 입력 들어옴"));
 	// 타겟 확정 시에만 탐색
 	FindTargets();
 
@@ -176,5 +196,7 @@ void UGA_RangeItemBase::OnConfirm(FGameplayEventData Payload)
 
 void UGA_RangeItemBase::OnCancel(FGameplayEventData Payload)
 {
+	LOG_CYS(Warning,TEXT("범위 어빌리티 캔슬 입력 들어옴"));
+	
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }

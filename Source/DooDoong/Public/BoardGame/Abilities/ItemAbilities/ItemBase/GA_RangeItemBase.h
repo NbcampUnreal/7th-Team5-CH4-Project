@@ -47,10 +47,10 @@ protected:
 	void OnCancel(FGameplayEventData Payload);
 
 	UPROPERTY(EditAnywhere)
-	float Radius = 500.f;
+	float Radius = 1000.f;
 
 	UPROPERTY(EditAnywhere)
-	float AngleDeg = 90.f;
+	float AngleDeg = 60.f;
 
 	TArray<ADDBoardGameCharacter*> CachedTargets;
 	FTimerHandle UpdateTimer;
