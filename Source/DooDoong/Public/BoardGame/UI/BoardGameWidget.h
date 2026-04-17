@@ -31,9 +31,6 @@ protected:
 	UPROPERTY(meta =(BindWidget))
 	UTextBlock* RemainTurnText;
 	
-	UPROPERTY(meta =(BindWidget))
-	UTextBlock* MyTurnText;
-	
 	// UPROPERTY(meta =(BindWidget))
 	// TArray<UBoardGamePlayerInfo*> PlayerInfos;
 	
