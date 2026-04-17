@@ -1,10 +1,15 @@
 ﻿
 #include "UI/Inventory/DDInventoryComponent.h"
+#include "UI/Inventory/DDInventoryWidget.h"
+#include "UI/Inventory/DDInventoryBase.h"
+
+#include "Base/Character/DDBaseCharacter.h"
 #include "Base/Player/DDBasePlayerController.h"
+
 #include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
-#include "Net/UnrealNetwork.h"
+#include "UI/Inventory/DDItemUseButtonWidget.h"
 
 
 UDDInventoryComponent::UDDInventoryComponent()
@@ -23,6 +28,7 @@ void UDDInventoryComponent::BeginPlay()
 		/* 테스트용 아이템추가 */
 		ServerRPCAddItem("HealingKit"); 
 		ServerRPCAddItem("GiveBomb");
+		ServerRPCAddItem("Magnet");
 	}
 	
 	InitializeInventoryUI();
