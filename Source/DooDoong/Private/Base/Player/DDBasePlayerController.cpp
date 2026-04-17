@@ -280,6 +280,14 @@ void ADDBasePlayerController::Client_CloseAllPopUps_Implementation()
 	UIManager->HideAllPopups();
 }
 
+void ADDBasePlayerController::Client_DrawErrorMessage_Implementation(const FString& ErrorMessage, float Duration)
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager) return;
+	
+	UIManager->DrawErrorMessage(ErrorMessage, Duration);
+}
+
 void ADDBasePlayerController::Input_Move(const FInputActionValue& Value)
 {
 	APawn* ControlledPawn = GetPawn();

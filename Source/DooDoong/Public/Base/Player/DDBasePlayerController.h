@@ -68,6 +68,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void Client_CloseAllPopUps();
 	
+	UFUNCTION(Client, Reliable)
+	void Client_DrawErrorMessage(const FString& ErrorMessage, float Duration = 3.f);
+	
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_RequestPlayerReady(); 

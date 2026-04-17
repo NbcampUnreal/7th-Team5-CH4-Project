@@ -57,6 +57,7 @@ void ADDLobbyPlayerController::Server_SubmitNickname_Implementation(const FName&
 void ADDLobbyPlayerController::Client_ReceiveNicknameFailure_Implementation(const FString& ErrorMessage)
 {
 	// Error Popup 그리기 
+	Client_DrawErrorMessage(ErrorMessage, 3.f);
 }
 
 bool ADDLobbyPlayerController::Server_RequestReady_Validate(bool bIsReady)

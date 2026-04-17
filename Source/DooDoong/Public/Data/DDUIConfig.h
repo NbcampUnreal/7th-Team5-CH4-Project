@@ -20,4 +20,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Layer|Popup")
 	TMap<FGameplayTag, TSubclassOf<UUserWidget>> PopupWidgetMap;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Layer|Popup")
+	TSubclassOf<UUserWidget> ErrorMessageWidget;
 };
