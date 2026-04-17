@@ -5,11 +5,6 @@ void UGA_InstantItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle, con
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (PlayItemMontage())
-	{
-		return;
-	}
-	
 	if (!HasAuthority(&ActivationInfo))
 	{
 		return;

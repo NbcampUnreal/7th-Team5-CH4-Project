@@ -6,8 +6,6 @@
 
 class ADDBoardGameCharacter;
 class UAbilitySystemComponent;
-class UAbilityTask_PlayMontageAndWait;
-class UAnimMontage;
 
 UCLASS(Abstract)
 class DOODOONG_API UGA_ItemBase : public UGameplayAbility
@@ -30,21 +28,4 @@ protected:
 	/** 보드게임 캐릭터가 사용하는 ASC Getter */
 	UAbilitySystemComponent* GetBoardGameAbilitySystemComponent() const;
 
-	bool PlayItemMontage(float PlayRate = 1.f, FName StartSection = NAME_None);
-
-	UFUNCTION()
-	virtual void OnItemMontageCompleted();
-
-	UFUNCTION()
-	virtual void OnItemMontageInterrupted();
-
-	UFUNCTION()
-	virtual void OnItemMontageCancelled();
-
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item|Animation")
-	TObjectPtr<UAnimMontage> ItemMontage;
-
-	UPROPERTY()
-	TObjectPtr<UAbilityTask_PlayMontageAndWait> ActiveItemMontageTask;
 };
