@@ -114,6 +114,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_HealingKit);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_GiveBomb);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_Magnet);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_MeleeDamage);
 	
 	// 아이템 액션 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Targeting);

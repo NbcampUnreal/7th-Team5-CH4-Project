@@ -30,6 +30,7 @@ void UDDInventoryComponent::BeginPlay()
 		ServerRPCAddItem("HealingKit"); 
 		ServerRPCAddItem("GiveBomb");
 		ServerRPCAddItem("Magnet");
+		ServerRPCAddItem("MeleeDamage");
 	}
 	
 	InitializeInventoryUI();
