@@ -211,10 +211,48 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 	{
 		CalculateFinalWinner();
 	}
+	else if (NewStateTag == DDGameplayTags::State_BoardGame_End)
+	{
+		LOG_CJH(Log, TEXT("게임이 종료되었습니다. 10초 후 로비로 이동합니다."));
+        
+        // 10초 타이머 설정
+        GetWorldTimerManager().SetTimer(
+            ReturnToLobbyTimerHandle, 
+            this, 
+            &ADDBoardGameMode::TravelToLobby, 
+            10.0f, 
+            false
+        );
+	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
 	{
+		// 1. 승리 조건(목표 트로피 달성)을 먼저 검사합니다.
+	    bool bHasTrophyWinner = false;
+	    for (APlayerController* PC : AlivePlayerControllers)
+	    {
+	        if (ADDBasePlayerState* PS = PC->GetPlayerState<ADDBasePlayerState>())
+	        {
+	            if (PS->GetPointSet() && PS->GetPointSet()->GetTrophy() >= CachedBoardGameState->MaxTrophy)
+	            {
+	                LOG_CJH(Log, TEXT("[승자 발생] %s님이 목표 트로피를 달성했습니다!"), *PS->PlayerGameData.PlayerDisplayName.ToString());
+	                bHasTrophyWinner = true;
+	                break;
+	            }
+	        }
+	    }
+		
+		// 2. 승자가 있다면 즉시 Ending 상태로 전환하고 함수를 종료(return)합니다.
+	    if (bHasTrophyWinner)
+	    {
+	        LOG_CJH(Log, TEXT("미니게임을 건너뛰고 결과 화면으로 이동합니다."));
+	        SetMatchState(DDGameplayTags::State_BoardGame_Ending);
+	        return;
+	    }
+		
+		// 3. 승자가 없을 경우에만 기존의 라운드 종료(미니게임 준비) 로직을 수행합니다.
 		CachedBoardGameState->StateTimer = 3;
 		LOG_CJH(Log, TEXT("[라운드 종료] 3초 뒤 미니게임으로 이동합니다."));
+		
 		// 현재 타일 위치 시작 위치로 초기화
 		for (APlayerController* PC : AlivePlayerControllers)
 		{
@@ -424,6 +462,15 @@ void ADDBoardGameMode::ExecuteNextTurnTransition()
 	SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 }
 
+void ADDBoardGameMode::TravelToLobby()
+{
+	if (GetWorld())
+    {
+        LOG_CJH(Log, TEXT("로비로 ServerTravel을 시작합니다."));
+        GetWorld()->ServerTravel(LobbyMapPath);
+    }
+}
+
 void ADDBoardGameMode::SetTurnPhase(FGameplayTag NewPhaseTag)
 {
 	if (!AlivePlayerControllers.IsValidIndex(CurrentTurnPlayerIndex)) return;
@@ -461,67 +508,58 @@ void ADDBoardGameMode::SetTurnPhase(FGameplayTag NewPhaseTag)
 
 void ADDBoardGameMode::CalculateFinalWinner()
 {
-	LOG_CJH(Log, TEXT("[CalculateFinalWinner] 최종 승자 집계를 시작합니다..."));
-	ADDGameStateBase* GameStateBase = GetGameState<ADDGameStateBase>();
-	if (!IsValid(GameStateBase)) return;
+	if (!IsValid(CachedBoardGameState)) return;
 
-	TArray<ADDBasePlayerState*> Winners;
-	float HighestTrophy = -1.0f;
-	float HighestCoin = -1.0f;
+    // 1. AlivePlayerControllers에서 참여 중인 PlayerState 수집
+    TArray<ADDBasePlayerState*> RankCandidates;
+    for (APlayerController* PC : AlivePlayerControllers)
+    {
+        if (PC && PC->PlayerState)
+        {
+            if (ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(PC->PlayerState))
+            {
+                // PointSet이 유효한지 확인 후 추가
+                if (PS->GetPointSet())
+                {
+	                RankCandidates.Add(PS);
+                }
+            }
+        }
+    }
 
-	for (APlayerState* PlayerState : GameStateBase->PlayerArray)
-	{
-		if (ADDBasePlayerState* BasePlayerState = Cast<ADDBasePlayerState>(PlayerState))
-		{
-			if (!BasePlayerState->bIsParticipant) continue;
+    // 2. 정렬 (람다식: 트로피 우선, 코인 차선)
+    RankCandidates.Sort([](const ADDBasePlayerState& A, const ADDBasePlayerState& B)
+    {
+        float TrophyA = A.GetPointSet()->GetTrophy();
+        float TrophyB = B.GetPointSet()->GetTrophy();
+        
+        if (TrophyA != TrophyB) return TrophyA > TrophyB; 
+        
+        return A.GetPointSet()->GetCoin() > B.GetPointSet()->GetCoin();
+    });
 
-			if (BasePlayerState->GetPointSet())
-			{
-				float CurrentTrophy = BasePlayerState->GetPointSet()->GetTrophy();
-				float CurrentCoin = BasePlayerState->GetPointSet()->GetCoin();
+    // 3. UI용 구조체 배열로 변환
+    TArray<FFinalRankData> FinalResults;
+    for (int32 i = 0; i < RankCandidates.Num(); ++i)
+    {
+    	RankCandidates[i]->PlayerGameData.bIsGameFinished = true;
+    	
+        FFinalRankData Data;
+        Data.Rank = i + 1;
+        Data.PlayerName = RankCandidates[i]->PlayerGameData.PlayerDisplayName;
+        Data.Trophy = (int32)RankCandidates[i]->GetPointSet()->GetTrophy();
+        Data.Coin = (int32)RankCandidates[i]->GetPointSet()->GetCoin();
+        
+        FinalResults.Add(Data);
+    	
+    	LOG_CJH(Log, TEXT("%d등 플레이어: %s | 트로피 개수: %d, 코인 개수: %d"), i + 1, *Data.PlayerName.ToString(), Data.Trophy, Data.Coin);
+    }
 
-				LOG_CJH(Log, TEXT(" - 참여자 [%s] | 트로피: %.0f | 코인: %.0f"),
-				        *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString(), CurrentTrophy, CurrentCoin);
+    // 4. GameState에 저장
+    CachedBoardGameState->FinalRankings = FinalResults;
 
-				if (CurrentTrophy > HighestTrophy)
-				{
-					HighestTrophy = CurrentTrophy;
-					HighestCoin = CurrentCoin;
-					Winners.Empty();
-					Winners.Add(BasePlayerState);
-				}
-				else if (CurrentTrophy == HighestTrophy)
-				{
-					if (CurrentCoin > HighestCoin)
-					{
-						HighestCoin = CurrentCoin;
-						Winners.Empty();
-						Winners.Add(BasePlayerState);
-					}
-					else if (CurrentCoin == HighestCoin)
-					{
-						Winners.Add(BasePlayerState);
-					}
-				}
-			}
-		}
-	}
-
-	if (Winners.Num() > 0)
-	{
-		FString WinnerNames = TEXT("");
-		for (ADDBasePlayerState* Winner : Winners)
-		{
-			WinnerNames += Winner->PlayerGameData.PlayerDisplayName.ToString() + TEXT(" ");
-		}
-		LOG_CJH(Log, TEXT("게임 종료! 승자: %s (트로피: %d, 코인: %d)"), *WinnerNames, (int32)HighestTrophy, (int32)HighestCoin);
-	}
-	else
-	{
-		LOG_CJH(Error, TEXT("승자를 찾을 수 없습니다! PointSet 데이터 오류를 확인하세요."));
-	}
-
-	SetMatchState(DDGameplayTags::State_BoardGame_End);
+    // 5. 결과 상태로 전환
+    SetMatchState(DDGameplayTags::State_BoardGame_End);
 }
 
 void ADDBoardGameMode::SortPlayersByTurnOrder()

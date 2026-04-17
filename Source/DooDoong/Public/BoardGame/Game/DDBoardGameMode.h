@@ -69,4 +69,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Turn")
 	TSubclassOf<UGameplayEffect> TurnWaitingEffectClass;
+	
+protected:
+    // 로비 이동을 위한 타이머 핸들
+    FTimerHandle ReturnToLobbyTimerHandle;
+	
+	// 실제 이동을 수행할 함수
+    void TravelToLobby();
+
+    // 로비 맵 경로
+    UPROPERTY(EditDefaultsOnly, Category = "GameData", meta=(DisplayName="게임 엔딩 시 돌아갈 로비 맵"))
+    FString LobbyMapPath = TEXT("/Game/DooDoong/Map/L_Park?listen");
 };

@@ -21,6 +21,7 @@ void ADDBoardGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ADDBoardGameState, MaxRound);
 	DOREPLIFETIME(ADDBoardGameState, StateTimer);
 	DOREPLIFETIME(ADDBoardGameState, CurrentRound);
+	DOREPLIFETIME(ADDBoardGameState, FinalRankings);
 }
 
 void ADDBoardGameState::BeginPlay()
@@ -77,4 +78,9 @@ void ADDBoardGameState::OnRep_StateTimer()
 void ADDBoardGameState::OnRep_CurrentRound()
 {
 	OnRoundChanged.Broadcast(CurrentRound);
+}
+
+void ADDBoardGameState::OnRep_FinalRankings()
+{
+	OnFinalRankingsUpdated.Broadcast(FinalRankings);
 }
