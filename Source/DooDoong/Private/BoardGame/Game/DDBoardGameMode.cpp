@@ -54,12 +54,11 @@ void ADDBoardGameMode::BeginPlay()
 
 void ADDBoardGameMode::OnMainTimerElapsed()
 {
-	ADDGameStateBase* GameStateBase = GetGameState<ADDGameStateBase>();
-	if (!IsValid(GameStateBase)) return;
+	if (!IsValid(CachedBoardGameState)) return;
 
-	if (!GameStateBase->MatchStateTag.IsValid())
+	if (!CachedBoardGameState->MatchStateTag.IsValid())
 	{
-		if (AlivePlayerControllers.Num() >= GameStateBase->MinPlayerCount)
+		if (AlivePlayerControllers.Num() >= CachedBoardGameState->MinPlayerCount)
 		{
 			bool bAllPlayerStatesReady = true;
 			for (APlayerController* PC : AlivePlayerControllers)
@@ -73,14 +72,14 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 
 			if (bAllPlayerStatesReady)
 			{
-				LOG_CJH(Log, TEXT("[GameLoop] %d명 접속 완료! 보드게임 Init 상태로 진입합니다."), GameStateBase->MinPlayerCount);
+				LOG_CJH(Log, TEXT("[GameLoop] %d명 접속 완료! 보드게임 Init 상태로 진입합니다."), CachedBoardGameState->MinPlayerCount);
 				SetMatchState(DDGameplayTags::State_BoardGame_Init);
 			}
 		}
 		return;
 	}
 
-	if (GameStateBase->MatchStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
+	if (CachedBoardGameState->MatchStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
 	{
 		if (CachedBoardGameState->StateTimer > 0)
 		{
@@ -100,7 +99,7 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 			}
 		}
 	}
-	else if (GameStateBase->MatchStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
+	else if (CachedBoardGameState->MatchStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
 	{
 		if (CachedBoardGameState->StateTimer > 0)
 		{
@@ -130,14 +129,13 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 
 void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 {
-	ADDGameStateBase* GameStateBase = GetGameState<ADDGameStateBase>();
-	if (!IsValid(GameStateBase)) return;
+	if (!IsValid(CachedBoardGameState)) return;
 
 	LOG_CJH(Log, TEXT("================================================="));
 	LOG_CJH(Log, TEXT("[상태 전환] 새로운 상태: %s"), *NewStateTag.ToString());
 	LOG_CJH(Log, TEXT("================================================="));
 
-	GameStateBase->MatchStateTag = NewStateTag;
+	CachedBoardGameState->MatchStateTag = NewStateTag;
 
 	for (APlayerController* PlayerController : AlivePlayerControllers)
 	{
@@ -197,10 +195,9 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 		{
 			//1라운드 시퀀서 재생 지시
 			LOG_CYS(Warning, TEXT("1라운드 인트로 시퀀서 재생해라"));
-			ADDBoardGameState* GS = GetGameState<ADDBoardGameState>();
-			if (GS)
+			if (CachedBoardGameState)
 			{
-				GS->Multicast_PlaySequence();
+				CachedBoardGameState->Multicast_PlaySequence();
 				// 시퀀서 끝나면 GS에서 턴 지시함.
 			}
 		}
@@ -324,14 +321,13 @@ void ADDBoardGameMode::Logout(AController* Exiting)
 void ADDBoardGameMode::CheckWinCondition()
 {
 	LOG_CJH(Log, TEXT("[CheckWinCondition] 승리 조건 및 최대 라운드 도달 여부를 검사합니다."));
-	ADDGameStateBase* GameStateBase = GetGameState<ADDGameStateBase>();
 	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
 
-	if (!IsValid(GameStateBase) || !IsValid(GameInstance)) return;
+	if (!IsValid(CachedBoardGameState) || !IsValid(GameInstance)) return;
 
 	bool bHasTrophyWinner = false;
 
-	for (APlayerState* PlayerState : GameStateBase->PlayerArray)
+	for (APlayerState* PlayerState : CachedBoardGameState->PlayerArray)
 	{
 		if (ADDBasePlayerState* BasePlayerState = Cast<ADDBasePlayerState>(PlayerState))
 		{
