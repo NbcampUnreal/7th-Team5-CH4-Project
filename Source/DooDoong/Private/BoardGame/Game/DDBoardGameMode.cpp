@@ -369,7 +369,7 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 			GameInstance->CurrentRound++;
 			if (CachedBoardGameState)
 			{
-				CachedBoardGameState->CurrentRound = GameInstance->CurrentRound;
+				CachedBoardGameState->CurrentRound = CachedBoardGameState->MaxRound - GameInstance->CurrentRound;
 			}
 			LOG_CJH(Log, TEXT("모든 플레이어의 턴 종료. 라운드를 넘깁니다."));
 		}
