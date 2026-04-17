@@ -9,6 +9,7 @@
 #include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
+#include "Net/UnrealNetwork.h"
 #include "UI/Inventory/DDItemUseButtonWidget.h"
 
 
