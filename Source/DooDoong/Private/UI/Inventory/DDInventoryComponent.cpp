@@ -111,4 +111,5 @@ void UDDInventoryComponent::ServerRPCUseItem_Implementation(const FName& ItemSlo
 			ItemDatas.Count--;
 		}
 	}
+	OwningController->Client_CloseInventory();
 }

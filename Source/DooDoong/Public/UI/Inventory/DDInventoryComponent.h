@@ -38,20 +38,6 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:
-	/*void ToggleInventory();*/
-	
-	/* 클라이언트 관련 함수 */
-	
-	/*UFUNCTION(Client, Reliable)
-	void ClientRPCOpenInventory();
-	
-	UFUNCTION(Client, Reliable)
-	void ClientRPCCloseInventory();
-	
-	UFUNCTION(Client, Reliable)
-	void ClientRPCCreateInventoryUI();*/
-	void ToggleInventory();
-
 	/** 주현 : 인벤토리 Open이 Private이라 한 번 감싸서 호출가능하게 요청하는 함수 */
 	void RequestOpenInventory();
 
@@ -66,10 +52,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRPCAddItem(FName ItemName);
 	
-	
 	void InitializeInventoryData();
 	void InitializeInventoryUI();
-	
 	
 	/* 레플리케이티드가 된다면 서버에서 획득삭제시 클라에 동기화 */
 	FItemTableRow* GetItemData(FName RowName) const;
@@ -89,14 +73,4 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, Category = "OwningController")
 	TWeakObjectPtr<ADDBasePlayerController> OwningController;
-	
-	/*UPROPERTY()
-	TObjectPtr<UDDInventoryWidget> InventoryWidget;
-	
-	UPROPERTY(EditDefaultsOnly, Category= "Inventory")
-	TSubclassOf<UDDInventoryWidget> InventoryWidgetClass;
-	
-	bool bInventoryOpen;*/
-	
-	
 };
