@@ -213,6 +213,14 @@ void ADDBasePlayerController::OnMouseClick()
 	Server_SelectTile(SelectableTileActor);
 }
 
+void ADDBasePlayerController::Client_SwitchGameLayer_Implementation(FGameplayTag Tag)
+{
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager) return;
+	
+	UIManager->SwitchGameLayer(Tag);
+}
+
 void ADDBasePlayerController::Client_SetUIConfig_Implementation(UDDUIConfig* InConfig)
 {
 	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();

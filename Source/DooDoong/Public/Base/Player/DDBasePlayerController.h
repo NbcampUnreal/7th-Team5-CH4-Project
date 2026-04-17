@@ -56,6 +56,9 @@ public:
 	void Client_SetUIConfig(UDDUIConfig* InConfig);
 	
 	UFUNCTION(Client, Reliable)
+	void Client_SwitchGameLayer(FGameplayTag Tag);
+	
+	UFUNCTION(Client, Reliable)
 	void Client_OpenPopUp(FGameplayTag Tag);
 	
 	UFUNCTION(Client, Reliable)
