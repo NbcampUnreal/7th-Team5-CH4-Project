@@ -2,11 +2,9 @@
 
 
 #include "UI/Inventory/DDItemUseButtonWidget.h"
-
-#include "Base/Player/DDBasePlayerController.h"
-#include "Components/Button.h"
-#include "Data/DDItemDataTypes.h"
 #include "UI/Inventory/DDInventoryComponent.h"
+#include "UI/Inventory/DDInventoryWidget.h"
+#include "Components/Button.h"
 
 void UDDItemUseButtonWidget::NativeOnInitialized()
 {
@@ -33,13 +31,19 @@ void UDDItemUseButtonWidget::NativeConstruct()
 
 void UDDItemUseButtonWidget::UseButton()
 {
-	InventoryComponent->UseItem(CurrentItemSlotName);
-	this->SetVisibility(ESlateVisibility::Collapsed);
+	if (GetOwningLocalPlayer())
+	{
+		InventoryComponent->ServerRPCUseItem(CurrentItemSlotName);
+		this->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UDDItemUseButtonWidget::CancelButton()
 {
-	this->SetVisibility(ESlateVisibility::Collapsed);
+	if (GetOwningLocalPlayer())
+	{
+		this->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UDDItemUseButtonWidget::InitializeGridSlotData(const FName& SlotItemName)

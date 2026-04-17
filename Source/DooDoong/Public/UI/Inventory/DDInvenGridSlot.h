@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "DDInvenGridSlot.generated.h"
 
+struct FInventoryItemData;
 struct FItemTableRow;
 class UTextBlock;
 class UImage;
@@ -20,7 +21,8 @@ class DOODOONG_API UDDInvenGridSlot : public UUserWidget
 public:
 	void SetItemInfo(const FItemTableRow& ItemTableRow);
 	
-	void UpdateItemInfo(const TMap<FName, int32>& InventoryItemData);
+	void UpdateItemInfo(const FInventoryItemData& InventoryItemData);
+	
 protected:
 	virtual void NativeConstruct() override;
 	

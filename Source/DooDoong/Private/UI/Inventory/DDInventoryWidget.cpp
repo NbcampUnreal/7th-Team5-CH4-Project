@@ -2,38 +2,36 @@
 
 
 #include "UI/Inventory/DDInventoryWidget.h"
-
-#include "Base/Player/DDBasePlayerController.h"
 #include "UI/Inventory/DDInvenGridSlot.h"
-#include "Common/DDLogManager.h"
 #include "UI/Inventory/DDInventoryComponent.h"
+#include "Base/Player/DDBasePlayerController.h"
+
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Data/DDItemDataTypes.h"
+#include "Common/DDLogManager.h"
 
 void UDDInventoryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(GetOwningPlayer());
-	if (IsValid(DDPC) == true)
-	{
-		InventoryComponent = DDPC->GetComponentByClass<UDDInventoryComponent>();
-	}
-	Columns = InventoryComponent->InventoryItems.Num();
+	InventoryComponent = GetOwningPlayer()->GetComponentByClass<UDDInventoryComponent>();
+	if (!InventoryComponent.IsValid()) return;
+	Columns = InventoryComponent->InventoryItemDatas.Num();
 	Rows = 1;
-	GenerationGrid();	
+	if (GetOwningPlayer()->IsLocalController())
+	{
+		GenerationGrid();	
+		BindItemData();
+	}
 }
 
 void UDDInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	RefreshGrid();
 }
 
 void UDDInventoryWidget::GenerationGrid()
 {
-	GridSlots.Reserve(Rows * Columns);
-	
 	for (int32 j = 0; j < Rows; ++j)
 	{
 		for (int32 i = 0; i < Columns; ++i)
@@ -53,22 +51,31 @@ void UDDInventoryWidget::GenerationGrid()
 					j * (SlotSizeX) + 50.f
 					));
 			}
-			int32 Index = i + j * Columns;
-			if (!InventoryComponent->ItemNames.IsValidIndex(Index)) return;
-			FName ItemName = InventoryComponent->ItemNames[Index];
-			FItemTableRow& ItemData = *InventoryComponent->GetItemData(ItemName);
-			GridSlot->SetItemInfo(ItemData);
 			GridSlots.Add(GridSlot);
 		}
 	}
 }
 
-void UDDInventoryWidget::RefreshGrid()
+void UDDInventoryWidget::Client_RefreshGrid_Implementation()
 {
-	LOG_PMJ(Error, TEXT("Call RefreshGrid"));
-	for (const auto& GridSlot : GridSlots)
+	LOG_PMJ(Error, TEXT("GridSlot.Num : %d"), GridSlots.Num());
+	if (!InventoryComponent.IsValid() || !GetOwningLocalPlayer()) return;
+	for (int32 i = 0; i < GridSlots.Num(); ++i)
 	{
-		GridSlot->UpdateItemInfo(InventoryComponent->InventoryItems);
+		GridSlots[i]->UpdateItemInfo(InventoryComponent->InventoryItemDatas[i]);
 	}
+}
+
+void UDDInventoryWidget::BindItemData()
+{
+	if (GridSlots.Num() <= 0) return;
+	for (int32 i =0; i < GridSlots.Num(); ++i)
+	{
+		if (!InventoryComponent->InventoryItemDatas.IsValidIndex(i)) return;
+		FName ItemName = InventoryComponent->InventoryItemDatas[i].ItemName;
+		FItemTableRow& ItemData = *InventoryComponent->GetItemData(ItemName);
+		GridSlots[i]->SetItemInfo(ItemData);
+	}
+	
 }
 

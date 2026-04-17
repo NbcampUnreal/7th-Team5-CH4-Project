@@ -13,7 +13,7 @@ class ADDBasePlayerController;
 class UDDInventoryBase;
 
 USTRUCT(BlueprintType)
-struct FInventoryItemReplicator
+struct FInventoryItemData
 {
 	GENERATED_BODY()
 	
@@ -35,47 +35,42 @@ public:
 public:
 	virtual void BeginPlay() override;
 	
-public:
-	void AddItem(FName ItemName);
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	void ToggleInventory();
-
+public:
 	/** 주현 : 인벤토리 Open이 Private이라 한 번 감싸서 호출가능하게 요청하는 함수 */
 	void RequestOpenInventory();
 
 	/** 주현 : 인벤토리 Close도 Private이라 한 번 감싸서 호출가능하게 요청하는 함수 */
 	void RequestCloseInventory();
 	
-	void UseItem(const FName& ItemSlotName);
+	/* 서버 관련 함수 */
 	
+	UFUNCTION(Server, Reliable)
+	void ServerRPCUseItem(const FName& ItemSlotName);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPCAddItem(FName ItemName);
+	
+	void InitializeInventoryData();
+	void InitializeInventoryUI();
 	
 	/* 레플리케이티드가 된다면 서버에서 획득삭제시 클라에 동기화 */
-	/* 서버전용 인벤토리 변수 */
-	UPROPERTY(VisibleAnywhere, Category= "Inventory|Items")
-	TMap<FName, int32> InventoryItems;
-	
-	UPROPERTY(VisibleAnywhere, Category= "Inventory|Items")
-	TArray<FName> ItemNames;
-	
 	FItemTableRow* GetItemData(FName RowName) const;
+	
+
+	/* 클라이언트 전용 복제 변수 */
+	UPROPERTY(ReplicatedUsing=OnRep_ClientInventoryData)
+	TArray<FInventoryItemData> InventoryItemDatas;
+	
+	UFUNCTION()
+	void OnRep_ClientInventoryData();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category= "Inventory|Data")
 	TObjectPtr<UDataTable> ItemDataTable;
 	
 private:
+	UPROPERTY(VisibleAnywhere, Category = "OwningController")
 	TWeakObjectPtr<ADDBasePlayerController> OwningController;
-	
-	void ConstructInventory();
-	
-	UPROPERTY()
-	TObjectPtr<UDDInventoryWidget> InventoryWidget;
-	
-	UPROPERTY(EditDefaultsOnly, Category= "Inventory")
-	TSubclassOf<UDDInventoryWidget> InventoryWidgetClass;
-	
-	bool bInventoryOpen;
-	void OpenInventory();
-	void CloseInventory();
-	
 };

@@ -2,10 +2,13 @@
 
 
 #include "UI/Inventory/DDInvenGridSlot.h"
+
+#include "Common/DDLogManager.h"
 #include "UI/Inventory/DDItemUseButtonWidget.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Data/DDItemDataTypes.h"
+#include "UI/Inventory/DDInventoryComponent.h"
 
 void UDDInvenGridSlot::NativeConstruct()
 {
@@ -25,17 +28,13 @@ void UDDInvenGridSlot::SetItemInfo(const FItemTableRow& ItemTableRow)
 	ItemName = ItemTableRow.ItemID;
 }
 
-void UDDInvenGridSlot::UpdateItemInfo(const TMap<FName, int32>& InventoryItemData)
+void UDDInvenGridSlot::UpdateItemInfo(const FInventoryItemData& InventoryItemData)
 {
 	// 인벤토리 열릴때마다 인벤토리내부 데이터 전달받아서 아이템이름확인하고 갯수맞춰주기
-	for (const TPair<FName, int32>& ItemPair : InventoryItemData)
-	{
-		if (ItemName == ItemPair.Key)
-		{
-			ItemCount = ItemPair.Value;
-		}
-	}
+	if (!InventoryItemData.ItemName.IsValid()) return;
+	ItemCount = InventoryItemData.Count;
 	
+	LOG_PMJ(Warning, TEXT("ItemCount : %d"), ItemCount);
 	if (ItemCount > 0)
 	{
 		bCanUse = true;
@@ -54,5 +53,6 @@ void UDDInvenGridSlot::UseItem()
 	{
 		ItemUseButtonWidget->AddToViewport();
 		ItemUseButtonWidget->InitializeGridSlotData(ItemName);
+		BT_ClickItem->SetIsEnabled(false);
 	}
 }
