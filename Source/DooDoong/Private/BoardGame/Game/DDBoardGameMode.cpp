@@ -85,11 +85,6 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 		{
 			CachedBoardGameState->StateTimer--;
 			LOG_CJH(Log, TEXT("현재 턴 남은 시간: %d"), CachedBoardGameState->StateTimer);
-
-			if (GetNetMode() != NM_DedicatedServer)
-			{
-				CachedBoardGameState->OnStateTimerChanged.Broadcast(CachedBoardGameState->StateTimer);
-			}
 			
 			if (CachedBoardGameState->StateTimer == 0)
 			{
