@@ -21,17 +21,21 @@ public:
 	
 	virtual void NativeConstruct() override;
 	
-	void RefreshGrid();
-private:
+	UFUNCTION(Client, Reliable)
+	void Client_RefreshGrid();
+	
+protected:
+	void BindItemData();
 	void GenerationGrid();
 	
+private:
 	/* 인벤토리 그리드 슬롯 */
 	UPROPERTY()
 	TArray<UDDInvenGridSlot*> GridSlots;
 	
 	/* 인벤토리 컴포넌트 */
 	UPROPERTY()
-	TObjectPtr<UDDInventoryComponent> InventoryComponent;
+	TWeakObjectPtr<UDDInventoryComponent> InventoryComponent;
 
 	/* 인벤토리 슬롯 클래스 */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
