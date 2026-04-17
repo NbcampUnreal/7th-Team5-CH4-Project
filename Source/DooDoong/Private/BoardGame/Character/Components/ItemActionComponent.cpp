@@ -27,35 +27,34 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 	ActiveItemID = ItemRow.ItemID;
 	ActiveItemTag = ItemRow.ItemTag;
 	ActiveItemAbilityTag = ItemRow.ItemAbilityTag;
-	
+
+	// 현재 액션 모드 지정
 	if (ActiveItemTag == DDGameplayTags::Item_Activate_Instant)
-	{
 		CurrentActionMode = EItemActionMode::Instant;
-		ConfirmCurrentItemAction();
-		return;
-	}
-
-	if (ActiveItemTag == DDGameplayTags::Item_Activate_Targeting)
-	{
-		LOG_JJH(Warning, TEXT("[아이템 액션] 타게팅 액션 시작"));
-
+	else if (ActiveItemTag == DDGameplayTags::Item_Activate_Targeting)
 		CurrentActionMode = EItemActionMode::Targeting;
-		ApplyItemActionTag();
-		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbilityTag, nullptr);
-		return;
-	}
-
-	if (ActiveItemTag == DDGameplayTags::Item_Activate_Range)
-	{
+	else if (ActiveItemTag == DDGameplayTags::Item_Activate_Range)
 		CurrentActionMode = EItemActionMode::Range;
-		ApplyItemActionTag();
-		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbilityTag, nullptr);
+	else
+	{
+		ResetItemAction();
 		return;
 	}
 	
-	ResetItemAction();
+	if (CurrentActionMode != EItemActionMode::Instant)
+	{
+		ApplyItemActionTag();
+	}
+	// 어빌리티 실행
+	Server_ActivateItemAbility(ActiveItemID, ActiveItemAbilityTag, nullptr);
+	
+	if (CurrentActionMode == EItemActionMode::Instant)
+	{
+		ResetItemAction();
+	}
 }
 
+// 컨펌 입력 액션
 void UItemActionComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -76,19 +75,14 @@ void UItemActionComponent::ConfirmCurrentItemAction()
 	
 	switch (CurrentActionMode)
 	{
-	case EItemActionMode::Instant:
-		// 서버에서 아이템 어빌리티를 활성화하도록 요청
-		Server_ActivateItemAbility(ActiveItemID, ActiveItemAbilityTag, nullptr);
-		ResetItemAction();
-		break;
-
 	case EItemActionMode::Targeting:
 		SendTargetingInput(EItemTargetingInput::Confirm);
 		break;
 
 	case EItemActionMode::Range:
-		Server_SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Confirm);
+		Server_SendInputEvent(DDGameplayTags::Event_Item_Target_Confirm);
 		break;
+		
 	default:
 		break;
 	}
@@ -98,9 +92,9 @@ void UItemActionComponent::CancelCurrentItemAction()
 {
 	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 : %s"), *ActiveItemID.ToString());
 
-	if (CurrentActionMode == EItemActionMode::Targeting)
+	if (CurrentActionMode == EItemActionMode::Targeting || CurrentActionMode == EItemActionMode::Range)
 	{
-		Server_SendTargetingInputEvent(DDGameplayTags::Event_Item_Target_Cancel);
+		Server_SendInputEvent(DDGameplayTags::Event_Item_Target_Cancel);
 	}
 	
 	// 아이템 수 원상복구
@@ -118,10 +112,12 @@ void UItemActionComponent::CancelCurrentItemAction()
 	ResetItemAction();
 }
 
-void UItemActionComponent::Server_ActivateItemAbility_Implementation(FName ItemID, FGameplayTag ItemAbilityTag, AActor* TargetActor)
+void UItemActionComponent::Server_ActivateItemAbility_Implementation(FName ItemID, FGameplayTag ItemAbilityTag,
+                                                                     AActor* TargetActor)
 {
-	LOG_JJH(Warning, TEXT("[아이템 액션] 아이템 Ability 실행 요청 : %s, Target: %s"), *ItemID.ToString(), *GetNameSafe(TargetActor));
-	
+	LOG_JJH(Warning, TEXT("[아이템 액션] 아이템 Ability 실행 요청 : %s, Target: %s"), *ItemID.ToString(),
+	        *GetNameSafe(TargetActor));
+
 	// 아이템 실행
 	if (!TryActivateItemAbility(ItemID, ItemAbilityTag, TargetActor))
 	{
@@ -159,7 +155,7 @@ void UItemActionComponent::SendTargetingInput(EItemTargetingInput Input)
 		return;
 	}
 
-	Server_SendTargetingInputEvent(EventTag);
+	Server_SendInputEvent(EventTag);
 
 	if (Input == EItemTargetingInput::Confirm)
 	{
@@ -167,7 +163,7 @@ void UItemActionComponent::SendTargetingInput(EItemTargetingInput Input)
 	}
 }
 
-void UItemActionComponent::Server_SendTargetingInputEvent_Implementation(FGameplayTag EventTag)
+void UItemActionComponent::Server_SendInputEvent_Implementation(FGameplayTag EventTag)
 {
 	AActor* OwnerActor = GetOwner();
 	if (!EventTag.IsValid() || !IsValid(OwnerActor))
