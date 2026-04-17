@@ -1,4 +1,8 @@
 #include "Lobby/Game/DDLobbyGameState.h"
+
+#include "SNegativeActionButton.h"
+#include "SWarningOrErrorBox.h"
+#include "Common/DDLogManager.h"
 #include "Net/UnrealNetwork.h" 
 
 
@@ -11,16 +15,19 @@ void ADDLobbyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(ADDLobbyGameState, ReadyCount);
-	DOREPLIFETIME(ADDLobbyGameState, ParticipantCount);
+	DOREPLIFETIME(ADDLobbyGameState, PlayerCount);
 	DOREPLIFETIME(ADDLobbyGameState, CountDown);
 }
 
-void ADDLobbyGameState::OnRep_ParticipantCount()
+void ADDLobbyGameState::OnRep_PlayerCount()
 {
+	LOG_KMS(Warning, TEXT("PlayerCount : %d"), PlayerCount);
+	OnPlayerCountChanged.Broadcast(PlayerCount);
 }
 
 void ADDLobbyGameState::OnRep_ReadyCount()
 {
+	LOG_KMS(Warning, TEXT("ReadyCount : %d"), ReadyCount);
 	OnReadyCountChanged.Broadcast(ReadyCount);
 }
 
