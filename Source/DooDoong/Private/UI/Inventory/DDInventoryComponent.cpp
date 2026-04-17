@@ -36,6 +36,16 @@ void UDDInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	DOREPLIFETIME(ThisClass, InventoryItemDatas);
 }
 
+void UDDInventoryComponent::RequestOpenInventory()
+{
+	OwningController->Client_OpenInventory();
+}
+
+void UDDInventoryComponent::RequestCloseInventory()
+{
+	OwningController->Client_CloseInventory();
+}
+
 void UDDInventoryComponent::InitializeInventoryData()
 {
 	if (!ItemDataTable) return;
