@@ -33,7 +33,7 @@ void UDDItemUseButtonWidget::NativeConstruct()
 
 void UDDItemUseButtonWidget::UseButton()
 {
-	InventoryComponent->UseItem(CurrentItemSlotName);
+	InventoryComponent->ServerRPCUseItem(CurrentItemSlotName);
 	this->SetVisibility(ESlateVisibility::Collapsed);
 }
 
