@@ -24,7 +24,8 @@ public:
 protected:
 	/** 아이템을 사용하는 보드게임 캐릭터 Getter */
 	ADDBoardGameCharacter* GetBoardGameCharacter() const;
-protected:
+
 	/** 보드게임 캐릭터가 사용하는 ASC Getter */
 	UAbilitySystemComponent* GetBoardGameAbilitySystemComponent() const;
+
 };

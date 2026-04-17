@@ -143,6 +143,8 @@ void UGA_TargetingItemBase::OnTargetConfirm(FGameplayEventData Payload)
 			return;
 		}
 	}
+	
+	
 
 	const bool bExecuted = ExecuteTargetingItem(TargetActor);
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, !bExecuted);
