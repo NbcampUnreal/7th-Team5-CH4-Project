@@ -1,5 +1,7 @@
 #include "AbilitySystem/Attributes/DDPointSet.h"
 
+#include "GameplayEffectExtension.h"
+
 UDDPointSet::UDDPointSet()
 {
 	InitCoin(0.f);
@@ -34,6 +36,20 @@ void UDDPointSet::PostAttributeChange(const FGameplayAttribute& Attribute, float
 		OnTrophyChanged.Broadcast(NewValue);	
 	}
 	
+}
+
+void UDDPointSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+	if (Data.EvaluatedData.Attribute == GetCoinAttribute())
+	{
+		float Delta = Data.EvaluatedData.Magnitude;
+
+		if (Delta < 0.f) // 코인 감소
+		{
+			LastCoinLose = -Delta; // 양수로 저장
+		}
+	}
 }
 
 void UDDPointSet::OnRep_Trophy(const FGameplayAttributeData& OldTrophy)
