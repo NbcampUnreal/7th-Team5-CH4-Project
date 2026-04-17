@@ -12,6 +12,7 @@ class UInputMappingContext;
 class UDDInputConfig;
 class UDDInventoryComponent;
 class UItemActionComponent;
+class UDDInventoryWidget;
 class UDDUIConfig;
 
 UCLASS()
@@ -98,8 +99,7 @@ protected:
 	/** 아이템 액션 컴포넌트를 매번 가져올 때 방어코드 작성하는게 코드를 지저분하게 만들어서 만든 헬퍼 */
 	UItemActionComponent* GetItemActionComponentFromPawn() const;
 	
-protected:
-	void ToggleInventoryMenu();
+
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -111,7 +111,30 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> BoardGameIMC;
 	
+	/*민재 : 인벤토리 코드*/
+	
+public:
+	UFUNCTION(Client, Reliable)
+	void Client_OpenInventory();
+	
+	UFUNCTION(Client, Reliable)
+	void Client_CloseInventory();
+	
+	UFUNCTION(Client, Reliable)
+	void Client_CreateInventoryUI();
+	
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+	TObjectPtr<UDDInventoryWidget> InventoryWidget;
+	
+protected:
+	void ToggleInventoryMenu();
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TObjectPtr<UDDInventoryComponent> InventoryComponent;
+	
+	UPROPERTY(EditDefaultsOnly, Category= "Inventory")
+	TSubclassOf<UDDInventoryWidget> InventoryWidgetClass;
+	
+	bool bInventoryOpen;
 };
