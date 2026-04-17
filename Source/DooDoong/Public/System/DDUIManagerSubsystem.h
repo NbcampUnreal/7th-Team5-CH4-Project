@@ -23,6 +23,8 @@ public:
 	void HideOverlay();
 	
 	void DrawPopup(FGameplayTag PopupTag);
+	void DrawPopupForDuration(FGameplayTag PopupTag, float Duration);
+	
 	void HidePopup(FGameplayTag PopupTag);
 	void HideAllPopups();
 

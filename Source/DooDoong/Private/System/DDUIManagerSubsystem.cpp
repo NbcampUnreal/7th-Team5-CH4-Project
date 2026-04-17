@@ -1,5 +1,6 @@
 #include "System/DDUIManagerSubsystem.h"
 #include "Blueprint/UserWidget.h"
+#include "Common/DDLogManager.h"
 #include "Data/DDUIConfig.h"
 #include "Engine/LocalPlayer.h"
 
@@ -13,7 +14,11 @@ void UDDUIManagerSubsystem::Deinitialize()
 	HideOverlay();
 	HideAllPopups();
 	
-	if (GameLayerWidget) GameLayerWidget->RemoveFromParent();
+	if (GameLayerWidget)
+	{
+		GameLayerWidget->RemoveFromParent();
+		GameLayerWidget = nullptr;
+	}
 	
 	Super::Deinitialize();
 }
@@ -76,7 +81,21 @@ void UDDUIManagerSubsystem::DrawPopup(FGameplayTag PopupTag)
 	{
 		NewWidget->AddToViewport(10);
 		PopupWidgets.Add(PopupTag, NewWidget);
+		LOG_KMS(Warning, TEXT("[UI Manager] : Open New Popup Widget"));
 	}
+}
+
+void UDDUIManagerSubsystem::DrawPopupForDuration(FGameplayTag PopupTag, float Duration)
+{
+	DrawPopup(PopupTag); 
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle,
+		FTimerDelegate::CreateUObject(this, &UDDUIManagerSubsystem::HidePopup, PopupTag),
+		Duration,
+		false
+	);
 }
 
 void UDDUIManagerSubsystem::HidePopup(FGameplayTag PopupTag)
@@ -86,6 +105,18 @@ void UDDUIManagerSubsystem::HidePopup(FGameplayTag PopupTag)
 		(*Widget)->RemoveFromParent();
 		PopupWidgets.Remove(PopupTag);
 	}
+	
+	TSubclassOf<UUserWidget>* WidgetClass = UIConfig->PopupWidgetMap.Find(PopupTag);
+	if (!WidgetClass) return;
+	
+	UUserWidget* NewWidget = CreateUIWidget(*WidgetClass);
+	if (NewWidget)
+	{
+		NewWidget->AddToViewport(10);
+		PopupWidgets.Add(PopupTag, NewWidget);
+		LOG_KMS(Warning, TEXT("[UI Manager] : Open New Popup Widget"));
+	}
+	
 }
 
 void UDDUIManagerSubsystem::HideAllPopups()
