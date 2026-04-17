@@ -91,4 +91,22 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="UX")
 	float HeadOffset = 70.f;
+	
+	/* 캐릭터 자석 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Range", meta=(AllowPrivateAccess="true"))
+	UStaticMeshComponent* RangeIndicator;
+
+public:
+	UPROPERTY(ReplicatedUsing=OnRep_IsAiming, BlueprintReadOnly)
+	bool bIsAiming = false;
+	
+	UPROPERTY(ReplicatedUsing=OnRep_RangeIndicator)
+	bool bShowRangeIndicator = false;
+
+	UFUNCTION()
+	void OnRep_RangeIndicator();
+
+	UFUNCTION()
+	void OnRep_IsAiming();
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

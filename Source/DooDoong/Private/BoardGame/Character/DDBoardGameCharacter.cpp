@@ -4,11 +4,17 @@
 #include "BoardGame/DDTile.h"
 #include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
+#include "Net/UnrealNetwork.h"
 #include "System/DDGameplayTags.h"
 
 ADDBoardGameCharacter::ADDBoardGameCharacter()
 {
 	ItemActionComp = CreateDefaultSubobject<UItemActionComponent>(TEXT("ItemActionComp"));
+	
+	RangeIndicator = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RangeIndicator"));
+	RangeIndicator->SetupAttachment(RootComponent);
+	RangeIndicator->SetRelativeLocation(FVector(0,0,5)); // 살짝 띄우기
+	RangeIndicator->SetVisibility(false);
 }
 
 void ADDBoardGameCharacter::InitLocation()
@@ -130,6 +136,27 @@ void ADDBoardGameCharacter::PlayDice(int32 DiceValue)
 	}
 
 	Multicast_PlayDiceAnimation();
+}
+
+void ADDBoardGameCharacter::OnRep_RangeIndicator()
+{
+	if (RangeIndicator)
+	{
+		RangeIndicator->SetVisibility(bShowRangeIndicator, true);
+	}
+
+	// 포즈도 같이
+	bIsAiming = bShowRangeIndicator;
+}
+
+void ADDBoardGameCharacter::OnRep_IsAiming()
+{
+}
+
+void ADDBoardGameCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ADDBoardGameCharacter, bShowRangeIndicator);
 }
 
 void ADDBoardGameCharacter::Multicast_PlayDiceAnimation_Implementation()
