@@ -8,27 +8,15 @@
 class UNiagaraSystem;
 
 USTRUCT(BlueprintType)
-struct DOODOONG_API FGameplayCueData
+struct DOODOONG_API FGameplayCueTags
 {
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag CueTag;
+	FGameplayTag LoopCueTag;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> Montage;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UNiagaraSystem> Effect;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<USoundBase> Sound;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<AActor> ActorClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FName AttachSocketName;
+	FGameplayTag ConfirmCueTag;
 };
 
 
@@ -63,5 +51,5 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	
 	/** GameplayCue에 사용될 데이터 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayCueData CueData;
+	FGameplayCueTags CueTags;
 };
