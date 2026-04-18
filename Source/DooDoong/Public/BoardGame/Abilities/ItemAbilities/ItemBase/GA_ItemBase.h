@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "GameplayTagContainer.h"
 #include "GA_ItemBase.generated.h"
 
 class ADDBoardGameCharacter;
@@ -28,4 +29,5 @@ protected:
 	/** 보드게임 캐릭터가 사용하는 ASC Getter */
 	UAbilitySystemComponent* GetBoardGameAbilitySystemComponent() const;
 
+	bool ExecuteItemCue(const FGameplayTag& CueTag, const FVector& CueLocation) const;
 };

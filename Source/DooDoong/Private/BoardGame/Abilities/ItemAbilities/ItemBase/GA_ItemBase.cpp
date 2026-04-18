@@ -33,3 +33,26 @@ UAbilitySystemComponent* UGA_ItemBase::GetBoardGameAbilitySystemComponent() cons
 	const ADDBoardGameCharacter* BoardGameCharacter = GetBoardGameCharacter();
 	return BoardGameCharacter ? BoardGameCharacter->GetAbilitySystemComponent() : nullptr;
 }
+
+bool UGA_ItemBase::ExecuteItemCue(const FGameplayTag& CueTag, const FVector& CueLocation) const
+{
+	if (!CueTag.IsValid())
+	{
+		return false;
+	}
+
+	UAbilitySystemComponent* AbilitySystemComponent = GetBoardGameAbilitySystemComponent();
+	AActor* AvatarActor = GetAvatarActorFromActorInfo();
+	if (!AbilitySystemComponent || !AvatarActor)
+	{
+		return false;
+	}
+
+	FGameplayCueParameters CueParameters;
+	CueParameters.Instigator = AvatarActor;
+	CueParameters.EffectCauser = AvatarActor;
+	CueParameters.Location = CueLocation;
+
+	AbilitySystemComponent->ExecuteGameplayCue(CueTag, CueParameters);
+	return true;
+}
