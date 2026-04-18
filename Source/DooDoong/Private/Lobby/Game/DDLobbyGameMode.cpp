@@ -105,14 +105,14 @@ bool ADDLobbyGameMode::TryRegisterPlayerNickname(
 	PS->SetPlayerColor(NewRandomColor);
 	
 	// 4. 참가자/관전자 판별
-	if (Participants.Num() < GetLobbyGameState()->RequiredPlayerCount)
+	if (Participants.Num() < CachedGameState->MaxPlayerCount)
 	{
 		PS->bIsParticipant = true;
 		Participants.AddUnique(Requester);
 		CachedGameState->PlayerCount = Participants.Num(); 
 		
 		LOG_CJH(Log, TEXT("[%s]님이 게임에 접속하셨습니다."), *Nickname.ToString());
-		LOG_CJH(Log, TEXT("현재 인원 수 (%d / %d)"), Participants.Num(), CachedGameState->MaxPlayerCount);
+		LOG_CJH(Log, TEXT("현재 인원 수 (%d / %d) [게임 최소 인원 수: %d]"), Participants.Num(), CachedGameState->MaxPlayerCount, CachedGameState->RequiredPlayerCount);
 	}
 	else
 	{
