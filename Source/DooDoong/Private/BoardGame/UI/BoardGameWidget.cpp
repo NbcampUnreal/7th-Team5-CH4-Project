@@ -36,8 +36,8 @@ void UBoardGameWidget::BindToGameState()
         CurrentGameState->OnRoundChanged.AddDynamic(this, &ThisClass::UpdateRemainTurn);
 
         // 2. 초기값 즉시 반영
-        UpdateTimeText(CurrentGameState->StateTimer);
-        UpdateRemainTurn(CurrentGameState->MaxRound - CurrentGameState->CurrentRound);
+        UpdateTimeText(CurrentGameState->GetStateTimer());
+        UpdateRemainTurn(CurrentGameState->MaxRound - CurrentGameState->GetCurrentRound());
     }
     else
     {
