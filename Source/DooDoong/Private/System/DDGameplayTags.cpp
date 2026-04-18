@@ -119,6 +119,10 @@ namespace DDGameplayTags
 	// GameplayCue 태그 : 반드시 'GameplayCue_'로 시작해야함! 안그러면 안 뜸.
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_InstantItem_HealingKit, "GameplayCue.InstantItem.HealingKit", "힐링키트 게임플레이 큐")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_TargetingItem_GiveBomb_Confirm, "GameplayCue.TargetingItem.GiveBomb.Confirm", "폭탄보내기 게임플레이 큐 : Confirm 시점");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_TargetingItem_GiveBomb_Target, "GameplayCue.TargetingItem.GiveBomb.Target", "폭탄보내기 게임플레이 큐 : Target 시점");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_RangeItem_Magnet_Confrim, "GameplayCue.RangeItem.Magnet.Confirm", "자석 게임플레이 큐 : Confirm 시점");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_RangeItem_Magnet_Target, "GameplayCue.RangeItem.Magnet.Target", "자석 게임플레이 큐 : Target 시점");
+	
 	
 	// UI 태그 
 	UE_DEFINE_GAMEPLAY_TAG(BoardGame_UI_PlayerTurn, "BoardGame.UI.PlayerTurn"); 

@@ -122,6 +122,9 @@ namespace DDGameplayTags
 	// GameplayCue 태그 : 반드시 'GameplayCue_'로 시작해야함! 안그러면 안 뜸.
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_InstantItem_HealingKit)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_TargetingItem_GiveBomb_Confirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_TargetingItem_GiveBomb_Target);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_RangeItem_Magnet_Confirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_RangeItem_Magnet_Target);
 	
 	// UI 태그 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoardGame_UI_PlayerTurn); 
