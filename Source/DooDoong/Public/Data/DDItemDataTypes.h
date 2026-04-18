@@ -52,4 +52,8 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	/** GameplayCue에 사용될 데이터 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayCueTags CueTags;
+	
+	/** 손에 스폰할 아이템 클래스 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<AActor> ItemActorClass;
 };
