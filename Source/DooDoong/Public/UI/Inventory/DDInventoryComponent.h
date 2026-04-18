@@ -65,7 +65,9 @@ public:
 	
 	UFUNCTION()
 	void OnRep_ClientInventoryData();
-	
+	UFUNCTION()
+	FName AddRandomItem();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category= "Inventory|Data")
 	TObjectPtr<UDataTable> ItemDataTable;

@@ -125,3 +125,18 @@ void UDDInventoryComponent::ServerRPCUseItem_Implementation(const FName& ItemSlo
 	}
 	OwningController->Client_CloseInventory();
 }
+FName UDDInventoryComponent::AddRandomItem()
+{
+	if (!GetOwner()->HasAuthority()) return NAME_None;
+	if (!ItemDataTable) return NAME_None;
+
+	const TArray<FName> RowNames = ItemDataTable->GetRowNames();
+	if (RowNames.Num() == 0) return NAME_None;
+
+	int32 Index = FMath::RandRange(0, RowNames.Num() - 1);
+	FName RandomItem = RowNames[Index];
+
+	ServerRPCAddItem(RandomItem);
+
+	return RandomItem;
+}
