@@ -5,6 +5,7 @@
 #include "DDItemGameplayCueNotify_Static.generated.h"
 
 class UNiagaraSystem;
+class UAnimMontage;
 class USoundBase;
 
 UCLASS(Blueprintable)
@@ -17,16 +18,10 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemCue|Animation")
-	TObjectPtr<UAnimMontage> Animation;
+	TObjectPtr<UAnimMontage> Montage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemCue|Animation")
-	FName AnimationSlotName = TEXT("DefaultSlot");
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemCue|Animation", meta = (ClampMin = "0.0"))
-	float BlendInTime = 0.1f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemCue|Animation", meta = (ClampMin = "0.0"))
-	float BlendOutTime = 0.1f;
+	FName MontageStartSection = NAME_None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemCue|Animation", meta = (ClampMin = "0.01"))
 	float PlayRate = 1.f;
