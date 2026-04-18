@@ -44,31 +44,38 @@ class DOODOONG_API ADDBasePlayerState : public APlayerState, public IAbilitySyst
 
 public:
     ADDBasePlayerState();
-
     virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void BeginPlay() override;
+    virtual void CopyProperties(APlayerState* PlayerState) override;
+	
+public:
+	// ==========================================
+	// FORCEINLINE Getter / Setter
+	// ==========================================
+	
     FORCEINLINE UDDHealthSet* GetHealthSet() const { return HealthSet; }
     FORCEINLINE UDDPointSet* GetPointSet() const { return PointSet; }
     FORCEINLINE UDDMovementSet* GetMovementSet() const { return MovementSet; }
 	
-	UFUNCTION(BlueprintCallable, Category = "PlayerState|Visuals")
-    void SetPlayerColor(FLinearColor InNewColor);
-
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-    
-	virtual void BeginPlay() override;
+	FORCEINLINE int32 GetTurnOrder() const { return PlayerGameData.TurnOrder; }
+	FORCEINLINE void SetTurnOrder(int32 InOrder) { PlayerGameData.TurnOrder = InOrder; }
 	
+	FORCEINLINE void SetIsGameFinished(bool bFinished) { PlayerGameData.bIsGameFinished = bFinished; }
+	FORCEINLINE FName GetPlayerDisplayName() const { return PlayerGameData.PlayerDisplayName; }
+
 public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCast_BroadcastKillLog(AActor* Victim, AActor* Killer);
 	
-public:
-    /** 심리스 트래블 시 새 맵의 PlayerState로 데이터를 인수인계 */
-    virtual void CopyProperties(APlayerState* PlayerState) override;
-	
 	UFUNCTION()
 	void InitTile();
 	
+	UFUNCTION(BlueprintCallable, Category = "PlayerState|Visuals")
+    void SetPlayerColor(FLinearColor InNewColor);
+
+	void UpdateCharacterVisuals();
+
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities", meta = (AllowPrivateAccess = true))
     TObjectPtr<UDDAbilitySystemComponent> AbilitySystemComponent;
@@ -97,9 +104,7 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerGameData, VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
 	FPlayerGameplayInfo PlayerGameData;
 	
+protected:
 	UFUNCTION()
     void OnRep_PlayerGameData();
-	
-	void UpdateCharacterVisuals();
-	
 };
