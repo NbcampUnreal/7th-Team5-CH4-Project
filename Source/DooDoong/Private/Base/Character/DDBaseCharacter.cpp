@@ -186,3 +186,16 @@ UDDMovementSet* ADDBaseCharacter::GetMovementSet() const
 	
 	return nullptr;
 }
+
+void ADDBaseCharacter::ApplyColorFromPlayerState(FLinearColor NewColor)
+{
+	if (!CachedColorMaterial && GetMesh())
+	{
+		CachedColorMaterial = GetMesh()->CreateDynamicMaterialInstance(0);
+	}
+
+	if (CachedColorMaterial)
+	{
+		CachedColorMaterial->SetVectorParameterValue(FName("PlayerColor"), NewColor);
+	}
+}

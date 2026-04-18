@@ -102,7 +102,4 @@ public:
 	
 	void UpdateCharacterVisuals();
 	
-protected:
-	UPROPERTY(Transient)
-    TObjectPtr<UMaterialInstanceDynamic> CachedColorMaterial;
 };
