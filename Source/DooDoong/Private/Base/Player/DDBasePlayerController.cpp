@@ -26,6 +26,7 @@ ADDBasePlayerController::ADDBasePlayerController()
 void ADDBasePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	CachedPlayerState = GetPlayerState<ADDBasePlayerState>();
 	
 	FInputModeGameAndUI Mode;
 	SetInputMode(Mode);
@@ -249,10 +250,9 @@ void ADDBasePlayerController::Server_RequestPlayerReady_Implementation()
 	ADDMiniGameModeBase* GM = GetWorld()->GetAuthGameMode<ADDMiniGameModeBase>();
 	if (!IsValid(GM)) return;
 	
-	ADDBasePlayerState* PS = GetPlayerState<ADDBasePlayerState>();
-	if (!IsValid(PS)) return;
+	if (!IsValid(CachedPlayerState)) return;
 	
-	GM->SetPlayerReady(PS, true);
+	GM->SetPlayerReady(CachedPlayerState, true);
 }
 
 void ADDBasePlayerController::Client_OpenPopUp_Implementation(FGameplayTag Tag)

@@ -16,9 +16,6 @@ public:
 	ADDGameStateBase();
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-    UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Game State", meta=(DisplayName="게임 루프 상태"))
-    FGameplayTag MatchStateTag;
 	
 	UPROPERTY()
 	ADDTileManager* TileManager;

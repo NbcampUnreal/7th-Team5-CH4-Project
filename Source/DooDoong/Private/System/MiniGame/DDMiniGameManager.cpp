@@ -174,7 +174,7 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 	for (const FMiniGameScoreEntry& Rank : Result.ScoreBoard)
 	{
 		ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(Rank.PlayerState);
-		PS->PlayerGameData.TurnOrder = Rank.Rank - 1;
+		PS->SetTurnOrder(Rank.Rank - 1);
 	}
 	
 	if (ReturnMapPackageName.IsEmpty())

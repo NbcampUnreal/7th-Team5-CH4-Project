@@ -3,11 +3,11 @@
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 #include "AbilitySystem/Attributes/DDPointSet.h"
 #include "AbilitySystem/Attributes/DDMovementSet.h"
+#include "Base/Character/DDBaseCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "Base/Game/DDGameStateBase.h"
 #include "BoardGame/DDTileManager.h"
 #include "Common/DDLogManager.h"
-#include "GameFramework/Character.h"
 
 ADDBasePlayerState::ADDBasePlayerState()
 {
@@ -135,22 +135,8 @@ void ADDBasePlayerState::SetPlayerColor(FLinearColor InNewColor)
 
 void ADDBasePlayerState::UpdateCharacterVisuals()
 {
-	APawn* OwningPawn = GetPawn();
-	if (!OwningPawn) return;
-
-	ACharacter* Character = Cast<ACharacter>(OwningPawn);
-	if (Character && Character->GetMesh())
+if (ADDBaseCharacter* BaseCharacter = Cast<ADDBaseCharacter>(GetPawn()))
 	{
-		USkeletalMeshComponent* Mesh = Character->GetMesh();
-
-		if (!CachedColorMaterial || Mesh->GetMaterial(0) != CachedColorMaterial)
-		{
-			CachedColorMaterial = Mesh->CreateDynamicMaterialInstance(0);
-		}
-
-		if (CachedColorMaterial)
-		{
-			CachedColorMaterial->SetVectorParameterValue(TEXT("PlayerColor"), PlayerGameData.PlayerColor);
-		}
+		BaseCharacter->ApplyColorFromPlayerState(PlayerGameData.PlayerColor);
 	}
 }

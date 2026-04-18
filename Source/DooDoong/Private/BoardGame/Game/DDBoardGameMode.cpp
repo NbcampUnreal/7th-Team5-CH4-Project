@@ -16,25 +16,19 @@
 #include "BoardGame/DDTile.h"
 #include "BoardGame/Game/DDBoardGameState.h"
 
-ADDBoardGameMode::ADDBoardGameMode()
-{
-}
+ADDBoardGameMode::ADDBoardGameMode() {}
 
 void ADDBoardGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// 시작할 때 미리 캐싱
     CachedBoardGameState = GetGameState<ADDBoardGameState>();
-
     if (CachedBoardGameState)
     {
-        // [Bridge 패턴] GameInstance에서 GameState로 데이터 복사
-        if (UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance()))
+    	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
+        if (GameInstance)
         {
-            CachedBoardGameState->CurrentRound = GameInstance->CurrentRound;
-            CachedBoardGameState->MaxTrophy = GameInstance->MaxTrophy;
-            CachedBoardGameState->MaxRound = GameInstance->MaxRound;
+            CachedBoardGameState->SetCurrentRound(GameInstance->CurrentRound);
         }
     }
     else
@@ -43,6 +37,7 @@ void ADDBoardGameMode::BeginPlay()
     }
 	
 	LOG_CJH(Log, TEXT("[BeginPlay] 보드게임 맵 진입 완료. 메인 타이머 시작."));
+	
 	GetWorld()->GetTimerManager().SetTimer(
 		MainTimerHandle, 
 		this,
@@ -55,68 +50,81 @@ void ADDBoardGameMode::BeginPlay()
 void ADDBoardGameMode::OnMainTimerElapsed()
 {
 	if (!IsValid(CachedBoardGameState)) return;
+	
+	FGameplayTag CurrentMatchState = CachedBoardGameState->GetBoardMatchState();
 
-	if (!CachedBoardGameState->MatchStateTag.IsValid())
+	if (!CurrentMatchState.IsValid())
 	{
-		if (AlivePlayerControllers.Num() >= CachedBoardGameState->MinPlayerCount)
+		TickState_WaitingForPlayers();
+	}
+	else if (CurrentMatchState == DDGameplayTags::State_BoardGame_PlayerTurn)
+	{
+		TickState_PlayerTurn();
+	}
+	else if (CurrentMatchState == DDGameplayTags::State_BoardGame_RoundEnd)
+	{
+		TickState_RoundEnd();
+	}
+}
+
+void ADDBoardGameMode::TickState_WaitingForPlayers()
+{
+	bool bAllReady = true;
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		if (!IsValid(PC->PlayerState))
 		{
-			bool bAllPlayerStatesReady = true;
+			bAllReady = false;
+			break;
+		}
+	}
+
+	if (bAllReady)
+	{
+		LOG_CJH(Log, TEXT("[GameLoop] %d명 접속 완료! Init 상태 진입."), AlivePlayerControllers.Num());
+		SetMatchState(DDGameplayTags::State_BoardGame_Init);
+	}
+}
+
+void ADDBoardGameMode::TickState_PlayerTurn()
+{
+	if (CachedBoardGameState->GetStateTimer() > 0)
+	{
+		LOG_CJH(Log, TEXT("현재 턴 남은 시간: %d초"), CachedBoardGameState->GetStateTimer());
+		CachedBoardGameState->DecreaseStateTimer();
+		
+		if (CachedBoardGameState->GetStateTimer() == 0)
+		{
+			LOG_CJH(Log, TEXT("[TimeOut] 턴 제한 시간 초과! 다음 플레이어로 강제 전환."));
+			SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
+		}
+	}
+}
+
+void ADDBoardGameMode::TickState_RoundEnd()
+{
+	if (CachedBoardGameState->GetStateTimer() > 0)
+	{
+		LOG_CJH(Log, TEXT("[Travel] 진입 전 시간: %d초"), CachedBoardGameState->GetStateTimer());
+		CachedBoardGameState->DecreaseStateTimer();
+		
+		if (CachedBoardGameState->GetStateTimer() == 0)
+		{
+			TArray<APlayerState*> MiniGamePlayers;
 			for (APlayerController* PC : AlivePlayerControllers)
 			{
-				if (!IsValid(PC->PlayerState))
+				if (IsValid(PC) && PC->PlayerState)
 				{
-					bAllPlayerStatesReady = false;
-					break;
+					MiniGamePlayers.Add(PC->PlayerState);
 				}
 			}
-
-			if (bAllPlayerStatesReady)
-			{
-				LOG_CJH(Log, TEXT("[GameLoop] %d명 접속 완료! 보드게임 Init 상태로 진입합니다."), CachedBoardGameState->MinPlayerCount);
-				SetMatchState(DDGameplayTags::State_BoardGame_Init);
-			}
-		}
-		return;
-	}
-
-	if (CachedBoardGameState->MatchStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
-	{
-		if (CachedBoardGameState->StateTimer > 0)
-		{
-			CachedBoardGameState->StateTimer--;
-			LOG_CJH(Log, TEXT("현재 턴 남은 시간: %d"), CachedBoardGameState->StateTimer);
 			
-			if (CachedBoardGameState->StateTimer == 0)
-			{
-				LOG_CJH(Log, TEXT("[TimeOut] 턴 제한 시간 초과! 다음 플레이어로 턴을 강제 전환합니다."));
-				CurrentTurnPlayerIndex++;
-				SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
-			}
-		}
-	}
-	else if (CachedBoardGameState->MatchStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
-	{
-		if (CachedBoardGameState->StateTimer > 0)
-		{
-			CachedBoardGameState->StateTimer--;
-			if (CachedBoardGameState->StateTimer == 0)
-			{
-				LOG_CJH(Log, TEXT("[Travel] 대기 시간 종료. 미니게임을 시작합니다."));
+			LOG_CJH(Log, TEXT("[Travel] 미니게임 참여 인원: %d명"), AlivePlayerControllers.Num());
 
-				TArray<APlayerState*> MiniGamePlayers;
-				for (APlayerController* PlayerController : AlivePlayerControllers)
-				{
-					if (IsValid(PlayerController) && PlayerController->PlayerState)
-					{
-						MiniGamePlayers.Add(PlayerController->PlayerState);
-					}
-				}
-				UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>();
-				if (IsValid(MiniGameManager))
-				{
-					LOG_CJH(Log, TEXT("[Travel] 미니게임에 진입합니다."));
-					MiniGameManager->RequestStartRandomMiniGame(MiniGamePlayers);
-				}
+			if (UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>())
+			{
+				LOG_CJH(Log, TEXT("[Travel] 미니게임에 진입합니다."));
+				MiniGameManager->RequestStartRandomMiniGame(MiniGamePlayers);
 			}
 		}
 	}
@@ -125,85 +133,27 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 {
 	if (!IsValid(CachedBoardGameState)) return;
+	
+	LOG_CJH(Log, TEXT("=== [상태 전환] 새로운 상태: %s ==="), *NewStateTag.ToString());
+	
+	// 1. GameState 상태값 갱신
+	CachedBoardGameState->SetBoardMatchState(NewStateTag);
 
-	LOG_CJH(Log, TEXT("================================================="));
-	LOG_CJH(Log, TEXT("[상태 전환] 새로운 상태: %s"), *NewStateTag.ToString());
-	LOG_CJH(Log, TEXT("================================================="));
-
-	CachedBoardGameState->MatchStateTag = NewStateTag;
-
-	for (APlayerController* PlayerController : AlivePlayerControllers)
-	{
-		if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(PlayerController))
-		{
-			ASC->RemoveActiveEffectsWithGrantedTags(CurrentAppliedTags);
-
-			if (TSubclassOf<UGameplayEffect>* EffectClassPtr = MatchStateEffectClasses.Find(NewStateTag))
-			{
-				if (*EffectClassPtr)
-				{
-					FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
-					Context.AddSourceObject(this);
-					FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(*EffectClassPtr, 1.0f, Context);
-					if (SpecHandle.IsValid())
-					{
-						ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-					}
-				}
-			}
-		}
-	}
-
-	CurrentAppliedTags = FGameplayTagContainer(NewStateTag);
+	// 2. 서버 측 공통 이펙트 처리
+	ApplyMatchStateEffects(NewStateTag);
 
 	if (NewStateTag == DDGameplayTags::State_BoardGame_Init)
 	{
-		SortPlayersByTurnOrder();
-		LOG_CYS(Warning, TEXT("[GM] 보드게임 전체 초기화 시작"));
-
-		ADDTileManager* TM = nullptr;
-		for (TActorIterator<ADDTileManager> It(GetWorld()); It; ++It)
-		{
-			TM = *It;
-			break;
-		}
-
-		if (TM) TM->InitializeTiles();
-
-		for (APlayerController* PC : AlivePlayerControllers)
-		{
-			if (auto PS = PC->GetPlayerState<ADDBasePlayerState>()) PS->InitTile();
-		}
-
-		for (APlayerController* PC : AlivePlayerControllers)
-		{
-			if (!PC->GetPawn()) RestartPlayer(PC);
-			if (auto Char = Cast<ADDBoardGameCharacter>(PC->GetPawn())) Char->InitLocation();
-			if (auto DDPC = Cast<ADDBasePlayerController>(PC)) DDPC->Client_ApplyState(NewStateTag);
-		}
-
-		LOG_CYS(Warning, TEXT("[GM] 보드게임 전체 초기화 완료"));
-
-		UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
-
-		if (IsValid(GameInstance) && GameInstance->CurrentRound == 0)
-		{
-			//1라운드 시퀀서 재생 지시
-			LOG_CYS(Warning, TEXT("1라운드 인트로 시퀀서 재생해라"));
-			if (CachedBoardGameState)
-			{
-				CachedBoardGameState->Multicast_PlaySequence();
-				// 시퀀서 끝나면 GS에서 턴 지시함.
-			}
-		}
-		else
-		{
-			CheckWinCondition();
-		}
+		HandleState_Init();
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
 	{
+		UpdateAllPlayersGameLayer(DDGameplayTags::State_BoardGame_Init);
 		StartNextPlayerTurn();
+	}
+	else if (NewStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
+	{
+		HandleState_RoundEnd();
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_Ending)
 	{
@@ -211,128 +161,176 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_End)
 	{
-		LOG_CJH(Log, TEXT("게임이 종료되었습니다. 10초 후 로비로 이동합니다."));
-        
-        // 10초 타이머 설정
-        GetWorldTimerManager().SetTimer(
-            ReturnToLobbyTimerHandle, 
-            this, 
-            &ADDBoardGameMode::TravelToLobby, 
-            10.0f, 
-            false
-        );
+		HandleState_End();
 	}
-	else if (NewStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
-	{
-		// 1. 승리 조건(목표 트로피 달성)을 먼저 검사합니다.
-	    bool bHasTrophyWinner = false;
-	    for (APlayerController* PC : AlivePlayerControllers)
-	    {
-	        if (ADDBasePlayerState* PS = PC->GetPlayerState<ADDBasePlayerState>())
-	        {
-	            if (PS->GetPointSet() && PS->GetPointSet()->GetTrophy() >= CachedBoardGameState->MaxTrophy)
-	            {
-	                LOG_CJH(Log, TEXT("[승자 발생] %s님이 목표 트로피를 달성했습니다!"), *PS->PlayerGameData.PlayerDisplayName.ToString());
-	                bHasTrophyWinner = true;
-	                break;
-	            }
-	        }
-	    }
-		
-		// 2. 승자가 있다면 즉시 Ending 상태로 전환하고 함수를 종료(return)합니다.
-	    if (bHasTrophyWinner)
-	    {
-	        LOG_CJH(Log, TEXT("미니게임을 건너뛰고 결과 화면으로 이동합니다."));
-	        SetMatchState(DDGameplayTags::State_BoardGame_Ending);
-	        return;
-	    }
-		
-		// 3. 승자가 없을 경우에만 기존의 라운드 종료(미니게임 준비) 로직을 수행합니다.
-		CachedBoardGameState->StateTimer = 3;
-		LOG_CJH(Log, TEXT("[라운드 종료] 3초 뒤 미니게임으로 이동합니다."));
-		
-		// 현재 타일 위치 시작 위치로 초기화
-		for (APlayerController* PC : AlivePlayerControllers)
-		{
-			if (auto PS = PC->GetPlayerState<ADDBasePlayerState>())
-			{
-				if (IsValid(PS->CurrentTile))
-				{
-					PS->StartTileName = PS->CurrentTile->TileRowName;
+}
 
-					LOG_CYS(Log, TEXT("[RoundEnd] Save Tile: %s"),
-					        *PS->StartTileName.ToString());
-				}
-				else
-				{
-					LOG_CYS(Error, TEXT("[RoundEnd] CurrentTile INVALID"));
-				}
+void ADDBoardGameMode::HandleState_Init()
+{
+	SortPlayersByTurnOrder();
+	LOG_CYS(Warning, TEXT("[GM] 보드게임 초기화 시작"));
+
+	// 타일 매니저 초기화
+	for (TActorIterator<ADDTileManager> It(GetWorld()); It; ++It)
+	{
+		It->InitializeTiles();
+		break;
+	}
+
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC);
+		if (!DDPC) continue;
+		
+		if (ADDBasePlayerState* PS = DDPC->GetCachedPlayerState()) PS->InitTile();
+		
+		if (!DDPC->GetPawn()) RestartPlayer(DDPC);
+		if (auto Char = Cast<ADDBoardGameCharacter>(DDPC->GetPawn())) Char->InitLocation();
+		
+		DDPC->Client_ApplyState(DDGameplayTags::State_BoardGame_Init);
+	}
+	
+	LOG_CYS(Warning, TEXT("[GM] 보드게임 전체 초기화 완료"));
+
+	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
+	if (IsValid(GameInstance) && GameInstance->CurrentRound == 0)
+	{
+		LOG_CYS(Warning, TEXT("1라운드 시퀀서 재생 지시"));
+		
+		if (CachedBoardGameState)
+		{
+			CachedBoardGameState->Multicast_PlaySequence();
+		}
+	}
+	else
+	{
+		CheckWinCondition();
+	}
+}
+
+void ADDBoardGameMode::HandleState_RoundEnd()
+{
+	// 1. 승리 조건 선제 검사
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC);
+		if (DDPC && DDPC->GetCachedPlayerState())
+		{
+			UDDPointSet* PointSet = DDPC->GetCachedPlayerState()->GetPointSet();
+			if (PointSet && PointSet->GetTrophy() >= CachedBoardGameState->MaxTrophy)
+			{
+				LOG_CJH(Log, TEXT("[승자 발생] %s 트로피 달성!"), *DDPC->GetCachedPlayerState()->GetPlayerDisplayName().ToString());
+				SetMatchState(DDGameplayTags::State_BoardGame_Ending);
+				return;
+			}
+		}
+	}
+   
+	// 2. 승자 없으면 대기 시간 설정 및 타일 정보 저장
+	CachedBoardGameState->SetStateTimer(3);
+   
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC))
+		{
+			ADDBasePlayerState* PS = DDPC->GetCachedPlayerState();
+			if (IsValid(PS->CurrentTile))
+			{
+				PS->StartTileName = PS->CurrentTile->TileRowName;
+
+				LOG_CYS(Log, TEXT("[RoundEnd] Save Tile: %s"),
+					    *PS->StartTileName.ToString());
+			}
+			else
+			{
+				LOG_CYS(Error, TEXT("[RoundEnd] CurrentTile INVALID"));
 			}
 		}
 	}
 }
 
-void ADDBoardGameMode::Logout(AController* Exiting)
+void ADDBoardGameMode::HandleState_End()
 {
-	APlayerController* ExitingPC = Cast<APlayerController>(Exiting);
-    if (IsValid(ExitingPC))
-    {
-        // 1. 현재 턴인 사람이 나가는 것인지 확인
-        bool bIsCurrentTurnPlayer = false;
-        if (AlivePlayerControllers.IsValidIndex(CurrentTurnPlayerIndex) && 
-            AlivePlayerControllers[CurrentTurnPlayerIndex] == ExitingPC)
-        {
-            bIsCurrentTurnPlayer = true;
-        }
+	LOG_CJH(Log, TEXT("게임 종료. 10초 후 로비 이동."));
+	GetWorldTimerManager().SetTimer(
+		ReturnToLobbyTimerHandle,
+		this,
+		&ThisClass::TravelToLobby,
+		10.0f,
+		false
+	);
+}
 
-        // 2. 명단에서 제거
-        AlivePlayerControllers.Remove(ExitingPC);
+void ADDBoardGameMode::StartNextPlayerTurn()
+{
+	int32 NextIndex = CachedBoardGameState->GetTurnPlayerIndex() + 1;
 
-        // 3. 비상 탈출 로직: 나간 사람이 현재 턴의 주인이었다면?
-        if (bIsCurrentTurnPlayer)
-        {
-            LOG_CJH(Warning, TEXT("현재 턴인 플레이어가 이탈했습니다! 강제로 다음 턴으로 넘깁니다."));
-            
-            // 기존 타이머들이 돌고 있다면 모두 취소
-            GetWorldTimerManager().ClearTimer(TurnTransitionTimerHandle);
-            
-            // 배열에서 제거되었으므로, 같은 인덱스를 유지하면 자연스레 다음 사람을 가리킴
-            // (마지막 사람이었다면 RoundEnd로 넘어가도록 조치 필요)
-            if (CurrentTurnPlayerIndex >= AlivePlayerControllers.Num())
-            {
-                CurrentTurnPlayerIndex = 0;
-                SetMatchState(DDGameplayTags::State_BoardGame_RoundEnd);
-            }
-            else
-            {
-                SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
-            }
-        }
-    }
+	// 라운드 종료 체크
+	if (NextIndex >= AlivePlayerControllers.Num())
+	{
+		ProcessRoundTransition();
+		return;
+	}
 
-    Super::Logout(Exiting);
+	// 데이터 갱신
+	CachedBoardGameState->SetTurnPlayerIndex(NextIndex);
+	CachedBoardGameState->SetStateTimer(CachedBoardGameState->MaxStateTimer);
+
+	// 서버 측 이펙트 적용
+	ApplyTurnEffectsToPlayers();
+	SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
+
+	// PC들에게 반응 지시
+	for (int32 i = 0; i < AlivePlayerControllers.Num(); ++i)
+	{
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[i]);
+		if (!DDPC) continue;
+
+		if (i == NextIndex)
+		{
+			DDPC->Client_SetMouseCursorVisible(true);
+			DDPC->Client_OpenPopUp(DDGameplayTags::BoardGame_UI_PlayerTurn); 
+		}
+		else
+		{
+			DDPC->Client_SetMouseCursorVisible(false);
+		}
+	}
+
+	APawn* ActivePawn = AlivePlayerControllers[NextIndex]->GetPawn();
+	Super::FocusAllCamerasOnTarget(ActivePawn);
+}
+
+void ADDBoardGameMode::ProcessRoundTransition()
+{
+	CachedBoardGameState->SetTurnPlayerIndex(-1); // 턴 초기화
+	
+	if (UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance()))
+	{
+		GameInstance->CurrentRound++;
+		CachedBoardGameState->SetCurrentRound(CachedBoardGameState->MaxRound - GameInstance->CurrentRound);
+	}
+	LOG_CJH(Log, TEXT("모든 플레이어의 턴 종료. 라운드를 넘깁니다."));
+	SetMatchState(DDGameplayTags::State_BoardGame_RoundEnd);
 }
 
 void ADDBoardGameMode::CheckWinCondition()
 {
-	LOG_CJH(Log, TEXT("[CheckWinCondition] 승리 조건 및 최대 라운드 도달 여부를 검사합니다."));
+	LOG_CJH(Log, TEXT("[CheckWinCondition] 승리 및 라운드 도달 검사"));
 	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
 
 	if (!IsValid(CachedBoardGameState) || !IsValid(GameInstance)) return;
 
 	bool bHasTrophyWinner = false;
-
-	for (APlayerState* PlayerState : CachedBoardGameState->PlayerArray)
+	for (APlayerState* PS : CachedBoardGameState->PlayerArray)
 	{
-		if (ADDBasePlayerState* BasePlayerState = Cast<ADDBasePlayerState>(PlayerState))
+		ADDBasePlayerState* BasePS = Cast<ADDBasePlayerState>(PS);
+		if (BasePS && BasePS->GetPointSet() && BasePS->GetPointSet()->GetTrophy() >= CachedBoardGameState->MaxTrophy)
 		{
-			if (BasePlayerState->GetPointSet() && BasePlayerState->GetPointSet()->GetTrophy() >= CachedBoardGameState->MaxTrophy)
-			{
-				LOG_CJH(Log, TEXT("목표 트로피 도달자 발생! (닉네임: %s)"),
-				        *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString());
-				bHasTrophyWinner = true;
-				break;
-			}
+			LOG_CJH(Log, TEXT("목표 트로피 도달자 발생! (닉네임: %s)"),
+				        *BasePS->PlayerGameData.PlayerDisplayName.ToString());
+			bHasTrophyWinner = true;
+			break;
 		}
 	}
 
@@ -343,42 +341,86 @@ void ADDBoardGameMode::CheckWinCondition()
 	}
 	else
 	{
-		LOG_CJH(Log, TEXT("[CheckWinCondition] 게임을 계속 진행합니다. (현재 라운드: %d)"), GameInstance->CurrentRound);
-		CurrentTurnPlayerIndex = 0;
+		LOG_CJH(Log, TEXT("[CheckWinCondition] 게임을 계속 진행합니다. (현재 라운드: %d)"), GameInstance->CurrentRound + 1);
+		CachedBoardGameState->SetTurnPlayerIndex(-1);
 		SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 	}
 }
 
-void ADDBoardGameMode::StartNextPlayerTurn()
+void ADDBoardGameMode::CalculateFinalWinner()
 {
-	if (CurrentTurnPlayerIndex >= AlivePlayerControllers.Num())
+	if (!IsValid(CachedBoardGameState)) return;
+
+	TArray<ADDBasePlayerState*> RankCandidates;
+	for (APlayerController* PC : AlivePlayerControllers)
 	{
-		CurrentTurnPlayerIndex = 0;
-		UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
-		if (IsValid(GameInstance))
+		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC))
 		{
-			GameInstance->CurrentRound++;
-			if (CachedBoardGameState)
-			{
-				CachedBoardGameState->CurrentRound = CachedBoardGameState->MaxRound - GameInstance->CurrentRound;
-			}
-			LOG_CJH(Log, TEXT("모든 플레이어의 턴 종료. 라운드를 넘깁니다."));
+			if (ADDBasePlayerState* PS = DDPC->GetCachedPlayerState()) RankCandidates.Add(PS);
 		}
-
-		SetMatchState(DDGameplayTags::State_BoardGame_RoundEnd);
-		return;
 	}
 
-	APawn* ActivePawn = nullptr;
-	if (AlivePlayerControllers.IsValidIndex(CurrentTurnPlayerIndex))
+	// 트로피 -> 코인 순으로 정렬
+	RankCandidates.Sort([](const ADDBasePlayerState& A, const ADDBasePlayerState& B)
 	{
-		ActivePawn = AlivePlayerControllers[CurrentTurnPlayerIndex]->GetPawn();
-	}
+		float TrophyA = A.GetPointSet()->GetTrophy();
+		float TrophyB = B.GetPointSet()->GetTrophy();
+		if (TrophyA != TrophyB) return TrophyA > TrophyB; 
+		return A.GetPointSet()->GetCoin() > B.GetPointSet()->GetCoin();
+	});
 
+	TArray<FFinalRankData> FinalResults;
+	for (int32 i = 0; i < RankCandidates.Num(); ++i)
+	{
+		RankCandidates[i]->SetIsGameFinished(true);
+		
+		FFinalRankData Data;
+		Data.Rank = i + 1;
+		Data.PlayerName = RankCandidates[i]->GetPlayerDisplayName();
+		Data.Trophy = (int32)RankCandidates[i]->GetPointSet()->GetTrophy();
+		Data.Coin = (int32)RankCandidates[i]->GetPointSet()->GetCoin();
+		FinalResults.Add(Data);
+		
+		LOG_CJH(Log, TEXT("%d등 플레이어: %s | 트로피 개수: %d, 코인 개수: %d"),
+			Data.Rank,
+			*Data.PlayerName.ToString(),
+			Data.Trophy,
+			Data.Coin
+		);
+	}
+	
+	CachedBoardGameState->SetFinalRankings(FinalResults);
+	SetMatchState(DDGameplayTags::State_BoardGame_End);
+}
+
+void ADDBoardGameMode::ApplyMatchStateEffects(FGameplayTag NewStateTag)
+{
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(PC);
+		if (!ASC) continue;
+
+		ASC->RemoveActiveEffectsWithGrantedTags(CurrentAppliedTags);
+
+		if (TSubclassOf<UGameplayEffect>* EffectClassPtr = MatchStateEffectClasses.Find(NewStateTag))
+		{
+			if (*EffectClassPtr)
+			{
+				FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+				Context.AddSourceObject(this);
+				FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(*EffectClassPtr, 1.0f, Context);
+				if (SpecHandle.IsValid()) ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			}
+		}
+	}
+	CurrentAppliedTags = FGameplayTagContainer(NewStateTag);
+}
+
+void ADDBoardGameMode::ApplyTurnEffectsToPlayers()
+{
 	for (int32 i = 0; i < AlivePlayerControllers.Num(); ++i)
 	{
-		APlayerController* PlayerController = AlivePlayerControllers[i];
-		UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(PlayerController);
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(AlivePlayerControllers[i]);
 		if (!ASC) continue;
 
 		FGameplayTagContainer TurnTagsToRemove;
@@ -387,48 +429,44 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 		TurnTagsToRemove.AddTag(DDGameplayTags::State_BoardGame_HasUsedItem);
 		ASC->RemoveActiveEffectsWithGrantedTags(TurnTagsToRemove);
 
-		TSubclassOf<UGameplayEffect> EffectToApply = 
-			(i == CurrentTurnPlayerIndex) ? TurnActiveEffectClass : TurnWaitingEffectClass;
-
-		if (EffectToApply)
+		TSubclassOf<UGameplayEffect> EffectClassPtr = (i == CachedBoardGameState->GetTurnPlayerIndex()) ? TurnActiveEffectClass : TurnWaitingEffectClass;
+		if (EffectClassPtr)
 		{
 			FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
 			Context.AddSourceObject(this);
-			FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(EffectToApply, 1.0f, Context);
-			if (SpecHandle.IsValid())
-			{
-				ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-			}
-		}
-		
-		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PlayerController);
-		if (IsValid(DDPC))
-		{
-			if (i == CurrentTurnPlayerIndex)
-			{
-				DDPC->Client_SetMouseCursorVisible(true);
-				CachedBoardGameState->StateTimer = CachedBoardGameState->MaxStateTimer;
-				LOG_CJH(Log, TEXT("▶ [%d]번 플레이어 턴 시작! (제한시간 %d초)"), i, CachedBoardGameState->MaxStateTimer);
-				SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
-				
-				// 현재 턴인 플레이어 한테 턴 ui 그리기
-				DDPC->Client_OpenPopUp(DDGameplayTags::BoardGame_UI_PlayerTurn); 
-			}
-			else
-			{
-				DDPC->Client_SetMouseCursorVisible(false);
-			}
+			FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(EffectClassPtr, 1.0f, Context);
+			if (SpecHandle.IsValid()) ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		}
 	}
+}
 
-	Super::FocusAllCamerasOnTarget(ActivePawn);
+void ADDBoardGameMode::Logout(AController* Exiting)
+{
+	APlayerController* ExitingPC = Cast<APlayerController>(Exiting);
+	if (!IsValid(ExitingPC)) return;
+
+	bool bWasCurrentTurn = (AlivePlayerControllers.IsValidIndex(CachedBoardGameState->GetTurnPlayerIndex()) && AlivePlayerControllers[CachedBoardGameState->GetTurnPlayerIndex()] == ExitingPC);
+	AlivePlayerControllers.Remove(ExitingPC);
+
+	if (bWasCurrentTurn)
+	{
+		GetWorldTimerManager().ClearTimer(TurnTransitionTimerHandle);
+		if (CachedBoardGameState->GetTurnPlayerIndex() >= AlivePlayerControllers.Num()) ProcessRoundTransition();
+		else
+		{
+			// 턴 보정 후 재생성
+			CachedBoardGameState->SetTurnPlayerIndex(CachedBoardGameState->GetTurnPlayerIndex() - 1);
+			SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
+		}
+	}
+	Super::Logout(Exiting);
 }
 
 void ADDBoardGameMode::NotifyDiceRolled()
 {
 	LOG_CJH(Log, TEXT("[Notify] 주사위 굴림. BeforeDice를 제거하고 Moving 페이즈로 전환."));
 	SetTurnPhase(DDGameplayTags::State_TurnPhase_Moving);
-	CachedBoardGameState->StateTimer = -1;
+	CachedBoardGameState->SetStateTimer(-1);
 }
 
 void ADDBoardGameMode::NotifyMovementFinished()
@@ -460,16 +498,13 @@ void ADDBoardGameMode::HandleRespawn(AController* TargetController)
 void ADDBoardGameMode::ExecuteNextTurnTransition()
 {
 	LOG_CJH(Log, TEXT("[Timer] %.0f초 대기 완료. 다음 플레이어로 턴을 전환합니다."), TurnTransitionTimer);
+	if (!AlivePlayerControllers.IsValidIndex(CachedBoardGameState->GetTurnPlayerIndex())) return;
 	
-	if (!AlivePlayerControllers.IsValidIndex(CurrentTurnPlayerIndex)) return;
-	
-	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[CurrentTurnPlayerIndex]);
+	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[CachedBoardGameState->GetTurnPlayerIndex()]);
 	if (!DDPC) return;
 	
-	// 턴 팝업 제거 
+	// 턴 팝업 제거
 	DDPC->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_PlayerTurn);
-	
-	CurrentTurnPlayerIndex++;
 	SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 }
 
@@ -484,17 +519,13 @@ void ADDBoardGameMode::TravelToLobby()
 
 void ADDBoardGameMode::SetTurnPhase(FGameplayTag NewPhaseTag)
 {
-	if (!AlivePlayerControllers.IsValidIndex(CurrentTurnPlayerIndex)) return;
+	int32 CurrentIndex = CachedBoardGameState->GetTurnPlayerIndex();
+	if (!AlivePlayerControllers.IsValidIndex(CurrentIndex)) return;
 
-	APlayerController* PlayerController = AlivePlayerControllers[CurrentTurnPlayerIndex];
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(PlayerController);
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(AlivePlayerControllers[CurrentIndex]);
 	if (!ASC) return;
 
-	if (CurrentTurnPhaseTag.IsValid())
-	{
-		FGameplayTagContainer PhaseTagToRemove(CurrentTurnPhaseTag);
-		ASC->RemoveActiveEffectsWithGrantedTags(PhaseTagToRemove);
-	}
+	if (CurrentTurnPhaseTag.IsValid()) ASC->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(CurrentTurnPhaseTag));
 
 	CurrentTurnPhaseTag = NewPhaseTag;
 
@@ -507,93 +538,32 @@ void ADDBoardGameMode::SetTurnPhase(FGameplayTag NewPhaseTag)
 				FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
 				Context.AddSourceObject(this);
 				FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(*EffectClassPtr, 1.0f, Context);
-				if (SpecHandle.IsValid())
-				{
-					ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-				}
+				if (SpecHandle.IsValid()) ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 			}
 		}
-		LOG_CJH(Log, TEXT("   └ [TurnPhase] 페이즈 갱신: %s"), *NewPhaseTag.ToString());
 	}
-}
-
-void ADDBoardGameMode::CalculateFinalWinner()
-{
-	if (!IsValid(CachedBoardGameState)) return;
-
-    // 1. AlivePlayerControllers에서 참여 중인 PlayerState 수집
-    TArray<ADDBasePlayerState*> RankCandidates;
-    for (APlayerController* PC : AlivePlayerControllers)
-    {
-        if (PC && PC->PlayerState)
-        {
-            if (ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(PC->PlayerState))
-            {
-                // PointSet이 유효한지 확인 후 추가
-                if (PS->GetPointSet())
-                {
-	                RankCandidates.Add(PS);
-                }
-            }
-        }
-    }
-
-    // 2. 정렬 (람다식: 트로피 우선, 코인 차선)
-    RankCandidates.Sort([](const ADDBasePlayerState& A, const ADDBasePlayerState& B)
-    {
-        float TrophyA = A.GetPointSet()->GetTrophy();
-        float TrophyB = B.GetPointSet()->GetTrophy();
-        
-        if (TrophyA != TrophyB) return TrophyA > TrophyB; 
-        
-        return A.GetPointSet()->GetCoin() > B.GetPointSet()->GetCoin();
-    });
-
-    // 3. UI용 구조체 배열로 변환
-    TArray<FFinalRankData> FinalResults;
-    for (int32 i = 0; i < RankCandidates.Num(); ++i)
-    {
-    	RankCandidates[i]->PlayerGameData.bIsGameFinished = true;
-    	
-        FFinalRankData Data;
-        Data.Rank = i + 1;
-        Data.PlayerName = RankCandidates[i]->PlayerGameData.PlayerDisplayName;
-        Data.Trophy = (int32)RankCandidates[i]->GetPointSet()->GetTrophy();
-        Data.Coin = (int32)RankCandidates[i]->GetPointSet()->GetCoin();
-        
-        FinalResults.Add(Data);
-    	
-    	LOG_CJH(Log, TEXT("%d등 플레이어: %s | 트로피 개수: %d, 코인 개수: %d"), i + 1, *Data.PlayerName.ToString(), Data.Trophy, Data.Coin);
-    }
-
-    // 4. GameState에 저장
-    CachedBoardGameState->FinalRankings = FinalResults;
-
-    // 5. 결과 상태로 전환
-    SetMatchState(DDGameplayTags::State_BoardGame_End);
+	
+	LOG_CJH(Log, TEXT("   └ [TurnPhase] 페이즈 갱신: %s"), *NewPhaseTag.ToString());
 }
 
 void ADDBoardGameMode::SortPlayersByTurnOrder()
 {
 	for (int32 i = 0; i < AlivePlayerControllers.Num(); ++i)
 	{
-		if (ADDBasePlayerState* BasePlayerState = AlivePlayerControllers[i]->GetPlayerState<ADDBasePlayerState>())
+		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[i]))
 		{
-			if (BasePlayerState->PlayerGameData.TurnOrder < 0)
-			{
-				BasePlayerState->PlayerGameData.TurnOrder = i + 100;
-			}
+			ADDBasePlayerState* PS = DDPC->GetCachedPlayerState();
+			if (PS && PS->GetTurnOrder() < 0) PS->SetTurnOrder(i + 100);
 		}
 	}
 
 	AlivePlayerControllers.Sort([](const TObjectPtr<APlayerController>& A, const TObjectPtr<APlayerController>& B)
 	{
-		ADDBasePlayerState* PlayerStateA = A ? A->GetPlayerState<ADDBasePlayerState>() : nullptr;
-		ADDBasePlayerState* PlayerStateB = B ? B->GetPlayerState<ADDBasePlayerState>() : nullptr;
-
-		if (PlayerStateA && PlayerStateB)
+		ADDBasePlayerController* PCA = Cast<ADDBasePlayerController>(A);
+		ADDBasePlayerController* PCB = Cast<ADDBasePlayerController>(B);
+		if (PCA && PCB && PCA->GetCachedPlayerState() && PCB->GetCachedPlayerState())
 		{
-			return PlayerStateA->PlayerGameData.TurnOrder < PlayerStateB->PlayerGameData.TurnOrder;
+			return PCA->GetCachedPlayerState()->GetTurnOrder() < PCB->GetCachedPlayerState()->GetTurnOrder();
 		}
 		return false;
 	});
@@ -605,9 +575,22 @@ void ADDBoardGameMode::SortPlayersByTurnOrder()
 		if (ADDBasePlayerState* BasePlayerState = AlivePlayerControllers[i]->GetPlayerState<ADDBasePlayerState>())
 		{
 			LOG_CJH(Log, TEXT(" [%d] %s (TurnOrder: %d)"), i + 1,
-			        *BasePlayerState->PlayerGameData.PlayerDisplayName.ToString(),
-			        BasePlayerState->PlayerGameData.TurnOrder);
+			        *BasePlayerState->GetPlayerDisplayName().ToString(),
+			        BasePlayerState->GetTurnOrder());
 		}
 	}
 	LOG_CJH(Log, TEXT("====================================="));
+}
+
+void ADDBoardGameMode::UpdateAllPlayersGameLayer(FGameplayTag StateTag)
+{
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC);
+		if (IsValid(DDPC))
+		{
+			// 클라이언트 RPC를 호출하여 각 로컬 UI 레이어를 전환합니다.
+			DDPC->Client_SwitchGameLayer(StateTag);
+		}
+	}
 }

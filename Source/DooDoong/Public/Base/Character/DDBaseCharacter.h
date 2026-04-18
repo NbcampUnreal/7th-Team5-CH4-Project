@@ -64,4 +64,11 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UDDMovementSet> MovementSet;
+	
+public:
+	void ApplyColorFromPlayerState(FLinearColor NewColor);
+	
+protected:
+	UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> CachedColorMaterial;
 };
