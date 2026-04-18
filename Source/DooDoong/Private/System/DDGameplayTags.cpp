@@ -105,8 +105,7 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Instant, "Item.Activate.Instant", "즉시사용 아이템");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Targeting, "Item.Activate.Targeting", "타게팅 아이템");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Activate_Range, "Item.Activate.Range", "범위 아이템");
-
-	// 아이템 액션 어빌리티 태그
+	
 	// 아이템 어빌리티 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_HealingKit, "Item.Ability.HealingKit", "힐링 키트 아이템 어빌리티");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_GiveBomb, "Item.Ability.GiveBomb", "폭탄 넘기기 아이템 어빌리티");
@@ -116,6 +115,10 @@ namespace DDGameplayTags
 	// 아이템 액션 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Targeting, "State.ItemAction.Targeting", "아이템 타겟 선택 중");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Range, "State.ItemAction.Range", "아이템 범위 표시/선택 중");
+	
+	// GameplayCue 태그 : 반드시 'GameplayCue_'로 시작해야함! 안그러면 안 뜸.
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_InstantItem_HealingKit, "GameplayCue.InstantItem.HealingKit", "힐링키트 게임플레이 큐")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_TargetingItem_GiveBomb_Confirm, "GameplayCue.TargetingItem.GiveBomb.Confirm", "폭탄보내기 게임플레이 큐 : Confirm 시점");
 	
 	// UI 태그 
 	UE_DEFINE_GAMEPLAY_TAG(BoardGame_UI_PlayerTurn, "BoardGame.UI.PlayerTurn"); 
