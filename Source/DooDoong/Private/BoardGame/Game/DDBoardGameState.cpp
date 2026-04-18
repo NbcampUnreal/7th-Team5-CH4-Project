@@ -25,7 +25,7 @@ void ADDBoardGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ADDBoardGameState, BoardMatchStateTag);
 	DOREPLIFETIME(ADDBoardGameState, TurnPlayerIndex);
 	DOREPLIFETIME(ADDBoardGameState, StateTimer);
-	DOREPLIFETIME(ADDBoardGameState, CurrentRound);
+	DOREPLIFETIME(ADDBoardGameState, RemainingRound);
 	DOREPLIFETIME(ADDBoardGameState, FinalRankings);
 }
 
@@ -99,9 +99,9 @@ void ADDBoardGameState::OnRep_StateTimer()
 	OnStateTimerChanged.Broadcast(StateTimer);
 }
 
-void ADDBoardGameState::OnRep_CurrentRound()
+void ADDBoardGameState::OnRep_RemainingRound()
 {
-	OnRoundChanged.Broadcast(CurrentRound);
+	OnRoundChanged.Broadcast(RemainingRound);
 }
 
 void ADDBoardGameState::OnRep_FinalRankings()
