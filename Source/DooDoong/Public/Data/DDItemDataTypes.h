@@ -5,21 +5,6 @@
 #include "Engine/DataTable.h"
 #include "DDItemDataTypes.generated.h"
 
-class UNiagaraSystem;
-
-USTRUCT(BlueprintType)
-struct DOODOONG_API FGameplayCueTags
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag LoopCueTag;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag ConfirmCueTag;
-};
-
-
 USTRUCT(BlueprintType)
 struct DOODOONG_API FItemTableRow : public FTableRowBase
 {
@@ -48,10 +33,6 @@ struct DOODOONG_API FItemTableRow : public FTableRowBase
 	/** 표시될 아이템 아이콘 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UTexture2D> Icon;
-	
-	/** GameplayCue에 사용될 데이터 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayCueTags CueTags;
 	
 	/** 손에 스폰할 아이템 클래스 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
