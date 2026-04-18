@@ -31,4 +31,5 @@ protected:
 	UAbilitySystemComponent* GetBoardGameAbilitySystemComponent() const;
 
 	bool ExecuteItemCue(const FGameplayTag& CueTag, const FVector& CueLocation) const;
+	bool ExecuteItemCueOnTarget(const FGameplayTag& CueTag, AActor* CueActor) const;
 };

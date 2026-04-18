@@ -160,6 +160,12 @@ void UGA_RangeItemBase::OnConfirm(FGameplayEventData Payload)
 		return;
 	}
 	LOG_CYS(Warning,TEXT("범위 어빌리티 컨펌 입력 들어옴"));
+
+	if (AActor* AvatarActor = GetAvatarActorFromActorInfo())
+	{
+		ExecuteItemCue(ConfirmCueTag, AvatarActor->GetActorLocation());
+	}
+
 	// 타겟 확정 시에만 탐색
 	FindTargets();
 
@@ -173,6 +179,8 @@ void UGA_RangeItemBase::OnConfirm(FGameplayEventData Payload)
 	// 타겟에게 GE 적용
 	for (auto Target : CachedTargets)
 	{
+		ExecuteItemCueOnTarget(TargetCueTag, Target);
+
 		ADDBasePlayerState* PS = Target->GetPlayerState<ADDBasePlayerState>();
 		if (!PS) continue;
 

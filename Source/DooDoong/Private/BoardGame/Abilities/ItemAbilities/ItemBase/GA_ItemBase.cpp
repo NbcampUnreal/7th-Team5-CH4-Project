@@ -1,5 +1,6 @@
 #include "BoardGame/Abilities/ItemAbilities/ItemBase/GA_ItemBase.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "System/DDGameplayTags.h"
@@ -54,5 +55,30 @@ bool UGA_ItemBase::ExecuteItemCue(const FGameplayTag& CueTag, const FVector& Cue
 	CueParameters.Location = CueLocation;
 
 	AbilitySystemComponent->ExecuteGameplayCue(CueTag, CueParameters);
+	return true;
+}
+
+bool UGA_ItemBase::ExecuteItemCueOnTarget(const FGameplayTag& CueTag, AActor* CueActor) const
+{
+	if (!CueTag.IsValid() || !IsValid(CueActor))
+	{
+		return false;
+	}
+
+	UAbilitySystemComponent* TargetAbilitySystemComponent =
+		UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(CueActor);
+	if (!TargetAbilitySystemComponent)
+	{
+		return false;
+	}
+
+	AActor* AvatarActor = GetAvatarActorFromActorInfo();
+
+	FGameplayCueParameters CueParameters;
+	CueParameters.Instigator = CueActor;
+	CueParameters.EffectCauser = AvatarActor ? AvatarActor : CueActor;
+	CueParameters.Location = CueActor->GetActorLocation();
+
+	TargetAbilitySystemComponent->ExecuteGameplayCue(CueTag, CueParameters);
 	return true;
 }
