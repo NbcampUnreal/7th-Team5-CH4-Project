@@ -15,6 +15,11 @@ void UGA_InstantItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle, con
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
+	
+	if (AActor* AvatarActor = GetAvatarActorFromActorInfo())
+	{
+		ExecuteItemCue(ConfirmCueTag, AvatarActor->GetActorLocation());
+	}
 
 	const bool bExecuted = ExecuteInstantItem(TriggerEventData);
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, !bExecuted);

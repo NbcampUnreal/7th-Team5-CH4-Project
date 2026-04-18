@@ -23,10 +23,11 @@ public:
 		const FGameplayEventData* TriggerEventData) override;
 
 protected:
-	/** 아이템을 사용하는 보드게임 캐릭터 Getter */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item|Cue")
+	FGameplayTag ConfirmCueTag;
+
 	ADDBoardGameCharacter* GetBoardGameCharacter() const;
 
-	/** 보드게임 캐릭터가 사용하는 ASC Getter */
 	UAbilitySystemComponent* GetBoardGameAbilitySystemComponent() const;
 
 	bool ExecuteItemCue(const FGameplayTag& CueTag, const FVector& CueLocation) const;
