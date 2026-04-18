@@ -7,6 +7,7 @@
 #include "Base/Player/DDBasePlayerState.h"
 #include "DDBasePlayerController.generated.h"
 
+class ADDBasePlayerState;
 struct FInputActionValue;
 
 class UInputMappingContext;
@@ -145,4 +146,8 @@ private:
 	TSubclassOf<UDDInventoryWidget> InventoryWidgetClass;
 	
 	bool bInventoryOpen;
+	
+protected:
+	UPROPERTY()
+	ADDBasePlayerState* CachedPlayerState;
 };

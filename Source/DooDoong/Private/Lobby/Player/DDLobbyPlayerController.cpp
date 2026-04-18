@@ -1,8 +1,9 @@
 #include "Lobby/Player/DDLobbyPlayerController.h"
+#include "Base/Player/DDBasePlayerState.h"
 #include "Common/DDLogManager.h"
 #include "Lobby/Game/DDLobbyGameMode.h"
 #include "System/DDGameplayTags.h"
-
+#include "System/DDUIManagerSubsystem.h"
 
 void ADDLobbyPlayerController::BeginPlay()
 {
@@ -12,22 +13,27 @@ void ADDLobbyPlayerController::BeginPlay()
 	FInputModeGameAndUI Mode;
     SetInputMode(Mode);
     bShowMouseCursor = true;
-	
-	// ToggleUIInputMode(true); 
 }
 
 void ADDLobbyPlayerController::Client_JoinLobby_Implementation()
 {
 	LOG_KMS(Warning, TEXT("플레이어 입장 성공")); 
 	
-	// 닉네임 입력창 닫기 
-	Client_ClosePopUp(DDGameplayTags::Lobby_UI_NicknamePopup);
+	// 닉네임 입력 팝업 제거 
+	Client_ClosePopUp(DDGameplayTags::Lobby_UI_NicknamePopup); 
 	
 	// Lobby 메인 열기 
 	Client_SwitchGameLayer(DDGameplayTags::Lobby_UI_Main);
 	
 	// 닉네임 입력 완료 후 캐릭터 조작 권한 활성화
-	ToggleUIInputMode(false);
+	FInputModeGameAndUI Mode;
+	SetInputMode(Mode);
+	
+	ADDLobbyGameState* LobbyGameState = GetWorld()->GetGameState<ADDLobbyGameState>();
+	if (IsValid(LobbyGameState))
+	{
+		LobbyGameState->OnCountDownChanged.AddDynamic(this, &ADDLobbyPlayerController::OnCountdownChanged);
+	}
 }
 
 bool ADDLobbyPlayerController::Server_SubmitNickname_Validate(const FName& InNickname)
@@ -49,9 +55,6 @@ void ADDLobbyPlayerController::Server_SubmitNickname_Implementation(const FName&
 		Client_ReceiveNicknameFailure(ErrorMessage);
 		return; 
 	}
-	
-	// 닉네임 입력 팝업 제거 
-	Client_ClosePopUp(DDGameplayTags::Lobby_UI_NicknamePopup); 
 }
 
 void ADDLobbyPlayerController::Client_ReceiveNicknameFailure_Implementation(const FString& ErrorMessage)
@@ -75,18 +78,14 @@ void ADDLobbyPlayerController::Server_RequestReady_Implementation(bool bIsReady)
 	LobbyGameMode->RequestPlayerReady(this, bIsReady);
 }
 
-void ADDLobbyPlayerController::ToggleUIInputMode(bool bUIOnly)
+void ADDLobbyPlayerController::OnCountdownChanged(int32 NewCountdown)
 {
-	if (bUIOnly)
-	{
-		FInputModeUIOnly Mode;
-		SetInputMode(Mode);
-		bShowMouseCursor = true;
-	}
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager) return;
+	
+	if (NewCountdown > 0)
+		UIManager->DrawPopup(DDGameplayTags::Lobby_UI_CountDown);
 	else
-	{
-		FInputModeGameAndUI Mode;
-		SetInputMode(Mode);
-		// bShowMouseCursor = true;
-	}
+		UIManager->HidePopup(DDGameplayTags::Lobby_UI_CountDown);
 }
+

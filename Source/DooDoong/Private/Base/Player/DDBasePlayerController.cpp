@@ -32,11 +32,13 @@ void ADDBasePlayerController::BeginPlay()
 	SetInputMode(Mode);
 	bShowMouseCursor = true;
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
-		GetLocalPlayer()))
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem 
+		= ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(DefaultIMC, 0);
 	}
+	
+	CachedPlayerState = GetPlayerState<ADDBasePlayerState>();
 	
 	if (IsLocalController())
 	{
