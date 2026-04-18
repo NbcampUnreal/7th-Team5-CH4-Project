@@ -32,7 +32,7 @@ void UGA_TargetingItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle,
 			return;
 		}
 
-		ExecuteItemCue(ConfirmCueTag, InitialTarget->GetActorLocation());
+		ExecuteItemCue(ConfirmCueTag);
 
 		const bool bExecuted = ExecuteTargetingItem(InitialTarget);
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, !bExecuted);
@@ -146,7 +146,7 @@ void UGA_TargetingItemBase::OnTargetConfirm(FGameplayEventData Payload)
 		}
 	}
 	
-	ExecuteItemCue(ConfirmCueTag, TargetActor->GetActorLocation());
+	ExecuteItemCue(ConfirmCueTag);
 
 	const bool bExecuted = ExecuteTargetingItem(TargetActor);
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, !bExecuted);

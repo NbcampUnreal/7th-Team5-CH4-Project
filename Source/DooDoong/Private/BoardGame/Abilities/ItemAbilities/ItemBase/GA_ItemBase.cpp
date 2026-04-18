@@ -35,7 +35,7 @@ UAbilitySystemComponent* UGA_ItemBase::GetBoardGameAbilitySystemComponent() cons
 	return BoardGameCharacter ? BoardGameCharacter->GetAbilitySystemComponent() : nullptr;
 }
 
-bool UGA_ItemBase::ExecuteItemCue(const FGameplayTag& CueTag, const FVector& CueLocation) const
+bool UGA_ItemBase::ExecuteItemCue(const FGameplayTag& CueTag) const
 {
 	if (!CueTag.IsValid())
 	{
@@ -52,7 +52,7 @@ bool UGA_ItemBase::ExecuteItemCue(const FGameplayTag& CueTag, const FVector& Cue
 	FGameplayCueParameters CueParameters;
 	CueParameters.Instigator = AvatarActor;
 	CueParameters.EffectCauser = AvatarActor;
-	CueParameters.Location = CueLocation;
+	CueParameters.Location = AvatarActor->GetActorLocation();
 
 	AbilitySystemComponent->ExecuteGameplayCue(CueTag, CueParameters);
 	return true;
