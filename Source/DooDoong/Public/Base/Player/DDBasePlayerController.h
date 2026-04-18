@@ -4,6 +4,7 @@
 #include "GameplayTagContainer.h"
 #include "BoardGame/DDSelectableTileActor.h"
 #include "GameFramework/PlayerController.h"
+#include "Base/Player/DDBasePlayerState.h"
 #include "DDBasePlayerController.generated.h"
 
 struct FInputActionValue;
@@ -25,12 +26,24 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
 	virtual void SetupInputComponent() override;
+
+protected:
+	UPROPERTY()
+	ADDBasePlayerState* CachedPlayerState;
+
+public:
+	FORCEINLINE ADDBasePlayerState* GetCachedPlayerState() 
+	{
+		if (!CachedPlayerState) CachedPlayerState = GetPlayerState<ADDBasePlayerState>();
+		return CachedPlayerState;
+	}
 
 public:
 	void SetInputMappingContext(UInputMappingContext* NewIMC);
 
+	// GameMode가 상태 변경을 클라이언트에게 전달하는 RPC들
+	
 	/** 윤서 : GameMode에서 상태(로비/보드)에 따라 IMC 지정 */
 	UFUNCTION(Client, Reliable)
 	void Client_ApplyState(FGameplayTag StateTag);
@@ -39,20 +52,24 @@ public:
 	UFUNCTION(Client, Reliable)
 	void Client_ApplyInput(UInputMappingContext* NewIMC);
 
+	/** 준혁 : BoardGameMode에서 플레이어 턴에 맞는 InputMode를 적용하기 위한 Client RPC */
+	UFUNCTION(Client, Reliable)
+	void Client_SetMouseCursorVisible(bool bVisible);
+	
 	/** 주현 : 준비완료 상태를 서버에서 호출시키기 위한 Server RPC */
 	UFUNCTION(Server, Reliable)
 	void Server_SetMiniGameReady(bool bReady);
 	
-	/** 준혁 : BoardGameMode에서 플레이어 턴에 맞는 InputMode를 적용하기 위한 Client RPC */
-	UFUNCTION(Client, Reliable)
-	void Client_SetMouseCursorVisible(bool bVisible);
-
-	void OnMouseClick();
+	UFUNCTION(Server, Reliable)
+	void Server_RequestPlayerReady(); 
 
 	UFUNCTION(Server, Reliable)
 	void Server_SelectTile(ADDSelectableTileActor* TileActor);
 	
+	void OnMouseClick();
+
 public:
+	// UI 및 팝업 관련 RPC들
 	UFUNCTION(Client, Reliable)
 	void Client_SetUIConfig(UDDUIConfig* InConfig);
 	
@@ -70,10 +87,6 @@ public:
 	
 	UFUNCTION(Client, Reliable)
 	void Client_DrawErrorMessage(const FString& ErrorMessage, float Duration = 3.f);
-	
-public:
-	UFUNCTION(Server, Reliable)
-	void Server_RequestPlayerReady(); 
 
 protected:
 	void Input_Move(const FInputActionValue& Value);
