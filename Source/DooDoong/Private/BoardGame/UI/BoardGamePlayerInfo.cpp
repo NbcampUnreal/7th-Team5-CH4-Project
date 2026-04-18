@@ -17,7 +17,7 @@ void UBoardGamePlayerInfo::InitializePlayerInfo(APlayerState* PlayerState)
 	
 	if(PlayerNameText)
 	{
-		PlayerNameText->SetText(FText::FromString(CurrentPlayerState->GetPlayerName()));
+		PlayerNameText->SetText(FText::FromName(CurrentPlayerState->GetPlayerDisplayName()));
 	}
 	
 	if (UDDHealthSet* HealthSet = CurrentPlayerState->GetHealthSet())
