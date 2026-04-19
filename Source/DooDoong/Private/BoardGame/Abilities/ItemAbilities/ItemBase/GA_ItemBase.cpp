@@ -2,6 +2,8 @@
 
 #include "AbilitySystemComponent.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
+#include "Data/DDItemDataTypes.h"
+#include "Data/ItemPayloadObject.h"
 #include "System/DDGameplayTags.h"
 
 UGA_ItemBase::UGA_ItemBase()
@@ -21,6 +23,47 @@ void UGA_ItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle, const FGam
 	FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
+	// 손에 아이템 액터 붙이기
+	if (HasAuthority(&ActivationInfo))
+	{
+		const UItemPayloadObject* PayloadObj = nullptr;
+
+		if (TriggerEventData && TriggerEventData->OptionalObject)
+		{
+			PayloadObj = Cast<UItemPayloadObject>(TriggerEventData->OptionalObject);
+		}
+
+		if (PayloadObj)
+		{
+			CachedItemData = PayloadObj->ItemRow; // ← 반드시 캐싱
+		}
+	
+		ItemActor = GetWorld()->SpawnActor<AActor>(CachedItemData.ItemActorClass);
+
+		// 클라 복제
+		ItemActor->SetReplicates(true);
+		
+		ItemActor->AttachToComponent(
+			GetBoardGameCharacter()->GetMesh(),
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			TEXT("RightHand")
+		);
+	}
+}
+
+void UGA_ItemBase::EndAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	// 액터 파괴
+	if (HasAuthority(&CurrentActivationInfo))
+	{
+		if (IsValid(ItemActor))
+		{
+			ItemActor->Destroy();
+		}
+	}
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 ADDBoardGameCharacter* UGA_ItemBase::GetBoardGameCharacter() const
