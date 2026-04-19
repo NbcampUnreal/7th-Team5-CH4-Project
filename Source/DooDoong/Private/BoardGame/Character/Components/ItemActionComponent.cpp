@@ -108,7 +108,6 @@ void UItemActionComponent::CancelCurrentItemAction()
 			PC->Client_OpenInventory();
 		}
 	}
-	
 	ResetItemAction();
 }
 
@@ -284,7 +283,7 @@ void UItemActionComponent::RestoreCanceledItem(FName ItemID)
 	}
 	
 	// InventoryComponent가 BeginItemAction 호출 전에 수량을 1개 선차감하므로, 취소 시 다시 1개를 더한다.
-	InventoryComponent->ServerRPCAddItem(ItemID);
+	InventoryComponent->Server_AddItem(ItemID);
 	LOG_JJH(Warning, TEXT("[아이템 액션] 취소 아이템 복구 : %s"), *ItemID.ToString());
 }
 
