@@ -338,6 +338,8 @@ void ADDLobbyGameMode::TryStartBoardGame()
 	
 	LOG_KMS(Log, TEXT("게임이 시작됩니다.")); 
 	
+	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
+	GameInstance->ExpectedPlayerCount = GetParticipantCount();
 	
 	GetWorld()->ServerTravel(BoardGameMapPath);
 }
