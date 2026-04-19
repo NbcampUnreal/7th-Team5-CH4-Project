@@ -1,4 +1,4 @@
-//DDRicochetCharacter.cpp
+﻿//DDRicochetCharacter.cpp
 #include "MiniGames/Ricochet/Character/DDRicochetCharacter.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -35,6 +35,28 @@ ADDRicochetCharacter::ADDRicochetCharacter()
 	ThrowComp->SetupAttachment(GetMesh());
 }
 
+void ADDRicochetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	UE_LOG(LogTemp, Warning, TEXT("SetupInput CALLED"));
+
+	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	
+	if (!EIC)
+	{
+		UE_LOG(LogTemp, Error, TEXT("EnhancedInputComponent NULL"));
+		return;
+	}
+
+	// Preview (우클릭)
+	EIC->BindAction(IA_Preview, ETriggerEvent::Started, this, &ADDRicochetCharacter::DebugPreviewInput);
+	EIC->BindAction(IA_Preview, ETriggerEvent::Completed, this, &ADDRicochetCharacter::StopLaserPreview);
+}
+
+
+
+
 void ADDRicochetCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -52,12 +74,46 @@ void ADDRicochetCharacter::BeginPlay()
 			}
 		}
 	}
+
+	LaserPredict = NewObject<ULaserPredictComponent>(this);
+	LaserPredict->RegisterComponent();
 }
 
 bool ADDRicochetCharacter::BIsCanThrow() const
 {
 	return ProjectileClass != nullptr;
 }
+
+
+
+void ADDRicochetCharacter::DebugPreviewInput()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Preview INPUT 들어옴"));
+
+	// 여기서 바로 Preview 시작해도 됨
+	StartLaserPreview();
+}
+
+
+void ADDRicochetCharacter::StartLaserPreview()
+{
+	if (LaserPredict)
+	{
+		LaserPredict->StartPreview();
+	}
+}
+
+void ADDRicochetCharacter::StopLaserPreview()
+{
+	if (LaserPredict)
+	{
+		LaserPredict->StopPreview();
+	}
+}
+
+
+
+
 
 void ADDRicochetCharacter::TryThrow()
 {

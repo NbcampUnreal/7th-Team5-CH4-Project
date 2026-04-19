@@ -5,6 +5,8 @@
 #include "Base/Character/DDBaseCharacter.h"
 #include "MiniGames/Ricochet/Actors/DDRicochetProjectile.h"
 #include "InputMappingContext.h"
+#include "InputAction.h"
+#include "MiniGames/Ricochet/Actors/LaserPredictComponent.h"
 #include "DDRicochetCharacter.generated.h"
 
 
@@ -25,7 +27,26 @@ public:
 public:
 	virtual void BeginPlay() override;
 
+	
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<class UInputAction> IA_Preview;
 
+	UFUNCTION()
+	void DebugPreviewInput();
+
+	UPROPERTY()
+	class ULaserPredictComponent* LaserPredict;
+
+
+	void StartLaserPreview();
+	void StopLaserPreview();
+
+
+public:
+	/** 화면 중앙 기준 조준 지점 계산 */
+	bool GetAimPoint(FVector& OutTargetPoint) const;
 
 	/** 던질 수 있는 상태인지 확인 */
 	bool BIsCanThrow() const;
@@ -37,10 +58,6 @@ public:
 	/** GAS 이벤트가 애님몽타주에서 발사(던지기) 프레임에 도달한 경우 실제로 서버에서 실행 */
 	UFUNCTION(BlueprintCallable, Category = "Ricochet")
 	void HandleThrowMontageNotify();
-
-public:
-	/** 화면 중앙 기준 조준 지점 계산 */
-	bool GetAimPoint(FVector& OutTargetPoint) const;
 
 	/** 던지는 위치 반환 */
 	FVector GetThrowLocation() const;
