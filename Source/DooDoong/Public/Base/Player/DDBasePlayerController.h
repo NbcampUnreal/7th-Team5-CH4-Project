@@ -146,8 +146,4 @@ private:
 	TSubclassOf<UDDInventoryWidget> InventoryWidgetClass;
 	
 	bool bInventoryOpen;
-	
-protected:
-	UPROPERTY()
-	ADDBasePlayerState* CachedPlayerState;
 };
