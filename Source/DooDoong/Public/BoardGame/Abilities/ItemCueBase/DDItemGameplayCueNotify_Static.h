@@ -6,7 +6,6 @@
 
 class UNiagaraSystem;
 class UAnimMontage;
-class USoundBase;
 
 UCLASS(Blueprintable)
 class DOODOONG_API UDDItemGameplayCueNotify_Static : public UGameplayCueNotify_Static
@@ -27,13 +26,7 @@ protected:
 	float PlayRate = 1.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemCue|Sound")
-	TObjectPtr<USoundBase> Sound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemCue|Sound", meta = (ClampMin = "0.0"))
-	float SoundVolumeMultiplier = 1.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemCue|Sound", meta = (ClampMin = "0.0"))
-	float SoundPitchMultiplier = 1.f;
+	FName SoundID = NAME_None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemCue|VFX")
 	TObjectPtr<UNiagaraSystem> Effect;

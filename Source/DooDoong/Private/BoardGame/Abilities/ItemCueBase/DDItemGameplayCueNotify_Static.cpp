@@ -2,8 +2,8 @@
 
 #include "Animation/AnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "System/DDSoundManager.h"
 
 bool UDDItemGameplayCueNotify_Static::OnExecute_Implementation(
 	AActor* MyTarget,
@@ -59,18 +59,18 @@ void UDDItemGameplayCueNotify_Static::PlaySound(
 	const UObject* WorldContextObject,
 	const FGameplayCueParameters& Parameters) const
 {
-	if (!Sound || !WorldContextObject)
+	if (SoundID.IsNone() || !WorldContextObject)
 	{
 		return;
 	}
 
-	UGameplayStatics::PlaySoundAtLocation(
-		WorldContextObject,
-		Sound,
-		Parameters.Location,
-		SoundVolumeMultiplier,
-		SoundPitchMultiplier
-	);
+	UDDSoundManager* SoundManager = UDDSoundManager::Get(WorldContextObject);
+	if (!SoundManager)
+	{
+		return;
+	}
+
+	SoundManager->PlaySoundAtLocation(SoundID, Parameters.Location);
 }
 
 void UDDItemGameplayCueNotify_Static::SpawnEffect(
