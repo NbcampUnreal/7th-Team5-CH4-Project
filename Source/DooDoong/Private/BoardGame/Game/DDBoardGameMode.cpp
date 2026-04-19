@@ -119,6 +119,15 @@ void ADDBoardGameMode::TickState_PlayerTurn()
 		
 		if (CachedBoardGameState->GetStateTimer() == 0)
 		{
+			int32 CurrentIndex = CachedBoardGameState->GetTurnPlayerIndex();
+			if (AlivePlayerControllers.IsValidIndex(CurrentIndex))
+			{
+			  if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[CurrentIndex]))
+			  {
+			      DDPC->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_PlayerTurn);
+			  }
+			}
+			
 			LOG_CJH(Log, TEXT("[TimeOut] 턴 제한 시간 초과! 다음 플레이어로 강제 전환."));
 			SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 		}
