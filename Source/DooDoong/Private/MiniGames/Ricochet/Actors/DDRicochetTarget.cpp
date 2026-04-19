@@ -1,6 +1,6 @@
-//DDRicochetTarget.cpp
+﻿//DDRicochetTarget.cpp
 #include "MiniGames/Ricochet/Actors/DDRicochetTarget.h"
-
+#include "NiagaraFunctionLibrary.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "Common/DDLogManager.h"
 #include "Components/BoxComponent.h"
@@ -33,12 +33,18 @@ ADDRicochetTarget::ADDRicochetTarget()
 	ProjectileMovementComp->MaxSpeed = MaxSpeed;
 	ProjectileMovementComp->ProjectileGravityScale = GravityScale;
 	ProjectileMovementComp->bRotationFollowsVelocity = true;
-	ProjectileMovementComp->bShouldBounce = true;
+	ProjectileMovementComp->bShouldBounce = false;
 }
 
 void ADDRicochetTarget::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!HasAuthority())
+	{
+		// 클라는 물리 시뮬 하지 않음
+		ProjectileMovementComp->Deactivate();
+	}
 }
 
 void ADDRicochetTarget::ThrowTarget(const FVector& ThrowDirection, float Speed)
@@ -67,8 +73,15 @@ bool ADDRicochetTarget::HandleProjectileHit(ADDRicochetProjectile* RicochetProje
 	bCanGetScore = false;
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	const FVector HitLocation = GetActorLocation();
+
+	if (HitEffect)
+	{
+		MulticastHitFX();
+	}
+
 	GameMode->AddScore(ThrowerPlayerState, ScoreValue);
-	Destroy();
+	SetLifeSpan(0.2f);
 
 	const ADDBasePlayerState* DDPlayerState = Cast<ADDBasePlayerState>(ThrowerPlayerState);
 	const FName DisplayName = DDPlayerState != nullptr
@@ -80,4 +93,20 @@ bool ADDRicochetTarget::HandleProjectileHit(ADDRicochetProjectile* RicochetProje
 		ScoreValue);
 
 	return true;
+}
+
+
+
+void ADDRicochetTarget::MulticastHitFX_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("MulticastHitFX called"));
+	if (!HitEffect)
+	{
+		UE_LOG(LogTemp, Error, TEXT("HitEffect is NULL"));
+	}
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		HitEffect,
+		GetActorLocation()
+	);
 }

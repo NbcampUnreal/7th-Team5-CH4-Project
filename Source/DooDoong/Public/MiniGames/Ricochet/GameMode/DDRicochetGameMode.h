@@ -29,6 +29,7 @@ public:
 	/** 타겟 액터를 스폰 */
 	void SpawnTarget();
 
+	bool IsMiniGameStarted() const { return bIsMiniGameStarted; }
 public:
 	/** 타겟 액터 스포너를 등록 */
 	void RegisterTargetSpawner(ADDRicochetTargetSpawner* Spawner);
@@ -46,10 +47,10 @@ protected:
 	float InitialTargetSpawnDelay = 5.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ricochet|Target", meta = (ClampMin = "0.0"))
-	float TargetSpawnInterval = 3.0f;
+	float TargetSpawnInterval = 4.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ricochet|Target")
-	int32 TargetSpawnCount = 3;
+	int32 TargetSpawnCount = 1;
 
 private:
 	void HandleTargetSpawnTimer();

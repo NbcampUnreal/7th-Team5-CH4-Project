@@ -1,7 +1,7 @@
 //DDRicochetCharacter.cpp
 #include "MiniGames/Ricochet/Character/DDRicochetCharacter.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "EnhancedInputComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "Camera/CameraComponent.h"
@@ -157,6 +157,8 @@ FTransform ADDRicochetCharacter::GetProjectileSpawnTransform() const
 	return GetActorTransform();
 }
 
+
+
 void ADDRicochetCharacter::HandleThrowMontageNotify()
 {
 	LOG_JJH(Log, TEXT("[RicochetCharacter] HandleThrowMontageNotify"));
@@ -229,3 +231,7 @@ void ADDRicochetCharacter::PlayThrowMontage()
 		}
 	}
 }
+
+
+
+

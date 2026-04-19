@@ -1,5 +1,5 @@
 #include "MiniGames/Shooter/Actors/DDShooterTarget.h"
-
+#include "NiagaraFunctionLibrary.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "Common/DDLogManager.h"
 #include "Components/BoxComponent.h"

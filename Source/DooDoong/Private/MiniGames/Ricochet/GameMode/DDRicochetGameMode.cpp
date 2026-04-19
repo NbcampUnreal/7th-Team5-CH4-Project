@@ -19,6 +19,12 @@ void ADDRicochetGameMode::BeginPlay()
 	if (!HasAuthority())
 		return;
 
+	if (HasAuthority())////////////
+	{
+		bIsMiniGameStarted = false; // 혹시 모르니까 초기화
+		StartMiniGame();//////////////////////////////////
+	}
+
 	TargetSpawners.Empty();
 
 	if (UWorld* World = GetWorld())

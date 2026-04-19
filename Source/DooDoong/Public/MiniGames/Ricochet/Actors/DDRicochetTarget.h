@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "NiagaraSystem.h"
 #include "DDRicochetTarget.generated.h"
 
 class UProjectileMovementComponent;
@@ -32,6 +33,12 @@ protected:
 	/** 탄환 Overlap 판정용 콜리전 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ricochet")
 	TObjectPtr<UBoxComponent> CollisionComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	UNiagaraSystem* HitEffect;
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHitFX();
 
 	/** 표적 외형 표시용 메시. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ricochet")

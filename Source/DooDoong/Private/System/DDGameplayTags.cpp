@@ -18,7 +18,9 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_RollDice, "Input.Ability.RollDice");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Ability_Attack, "Input.Ability.Attack");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Ability_Shot, "Input.Ability.Shot", "슈터 미니게임 전용 발사 어빌리티");
-	
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Ability_Ricochet, "Input.Ability.Ricochet", "리코쳇 던지기 어빌리티");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Ability_Throw, "Input.Ability.Throw", "Throw input");
+
 	// Character State Tags
 	UE_DEFINE_GAMEPLAY_TAG(State_Character_Attacking, "State.Character.Attacking");
 	UE_DEFINE_GAMEPLAY_TAG(State_Character_Death, "State.Character.Death");
@@ -31,7 +33,9 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace_End, "Event.Trace.End");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Shooter_Fire, "Event.Shooter.Fire", "슈터 미니게임 발사 애니메이션 몽타주에서 사용할 발사 이벤트 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Item_Activate, "Event.Item.Activate", "아이템 Ability 실행 시 전달하는 이벤트 태그");
-	
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Ricochet_Throw, "Event.Ricochet.Throw", "리코쳇 투사체 던지기 몽타주 이벤트");
+
+
 	// Data Tags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Data_Health_Heal, "Data.Health.Heal", "Health Attribute를 양변화 시키는 경우 사용할 태그")
 	UE_DEFINE_GAMEPLAY_TAG(Data_Health_Damage, "Data.Health.Damage");

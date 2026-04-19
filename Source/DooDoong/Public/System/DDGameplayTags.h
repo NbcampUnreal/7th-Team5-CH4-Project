@@ -20,6 +20,8 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_RollDice);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Attack);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Shot);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Ricochet);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Ability_Throw);
 
 	// Character State Tags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Attacking);
@@ -33,6 +35,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace_End);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Shooter_Fire);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Item_Activate);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Ricochet_Throw);
 
 	// Data Tags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Health_Heal);

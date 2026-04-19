@@ -1,4 +1,4 @@
-#include "MiniGames/Ricochet/GameState/DDRicochetGameState.h"
+﻿#include "MiniGames/Ricochet/GameState/DDRicochetGameState.h"
 #include "MiniGames/Ricochet/Actors/DDRicochetTargetSpawner.h"
 
 void ADDRicochetGameState::RegisterSpawner(ADDRicochetTargetSpawner* Spawner)
@@ -20,3 +20,4 @@ void ADDRicochetGameState::UnregisterSpawner(ADDRicochetTargetSpawner* Spawner)
     UE_LOG(LogTemp, Warning, TEXT("[GS] Unregistered Spawner | Total: %d"),
         TargetSpawners.Num());
 }
+

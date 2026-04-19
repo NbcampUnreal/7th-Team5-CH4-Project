@@ -25,6 +25,8 @@ public:
 public:
 	virtual void BeginPlay() override;
 
+
+
 	/** 던질 수 있는 상태인지 확인 */
 	bool BIsCanThrow() const;
 
@@ -57,6 +59,7 @@ public:
 	TObjectPtr<UInputMappingContext> IMC_Ricochet;
 
 protected:
+
 	/** 서버 RPC: 실제 던지기 처리 */
 	UFUNCTION(Server, Reliable)
 	void Server_TryThrow(const FVector_NetQuantize& ThrowLocation, const FVector_NetQuantize& TargetPoint);

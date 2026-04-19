@@ -55,10 +55,10 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ricochet|Spawner", meta = (ClampMin = "0.0"))
-	float MinSpeed = 500.0f;
+	float MinSpeed = 3500.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ricochet|Spawner", meta = (ClampMin = "0.0"))
-	float MaxSpeed = 1500.0f;
+	float MaxSpeed = 5500.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ricochet|Spawner", meta = (ClampMin = "0.0", ClampMax = "180.0"))
 	float RandomYawAngle = 0.0f;
