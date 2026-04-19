@@ -131,15 +131,6 @@ protected:
 	/*민재 : 인벤토리 코드*/
 	
 public:
-	UFUNCTION(Client, Reliable)
-	void Client_OpenInventory();
-	
-	UFUNCTION(Client, Reliable)
-	void Client_CloseInventory();
-	
-	UFUNCTION(Client, Reliable)
-	void Client_CreateInventoryUI();
-	
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	TObjectPtr<UDDInventoryWidget> InventoryWidget;
 	

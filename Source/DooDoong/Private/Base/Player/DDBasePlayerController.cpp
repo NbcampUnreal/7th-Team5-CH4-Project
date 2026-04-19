@@ -418,37 +418,3 @@ void ADDBasePlayerController::ToggleInventoryMenu()
 		bInventoryOpen = true;
 	}
 }
-
-void ADDBasePlayerController::Client_OpenInventory_Implementation()
-{
-	if (!InventoryWidget || !IsLocalController()) return;
-	
-	InventoryWidget->SetVisibility(ESlateVisibility::Visible);
-	bInventoryOpen = true;
-}
-
-void ADDBasePlayerController::Client_CloseInventory_Implementation()
-{
-	if (!InventoryWidget || !IsLocalController()) return;
-	
-	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
-	bInventoryOpen = false;
-}
-
-void ADDBasePlayerController::Client_CreateInventoryUI_Implementation()
-{
-	/*if (!InventoryWidgetClass || !IsLocalController())
-	{
-		LOG_PMJ(Error, TEXT("Client_CreateInventoryUI_Implementation 1"));
-		return;
-	}
-	InventoryWidget = CreateWidget<UDDInventoryWidget>(this, InventoryWidgetClass);
-	if (!InventoryWidget)
-	{
-		LOG_PMJ(Error, TEXT("Client_CreateInventoryUI_Implementation 2"));
-		return;	
-	}
-	InventoryWidget->AddToViewport();
-	Client_CloseInventory();*/
-}
-

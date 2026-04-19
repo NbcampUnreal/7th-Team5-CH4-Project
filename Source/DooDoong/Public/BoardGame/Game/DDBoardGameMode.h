@@ -134,8 +134,4 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Turn")
 	TSubclassOf<UGameplayEffect> TurnWaitingEffectClass;
-	
-	/* 민재 : 임시 테스트 */
-public:
-	void InitializeInventory();
 };
