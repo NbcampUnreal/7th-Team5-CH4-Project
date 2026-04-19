@@ -15,7 +15,6 @@
 #include "GameplayEffect.h"
 #include "BoardGame/DDTile.h"
 #include "BoardGame/Game/DDBoardGameState.h"
-#include "UI/Inventory/DDInventoryComponent.h"
 
 ADDBoardGameMode::ADDBoardGameMode() {}
 
@@ -119,6 +118,28 @@ void ADDBoardGameMode::TickState_PlayerTurn()
 		
 		if (CachedBoardGameState->GetStateTimer() == 0)
 		{
+			int32 CurrentIndex = CachedBoardGameState->GetTurnPlayerIndex();
+			if (AlivePlayerControllers.IsValidIndex(CurrentIndex))
+			{
+			  if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[CurrentIndex]))
+			  {
+			      DDPC->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_PlayerTurn);
+			  }
+			}
+			
+			ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[CachedBoardGameState->GetTurnPlayerIndex()]);
+			if (DDPC)
+			{
+				// 1. UI 팝업 닫기
+				DDPC->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_PlayerTurn);
+
+				// 2. 현재 턴이었던 플레이어의 실행 중인 어빌리티 강제 종료
+				if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(DDPC))
+				{
+					ASC->CancelAllAbilities();
+				}
+			}
+			
 			LOG_CJH(Log, TEXT("[TimeOut] 턴 제한 시간 초과! 다음 플레이어로 강제 전환."));
 			SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 		}
@@ -571,14 +592,19 @@ void ADDBoardGameMode::ExecuteNextTurnTransition()
 	if (!AlivePlayerControllers.IsValidIndex(CachedBoardGameState->GetTurnPlayerIndex())) return;
 	
 	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[CachedBoardGameState->GetTurnPlayerIndex()]);
-	if (!DDPC) return;
-	
-	// TODO: 
-	// 턴넘어가기 전에 실행중인 어빌리티 다 끄는 로직
-	
-	// 턴 팝업 제거
-	DDPC->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_PlayerTurn);
-	SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
+	if (DDPC)
+	{
+		// 1. UI 팝업 닫기
+		DDPC->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_PlayerTurn);
+
+		// 2. 현재 턴이었던 플레이어의 실행 중인 어빌리티 강제 종료
+		if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(DDPC))
+		{
+			ASC->CancelAllAbilities();
+		}
+		
+		SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
+	}
 }
 
 void ADDBoardGameMode::TravelToLobby()
