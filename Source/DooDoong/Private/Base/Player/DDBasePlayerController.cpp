@@ -37,6 +37,11 @@ void ADDBasePlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(DefaultIMC, 0);
 	}
+	
+	if (IsLocalController())
+	{
+		Server_NotifyClientLoaded();
+	}
 }
 
 void ADDBasePlayerController::SetupInputComponent()
@@ -197,6 +202,14 @@ void ADDBasePlayerController::Client_SetMouseCursorVisible_Implementation(bool b
         FInputModeGameOnly Mode;
         SetInputMode(Mode);
     }
+}
+
+void ADDBasePlayerController::Server_NotifyClientLoaded_Implementation()
+{
+	if (ADDBasePlayerState* PS = GetCachedPlayerState())
+	{
+		PS->bHasClientLoaded = true;
+	}
 }
 
 void ADDBasePlayerController::OnMouseClick()

@@ -66,6 +66,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_SelectTile(ADDSelectableTileActor* TileActor);
 	
+	UFUNCTION(Server, Reliable)
+	void Server_NotifyClientLoaded();
+	
 	void OnMouseClick();
 
 public:

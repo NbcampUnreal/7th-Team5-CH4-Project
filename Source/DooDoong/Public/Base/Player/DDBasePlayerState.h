@@ -104,6 +104,10 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerGameData, VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
 	FPlayerGameplayInfo PlayerGameData;
 	
+	/** 이 플레이어의 클라이언트 맵 로딩 및 스폰이 완전히 끝났는지 식별 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
+	bool bHasClientLoaded = false;
+	
 protected:
 	UFUNCTION()
     void OnRep_PlayerGameData();

@@ -69,19 +69,42 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 
 void ADDBoardGameMode::TickState_WaitingForPlayers()
 {
-	bool bAllReady = true;
+	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
+	if (!GameInstance) return;
+
+	// 1. 로비에서 넘어오기로 약속된 '총 예상 인원'
+	int32 ExpectedPlayers = GameInstance->ExpectedPlayerCount;
+
+	// 혹시 값이 세팅 안 되어있을 경우를 대비한 방어 코드
+	if (ExpectedPlayers <= 0) ExpectedPlayers = CachedBoardGameState->GetMinPlayerCount();
+
+	// 2. 아직 약속된 인원수만큼 서버에 접속조차 못 했다면 무조건 대기
+	if (AlivePlayerControllers.Num() < ExpectedPlayers) 
+	{
+		return; 
+	}
+
+	// 3. 접속한 인원 중 로딩이 완벽하게 끝난 인원수 카운트
+	int32 FullyLoadedPlayerCount = 0;
+
 	for (APlayerController* PC : AlivePlayerControllers)
 	{
-		if (!IsValid(PC->PlayerState))
+		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC))
 		{
-			bAllReady = false;
-			break;
+			ADDBasePlayerState* PS = DDPC->GetCachedPlayerState();
+			
+			// PlayerState 유효 + 클라이언트 로딩 완료 통보 + 캐릭터 빙의 완료 확인
+			if (PS && PS->bHasClientLoaded && IsValid(DDPC->GetPawn()))
+			{
+				FullyLoadedPlayerCount++;
+			}
 		}
 	}
 
-	if (bAllReady)
+	// 4. 약속된 인원 모두가 100% 로딩을 완료했는가?
+	if (FullyLoadedPlayerCount == ExpectedPlayers)
 	{
-		LOG_CJH(Log, TEXT("[GameLoop] %d명 접속 완료! Init 상태 진입."), AlivePlayerControllers.Num());
+		LOG_CJH(Log, TEXT("[GameLoop] 로비에서 넘어온 %d명 전원 로딩 완료! Init 상태 진입."), ExpectedPlayers);
 		SetMatchState(DDGameplayTags::State_BoardGame_Init);
 	}
 }
@@ -449,13 +472,55 @@ void ADDBoardGameMode::Logout(AController* Exiting)
 	APlayerController* ExitingPC = Cast<APlayerController>(Exiting);
 	if (!IsValid(ExitingPC)) return;
 
-	bool bWasCurrentTurn = (AlivePlayerControllers.IsValidIndex(CachedBoardGameState->GetTurnPlayerIndex()) && AlivePlayerControllers[CachedBoardGameState->GetTurnPlayerIndex()] == ExitingPC);
+	int32 ExitingIndex = AlivePlayerControllers.Find(ExitingPC);
+	bool bWasCurrentTurn = (CachedBoardGameState && ExitingIndex == CachedBoardGameState->GetTurnPlayerIndex());
 	AlivePlayerControllers.Remove(ExitingPC);
 
+	if (CachedBoardGameState && AlivePlayerControllers.Num() < CachedBoardGameState->GetMinPlayerCount())
+	{
+		FGameplayTag CurrentState = CachedBoardGameState->GetBoardMatchState();
+
+		// 1-1. 대기실 상태였다면: 조기 종료할 필요 없이 자연스럽게 틱(Tick)에서 대기 상태 유지
+		if (!CurrentState.IsValid())
+		{
+			Super::Logout(Exiting);
+			return;
+		}
+
+		// 1-2. 이미 정상적인 종료 과정 중이라면 중복 실행 방지
+		if (CurrentState == DDGameplayTags::State_BoardGame_Ending || CurrentState == DDGameplayTags::State_BoardGame_End)
+		{
+			Super::Logout(Exiting);
+			return;
+		}
+
+		// 1-3. 게임 진행 중 인원 미달: 조기 종료(기권 승) 후 결과창으로 즉시 이동!
+		LOG_CJH(Warning, TEXT("진행 중 인원 미달 발생! 남은 인원으로 조기 종료 후 결과창을 표시합니다."));
+		
+		GetWorldTimerManager().ClearTimer(TurnTransitionTimerHandle); // 혹시 돌고 있을 턴 딜레이 취소
+
+		// 남은 플레이어들에게 안내
+		for (APlayerController* PC : AlivePlayerControllers)
+		{
+			if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC))
+			{
+				DDPC->Client_DrawErrorMessage(TEXT("상대방의 이탈로 게임이 조기 종료되었습니다."), 3.0f);
+			}
+		}
+
+		// CalculateFinalWinner를 호출하게 만들어 남은 사람들끼리 정렬하여 1등을 부여함
+		SetMatchState(DDGameplayTags::State_BoardGame_Ending); 
+		Super::Logout(Exiting);
+		return;
+	}
+	
 	if (bWasCurrentTurn)
 	{
 		GetWorldTimerManager().ClearTimer(TurnTransitionTimerHandle);
-		if (CachedBoardGameState->GetTurnPlayerIndex() >= AlivePlayerControllers.Num()) ProcessRoundTransition();
+		if (CachedBoardGameState->GetTurnPlayerIndex() >= AlivePlayerControllers.Num())
+		{
+			ProcessRoundTransition();
+		}
 		else
 		{
 			// 턴 보정 후 재생성
