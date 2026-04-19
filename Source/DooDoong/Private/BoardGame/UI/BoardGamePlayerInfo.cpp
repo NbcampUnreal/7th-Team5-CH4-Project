@@ -1,5 +1,4 @@
 #include "BoardGame/UI/BoardGamePlayerInfo.h"
-
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 #include "AbilitySystem/Attributes/DDPointSet.h"
 #include "Base/Player/DDBasePlayerState.h"
@@ -18,6 +17,9 @@ void UBoardGamePlayerInfo::InitializePlayerInfo(APlayerState* PlayerState)
 	if(PlayerNameText)
 	{
 		PlayerNameText->SetText(FText::FromName(CurrentPlayerState->GetPlayerDisplayName()));
+		
+		PlayerColor = CurrentPlayerState->PlayerGameData.PlayerColor; 
+		PlayerNameText->SetColorAndOpacity(PlayerColor);
 	}
 	
 	if (UDDHealthSet* HealthSet = CurrentPlayerState->GetHealthSet())

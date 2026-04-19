@@ -29,18 +29,21 @@ protected:
 	UFUNCTION()
 	void UpdateTrophyCount(int32 Trophy);
 	
-public:
+protected:
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* PlayerNameText; 
+	TObjectPtr<UTextBlock> PlayerNameText; 
 	
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* HealthText;
+	TObjectPtr<UTextBlock> HealthText;
 	
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TrophyText;
+	TObjectPtr<UTextBlock> TrophyText;
 	
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* CoinText;
+	TObjectPtr<UTextBlock> CoinText;
+	
+	UPROPERTY()
+	FLinearColor PlayerColor = FLinearColor::White;
 	
 protected:
 	UPROPERTY()

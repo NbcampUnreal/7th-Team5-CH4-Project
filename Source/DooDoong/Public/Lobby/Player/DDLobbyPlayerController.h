@@ -3,10 +3,11 @@
 #include "Base/Player/DDBasePlayerController.h"
 #include "DDLobbyPlayerController.generated.h"
 
+class ADDBasePlayerState;
 class UUserWidget;
 
 UCLASS()
-class ADDLobbyPlayerController : public ADDBasePlayerController
+class DOODOONG_API ADDLobbyPlayerController : public ADDBasePlayerController
 {
 	GENERATED_BODY()
 	
@@ -28,8 +29,8 @@ public:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_RequestReady(bool bIsReady); 
-
+	
 public:
-	// 입력 모드 토글 함수 (UIOnly <-> GameOnly) 
-	void ToggleUIInputMode(bool bUIOnly);	
+	UFUNCTION()
+	void OnCountdownChanged(int32 NewCountdown);
 };

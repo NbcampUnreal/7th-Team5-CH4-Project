@@ -38,7 +38,7 @@ public:
 	UButton* ReadyButton;
 	
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* ButtonText;
+	UTextBlock* ReadyButtonText;
 	
 	UPROPERTY(meta = (BindWidget))
 	UImage* ThumbnailImage;

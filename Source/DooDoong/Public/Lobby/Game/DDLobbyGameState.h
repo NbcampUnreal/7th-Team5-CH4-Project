@@ -4,6 +4,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "DDLobbyGameState.generated.h"
 
+class ADDLobbyPlayerController;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReadyCountChanged, int32, ReadyCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerCountChanged, int32, PlayerCount);
@@ -53,6 +54,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnCountDownChanged OnCountDownChanged;
+
+
+	
 	
 };
 

@@ -8,10 +8,10 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMiniGameReadyStateChanged, int32, ReadyPlayerCount, int32, TotalParticipantCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGameReadyEntriesChanged, const TArray<FMiniGameReadyEntry>&, ReadyEntries);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMiniGameScoreBoardChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemainingTimeChanged, const float, RemainingTimeSeconds);
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGameStateTagChanged, FGameplayTag, StateTag);
+
 UCLASS()
 class DOODOONG_API ADDMiniGameStateBase : public ADDGameStateBase
 {
@@ -121,6 +121,9 @@ public:
 	/** ScoreBoard가 갱신되면 UI도 갱신하기 위함 */
 	UFUNCTION()
 	void OnRep_ScoreBoard();
+	
+	UFUNCTION()
+	void OnRep_RemainingTimeSeconds(); 
 
 public:
 	/** 준비상태 변화 헬퍼 */
@@ -138,7 +141,7 @@ protected:
 	FGameplayTag CurrentState = DDGameplayTags::State_MiniGame_Idle;
 	
 	/** 남은 시간 */
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
+	UPROPERTY(ReplicatedUsing=OnRep_RemainingTimeSeconds, Replicated, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
 	float RemainingTimeSeconds = 0.f;
 	
 	/** 참가자 정보를 담은 배열 */
@@ -160,4 +163,7 @@ protected:
 	/** 플레이어별 준비 상태 */
 	UPROPERTY(ReplicatedUsing=OnRep_ReadyEntries, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame|Ready")
 	TArray<FMiniGameReadyEntry> ReadyEntries;
+	
+public:
+	FRemainingTimeChanged OnRemainingTimeChanged;
 };

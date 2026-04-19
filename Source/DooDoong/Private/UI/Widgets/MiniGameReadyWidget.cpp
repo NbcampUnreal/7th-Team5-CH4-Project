@@ -1,6 +1,7 @@
 #include "UI/Widgets/MiniGameReadyWidget.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "Base/MiniGame/DDMiniGameStateBase.h"
+#include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/MultiLineEditableTextBox.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
@@ -54,6 +55,17 @@ void UMiniGameReadyWidget::OnReadyButtonClicked()
 	if (!PC) return;
 	
 	PC->Server_RequestPlayerReady();
+
+	if (ReadyStateText)
+	{
+		ReadyButton->SetIsEnabled(false);
+	}
+	
+	if (ReadyButtonText)
+	{
+		FString ReadyString = FString(TEXT("준비 완료"));
+		ReadyButtonText->SetText(FText::FromString(ReadyString));
+	}
 }
 
 void UMiniGameReadyWidget::OnReadyStateChanged(int32 ReadyCount, int32 TotalCount)

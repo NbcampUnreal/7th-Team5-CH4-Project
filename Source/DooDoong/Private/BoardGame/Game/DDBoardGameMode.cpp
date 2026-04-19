@@ -573,6 +573,9 @@ void ADDBoardGameMode::ExecuteNextTurnTransition()
 	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[CachedBoardGameState->GetTurnPlayerIndex()]);
 	if (!DDPC) return;
 	
+	// TODO: 
+	// 턴넘어가기 전에 실행중인 어빌리티 다 끄는 로직
+	
 	// 턴 팝업 제거
 	DDPC->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_PlayerTurn);
 	SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);

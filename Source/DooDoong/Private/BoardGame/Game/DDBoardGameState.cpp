@@ -47,6 +47,18 @@ void ADDBoardGameState::BeginPlay()
 	}
 }
 
+void ADDBoardGameState::AddPlayerState(APlayerState* PlayerState)
+{
+	Super::AddPlayerState(PlayerState);
+	OnPlayerArrayChanged.Broadcast();
+}
+
+void ADDBoardGameState::RemovePlayerState(APlayerState* PlayerState)
+{
+	Super::RemovePlayerState(PlayerState);
+	OnPlayerArrayChanged.Broadcast();
+}
+
 void ADDBoardGameState::OnSequenceFinished()
 {
 	if (!HasAuthority()) return; // 서버 체크

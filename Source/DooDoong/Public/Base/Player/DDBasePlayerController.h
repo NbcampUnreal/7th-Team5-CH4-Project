@@ -7,6 +7,7 @@
 #include "Base/Player/DDBasePlayerState.h"
 #include "DDBasePlayerController.generated.h"
 
+class ADDBasePlayerState;
 struct FInputActionValue;
 
 class UInputMappingContext;

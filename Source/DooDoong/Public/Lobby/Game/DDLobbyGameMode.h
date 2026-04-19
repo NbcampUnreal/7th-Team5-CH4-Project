@@ -1,12 +1,35 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DDLobbyGameState.h"
 #include "GameFramework/GameModeBase.h"
 #include "DDLobbyGameMode.generated.h"
 
 class ADDLobbyGameState;
 class UDDUIConfig;
 class ADDLobbyPlayerController;
+
+UENUM()
+enum class ELobbyPlayerRole : uint8
+{
+	Participant,  // 참가자
+	Spectator,    // 관전자
+};
+
+USTRUCT(BlueprintType)
+struct FLobbyParticipantInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TObjectPtr<ADDLobbyPlayerController> Controller = nullptr;
+
+	UPROPERTY()
+	bool bIsReady = false;
+	
+	UPROPERTY()
+	ELobbyPlayerRole Role = ELobbyPlayerRole::Participant;
+};
 
 UCLASS()
 class DOODOONG_API ADDLobbyGameMode : public AGameModeBase
@@ -18,9 +41,9 @@ public:
 	
 	virtual void InitGameState() override;
 	
-	virtual void GenericPlayerInitialization(AController* C) override;
-	
 	virtual void Logout(AController* Exiting) override;
+	
+	virtual void GenericPlayerInitialization(AController* C) override;
 	
 	/** 플레이어 등록 시도 (성공 시 true) */
 	bool TryRegisterPlayerNickname(ADDLobbyPlayerController* Requester, const FName& Nickname, FString& ErrorMessage);
@@ -28,6 +51,8 @@ public:
 	/** 컨트롤러에서 레디 요청 */
 	void RequestPlayerReady(ADDLobbyPlayerController* Requester, bool bReady);
 
+	void AssignPlayerRole(ADDLobbyPlayerController* Requester, ELobbyPlayerRole RequestedRole = ELobbyPlayerRole::Participant);
+	
 protected:
 	virtual void BeginPlay() override;
 	
@@ -40,11 +65,11 @@ protected:
 	void SetPlayerAsSpectator(APlayerController* InPlayerController);
 	
 	/** 게임 시작 카운트 다운 */
-	void StartPlayCountDown(float InSeconds); 
+	void StartBoardGameCountdown(float InSeconds); 
 	
 	/** 카운트 다운 콜백 */
 	UFUNCTION()
-	void OnMainTimerElapsed();
+	void OnCountdownTick();
 
 	/** 보드게임 시작 여부 확인 */
 	bool CanStartBoardGame(FString& ErrorMessage);
@@ -55,32 +80,33 @@ protected:
 	/** 중복되지 않는 랜덤 색상을 반환하고 배열에서 제거하는 함수 */
 	FLinearColor GetRandomAvailableColor();
 	
+	/** 현재 참가자 수 */
+	int32 GetParticipantCount() const;
+	
+	/** 컨트롤러로 플레이어 정보가져오기 */
+	FLobbyParticipantInfo* FindParticipant(ADDLobbyPlayerController* Requester);
+	
 private:
-	UPROPERTY() /** 전체 참가자 */
-	TArray<TObjectPtr<ADDLobbyPlayerController>> Participants;
+	UPROPERTY(EditDefaultsOnly, Category= "UI")
+	TObjectPtr<UDDUIConfig> LobbyUIConfig;
 	
-	UPROPERTY() /** 준비 완료된 참가자 */
-	TArray<TObjectPtr<ADDLobbyPlayerController>> ReadyParticipants;
+	UPROPERTY(EditDefaultsOnly, Category = "GameSettings", meta=(DisplayName="보드게임 맵 경로"))
+	FString BoardGameMapPath = TEXT("/Game/DooDoong/Map/L_BoardMap?listen");
 	
-	UPROPERTY() /** 관전자 */
-	TArray<TObjectPtr<ADDLobbyPlayerController>> Spectators;
-
+	UPROPERTY()  // 로비에 있는 플레이어 정보들 (컨트롤러 / 준비 여부 / 관전자 여부 ) 
+	TArray<FLobbyParticipantInfo> Participants; 
+	
 	UPROPERTY() /** 로비 게임 스테이트 */
 	TObjectPtr<ADDLobbyGameState> CachedGameState = nullptr;
 	
-private:
+protected:
 	/** 카운트 다운 타이머 핸들*/
 	FTimerHandle StartTimerHandle;
 	
 	/** 카운트 다운 시작 초 */
 	UPROPERTY(EditDefaultsOnly, Category = "GameSettings", meta=(DisplayName="N초 후 게임 시작"))
 	float StartCountdownSeconds = 5.f; 
-
-private:
-	UPROPERTY(EditDefaultsOnly, Category = "GameSettings", meta=(DisplayName="보드게임 맵 경로"))
-	FString BoardGameMapPath = TEXT("/Game/DooDoong/Map/L_BoardMap?listen");
 	
-protected:
 	UPROPERTY(EditDefaultsOnly, Category = "GameSettings|Color", meta=(DisplayName="기본 플레이어 색상 목록"))
     TArray<FLinearColor> DefaultPlayerColors;
 	
@@ -92,7 +118,5 @@ protected:
 		FLinearColor(1.0f, 0.305f, 0.254f, 1.0f),
 	};
 
-protected:
-	UPROPERTY(EditDefaultsOnly, Category= "UI")
-	TObjectPtr<UDDUIConfig> LobbyUIConfig;
+
 };

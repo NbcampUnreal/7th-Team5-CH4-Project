@@ -1,7 +1,4 @@
 #include "Lobby/Game/DDLobbyGameState.h"
-
-#include "SNegativeActionButton.h"
-#include "SWarningOrErrorBox.h"
 #include "Common/DDLogManager.h"
 #include "Net/UnrealNetwork.h" 
 
@@ -35,3 +32,5 @@ void ADDLobbyGameState::OnRep_CountDown()
 {
 	OnCountDownChanged.Broadcast(CountDown);
 }
+
+

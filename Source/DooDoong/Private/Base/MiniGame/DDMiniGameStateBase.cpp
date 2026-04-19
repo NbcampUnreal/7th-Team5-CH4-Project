@@ -141,6 +141,11 @@ void ADDMiniGameStateBase::OnRep_ScoreBoard()
 	BroadcastScoreBoardChanged();
 }
 
+void ADDMiniGameStateBase::OnRep_RemainingTimeSeconds()
+{
+	OnRemainingTimeChanged.Broadcast(RemainingTimeSeconds);
+}
+
 void ADDMiniGameStateBase::BroadcastScoreBoardChanged()
 {
 	OnMiniGameScoreBoardChanged.Broadcast();
