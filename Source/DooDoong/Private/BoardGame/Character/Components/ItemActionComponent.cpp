@@ -6,6 +6,7 @@
 #include "Base/Player/DDBasePlayerController.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Common/DDLogManager.h"
+#include "Data/ItemPayloadObject.h"
 #include "Net/UnrealNetwork.h"
 #include "System/DDGameplayTags.h"
 #include "UI/Inventory/DDInventoryComponent.h"
@@ -23,7 +24,7 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 		LOG_JJH(Warning, TEXT("[아이템 액션] 이미 아이템 액션 중입니다."));
 		return;
 	}
-	
+	ItemRowData = ItemRow;
 	ActiveItemID = ItemRow.ItemID;
 	ActiveItemTag = ItemRow.ItemTag;
 	ActiveItemAbilityTag = ItemRow.ItemAbilityTag;
@@ -225,12 +226,15 @@ bool UItemActionComponent::TryActivateItemAbility(FName ItemID, FGameplayTag Ite
 		return false;
 	}
 	
+	UItemPayloadObject* PayloadObj = NewObject<UItemPayloadObject>(this);
+	PayloadObj->ItemRow = ItemRowData;
+
 	// 아이템 확성화 이벤트 태그를 발송
 	FGameplayEventData EventData;
 	EventData.EventTag = DDGameplayTags::Event_Item_Activate;
 	EventData.Instigator = OwnerCharacter;
 	EventData.Target = TargetActor;
-	EventData.OptionalObject = this;
+	EventData.OptionalObject = PayloadObj;
 
 	const bool bTriggered = AbilitySystemComp->TriggerAbilityFromGameplayEvent(
 		ItemAbilitySpec->Handle,
