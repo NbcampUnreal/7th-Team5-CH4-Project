@@ -5,6 +5,7 @@
 #include "UI/Inventory/DDInventoryComponent.h"
 #include "UI/Inventory/DDInventoryWidget.h"
 #include "Components/Button.h"
+#include "UI/Inventory/DDInvenGridSlot.h"
 
 void UDDItemUseButtonWidget::NativeOnInitialized()
 {
@@ -33,7 +34,7 @@ void UDDItemUseButtonWidget::UseButton()
 {
 	if (GetOwningLocalPlayer())
 	{
-		InventoryComponent->ServerRPCUseItem(CurrentItemSlotName);
+		InventoryComponent->Server_UseItem(CurrentItemSlotName);
 		this->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
@@ -42,6 +43,11 @@ void UDDItemUseButtonWidget::CancelButton()
 {
 	if (GetOwningLocalPlayer())
 	{
+		UDDInvenGridSlot* ParentGridSlot = Cast<UDDInvenGridSlot>(GetParent());
+		if (ParentGridSlot != nullptr)
+		{
+			ParentGridSlot->BT_ClickItem->SetIsEnabled(true);
+		}
 		this->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
