@@ -106,7 +106,7 @@ void UItemActionComponent::CancelCurrentItemAction()
 		if (AController* OwnerController = OwnerCharacter->GetController())
 		{
 			ADDBasePlayerController* PC = Cast<ADDBasePlayerController>(OwnerController);
-			PC->Client_OpenInventory();
+			PC->Client_OpenPopUp(DDGameplayTags::BoardGame_UI_Inventory); 
 		}
 	}
 	ResetItemAction();
