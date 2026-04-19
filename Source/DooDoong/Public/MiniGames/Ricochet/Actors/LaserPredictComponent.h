@@ -2,39 +2,40 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Components/SplineComponent.h"
-#include "Components/SplineMeshComponent.h"
 #include "LaserPredictComponent.generated.h"
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DOODOONG_API ULaserPredictComponent : public UActorComponent
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    ULaserPredictComponent();
-
-    virtual void BeginPlay() override;
-    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-    void StartPreview();
-    void StopPreview();
+	ULaserPredictComponent();
 
 protected:
+	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-    void UpdatePreview();
-    void BuildPath(TArray<FVector>& OutPoints);
-    void BuildSpline(const TArray<FVector>& Points);
+public:
+	void StartPreview();
+	void StopPreview();
 
-protected:
+private:
+	void UpdatePreview();
+	void BuildPath(TArray<FVector>& OutPoints);
+	void DrawDashedLine(const TArray<FVector>& Points);
 
-    UPROPERTY()
-    USplineComponent* Spline;
+private:
+	bool bIsHolding = false;
 
-    TArray<USplineMeshComponent*> Meshes;
+	float CurrentLength = 0.f;
 
-    bool bIsActive = false;
+	UPROPERTY(EditAnywhere)
+	float GrowthSpeed = 2000.f;
 
-    float MaxDistance = 8000.f;
-    int MaxBounces = 5;
+	UPROPERTY(EditAnywhere)
+	float MaxDistance = 5000.f;
+
+	UPROPERTY(EditAnywhere)
+	int32 MaxBounces = 5;
 };
