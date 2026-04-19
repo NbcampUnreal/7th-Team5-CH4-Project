@@ -25,7 +25,7 @@ void ADDBoardGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ADDBoardGameState, BoardMatchStateTag);
 	DOREPLIFETIME(ADDBoardGameState, TurnPlayerIndex);
 	DOREPLIFETIME(ADDBoardGameState, StateTimer);
-	DOREPLIFETIME(ADDBoardGameState, RemainingRound);
+	DOREPLIFETIME(ADDBoardGameState, CurrentRound);
 	DOREPLIFETIME(ADDBoardGameState, FinalRankings);
 }
 
@@ -45,6 +45,18 @@ void ADDBoardGameState::BeginPlay()
 		LevelSequenceActor = Cast<ALevelSequenceActor>(FoundActors[0]);
 		LOG_CYS(Warning,TEXT("[GS] 인트로 시퀀서 찾음"));
 	}
+}
+
+void ADDBoardGameState::AddPlayerState(APlayerState* PlayerState)
+{
+	Super::AddPlayerState(PlayerState);
+	OnPlayerArrayChanged.Broadcast();
+}
+
+void ADDBoardGameState::RemovePlayerState(APlayerState* PlayerState)
+{
+	Super::RemovePlayerState(PlayerState);
+	OnPlayerArrayChanged.Broadcast();
 }
 
 void ADDBoardGameState::OnSequenceFinished()
@@ -99,9 +111,9 @@ void ADDBoardGameState::OnRep_StateTimer()
 	OnStateTimerChanged.Broadcast(StateTimer);
 }
 
-void ADDBoardGameState::OnRep_RemainingRound()
+void ADDBoardGameState::OnRep_CurrentRound()
 {
-	OnRoundChanged.Broadcast(RemainingRound);
+	OnRoundChanged.Broadcast(CurrentRound);
 }
 
 void ADDBoardGameState::OnRep_FinalRankings()

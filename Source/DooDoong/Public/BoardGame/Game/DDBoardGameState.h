@@ -26,6 +26,7 @@ struct FFinalRankData
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFinalRankingsUpdated, const TArray<FFinalRankData>&, Rankings);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateTimerChanged, int32, NewTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoundChanged, int32, NewRound);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerArrayChanged);
 
 class ALevelSequenceActor;
 
@@ -60,6 +61,11 @@ public:
 	FORCEINLINE void SetFinalRankings(const TArray<FFinalRankData>& InRankings) { FinalRankings = InRankings; }
 
 	FORCEINLINE int32 GetMinPlayerCount() const { return MinPlayerCount; }
+public:
+	virtual void AddPlayerState(APlayerState* PlayerState) override;
+	virtual void RemovePlayerState(APlayerState* PlayerState) override;
+
+	
 public:
 	// --- 고정 데이터 (Read-Only) ---
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="플레이어 턴 최소 인원 수"))
@@ -101,7 +107,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnFinalRankingsUpdated OnFinalRankingsUpdated;
-
+	
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnPlayerArrayChanged OnPlayerArrayChanged;
 protected:
 	UFUNCTION()
 	void OnRep_StateTimer();
