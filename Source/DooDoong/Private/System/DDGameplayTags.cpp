@@ -111,6 +111,7 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_HealingKit, "Item.Ability.HealingKit", "힐링 키트 아이템 어빌리티");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_GiveBomb, "Item.Ability.GiveBomb", "폭탄 넘기기 아이템 어빌리티");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_Magnet, "Item.Ability.Magnet", "자석 아이템 어빌리티");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_MeleeDamage, "Item.Ability.MeleeDamage", "근거리공격 아이템 어빌리티");
 	
 	// 아이템 액션 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Targeting, "State.ItemAction.Targeting", "아이템 타겟 선택 중");
