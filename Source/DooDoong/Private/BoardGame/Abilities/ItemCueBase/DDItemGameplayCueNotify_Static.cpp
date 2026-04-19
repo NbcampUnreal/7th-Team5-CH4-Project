@@ -1,7 +1,6 @@
 #include "BoardGame/Abilities/ItemCueBase/DDItemGameplayCueNotify_Static.h"
 
 #include "Animation/AnimInstance.h"
-#include "Animation/AnimSequenceBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
@@ -21,7 +20,7 @@ bool UDDItemGameplayCueNotify_Static::OnExecute_Implementation(
 
 void UDDItemGameplayCueNotify_Static::PlayAnimation(const FGameplayCueParameters& Parameters) const
 {
-	if (!Animation)
+	if (!Montage)
 	{
 		return;
 	}
@@ -44,13 +43,16 @@ void UDDItemGameplayCueNotify_Static::PlayAnimation(const FGameplayCueParameters
 		return;
 	}
 
-	AnimInstance->PlaySlotAnimationAsDynamicMontage(
-		Animation,
-		AnimationSlotName,
-		BlendInTime,
-		BlendOutTime,
-		PlayRate
-	);
+	const float MontageLength = AnimInstance->Montage_Play(Montage, PlayRate);
+	if (MontageLength <= 0.f)
+	{
+		return;
+	}
+
+	if (!MontageStartSection.IsNone())
+	{
+		AnimInstance->Montage_JumpToSection(MontageStartSection, Montage);
+	}
 }
 
 void UDDItemGameplayCueNotify_Static::PlaySound(

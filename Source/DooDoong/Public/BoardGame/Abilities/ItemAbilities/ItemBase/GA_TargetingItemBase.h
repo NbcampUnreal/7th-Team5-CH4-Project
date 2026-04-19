@@ -76,4 +76,8 @@ protected:
 	/** Target 없이 활성화되어 입력을 기다리는 상태인지 여부. true가 되면 효과적용 */
 	UPROPERTY()
 	bool bSelectingTarget = false;
+	
+	/** 타겟에게 재생할 GameplayCue 태그 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item|Cue")
+	FGameplayTag TargetCueTag;
 };

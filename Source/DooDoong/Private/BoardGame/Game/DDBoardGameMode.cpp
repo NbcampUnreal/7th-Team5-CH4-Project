@@ -204,6 +204,10 @@ void ADDBoardGameMode::HandleState_Init()
 	}
 	else
 	{
+		if (CachedBoardGameState)
+		{
+			CachedBoardGameState->Multicast_PlayBoardBGM();
+		}
 		CheckWinCondition();
 	}
 }

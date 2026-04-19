@@ -63,5 +63,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "GAS")
 	float EffectValue = 0;
 
+	/** 타겟에게 재생할 GameplayCue 태그 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item|Cue")
+	FGameplayTag TargetCueTag;
+
 	float TotalDrainedAmount = 0;
 };

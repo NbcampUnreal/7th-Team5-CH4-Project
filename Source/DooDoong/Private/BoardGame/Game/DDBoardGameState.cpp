@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "System/DDGameplayTags.h"
+#include "System/DDSoundManager.h"
 
 ADDBoardGameState::ADDBoardGameState()
 {
@@ -66,10 +67,29 @@ void ADDBoardGameState::Multicast_PlaySequence_Implementation()
 			// 서버에서만 바인딩 (중요)
 			if (HasAuthority())
 			{
-				SequencePlayer->OnFinished.AddDynamic(this, &ADDBoardGameState::OnSequenceFinished);
+				SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::OnSequenceFinished);
 			}
+			SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::PlayBoardBGMLocal);
 			SequencePlayer->Play();
 		}
+	}
+}
+
+void ADDBoardGameState::Multicast_PlayBoardBGM_Implementation()
+{
+	PlayBoardBGMLocal();
+}
+
+void ADDBoardGameState::PlayBoardBGMLocal()
+{
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		return;
+	}
+
+	if (UDDSoundManager* SoundMgr = UDDSoundManager::Get(this))
+	{
+		SoundMgr->PlayBGM("BGM_Board", 0.5f);
 	}
 }
 
