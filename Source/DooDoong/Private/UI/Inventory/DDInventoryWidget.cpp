@@ -53,7 +53,7 @@ void UDDInventoryWidget::GenerationGrid()
 			UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(CanvasPanel->AddChild(GridSlot));
 			
 			const float SlotSizeX = 200.f;
-			const float SlotSizeY = 150.f;
+			const float SlotSizeY = 200.f;
 			const float SpacingX = 100.f;
 			
 			if (CanvasSlot)

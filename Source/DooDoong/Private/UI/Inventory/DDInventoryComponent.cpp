@@ -7,14 +7,14 @@
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
 #include "Net/UnrealNetwork.h"
-
+#include "System/DDGameplayTags.h"
 
 
 UDDInventoryComponent::UDDInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicatedByDefault(true);
-	OwningController = Cast<ADDBasePlayerController>(GetOwner());
+	
 }
 
 
@@ -27,6 +27,8 @@ void UDDInventoryComponent::BeginPlay()
 		Server_AddItem("HealingKit");
 		Server_AddItem("Magnet");
 	}
+	
+	OwningController = Cast<ADDBasePlayerController>(GetOwner());
 }
 
 void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
@@ -123,11 +125,13 @@ void UDDInventoryComponent::Server_AddItem_Implementation(FName ItemName)
 {
 	LOG_PMJ(Warning, TEXT("ServerRPCAddItem 진입"));
 	if (!GetOwner()->HasAuthority()) return;
+	
 	if (InventoryItemDatas.IsEmpty())
 	{
 		LOG_PMJ(Warning, TEXT("인벤데이터가 비어있습니다"));
 		return;
 	}
+	
 	for (FInventoryItemData& InventoryItemData : InventoryItemDatas)
 	{
 		if (InventoryItemData.ItemName == ItemName)
@@ -147,26 +151,18 @@ void UDDInventoryComponent::Server_UseItem_Implementation(const FName& ItemSlotN
 		if (ItemDatas.ItemName == ItemSlotName)
 		{
 			LOG_PMJ(Error, TEXT("====== 사용아이템존재 ======"));
-			if (OwningController)
-			{
-				LOG_PMJ(Error, TEXT("====== 컨트롤러존재 ======"));
-				if (ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(OwningController->GetCharacter()))
-				{
-					LOG_PMJ(Error, TEXT("====== 폰존재 ======"));
-					if (UItemActionComponent* IAC = Character->FindComponentByClass<UItemActionComponent>())
-					{
-						LOG_PMJ(Error, TEXT("====== IAC존재 ======"));
-					}
-				}
-			}
-			//if (!IsValid(IAC)) return;
-			/*FItemTableRow& CurrentItemDataRow = *GetItemData(ItemDatas.ItemName);
+			
+			ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(OwningController->GetCharacter());
+			if (!IsValid(Character)) return;
+			UItemActionComponent* IAC = Character->FindComponentByClass<UItemActionComponent>();
+			if (!IsValid(IAC)) return;
+			FItemTableRow& CurrentItemDataRow = *GetItemData(ItemDatas.ItemName);
 			IAC->BeginItemAction(CurrentItemDataRow);
 			ItemDatas.ItemCount--;
-			RefreshInventory();*/
+			RefreshInventory();
 		}
 	}
-	OwningController->Client_CloseInventory();
+	OwningController->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_Inventory);
 }
 
 FName UDDInventoryComponent::AddRandomItem()
