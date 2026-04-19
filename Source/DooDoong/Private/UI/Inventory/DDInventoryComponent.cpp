@@ -73,17 +73,6 @@ void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 	}
 }
 
-
-void UDDInventoryComponent::RequestOpenInventory()
-{
-	OwningController->Client_OpenInventory();
-}
-
-void UDDInventoryComponent::RequestCloseInventory()
-{
-	OwningController->Client_CloseInventory();
-}
-
 void UDDInventoryComponent::RefreshInventory()
 {
 	if (InventoryItemDatas.IsEmpty())
