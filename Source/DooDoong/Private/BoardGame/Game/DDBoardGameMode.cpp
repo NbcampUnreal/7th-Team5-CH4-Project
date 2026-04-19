@@ -69,6 +69,13 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 
 void ADDBoardGameMode::TickState_WaitingForPlayers()
 {
+	// 최소 인원보다 적을 경우 대기
+	if (AlivePlayerControllers.Num() < CachedBoardGameState->GetMinPlayerCount()) 
+	{
+		return; 
+	}
+	
+	// 인원이 충족된 경우, 모든 플레이어의 데이터 준비되었는지 확인
 	bool bAllReady = true;
 	for (APlayerController* PC : AlivePlayerControllers)
 	{
@@ -449,13 +456,55 @@ void ADDBoardGameMode::Logout(AController* Exiting)
 	APlayerController* ExitingPC = Cast<APlayerController>(Exiting);
 	if (!IsValid(ExitingPC)) return;
 
-	bool bWasCurrentTurn = (AlivePlayerControllers.IsValidIndex(CachedBoardGameState->GetTurnPlayerIndex()) && AlivePlayerControllers[CachedBoardGameState->GetTurnPlayerIndex()] == ExitingPC);
+	int32 ExitingIndex = AlivePlayerControllers.Find(ExitingPC);
+	bool bWasCurrentTurn = (CachedBoardGameState && ExitingIndex == CachedBoardGameState->GetTurnPlayerIndex());
 	AlivePlayerControllers.Remove(ExitingPC);
 
+	if (CachedBoardGameState && AlivePlayerControllers.Num() < CachedBoardGameState->GetMinPlayerCount())
+	{
+		FGameplayTag CurrentState = CachedBoardGameState->GetBoardMatchState();
+
+		// 1-1. 대기실 상태였다면: 조기 종료할 필요 없이 자연스럽게 틱(Tick)에서 대기 상태 유지
+		if (!CurrentState.IsValid())
+		{
+			Super::Logout(Exiting);
+			return;
+		}
+
+		// 1-2. 이미 정상적인 종료 과정 중이라면 중복 실행 방지
+		if (CurrentState == DDGameplayTags::State_BoardGame_Ending || CurrentState == DDGameplayTags::State_BoardGame_End)
+		{
+			Super::Logout(Exiting);
+			return;
+		}
+
+		// 1-3. 게임 진행 중 인원 미달: 조기 종료(기권 승) 후 결과창으로 즉시 이동!
+		LOG_CJH(Warning, TEXT("진행 중 인원 미달 발생! 남은 인원으로 조기 종료 후 결과창을 표시합니다."));
+		
+		GetWorldTimerManager().ClearTimer(TurnTransitionTimerHandle); // 혹시 돌고 있을 턴 딜레이 취소
+
+		// 남은 플레이어들에게 안내
+		for (APlayerController* PC : AlivePlayerControllers)
+		{
+			if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC))
+			{
+				DDPC->Client_DrawErrorMessage(TEXT("상대방의 이탈로 게임이 조기 종료되었습니다."), 3.0f);
+			}
+		}
+
+		// CalculateFinalWinner를 호출하게 만들어 남은 사람들끼리 정렬하여 1등을 부여함
+		SetMatchState(DDGameplayTags::State_BoardGame_Ending); 
+		Super::Logout(Exiting);
+		return;
+	}
+	
 	if (bWasCurrentTurn)
 	{
 		GetWorldTimerManager().ClearTimer(TurnTransitionTimerHandle);
-		if (CachedBoardGameState->GetTurnPlayerIndex() >= AlivePlayerControllers.Num()) ProcessRoundTransition();
+		if (CachedBoardGameState->GetTurnPlayerIndex() >= AlivePlayerControllers.Num())
+		{
+			ProcessRoundTransition();
+		}
 		else
 		{
 			// 턴 보정 후 재생성

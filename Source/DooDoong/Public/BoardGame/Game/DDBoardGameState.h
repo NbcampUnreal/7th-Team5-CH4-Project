@@ -59,8 +59,12 @@ public:
 
 	FORCEINLINE void SetFinalRankings(const TArray<FFinalRankData>& InRankings) { FinalRankings = InRankings; }
 
+	FORCEINLINE int32 GetMinPlayerCount() const { return MinPlayerCount; }
 public:
 	// --- 고정 데이터 (Read-Only) ---
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="플레이어 턴 최소 인원 수"))
+	int32 MinPlayerCount = 2;
+	
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="각 플레이어 턴 시간"))
 	int32 MaxStateTimer = 60;
 

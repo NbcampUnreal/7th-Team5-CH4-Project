@@ -17,6 +17,7 @@ void ADDBoardGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ADDBoardGameState, MinPlayerCount);
 	DOREPLIFETIME(ADDBoardGameState, MaxStateTimer);
 	DOREPLIFETIME(ADDBoardGameState, MaxTrophy);
 	DOREPLIFETIME(ADDBoardGameState, MaxRound);
