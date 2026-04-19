@@ -422,7 +422,6 @@ void ADDBasePlayerController::Client_OpenInventory_Implementation()
 	if (!InventoryWidget || !IsLocalController()) return;
 	
 	InventoryWidget->SetVisibility(ESlateVisibility::Visible);
-	InventoryWidget->Client_RefreshGrid();
 	bInventoryOpen = true;
 }
 
@@ -431,7 +430,6 @@ void ADDBasePlayerController::Client_CloseInventory_Implementation()
 	if (!InventoryWidget || !IsLocalController()) return;
 	
 	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
-	InventoryWidget->Client_RefreshGrid();
 	bInventoryOpen = false;
 }
 
