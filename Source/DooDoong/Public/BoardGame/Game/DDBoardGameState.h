@@ -116,6 +116,12 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlaySequence();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayBoardBGM();
+
 	UFUNCTION()
 	void OnSequenceFinished();
+
+	UFUNCTION()
+	void PlayBoardBGMLocal();
 };
