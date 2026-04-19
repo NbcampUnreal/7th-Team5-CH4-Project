@@ -15,6 +15,7 @@
 #include "GameplayEffect.h"
 #include "BoardGame/DDTile.h"
 #include "BoardGame/Game/DDBoardGameState.h"
+#include "UI/Inventory/DDInventoryComponent.h"
 
 ADDBoardGameMode::ADDBoardGameMode() {}
 

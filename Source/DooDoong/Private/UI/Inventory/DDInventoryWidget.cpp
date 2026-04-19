@@ -13,6 +13,13 @@
 void UDDInventoryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+	
+	
+}
+
+void UDDInventoryWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
 	UDDInventoryComponent* DDInventoryComponent = GetOwningPlayer()->FindComponentByClass<UDDInventoryComponent>();
 	if (!DDInventoryComponent) return;
 	InventoryComponent = DDInventoryComponent;
@@ -21,11 +28,13 @@ void UDDInventoryWidget::NativeOnInitialized()
 	Rows = 1;
 	GenerationGrid();
 	InventoryComponent->OnInventoryChanged.AddDynamic(this, &UDDInventoryWidget::UpdateGrid);
+	UpdateGrid();
 }
 
-void UDDInventoryWidget::NativeConstruct()
+void UDDInventoryWidget::NativeDestruct()
 {
-	Super::NativeConstruct();
+	Super::NativeDestruct();
+	InventoryComponent->OnInventoryChanged.RemoveAll(this);
 }
 
 void UDDInventoryWidget::GenerationGrid()

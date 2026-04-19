@@ -15,37 +15,46 @@ UDDInventoryComponent::UDDInventoryComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicatedByDefault(true);
 	OwningController = Cast<ADDBasePlayerController>(GetOwner());
-	
 }
 
 
 void UDDInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	/*if (GetOwner()->HasAuthority())
+	if (GetOwner()->HasAuthority())
 	{
-		InitializeInventoryData();
-		/* 테스트용 아이템추가 #1#
-		Server_AddItem("HealingKit"); 
-	}*/
-		/* 테스트용 아이템추가 
-		ServerRPCAddItem("HealingKit"); 
-		ServerRPCAddItem("GiveBomb");
-		ServerRPCAddItem("Magnet");
-		ServerRPCAddItem("MeleeDamage");
-	}*/
+		Server_InitializeInventoryData();
+		Server_AddItem("HealingKit");
+		Server_AddItem("Magnet");
+	}
 }
 
 void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 {
-	if (!(GetOwner()->HasAuthority())) return;
-	if (!ItemDataTable) return;
+	if (!(GetOwner()->HasAuthority()))
+	{
+		LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 1"));
+		return;	
+	}
+	if (!ItemDataTable)
+	{
+		LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 2"));
+		return;
+	}
 	const TArray<FName>& AllItemNames = ItemDataTable->GetRowNames();
-	if (AllItemNames.IsEmpty()) return;
+	if (AllItemNames.IsEmpty())
+	{
+		LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 3"));
+		return;
+	}
 	for (int32 i = 0; i < AllItemNames.Num(); ++i)
 	{
 		FItemTableRow* ItemDataRow = ItemDataTable->FindRow<FItemTableRow>(AllItemNames[i], TEXT("FindItem"));
-		if (!ItemDataRow) return;
+		if (!ItemDataRow)
+		{
+			LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 4"));
+			continue;
+		}
 		FInventoryItemData InventoryItemData;
 		InventoryItemData.ItemName = AllItemNames[i];
 		InventoryItemData.ItemCount = 0;
@@ -112,8 +121,8 @@ FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
 
 void UDDInventoryComponent::Server_AddItem_Implementation(FName ItemName)
 {
-	if (!(GetOwner()->HasAuthority())) return;
 	LOG_PMJ(Warning, TEXT("ServerRPCAddItem 진입"));
+	if (!GetOwner()->HasAuthority()) return;
 	if (InventoryItemDatas.IsEmpty())
 	{
 		LOG_PMJ(Warning, TEXT("인벤데이터가 비어있습니다"));
@@ -138,19 +147,28 @@ void UDDInventoryComponent::Server_UseItem_Implementation(const FName& ItemSlotN
 		if (ItemDatas.ItemName == ItemSlotName)
 		{
 			LOG_PMJ(Error, TEXT("====== 사용아이템존재 ======"));
-			ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(OwningController.Get()->GetPawn());
-			if (!IsValid(Character)) return;
-			UItemActionComponent* ISC = Character->FindComponentByClass<UItemActionComponent>();
-			if (!IsValid(ISC)) return;
-			LOG_PMJ(Error, TEXT("====== 아이템컴포넌트존재 ======"));
-			FItemTableRow& CurrentItemDataRow = *GetItemData(ItemDatas.ItemName);
-			ISC->BeginItemAction(CurrentItemDataRow);
+			if (OwningController)
+			{
+				LOG_PMJ(Error, TEXT("====== 컨트롤러존재 ======"));
+				if (ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(OwningController->GetCharacter()))
+				{
+					LOG_PMJ(Error, TEXT("====== 폰존재 ======"));
+					if (UItemActionComponent* IAC = Character->FindComponentByClass<UItemActionComponent>())
+					{
+						LOG_PMJ(Error, TEXT("====== IAC존재 ======"));
+					}
+				}
+			}
+			//if (!IsValid(IAC)) return;
+			/*FItemTableRow& CurrentItemDataRow = *GetItemData(ItemDatas.ItemName);
+			IAC->BeginItemAction(CurrentItemDataRow);
 			ItemDatas.ItemCount--;
-			RefreshInventory();
+			RefreshInventory();*/
 		}
 	}
 	OwningController->Client_CloseInventory();
 }
+
 FName UDDInventoryComponent::AddRandomItem()
 {
 	if (!GetOwner()->HasAuthority()) return NAME_None;

@@ -7,6 +7,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
 
+class UItemActionComponent;
 class UDDItemUseButtonWidget;
 struct FItemTableRow;
 class UDataTable;
@@ -104,5 +105,5 @@ protected:
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category = "OwningController")
-	TWeakObjectPtr<ADDBasePlayerController> OwningController;
+	TObjectPtr<ADDBasePlayerController> OwningController;
 };

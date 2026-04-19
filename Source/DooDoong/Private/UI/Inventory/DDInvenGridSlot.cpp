@@ -61,7 +61,7 @@ void UDDInvenGridSlot::UseItem()
 	ItemUseButtonWidget = CreateWidget<UDDItemUseButtonWidget>(this, ItemUseButtonWidgetClass);
 	if (ItemUseButtonWidget)
 	{
-		ItemUseButtonWidget->AddToViewport();
+		ItemUseButtonWidget->AddToViewport(30);
 		ItemUseButtonWidget->InitializeGridSlotData(ItemName);
 		BT_ClickItem->SetIsEnabled(false);
 	}

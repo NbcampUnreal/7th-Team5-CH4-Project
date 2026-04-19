@@ -409,11 +409,13 @@ void ADDBasePlayerController::ToggleInventoryMenu()
 	if (!InventoryComponent || !IsLocalController()) return;
 	if (bInventoryOpen)
 	{
-		Client_CloseInventory();
+		Client_ClosePopUp(DDGameplayTags::BoardGame_UI_Inventory);
+		bInventoryOpen = false;
 	}
 	else
 	{
-		Client_OpenInventory();
+		Client_OpenPopUp(DDGameplayTags::BoardGame_UI_Inventory);
+		bInventoryOpen = true;
 	}
 }
 
@@ -435,10 +437,18 @@ void ADDBasePlayerController::Client_CloseInventory_Implementation()
 
 void ADDBasePlayerController::Client_CreateInventoryUI_Implementation()
 {
-	if (!InventoryWidgetClass || !IsLocalController()) return;
+	/*if (!InventoryWidgetClass || !IsLocalController())
+	{
+		LOG_PMJ(Error, TEXT("Client_CreateInventoryUI_Implementation 1"));
+		return;
+	}
 	InventoryWidget = CreateWidget<UDDInventoryWidget>(this, InventoryWidgetClass);
-	if (!InventoryWidget) return;
+	if (!InventoryWidget)
+	{
+		LOG_PMJ(Error, TEXT("Client_CreateInventoryUI_Implementation 2"));
+		return;	
+	}
 	InventoryWidget->AddToViewport();
-	Client_CloseInventory();
+	Client_CloseInventory();*/
 }
 
