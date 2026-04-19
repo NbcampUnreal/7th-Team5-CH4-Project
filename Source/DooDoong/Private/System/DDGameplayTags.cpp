@@ -130,5 +130,8 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Lobby_UI_NicknamePopup, "Lobby.UI.NicknamePopup"); 
 	UE_DEFINE_GAMEPLAY_TAG(Lobby_UI_Main, "Lobby.UI.Main"); 
 	UE_DEFINE_GAMEPLAY_TAG(Lobby_UI_CountDown, "Lobby.UI.CountDown");
+	
+	UE_DEFINE_GAMEPLAY_TAG(MiniGame_UI_ReadyPopUp, "MiniGame.UI.ReadyPopUp");
+	
 }
 
