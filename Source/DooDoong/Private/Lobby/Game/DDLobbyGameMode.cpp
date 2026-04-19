@@ -4,6 +4,7 @@
 #include "Lobby/Player/DDLobbyPlayerController.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "Common/DDLogManager.h"
+#include "System/DDGameInstance.h"
 #include "System/DDGameplayTags.h"
 
 
@@ -325,6 +326,9 @@ void ADDLobbyGameMode::TryStartBoardGame()
 	}
 	
 	LOG_KMS(Log, TEXT("게임이 시작됩니다.")); 
+	
+	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
+	GameInstance->ExpectedPlayerCount = ReadyParticipants.Num();
 	
 	GetWorld()->ServerTravel(BoardGameMapPath);
 }

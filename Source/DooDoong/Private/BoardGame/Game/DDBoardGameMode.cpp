@@ -69,26 +69,42 @@ void ADDBoardGameMode::OnMainTimerElapsed()
 
 void ADDBoardGameMode::TickState_WaitingForPlayers()
 {
-	// 최소 인원보다 적을 경우 대기
-	if (AlivePlayerControllers.Num() < CachedBoardGameState->GetMinPlayerCount()) 
+	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
+	if (!GameInstance) return;
+
+	// 1. 로비에서 넘어오기로 약속된 '총 예상 인원'
+	int32 ExpectedPlayers = GameInstance->ExpectedPlayerCount;
+
+	// 혹시 값이 세팅 안 되어있을 경우를 대비한 방어 코드
+	if (ExpectedPlayers <= 0) ExpectedPlayers = CachedBoardGameState->GetMinPlayerCount();
+
+	// 2. 아직 약속된 인원수만큼 서버에 접속조차 못 했다면 무조건 대기
+	if (AlivePlayerControllers.Num() < ExpectedPlayers) 
 	{
 		return; 
 	}
-	
-	// 인원이 충족된 경우, 모든 플레이어의 데이터 준비되었는지 확인
-	bool bAllReady = true;
+
+	// 3. 접속한 인원 중 로딩이 완벽하게 끝난 인원수 카운트
+	int32 FullyLoadedPlayerCount = 0;
+
 	for (APlayerController* PC : AlivePlayerControllers)
 	{
-		if (!IsValid(PC->PlayerState))
+		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC))
 		{
-			bAllReady = false;
-			break;
+			ADDBasePlayerState* PS = DDPC->GetCachedPlayerState();
+			
+			// PlayerState 유효 + 클라이언트 로딩 완료 통보 + 캐릭터 빙의 완료 확인
+			if (PS && PS->bHasClientLoaded && IsValid(DDPC->GetPawn()))
+			{
+				FullyLoadedPlayerCount++;
+			}
 		}
 	}
 
-	if (bAllReady)
+	// 4. 약속된 인원 모두가 100% 로딩을 완료했는가?
+	if (FullyLoadedPlayerCount == ExpectedPlayers)
 	{
-		LOG_CJH(Log, TEXT("[GameLoop] %d명 접속 완료! Init 상태 진입."), AlivePlayerControllers.Num());
+		LOG_CJH(Log, TEXT("[GameLoop] 로비에서 넘어온 %d명 전원 로딩 완료! Init 상태 진입."), ExpectedPlayers);
 		SetMatchState(DDGameplayTags::State_BoardGame_Init);
 	}
 }
