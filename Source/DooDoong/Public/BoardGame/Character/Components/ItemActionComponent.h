@@ -93,4 +93,6 @@ protected:
 	
 	UPROPERTY(Replicated)
 	FGameplayTag ActiveItemAbilityTag;
+	
+	FItemTableRow ItemRowData;
 };
