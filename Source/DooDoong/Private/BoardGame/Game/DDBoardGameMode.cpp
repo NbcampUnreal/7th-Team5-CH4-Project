@@ -127,6 +127,19 @@ void ADDBoardGameMode::TickState_PlayerTurn()
 			  }
 			}
 			
+			ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(AlivePlayerControllers[CachedBoardGameState->GetTurnPlayerIndex()]);
+			if (DDPC)
+			{
+				// 1. UI 팝업 닫기
+				DDPC->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_PlayerTurn);
+
+				// 2. 현재 턴이었던 플레이어의 실행 중인 어빌리티 강제 종료
+				if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(DDPC))
+				{
+					ASC->CancelAllAbilities();
+				}
+			}
+			
 			LOG_CJH(Log, TEXT("[TimeOut] 턴 제한 시간 초과! 다음 플레이어로 강제 전환."));
 			SetMatchState(DDGameplayTags::State_BoardGame_PlayerTurn);
 		}
