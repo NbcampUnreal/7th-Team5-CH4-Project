@@ -1,12 +1,29 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "SoundDataTypes.generated.h"
+
+class USoundAttenuation;
+class USoundBase;
+class USoundConcurrency;
+
+UENUM(BlueprintType)
+enum class EDDSoundCategory : uint8
+{
+	BGM,
+	SFX,
+	UI,
+	GameplayCue
+};
 
 USTRUCT(BlueprintType)
 struct DOODOONG_API FDDSoundDataTableRow : public FTableRowBase
 {
 	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundData")
+	EDDSoundCategory Category = EDDSoundCategory::BGM;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundData")
 	TObjectPtr<USoundBase> Sound;
