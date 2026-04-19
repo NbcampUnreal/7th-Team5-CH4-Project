@@ -4,30 +4,37 @@
 #include "UI/Inventory/DDInventoryWidget.h"
 #include "UI/Inventory/DDInvenGridSlot.h"
 #include "UI/Inventory/DDInventoryComponent.h"
-#include "Base/Player/DDBasePlayerController.h"
 
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
-#include "Data/DDItemDataTypes.h"
 #include "Common/DDLogManager.h"
+#include "Data/DDItemDataTypes.h"
 
 void UDDInventoryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	InventoryComponent = GetOwningPlayer()->GetComponentByClass<UDDInventoryComponent>();
-	if (!InventoryComponent.IsValid()) return;
-	Columns = InventoryComponent->InventoryItemDatas.Num();
-	Rows = 1;
-	if (GetOwningPlayer()->IsLocalController())
-	{
-		GenerationGrid();	
-		BindItemData();
-	}
+	
+	
 }
 
 void UDDInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	UDDInventoryComponent* DDInventoryComponent = GetOwningPlayer()->FindComponentByClass<UDDInventoryComponent>();
+	if (!DDInventoryComponent) return;
+	InventoryComponent = DDInventoryComponent;
+	if (!InventoryComponent.IsValid()) return;
+	Columns = InventoryComponent->ViewItemDatas.Num();
+	Rows = 1;
+	GenerationGrid();
+	InventoryComponent->OnInventoryChanged.AddDynamic(this, &UDDInventoryWidget::UpdateGrid);
+	UpdateGrid();
+}
+
+void UDDInventoryWidget::NativeDestruct()
+{
+	Super::NativeDestruct();
+	InventoryComponent->OnInventoryChanged.RemoveAll(this);
 }
 
 void UDDInventoryWidget::GenerationGrid()
@@ -36,11 +43,17 @@ void UDDInventoryWidget::GenerationGrid()
 	{
 		for (int32 i = 0; i < Columns; ++i)
 		{
+			if (InventoryComponent->ViewItemDatas.IsEmpty())
+			{
+				LOG_PMJ(Error, TEXT("===== UI출력용 아이템 데이터가 존재하지 않습니다! ====="));
+				return;
+			}
+			int32 Index = i + j * Columns;
 			UDDInvenGridSlot* GridSlot = CreateWidget<UDDInvenGridSlot>(this, GridSlotClass);
 			UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(CanvasPanel->AddChild(GridSlot));
 			
 			const float SlotSizeX = 200.f;
-			const float SlotSizeY = 150.f;
+			const float SlotSizeY = 200.f;
 			const float SpacingX = 100.f;
 			
 			if (CanvasSlot)
@@ -51,31 +64,19 @@ void UDDInventoryWidget::GenerationGrid()
 					j * (SlotSizeX) + 50.f
 					));
 			}
+			GridSlot->SetItemInfo(InventoryComponent->ViewItemDatas[Index]);
 			GridSlots.Add(GridSlot);
 		}
 	}
 }
 
-void UDDInventoryWidget::Client_RefreshGrid_Implementation()
+void UDDInventoryWidget::UpdateGrid()
 {
-	LOG_PMJ(Error, TEXT("GridSlot.Num : %d"), GridSlots.Num());
-	if (!InventoryComponent.IsValid() || !GetOwningLocalPlayer()) return;
 	for (int32 i = 0; i < GridSlots.Num(); ++i)
 	{
-		GridSlots[i]->UpdateItemInfo(InventoryComponent->InventoryItemDatas[i]);
+		if (InventoryComponent->ViewItemDatas.IsEmpty()) return;
+		GridSlots[i]->UpdateItemInfo(InventoryComponent->ViewItemDatas[i]);
 	}
 }
 
-void UDDInventoryWidget::BindItemData()
-{
-	if (GridSlots.Num() <= 0) return;
-	for (int32 i =0; i < GridSlots.Num(); ++i)
-	{
-		if (!InventoryComponent->InventoryItemDatas.IsValidIndex(i)) return;
-		FName ItemName = InventoryComponent->InventoryItemDatas[i].ItemName;
-		FItemTableRow& ItemData = *InventoryComponent->GetItemData(ItemName);
-		GridSlots[i]->SetItemInfo(ItemData);
-	}
-	
-}
 

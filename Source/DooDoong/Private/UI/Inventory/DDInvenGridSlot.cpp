@@ -9,6 +9,7 @@
 #include "Components/Image.h"
 #include "Data/DDItemDataTypes.h"
 #include "UI/Inventory/DDInventoryComponent.h"
+#include "UI/Inventory/DDInventoryWidget.h"
 
 void UDDInvenGridSlot::NativeConstruct()
 {
@@ -20,30 +21,39 @@ void UDDInvenGridSlot::NativeConstruct()
 	}
 }
 
-void UDDInvenGridSlot::SetItemInfo(const FItemTableRow& ItemTableRow)
+void UDDInvenGridSlot::SetItemInfo(const FViewItemData& ViewItemData)
 {
 	// ItemTable 가져와서 처음 아이콘 이랑 아이템ID 설정
-	UTexture2D* ItemIcon = ItemTableRow.Icon.LoadSynchronous();
+	if (ViewItemData.Icon.IsNull() || ViewItemData.ViewItemName.IsNone())
+	{
+		LOG_PMJ(Error, TEXT("===== 아이템의 정보를 참조할 수 없습니다 존재하지않습니다! ====="));
+		return;
+	}
+	UTexture2D* ItemIcon = ViewItemData.Icon.LoadSynchronous();
 	Image_ItemIcon->SetBrushFromTexture(ItemIcon);
-	ItemName = ItemTableRow.ItemID;
+	ItemName = ViewItemData.ViewItemName;
+	ItemCount = ViewItemData.ViewItemCount;
+	BT_ClickItem->SetIsEnabled(false);
 }
 
-void UDDInvenGridSlot::UpdateItemInfo(const FInventoryItemData& InventoryItemData)
+void UDDInvenGridSlot::UpdateItemInfo(const FViewItemData& ViewItemData)
 {
 	// 인벤토리 열릴때마다 인벤토리내부 데이터 전달받아서 아이템이름확인하고 갯수맞춰주기
-	if (!InventoryItemData.ItemName.IsValid()) return;
-	ItemCount = InventoryItemData.Count;
+	if (!ViewItemData.ViewItemName.IsValid()) return;
+	if (ViewItemData.ViewItemName == ItemName)
+	{
+		ItemCount = ViewItemData.ViewItemCount;
 	
-	LOG_PMJ(Warning, TEXT("ItemCount : %d"), ItemCount);
-	if (ItemCount > 0)
-	{
-		bCanUse = true;
+		if (ItemCount > 0)
+		{
+			bCanUse = true;
+		}
+		else
+		{
+			bCanUse = false;
+		}
+		BT_ClickItem->SetIsEnabled(bCanUse);
 	}
-	else
-	{
-		bCanUse = false;
-	}
-	BT_ClickItem->SetIsEnabled(bCanUse);
 }
 
 void UDDInvenGridSlot::UseItem()
@@ -51,7 +61,7 @@ void UDDInvenGridSlot::UseItem()
 	ItemUseButtonWidget = CreateWidget<UDDItemUseButtonWidget>(this, ItemUseButtonWidgetClass);
 	if (ItemUseButtonWidget)
 	{
-		ItemUseButtonWidget->AddToViewport();
+		ItemUseButtonWidget->AddToViewport(30);
 		ItemUseButtonWidget->InitializeGridSlotData(ItemName);
 		BT_ClickItem->SetIsEnabled(false);
 	}

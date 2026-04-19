@@ -6,11 +6,12 @@
 #include "Blueprint/UserWidget.h"
 #include "DDInventoryWidget.generated.h"
 
+
 class UDDInventoryComponent;
 class UCanvasPanel;
 class UDDInvenGridSlot;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
+
 
 UCLASS()
 class DOODOONG_API UDDInventoryWidget : public UUserWidget
@@ -21,14 +22,21 @@ public:
 	
 	virtual void NativeConstruct() override;
 	
-	UFUNCTION(Client, Reliable)
-	void Client_RefreshGrid();
+	virtual void NativeDestruct() override;
+	
+	UFUNCTION()
+	void UpdateGrid();
 	
 protected:
-	void BindItemData();
 	void GenerationGrid();
 	
 private:
+	/* 인벤토리 그리기에 필요한 데이터 */
+	
+	
+	UPROPERTY(EditDefaultsOnly, category="Inventory|Data")
+	TObjectPtr<UDataTable> ItemDataTable;
+	
 	/* 인벤토리 그리드 슬롯 */
 	UPROPERTY()
 	TArray<UDDInvenGridSlot*> GridSlots;
