@@ -52,11 +52,8 @@ void UDDInventoryWidget::NativeConstruct()
 		if (ASC->HasMatchingGameplayTag(DDGameplayTags::State_BoardGame_TurnActive))
 		{
 			LOG_KMS(Warning, TEXT("Matching Tag Found.")); 
-			ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(DDPS->GetPlayerController()); 
-			if (!DDPC) continue;
-			
-			InitInventory(DDPC->GetInventoryComponent()); 
-			break; 
+			InitInventory(DDPS->GetInventoryComponent());
+			break;
 		}
 	}
 }
@@ -78,6 +75,7 @@ void UDDInventoryWidget::GenerateGrid()
 		LOG_KMS(Warning, TEXT("[GenerationGrid] : Inventory is null."));
 		return;
 	}
+	LOG_PMJ(Warning, TEXT("Columns : %d"), InventoryComponent->ViewItemDatas.Num());
 	
 	for (int32 j = 0; j < Rows; ++j)
 	{
@@ -107,6 +105,7 @@ void UDDInventoryWidget::GenerateGrid()
 					));
 			}
 			
+			LOG_PMJ(Warning, TEXT("InventoryComponent->ViewItemDatas[Index].Name : %s"), *InventoryComponent->ViewItemDatas[Index].ViewItemName.ToString());
 			GridSlot->SetItemInfo(InventoryComponent->ViewItemDatas[Index]);
 			GridSlots.Add(GridSlot);
 		}
