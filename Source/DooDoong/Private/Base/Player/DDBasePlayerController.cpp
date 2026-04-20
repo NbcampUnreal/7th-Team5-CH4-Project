@@ -12,6 +12,7 @@
 #include "BoardGame/Game/DDBoardGameMode.h"
 #include "Common/DDLogManager.h"
 #include "Components/SlateWrapperTypes.h"
+#include "FieldNotification/FieldMulticastDelegate.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
 #include "System/DDUIManagerSubsystem.h"
@@ -21,7 +22,7 @@
 
 ADDBasePlayerController::ADDBasePlayerController()
 {
-	InventoryComponent = CreateDefaultSubobject<UDDInventoryComponent>(TEXT("InventoryComponent"));
+	
 }
 
 void ADDBasePlayerController::BeginPlay()
@@ -411,7 +412,7 @@ UItemActionComponent* ADDBasePlayerController::GetItemActionComponentFromPawn() 
 
 void ADDBasePlayerController::Input_ToggleInventoryMenu()
 {
-	if (!InventoryComponent || !IsLocalController()) return;
+	if (!CachedPlayerState->GetInventoryComponent() || !IsLocalController()) return;
 	
 	Server_RequestInventory();
 }

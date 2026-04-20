@@ -8,9 +8,12 @@
 #include "Base/Game/DDGameStateBase.h"
 #include "BoardGame/DDTileManager.h"
 #include "Common/DDLogManager.h"
+#include "UI/Inventory/DDInventoryComponent.h"
 
 ADDBasePlayerState::ADDBasePlayerState()
 {
+	InventoryComponent = CreateDefaultSubobject<UDDInventoryComponent>(TEXT("InventoryComponent"));
+	
 	AbilitySystemComponent = CreateDefaultSubobject<UDDAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);

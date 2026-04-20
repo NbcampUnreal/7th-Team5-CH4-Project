@@ -124,4 +124,11 @@ public:
 protected:
 	UFUNCTION()
     void OnRep_PlayerGameData();
+	
+	/* 민재 :인벤토리 로직*/
+public:
+	UDDInventoryComponent* GetInventoryComponent() const {return InventoryComponent;}
+private:
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TObjectPtr<UDDInventoryComponent> InventoryComponent;
 };
