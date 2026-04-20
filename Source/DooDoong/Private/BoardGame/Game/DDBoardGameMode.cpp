@@ -193,7 +193,7 @@ void ADDBoardGameMode::SetMatchState(FGameplayTag NewStateTag)
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_PlayerTurn)
 	{
-		UpdateAllPlayersGameLayer(DDGameplayTags::State_BoardGame_Init);
+		BroadcastGameLayer(DDGameplayTags::State_BoardGame_Init);
 		StartNextPlayerTurn();
 	}
 	else if (NewStateTag == DDGameplayTags::State_BoardGame_RoundEnd)
@@ -679,17 +679,4 @@ void ADDBoardGameMode::SortPlayersByTurnOrder()
 		}
 	}
 	LOG_CJH(Log, TEXT("====================================="));
-}
-
-void ADDBoardGameMode::UpdateAllPlayersGameLayer(FGameplayTag StateTag)
-{
-	for (APlayerController* PC : AlivePlayerControllers)
-	{
-		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC);
-		if (IsValid(DDPC))
-		{
-			// 클라이언트 RPC를 호출하여 각 로컬 UI 레이어를 전환합니다.
-			DDPC->Client_SwitchGameLayer(StateTag);
-		}
-	}
 }
