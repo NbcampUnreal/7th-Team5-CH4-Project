@@ -11,7 +11,7 @@ UGA_HealingKit::UGA_HealingKit()
 
 bool UGA_HealingKit::ExecuteInstantItem(const FGameplayEventData* TriggerEventData)
 {
-	UAbilitySystemComponent* ASC = GetBoardGameAbilitySystemComponent();
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
 	if (!ASC)
 	{
 		return false;

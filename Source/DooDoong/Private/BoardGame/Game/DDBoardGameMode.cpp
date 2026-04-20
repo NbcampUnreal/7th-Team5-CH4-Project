@@ -164,6 +164,11 @@ void ADDBoardGameMode::TickState_RoundEnd()
 				{
 					MiniGamePlayers.Add(PC->PlayerState);
 				}
+				
+				if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(PC))
+	            {
+	                ASC->CancelAllAbilities();
+	            }
 			}
 			
 			LOG_CJH(Log, TEXT("[Travel] 미니게임 참여 인원: %d명"), AlivePlayerControllers.Num());
