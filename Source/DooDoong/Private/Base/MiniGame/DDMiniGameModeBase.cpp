@@ -9,6 +9,7 @@
 #include "System/MiniGame/DDMiniGameDefinition.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "TimerManager.h"
+#include "Common/DDLogManager.h"
 #include "GameFramework/PlayerState.h"
 
 static const TArray<FName> MiniGameSpawnTags =
@@ -99,8 +100,11 @@ void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 		ApplyMiniGameInput(BasePlayerController);
 	}
 	
+	// 준비 위젯 띄우기 
+	BroadcastOpenPopUp(DDGameplayTags::MiniGame_UI_ReadyPopUp);
+	
 	// TODO 추후에 UI로 준비완료 로직이 추가되면 삭제해야할 로직.
-	SetPlayerReady(PlayerController->PlayerState, true);
+	// SetPlayerReady(PlayerController->PlayerState, true);
 }
 
 AActor* ADDMiniGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -145,9 +149,8 @@ void ADDMiniGameModeBase::UpdateMiniGameTime()
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
 		// 남은 시간을 (게임 제한시간 - 경과한 시간)으로 계산하고 GameState 모든 클라이언트와 동기화
-		const float RemainingTimeSeconds = ActiveSetup.TimeLimitSeconds > 0.f
-			                                   ? FMath::Max(0.f, ActiveSetup.TimeLimitSeconds - ElapsedTimeSeconds)
-			                                   : 0.f;
+		const float RemainingTimeSeconds = ActiveSetup.TimeLimitSeconds > 0.f ?
+			FMath::Max(0.f, ActiveSetup.TimeLimitSeconds - ElapsedTimeSeconds) : 0.f;
 
 		MiniGameState->SetRemainingTimeSeconds(RemainingTimeSeconds);
 	}
@@ -243,6 +246,12 @@ void ADDMiniGameModeBase::StartMiniGame()
 	{
 		return;
 	}
+	
+	// 팝업 제거 
+	BroadcastClosePopUp(DDGameplayTags::MiniGame_UI_ReadyPopUp); 
+	
+	// UI 세팅 
+	BroadcastGameLayer(DDGameplayTags::MiniGame_UI_Main);
 
 	// 플레이 시작 및 시작 시점을 기록
 	bIsMiniGameStarted = true;
@@ -257,9 +266,16 @@ void ADDMiniGameModeBase::StartMiniGame()
 
 	if (UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().SetTimer(MiniGameTimerHandle, this, &ADDMiniGameModeBase::UpdateMiniGameTime,
-		                                  TimeUpdateIntervalSeconds, true);
+		World->GetTimerManager().SetTimer(
+			MiniGameTimerHandle, 
+			this, 
+			&ADDMiniGameModeBase::UpdateMiniGameTime,
+			TimeUpdateIntervalSeconds, 
+			true
+		);
 	}
+	
+	
 }
 
 void ADDMiniGameModeBase::FinishMiniGame()
@@ -472,6 +488,7 @@ bool ADDMiniGameModeBase::AreAllParticipantsReady() const
 
 void ADDMiniGameModeBase::TryStartMiniGame()
 {
+	LOG_KMS(Warning, TEXT("Try Start MiniGame"));
 	if (bIsMiniGameStarted || bIsMiniGameFinished)
 	{
 		return;
@@ -480,11 +497,17 @@ void ADDMiniGameModeBase::TryStartMiniGame()
 	if (AreAllParticipantsReady())
 	{
 		StartMiniGame();
+		 
+	}
+	else
+	{
+		LOG_KMS(Error, TEXT("Failed to start mini-game mode"));
 	}
 }
 
 void ADDMiniGameModeBase::SetPlayerReady(APlayerState* PlayerState, bool bReady)
 {
+	LOG_KMS(Warning, TEXT("SetPlayerReady"));
 	if (!HasAuthority() || bIsMiniGameStarted || bIsMiniGameFinished || PlayerState == nullptr)
 	{
 		return;
