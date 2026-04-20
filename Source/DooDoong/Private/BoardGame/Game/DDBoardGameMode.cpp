@@ -418,46 +418,54 @@ void ADDBoardGameMode::CalculateFinalWinner()
 {
 	if (!IsValid(CachedBoardGameState)) return;
 
-	TArray<ADDBasePlayerState*> RankCandidates;
-	for (APlayerController* PC : AlivePlayerControllers)
-	{
-		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC))
-		{
-			if (ADDBasePlayerState* PS = DDPC->GetCachedPlayerState()) RankCandidates.Add(PS);
-		}
-	}
+    // GameState에 구현된 '공통 정렬 로직'을 호출하여 이미 정렬된 배열을 받아옵니다.
+    TArray<ADDBasePlayerState*> SortedPlayers = CachedBoardGameState->UpdateAndGetPlayerRanks();
 
-	// 트로피 -> 코인 순으로 정렬
-	RankCandidates.Sort([](const ADDBasePlayerState& A, const ADDBasePlayerState& B)
-	{
-		float TrophyA = A.GetPointSet()->GetTrophy();
-		float TrophyB = B.GetPointSet()->GetTrophy();
-		if (TrophyA != TrophyB) return TrophyA > TrophyB; 
-		return A.GetPointSet()->GetCoin() > B.GetPointSet()->GetCoin();
-	});
+    TArray<FFinalRankData> FinalResults;
+    for (ADDBasePlayerState* PS : SortedPlayers)
+    {
+       PS->SetIsGameFinished(true);
+       
+       FFinalRankData Data;
+       // 이미 갱신된 순위(CurrentRank)를 그대로 사용
+       Data.Rank = PS->PlayerGameData.CurrentRank;
+       Data.PlayerName = PS->GetPlayerDisplayName();
+       Data.Trophy = (int32)PS->GetPointSet()->GetTrophy();
+       Data.Coin = (int32)PS->GetPointSet()->GetCoin();
+       FinalResults.Add(Data);
+       
+       LOG_CJH(Log, TEXT("%d등 플레이어: %s | 트로피 개수: %d, 코인 개수: %d"),
+          Data.Rank,
+          *Data.PlayerName.ToString(),
+          Data.Trophy,
+          Data.Coin
+       );
+    }
+    
+    CachedBoardGameState->SetFinalRankings(FinalResults);
+    SetMatchState(DDGameplayTags::State_BoardGame_End);
+}
 
-	TArray<FFinalRankData> FinalResults;
-	for (int32 i = 0; i < RankCandidates.Num(); ++i)
-	{
-		RankCandidates[i]->SetIsGameFinished(true);
-		
-		FFinalRankData Data;
-		Data.Rank = i + 1;
-		Data.PlayerName = RankCandidates[i]->GetPlayerDisplayName();
-		Data.Trophy = (int32)RankCandidates[i]->GetPointSet()->GetTrophy();
-		Data.Coin = (int32)RankCandidates[i]->GetPointSet()->GetCoin();
-		FinalResults.Add(Data);
-		
-		LOG_CJH(Log, TEXT("%d등 플레이어: %s | 트로피 개수: %d, 코인 개수: %d"),
-			Data.Rank,
-			*Data.PlayerName.ToString(),
-			Data.Trophy,
-			Data.Coin
-		);
-	}
-	
-	CachedBoardGameState->SetFinalRankings(FinalResults);
-	SetMatchState(DDGameplayTags::State_BoardGame_End);
+void ADDBoardGameMode::RequestRankUpdate()
+{
+    if (!GetWorldTimerManager().IsTimerActive(RankUpdateTimerHandle))
+    {
+        GetWorldTimerManager().SetTimer(
+            RankUpdateTimerHandle,
+            this,
+            &ThisClass::ExecuteRankUpdate,
+            0.1f,
+            false
+        );
+    }
+}
+
+void ADDBoardGameMode::ExecuteRankUpdate()
+{
+    if (CachedBoardGameState)
+    {
+        CachedBoardGameState->UpdateAndGetPlayerRanks();
+    }
 }
 
 void ADDBoardGameMode::ApplyMatchStateEffects(FGameplayTag NewStateTag)

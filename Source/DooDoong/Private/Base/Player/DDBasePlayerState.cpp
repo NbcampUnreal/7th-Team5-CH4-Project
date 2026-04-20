@@ -109,6 +109,19 @@ void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 	}
 }
 
+void ADDBasePlayerState::SetCurrentRank(int32 InRank)
+{
+	if (PlayerGameData.CurrentRank != InRank)
+    {
+		FPlayerGameplayInfo TempData = PlayerGameData;
+        TempData.CurrentRank = InRank;
+		
+        PlayerGameData = TempData;
+		
+        OnRankChanged.Broadcast(InRank);
+    }
+}
+
 void ADDBasePlayerState::InitTile()
 {
 	LOG_CYS(Warning, TEXT("[PS]InitTile"));
@@ -121,6 +134,8 @@ void ADDBasePlayerState::InitTile()
 void ADDBasePlayerState::OnRep_PlayerGameData()
 {
 	UpdateCharacterVisuals();
+	
+	OnRankChanged.Broadcast(PlayerGameData.CurrentRank);
 }
 
 void ADDBasePlayerState::SetPlayerColor(FLinearColor InNewColor)

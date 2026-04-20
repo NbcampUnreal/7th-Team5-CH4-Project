@@ -29,6 +29,9 @@ protected:
 	UFUNCTION()
 	void UpdateTrophyCount(int32 Trophy);
 	
+	UFUNCTION()
+	void UpdateCurrentRank(int32 CurrentRank);
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> PlayerNameText; 
@@ -41,6 +44,9 @@ protected:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> CoinText;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> CurrentRankText;
 	
 	UPROPERTY()
 	FLinearColor PlayerColor = FLinearColor::White;

@@ -12,6 +12,8 @@ class UDDMovementSet;
 class ADDTile; 
 class ADDTileManager;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnRankChanged, int32 NewRank);
+
 USTRUCT(BlueprintType)
 struct FPlayerGameplayInfo
 {
@@ -35,6 +37,9 @@ struct FPlayerGameplayInfo
 	// 게임 진행 중에는 false, 게임 종료 후 true
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     bool bIsGameFinished = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int CurrentRank = 1;
 };
 
 UCLASS()
@@ -63,6 +68,8 @@ public:
 	
 	FORCEINLINE void SetIsGameFinished(bool bFinished) { PlayerGameData.bIsGameFinished = bFinished; }
 	FORCEINLINE FName GetPlayerDisplayName() const { return PlayerGameData.PlayerDisplayName; }
+	
+	void SetCurrentRank(int32 InRank);
 
 public:
 	UFUNCTION(NetMulticast, Reliable)
@@ -107,6 +114,9 @@ public:
 	/** 이 플레이어의 클라이언트 맵 로딩 및 스폰이 완전히 끝났는지 식별 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Info")
 	bool bHasClientLoaded = false;
+	
+public:
+	FOnRankChanged OnRankChanged;
 	
 protected:
 	UFUNCTION()

@@ -110,6 +110,7 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPlayerArrayChanged OnPlayerArrayChanged;
+
 protected:
 	UFUNCTION()
 	void OnRep_StateTimer();
@@ -134,6 +135,11 @@ public:
 	UFUNCTION()
 	void OnSequenceFinished();
 
+public:
 	UFUNCTION()
 	void PlayBoardBGMLocal();
+	
+	/** 실시간 랭킹을 갱신하고, 정렬된 플레이어 배열을 반환하는 공통 함수 */
+	UFUNCTION(BlueprintCallable, Category = "Ranking")
+    TArray<class ADDBasePlayerState*> UpdateAndGetPlayerRanks();
 };
