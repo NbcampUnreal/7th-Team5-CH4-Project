@@ -38,8 +38,6 @@ void ADDBasePlayerController::BeginPlay()
 		Subsystem->AddMappingContext(DefaultIMC, 0);
 	}
 	
-	CachedPlayerState = GetPlayerState<ADDBasePlayerState>();
-	
 	if (IsLocalController())
 	{
 		Server_NotifyClientLoaded();
