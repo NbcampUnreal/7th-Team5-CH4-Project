@@ -35,9 +35,6 @@ protected:
 
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> RankText; 
-	
-	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> PlayerNameText; 
 	
 	UPROPERTY(meta = (BindWidget))
