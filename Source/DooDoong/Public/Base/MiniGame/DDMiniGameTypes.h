@@ -75,7 +75,7 @@ struct DOODOONG_API FMiniGameSetup
 	FText Description;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UTexture2D> MiniGameThumbnail;
+	TObjectPtr<UTexture2D> MiniGameThumbnail;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(Categories="MiniGame.Genre"))
 	FGameplayTag Genre;
