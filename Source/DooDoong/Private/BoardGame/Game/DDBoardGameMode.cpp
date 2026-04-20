@@ -15,6 +15,8 @@
 #include "GameplayEffect.h"
 #include "BoardGame/DDTile.h"
 #include "BoardGame/Game/DDBoardGameState.h"
+#include "System/DDSoundManager.h"
+#include "UI/Inventory/DDInventoryComponent.h"
 
 ADDBoardGameMode::ADDBoardGameMode() {}
 
@@ -236,7 +238,7 @@ void ADDBoardGameMode::HandleState_Init()
 	}
 	
 	LOG_CYS(Warning, TEXT("[GM] 보드게임 전체 초기화 완료"));
-
+	
 	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
 	if (IsValid(GameInstance) && GameInstance->CurrentRound == 0)
 	{

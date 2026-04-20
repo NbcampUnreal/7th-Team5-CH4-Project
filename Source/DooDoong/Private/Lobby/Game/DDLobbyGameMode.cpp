@@ -327,7 +327,8 @@ bool ADDLobbyGameMode::CanStartBoardGame(FString& ErrorMessage)
 
 void ADDLobbyGameMode::TryStartBoardGame()
 {
-	if (!IsValid(GetLobbyGameState())) return;
+	ADDLobbyGameState* LobbyGameState = GetLobbyGameState();
+	if (!IsValid(LobbyGameState)) return;
 	
 	FString ErrorMessage; 
 	if (!CanStartBoardGame(ErrorMessage))
@@ -340,6 +341,8 @@ void ADDLobbyGameMode::TryStartBoardGame()
 	
 	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());
 	GameInstance->ExpectedPlayerCount = GetParticipantCount();
+	
+	LobbyGameState->Multicast_StopLobbyBGM();
 	
 	GetWorld()->ServerTravel(BoardGameMapPath);
 }
