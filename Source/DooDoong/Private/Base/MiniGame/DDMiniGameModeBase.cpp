@@ -195,6 +195,7 @@ void ADDMiniGameModeBase::InitializeMiniGame(
 		MiniGameState->SetReadyEntries(TArray<FMiniGameReadyEntry>());
 		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 		MiniGameState->SetScoreBoard(TArray<FMiniGameScoreEntry>());
+		MiniGameState->NotifyMiniGameSetupReady();
 	}
 }
 

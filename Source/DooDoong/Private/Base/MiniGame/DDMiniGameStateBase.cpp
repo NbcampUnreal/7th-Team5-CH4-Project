@@ -15,6 +15,7 @@ void ADDMiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 	// 진행 상태와 점수판은 모든 클라이언트가 동일하게 봐야하기 때문에 복제
 	DOREPLIFETIME(ADDMiniGameStateBase, MiniGameSetup);
+	DOREPLIFETIME(ADDMiniGameStateBase, bMiniGameSetupReady);
 	DOREPLIFETIME(ADDMiniGameStateBase, CurrentState);
 	DOREPLIFETIME(ADDMiniGameStateBase, RemainingTimeSeconds);
 	DOREPLIFETIME(ADDMiniGameStateBase, Participants);
@@ -34,6 +35,14 @@ void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
 void ADDMiniGameStateBase::SetMiniGameSetup(const FMiniGameSetup& Setup)
 {
 	MiniGameSetup = Setup;
+	bMiniGameSetupReady = false;
+	bHasBroadcastMiniGameSetup = false;
+}
+
+void ADDMiniGameStateBase::NotifyMiniGameSetupReady()
+{
+	bMiniGameSetupReady = true;
+	BroadcastMiniGameSetupChanged();
 }
 
 void ADDMiniGameStateBase::SetRemainingTimeSeconds(float NewRemainingTimeSeconds)
@@ -133,6 +142,11 @@ void ADDMiniGameStateBase::OnRep_MiniGameSetup()
 	BroadcastMiniGameSetupChanged();
 }
 
+void ADDMiniGameStateBase::OnRep_MiniGameSetupReady()
+{
+	BroadcastMiniGameSetupChanged();
+}
+
 void ADDMiniGameStateBase::OnRep_ReadyPlayerCount()
 {
 	BroadcastReadyStateChanged();
@@ -160,6 +174,12 @@ void ADDMiniGameStateBase::OnRep_RemainingTimeSeconds()
 
 void ADDMiniGameStateBase::BroadcastMiniGameSetupChanged()
 {
+	if (!bMiniGameSetupReady || bHasBroadcastMiniGameSetup || MiniGameSetup.MiniGameID.IsNone())
+	{
+		return;
+	}
+
+	bHasBroadcastMiniGameSetup = true;
 	OnMiniGameSetupChanged.Broadcast(MiniGameSetup);
 }
 

@@ -44,6 +44,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="MiniGame")
 	void SetMiniGameSetup(const FMiniGameSetup& Setup);
+
+	UFUNCTION(BlueprintPure, Category="MiniGame")
+	bool IsMiniGameSetupReady() const { return bMiniGameSetupReady; }
+
+	void NotifyMiniGameSetupReady();
 	
 	/** 남은 시간 Get */
 	UFUNCTION(BlueprintPure, Category="MiniGame")
@@ -119,6 +124,9 @@ public:
 public:
 	UFUNCTION()
 	void OnRep_MiniGameSetup();
+
+	UFUNCTION()
+	void OnRep_MiniGameSetupReady();
 	
 	/** 준비 인원 수가 클라이언트에 동기화되면 UI를 갱신하기 위해 호출 */
 	UFUNCTION()
@@ -140,7 +148,6 @@ public:
 	void OnRep_RemainingTimeSeconds(); 
 
 public:
-	/** UI 갱신용 : 미니게임 이름, 설명 등을 표시하기 위함 */
 	void BroadcastMiniGameSetupChanged();
 	
 	/** 준비상태 변화 헬퍼 */
@@ -155,6 +162,11 @@ public:
 protected:
 	UPROPERTY(ReplicatedUsing=OnRep_MiniGameSetup, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
 	FMiniGameSetup MiniGameSetup;
+
+	UPROPERTY(ReplicatedUsing=OnRep_MiniGameSetupReady, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
+	bool bMiniGameSetupReady = false;
+
+	bool bHasBroadcastMiniGameSetup = false;
 	
 	/** 현재 게임 상태 */
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.State"))
