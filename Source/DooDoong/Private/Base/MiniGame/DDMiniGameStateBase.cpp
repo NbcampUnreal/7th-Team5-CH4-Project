@@ -14,6 +14,7 @@ void ADDMiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// 진행 상태와 점수판은 모든 클라이언트가 동일하게 봐야하기 때문에 복제
+	DOREPLIFETIME(ADDMiniGameStateBase, MiniGameSetup);
 	DOREPLIFETIME(ADDMiniGameStateBase, CurrentState);
 	DOREPLIFETIME(ADDMiniGameStateBase, RemainingTimeSeconds);
 	DOREPLIFETIME(ADDMiniGameStateBase, Participants);
