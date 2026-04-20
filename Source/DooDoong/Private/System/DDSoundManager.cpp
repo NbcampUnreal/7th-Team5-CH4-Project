@@ -41,6 +41,11 @@ void UDDSoundManager::Deinitialize()
 
 void UDDSoundManager::PlayBGM(FName SoundID, float FadeIn)
 {
+	if (CurrentBGM && CurrentBGMID == SoundID)
+	{
+		return;
+	}
+	
 	const FDDSoundDataTableRow* SoundRow = FindSoundRow(SoundID);
 	if (!SoundRow || !SoundRow->Sound)
 	{
@@ -62,6 +67,8 @@ void UDDSoundManager::PlayBGM(FName SoundID, float FadeIn)
 
 	if (CurrentBGM)
 	{
+		CurrentBGMID = SoundID;
+		
 		const float FadeInTime = ResolveFadeTime(FadeIn, SoundRow->FadeInTime);
 		if (FadeInTime > 0.f)
 		{
@@ -137,6 +144,7 @@ void UDDSoundManager::StopBGM(float FadeOut)
 {
 	if (!CurrentBGM)
 	{
+		CurrentBGMID = NAME_None;
 		return;
 	}
 
@@ -151,6 +159,7 @@ void UDDSoundManager::StopBGM(float FadeOut)
 	}
 
 	CurrentBGM = nullptr;
+	CurrentBGMID = NAME_None;
 }
 
 void UDDSoundManager::StopSound(FName SoundID, float FadeOut)

@@ -63,5 +63,8 @@ private:
 	TObjectPtr<UAudioComponent> CurrentBGM;
 	
 	UPROPERTY()
+	FName CurrentBGMID = NAME_None;
+	
+	UPROPERTY()
 	TMap<EDDSoundCategory, float> CategoryVolumes;
 };
