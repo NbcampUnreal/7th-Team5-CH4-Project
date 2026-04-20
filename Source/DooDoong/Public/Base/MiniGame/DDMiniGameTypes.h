@@ -66,6 +66,12 @@ struct DOODOONG_API FMiniGameSetup
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName MiniGameID = NAME_None;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText DisplayName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText Description;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(Categories="MiniGame.Genre"))
 	FGameplayTag Genre;
 	
@@ -80,6 +86,9 @@ struct DOODOONG_API FMiniGameSetup
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName ReturnContextId = NAME_None;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName BGM;
 };
 
 USTRUCT(BlueprintType)
