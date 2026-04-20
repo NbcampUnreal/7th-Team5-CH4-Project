@@ -8,6 +8,7 @@ class UTextBlock;
 class UVerticalBox;
 class UBoardGamePlayerInfo; 
 class UButton; 
+class ADDBasePlayerState;
 
 UCLASS()
 class DOODOONG_API UFinalResultWidget : public UUserWidget
