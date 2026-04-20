@@ -143,6 +143,7 @@ void ADDBasePlayerController::SetupInputComponent()
 	}
 }
 
+
 void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIMC)
 {
 	if (auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
@@ -262,8 +263,9 @@ void ADDBasePlayerController::Server_SelectTile_Implementation(ADDSelectableTile
 
 void ADDBasePlayerController::Server_RequestPlayerReady_Implementation()
 {
+	LOG_KMS(Warning, TEXT("Request Player Ready"));
 	ADDMiniGameModeBase* GM = GetWorld()->GetAuthGameMode<ADDMiniGameModeBase>();
-	if (!IsValid(GM)) return;
+	if (!IsValid(GM)) return; 
 	
 	if (!IsValid(CachedPlayerState)) return;
 	
@@ -275,6 +277,7 @@ void ADDBasePlayerController::Client_OpenPopUp_Implementation(FGameplayTag Tag)
 	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
 	if (!UIManager || !Tag.IsValid()) return;
 	
+	Client_SetMouseCursorVisible(true); 
 	UIManager->DrawPopup(Tag); 
 }
 
@@ -284,7 +287,7 @@ void ADDBasePlayerController::Client_ClosePopUp_Implementation(FGameplayTag Tag)
 	if (!UIManager || !Tag.IsValid()) return;
 	
 	UIManager->HidePopup(Tag);
-	
+	Client_SetMouseCursorVisible(false); 
 }
 
 void ADDBasePlayerController::Client_CloseAllPopUps_Implementation()
@@ -293,6 +296,7 @@ void ADDBasePlayerController::Client_CloseAllPopUps_Implementation()
 	if (!UIManager) return;
 	
 	UIManager->HideAllPopups();
+	Client_SetMouseCursorVisible(false); 
 }
 
 void ADDBasePlayerController::Client_DrawErrorMessage_Implementation(const FString& ErrorMessage, float Duration)

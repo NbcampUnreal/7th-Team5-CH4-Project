@@ -39,6 +39,13 @@ protected:
 
 	void BroadcastToAllPlayers(TFunctionRef<void(ADDBasePlayerController*)> Func);
 	
+	void BroadcastGameLayer(const FGameplayTag NewGameTag);
+	
+	void BroadcastErrorMessage(const FString& ErrorMessage);
+	
+	void BroadcastOpenPopUp(FGameplayTag Tag);
+	
+	void BroadcastClosePopUp(FGameplayTag Tag);
 protected:
 	/** 본 게임에 참여 중인 플레이어 컨트롤러 목록 (관전자 제외) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData", meta=(DisplayName="참여 중인 플레이어 컨트롤러 목록"))

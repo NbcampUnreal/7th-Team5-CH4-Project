@@ -1,52 +1,102 @@
 #include "UI/Widgets/MiniGameReadyWidget.h"
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "Base/MiniGame/DDMiniGameStateBase.h"
+#include "Common/DDLogManager.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/MultiLineEditableTextBox.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 #include "Components/TextBlock.h"
 
+void UMiniGameReadyWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+	
+	if (ReadyButton) 
+		ReadyButton->OnClicked.AddDynamic(this, &ThisClass::OnReadyButtonClicked);
+}
+
 void UMiniGameReadyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	CurrentGameState = GetWorld()->GetGameState<ADDMiniGameStateBase>();
-	if (!CurrentGameState) return;
-	
-	CurrentGameState->OnMiniGameReadyStateChanged.AddDynamic(this, &UMiniGameReadyWidget::OnReadyStateChanged);
-	OnReadyStateChanged(CurrentGameState->GetReadyPlayerCount(), CurrentGameState->GetTotalParticipantCount());
-	
-	UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>();
-	if (IsValid(MiniGameManager))
-	{
-		UDDMiniGameDefinition* Definition = MiniGameManager->GetActiveDefinition();
-		
-		if (MiniGameTitle)
-		{
-			MiniGameTitle->SetText(FText::FromName(Definition->MiniGameID));
-		}
-		
-		if (DescriptionText)
-		{
-			DescriptionText->SetText(Definition->Description);
-		}
-		
-		if (ThumbnailImage)
-		{
-			ThumbnailImage->SetBrushFromTexture(Definition->MiniGameThumbnail);
-		}
-	}
+	TryBindGameInfo();
+	TryBindGameState(); 
 }
 
 void UMiniGameReadyWidget::NativeDestruct()
 {
+	// 바인딩 해제 
 	if (CurrentGameState)
 	{
 		CurrentGameState->OnMiniGameReadyStateChanged.RemoveDynamic(this, &ThisClass::OnReadyStateChanged);
 	}
 	
+	// 아직 타이머 도는 중이라면 타이머 해제 
+	GetWorld()->GetTimerManager().ClearTimer(GameStateRetryHandle);
+	GetWorld()->GetTimerManager().ClearTimer(GameInfoRetryHandle);
+	
 	Super::NativeDestruct();
+}
+
+void UMiniGameReadyWidget::TryBindGameState()
+{
+	CurrentGameState = GetWorld()->GetGameState<ADDMiniGameStateBase>();
+	if (!CurrentGameState)
+	{
+		LOG_KMS(Warning, TEXT("미니 게임 스테이트가 없어 다시 실행합니다."));
+		
+		GetWorld()->GetTimerManager().SetTimer(
+			GameStateRetryHandle, 
+			this, 
+			&ThisClass::TryBindGameState,
+			0.1f, 
+			false
+		);
+		
+		return;
+	}
+	
+	// 준비 인원 수 갱신 델리게이트
+	CurrentGameState->OnMiniGameReadyStateChanged.AddDynamic(
+		this, &UMiniGameReadyWidget::OnReadyStateChanged);
+	
+	OnReadyStateChanged(CurrentGameState->GetReadyPlayerCount(), CurrentGameState->GetTotalParticipantCount());
+}
+
+void UMiniGameReadyWidget::TryBindGameInfo()
+{
+	UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>();
+	if (!IsValid(MiniGameManager))
+	{
+		LOG_KMS(Warning, TEXT("미니게임 매니저가 없어 다시 실행합니다."));
+		GetWorld()->GetTimerManager().SetTimer(
+			GameInfoRetryHandle, 
+			this,
+			&ThisClass::TryBindGameInfo,
+			0.1f, 
+			false
+		);
+		
+		return;
+	}
+	
+	UDDMiniGameDefinition* Definition = MiniGameManager->GetActiveDefinition();
+	if (Definition)
+	{
+		if (MiniGameTitle) 
+			MiniGameTitle->SetText(FText::FromName(Definition->MiniGameID));
+		
+		if (DescriptionText)
+			DescriptionText->SetText(Definition->Description);
+		
+		if (ThumbnailImage && Definition->MiniGameThumbnail) 
+			ThumbnailImage->SetBrushFromTexture(Definition->MiniGameThumbnail);
+	}
+	else
+	{
+		LOG_KMS(Warning,TEXT("미니게임 정의가 없습니다.")); 
+	}
 }
 
 void UMiniGameReadyWidget::OnReadyButtonClicked()
@@ -56,7 +106,7 @@ void UMiniGameReadyWidget::OnReadyButtonClicked()
 	
 	PC->Server_RequestPlayerReady();
 
-	if (ReadyStateText)
+	if (ReadyButton)
 	{
 		ReadyButton->SetIsEnabled(false);
 	}
@@ -77,3 +127,4 @@ void UMiniGameReadyWidget::OnReadyStateChanged(int32 ReadyCount, int32 TotalCoun
 		ReadyStateText->SetText(FText::FromString(NewReadyString));
 	}
 }
+

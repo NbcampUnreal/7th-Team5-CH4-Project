@@ -4,7 +4,6 @@
 #include "Blueprint/UserWidget.h"
 #include "MiniGameBaseWidget.generated.h"
 
-
 class ADDMiniGameStateBase;
 class UHorizontalBox;
 class UTextBlock;
@@ -20,7 +19,6 @@ public:
 	virtual void NativeDestruct() override;
 	
 	virtual void CreatePlayerInfos(); 
-	
 	
 	virtual void InitializePlayerInfoWidget(UUserWidget* PlayerInfoWidget);
 	
