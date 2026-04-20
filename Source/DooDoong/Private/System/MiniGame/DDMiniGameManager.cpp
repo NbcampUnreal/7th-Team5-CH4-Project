@@ -328,6 +328,7 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 	ActiveSetup.MiniGameID = Definition->MiniGameID;
 	ActiveSetup.DisplayName = Definition->DisplayName;
 	ActiveSetup.Description = Definition->Description;
+	ActiveSetup.MiniGameThumbnail = Definition->MiniGameThumbnail;
 	ActiveSetup.Genre = Definition->Genre;
 	ActiveSetup.TimeLimitSeconds = Definition->DefaultTimeLimitSeconds;
 	ActiveSetup.MiniGameTags = Definition->MiniGameTags;

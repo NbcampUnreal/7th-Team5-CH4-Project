@@ -5,6 +5,8 @@
 #include "System/DDGameplayTags.h"
 #include "DDMiniGameTypes.generated.h"
 
+class UTexture2D;
+
 USTRUCT(BlueprintType)
 struct DOODOONG_API FMiniGameParticipantInfo
 {
@@ -71,6 +73,9 @@ struct DOODOONG_API FMiniGameSetup
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSoftObjectPtr<UTexture2D> MiniGameThumbnail;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(Categories="MiniGame.Genre"))
 	FGameplayTag Genre;
