@@ -30,6 +30,11 @@ void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
 	OnMiniGameStateTagChanged.Broadcast(CurrentState); 
 }
 
+void ADDMiniGameStateBase::SetMiniGameSetup(const FMiniGameSetup& Setup)
+{
+	MiniGameSetup = Setup;
+}
+
 void ADDMiniGameStateBase::SetRemainingTimeSeconds(float NewRemainingTimeSeconds)
 {
 	// 게임의 남은 시간을 갱신 및 저장 (UI에서 사용하거나 할 수 있도록)
@@ -122,6 +127,11 @@ int32 ADDMiniGameStateBase::GetScore(APlayerState* PlayerState) const
 	return ExistingEntry != nullptr ? ExistingEntry->Score : 0;
 }
 
+void ADDMiniGameStateBase::OnRep_MiniGameSetup()
+{
+	BroadcastMiniGameSetupChanged();
+}
+
 void ADDMiniGameStateBase::OnRep_ReadyPlayerCount()
 {
 	BroadcastReadyStateChanged();
@@ -145,6 +155,11 @@ void ADDMiniGameStateBase::OnRep_ScoreBoard()
 void ADDMiniGameStateBase::OnRep_RemainingTimeSeconds()
 {
 	OnRemainingTimeChanged.Broadcast(RemainingTimeSeconds);
+}
+
+void ADDMiniGameStateBase::BroadcastMiniGameSetupChanged()
+{
+	OnMiniGameSetupChanged.Broadcast(MiniGameSetup);
 }
 
 void ADDMiniGameStateBase::BroadcastScoreBoardChanged()

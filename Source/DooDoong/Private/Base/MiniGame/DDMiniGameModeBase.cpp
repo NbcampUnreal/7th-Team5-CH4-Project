@@ -187,6 +187,7 @@ void ADDMiniGameModeBase::InitializeMiniGame(
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
 		// 클라이언트가 확인할 초기 상태는 GameState에 복제 가능한 형태로 저장
+		MiniGameState->SetMiniGameSetup(ActiveSetup);
 		MiniGameState->SetParticipants(ActiveParticipants);
 		MiniGameState->SetRemainingTimeSeconds(ActiveSetup.TimeLimitSeconds);
 		MiniGameState->SetReadyPlayerCount(0);
