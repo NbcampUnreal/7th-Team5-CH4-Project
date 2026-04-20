@@ -1,6 +1,7 @@
 ﻿#include "MiniGames/Platformer/Actors/DDPlatformerDeadZone.h"
 
 #include "Base/Player/DDBasePlayerState.h"
+#include "Common/DDLogManager.h"
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
 #include "Components/BoxComponent.h"
 #include "Interfaces/IPluginManager.h"
@@ -8,6 +9,7 @@
 ADDPlatformerDeadZone::ADDPlatformerDeadZone()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 	
 	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
@@ -37,24 +39,34 @@ void ADDPlatformerDeadZone::OnComponentBeginOverlap(
 	}
 	
 	APawn* OverlapPawn = Cast<APawn>(OtherActor);
-	if (IsValid(OverlapPawn) == true)
+	if (IsValid(OverlapPawn) == false)
 	{
-		ADDBasePlayerState* DDPlayerState = OverlapPawn->GetPlayerState<ADDBasePlayerState>();
-		if (DDPlayerState != nullptr)
+		LOG_PMJ(Error, TEXT("=== DEADZONE : 폰 캐스팅 실패 ==="));
+		return;
+	}
+	
+	ADDBasePlayerState* DDPlayerState = OverlapPawn->GetPlayerState<ADDBasePlayerState>();
+	if (DDPlayerState == nullptr)
+	{
+		LOG_PMJ(Error, TEXT("=== DEADZONE : 플레이어 스테이트 캐스팅 실패 ==="));
+		return;
+	}
+	
+	ADDPlatformerGameMode* CurrentGameMode = Cast<ADDPlatformerGameMode>(GetWorld()->GetAuthGameMode());
+	if (IsValid(CurrentGameMode) == false)
+	{
+		LOG_PMJ(Error, TEXT("=== DEADZONE : 게임모드 캐스팅 실패 ==="));
+		return;
+	}
+	
+	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : CurrentGameMode->PlayerDatas)
+	{
+		if (DDPlayerState->PlayerGameData.SlotIndex == EnteredPlayer.Value.PlayerSlotIndex)
 		{
-			ADDPlatformerGameMode* CurrentGameMode = Cast<ADDPlatformerGameMode>(GetWorld()->GetAuthGameMode());
-			if (IsValid(CurrentGameMode) == true)
-			{
-				for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : CurrentGameMode->PlayerDatas)
-				{
-					if (DDPlayerState->PlayerGameData.SlotIndex == EnteredPlayer.Value.PlayerSlotIndex)
-					{
-						OtherActor->SetActorLocation(EnteredPlayer.Value.SavePointLocation);
-					}
-				}
-			}
+			OtherActor->SetActorLocation(EnteredPlayer.Value.SavePointLocation);
 		}
 	}
+	
 }
 
 

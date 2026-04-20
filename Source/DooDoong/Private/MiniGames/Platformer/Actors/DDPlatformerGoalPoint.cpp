@@ -48,17 +48,19 @@ void ADDPlatformerGoalPoint::OnComponentBeginOverlap(
 		return;
 	}
 	
-	/* 게임모드 가져오기 */
-	AGameModeBase* CurrentGameModeBase = Cast<AGameModeBase>(GetWorld()->GetAuthGameMode());
-	if (CurrentGameModeBase != nullptr)
+	ADDPlatformerGameMode* CurrentGameMode = Cast<ADDPlatformerGameMode>(GetWorld()->GetAuthGameMode());
+	if (IsValid(CurrentGameMode) == false)
 	{
-		ADDPlatformerGameMode* PlatformerGameModeBase = Cast<ADDPlatformerGameMode>(CurrentGameModeBase);
-		if (PlatformerGameModeBase != nullptr)
-		{
-			PlatformerGameModeBase->CheckGoalPlayerCharacter(OtherActor);
-			UE_LOG(LogPMJ, Log, TEXT("점수 전달!"));
-		}
+		LOG_PMJ(Error, TEXT("=== GOALPOINT : 게임모드 캐스팅 실패 ==="));
+		return;
 	}
+	
+	if (CurrentGameMode != nullptr)
+	{
+		CurrentGameMode->CheckGoalPlayerCharacter(OtherActor);
+		UE_LOG(LogPMJ, Log, TEXT("=== 점수 전달 성공! ==="));
+	}
+	
 }
 
 
