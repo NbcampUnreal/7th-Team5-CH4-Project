@@ -102,9 +102,6 @@ void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 	
 	// 준비 위젯 띄우기 
 	BroadcastOpenPopUp(DDGameplayTags::MiniGame_UI_ReadyPopUp);
-	
-	// TODO 추후에 UI로 준비완료 로직이 추가되면 삭제해야할 로직.
-	// SetPlayerReady(PlayerController->PlayerState, true);
 }
 
 AActor* ADDMiniGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
