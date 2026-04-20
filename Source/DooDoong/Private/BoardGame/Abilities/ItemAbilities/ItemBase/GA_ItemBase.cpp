@@ -16,7 +16,12 @@ UGA_ItemBase::UGA_ItemBase()
 	TriggerData.TriggerTag = DDGameplayTags::Event_Item_Activate;
 	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
 	AbilityTriggers.Add(TriggerData);
-
+	
+	ActivationRequiredTags.AddTag(DDGameplayTags::State_BoardGame_TurnActive);
+    ActivationRequiredTags.AddTag(DDGameplayTags::State_TurnPhase_BeforeDice);
+	
+	ActivationBlockedTags.AddTag(DDGameplayTags::State_TurnPhase_Moving);
+	ActivationBlockedTags.AddTag(DDGameplayTags::State_BoardGame_TurnWaiting);
 	ActivationBlockedTags.AddTag(DDGameplayTags::State_Character_Death);
 }
 
