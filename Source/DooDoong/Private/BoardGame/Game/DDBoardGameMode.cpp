@@ -167,7 +167,7 @@ void ADDBoardGameMode::TickState_RoundEnd()
 			}
 			
 			LOG_CJH(Log, TEXT("[Travel] 미니게임 참여 인원: %d명"), AlivePlayerControllers.Num());
-
+			
 			if (UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>())
 			{
 				LOG_CJH(Log, TEXT("[Travel] 미니게임에 진입합니다."));
@@ -355,6 +355,17 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 void ADDBoardGameMode::ProcessRoundTransition()
 {
 	CachedBoardGameState->SetTurnPlayerIndex(-1); // 턴 초기화
+	
+	for (APlayerController* PC : AlivePlayerControllers)
+    {
+       if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC))
+       {
+          if (ADDBasePlayerState* PS = DDPC->GetCachedPlayerState())
+          {
+             PS->SetTurnOrder(-1);
+          }
+       }
+    }
 	
 	if (UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance()))
 	{
