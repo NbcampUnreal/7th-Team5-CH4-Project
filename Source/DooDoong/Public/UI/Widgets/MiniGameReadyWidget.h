@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MiniGameReadyWidget.generated.h"
 
+struct FMiniGameReadyEntry;
 class UButton; 
 class UTextBlock; 
 class UImage;
@@ -16,17 +17,22 @@ class DOODOONG_API UMiniGameReadyWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeOnInitialized() override;
 	
 	virtual void NativeConstruct() override;
 	
 	virtual void NativeDestruct() override;
+	
+	void TryBindGameState(); 
+	
+	void TryBindGameInfo(); 
 	
 	UFUNCTION()
 	void OnReadyButtonClicked();
 	
 	UFUNCTION()
 	void OnReadyStateChanged(int32 ReadyCount, int32 TotalCount); 
-	
+
 public:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* MiniGameTitle;
@@ -49,4 +55,7 @@ public:
 private:
 	UPROPERTY()
 	ADDMiniGameStateBase* CurrentGameState; 
+	
+	FTimerHandle GameStateRetryHandle; 
+	FTimerHandle GameInfoRetryHandle;
 };

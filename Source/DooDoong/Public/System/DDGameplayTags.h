@@ -135,4 +135,5 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lobby_UI_CountDown);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(MiniGame_UI_ReadyPopUp);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(MiniGame_UI_Main);
 }
