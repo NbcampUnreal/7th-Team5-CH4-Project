@@ -106,6 +106,9 @@ protected:
     /** ServerTravel을 호출하여 서버와 모든 클라이언트를 묶어 로비 맵으로 이동시키는 함수 */
     void TravelToLobby();
 	
+public:
+	
+	void HandleInventoryRequest(ADDBasePlayerController* Requester);
 	
 
 protected:

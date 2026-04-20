@@ -643,6 +643,22 @@ void ADDBoardGameMode::TravelToLobby()
     }
 }
 
+void ADDBoardGameMode::HandleInventoryRequest(ADDBasePlayerController* Requester)
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(Requester);
+	if (ASC == nullptr)
+	{
+		//로그
+		return;
+	}
+	
+	if (ASC->HasMatchingGameplayTag(DDGameplayTags::State_BoardGame_TurnActive))
+	{
+		BroadcastOpenPopUp(DDGameplayTags::BoardGame_UI_Inventory);
+	}
+	
+}
+
 void ADDBoardGameMode::SetTurnPhase(FGameplayTag NewPhaseTag)
 {
 	int32 CurrentIndex = CachedBoardGameState->GetTurnPlayerIndex();

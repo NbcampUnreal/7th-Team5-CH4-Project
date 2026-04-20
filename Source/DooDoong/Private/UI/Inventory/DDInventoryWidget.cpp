@@ -3,7 +3,9 @@
 
 #include "UI/Inventory/DDInventoryWidget.h"
 
+#include "AbilitySystemComponent.h"
 #include "Base/Player/DDBasePlayerController.h"
+#include "BoardGame/Game/DDBoardGameState.h"
 #include "UI/Inventory/DDInvenGridSlot.h"
 #include "UI/Inventory/DDInventoryComponent.h"
 
@@ -11,6 +13,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
+#include "MiniGames/Platformer/GameState/DDPlatformerGameState.h"
 
 void UDDInventoryWidget::NativeOnInitialized()
 {
@@ -22,20 +25,20 @@ void UDDInventoryWidget::NativeOnInitialized()
 void UDDInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	/*/* 인벤토리 컴포넌트 가져오기 #1#
-	UDDInventoryComponent* DDInventoryComponent = GetOwningPlayer()->FindComponentByClass<UDDInventoryComponent>();
-	if (!DDInventoryComponent) return;
+	ADDBoardGameState* DDGS = GetWorld()->GetGameState<ADDBoardGameState>();
+	if (DDGS == nullptr) return;
 	
-	/* 인벤토리 컴포넌트 초기화 #1#
-	InventoryComponent = DDInventoryComponent;
-	if (!InventoryComponent.IsValid()) return;
-	
-	/* 가지고 있는 아이템 갯수 확인 #1#
-	Columns = InventoryComponent->ViewItemDatas.Num();
-	Rows = 1;
-	GenerationGrid();
-	InventoryComponent->OnInventoryChanged.AddDynamic(this, &UDDInventoryWidget::UpdateGrid);
-	UpdateGrid();*/
+	for (const auto& PlayerState : DDGS->PlayerArray)
+	{
+		ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(PlayerState);
+		if (DDPS == nullptr) continue;
+		UAbilitySystemComponent* ASC = DDPS->GetAbilitySystemComponent();
+		if (ASC == nullptr) return;
+		if (ASC->HasMatchingGameplayTag(DDGameplayTags::State_BoardGame_TurnActive))
+		{
+			InitInventory(DDPS->GetPlayerController());
+		}
+	}
 }
 
 void UDDInventoryWidget::NativeDestruct()
@@ -46,6 +49,7 @@ void UDDInventoryWidget::NativeDestruct()
 
 void UDDInventoryWidget::GenerationGrid()
 {
+	if (InventoryComponent.IsValid() == false) return;
 	for (int32 j = 0; j < Rows; ++j)
 	{
 		for (int32 i = 0; i < Columns; ++i)
@@ -77,15 +81,17 @@ void UDDInventoryWidget::GenerationGrid()
 	}
 }
 
-void UDDInventoryWidget::InitInventory(ADDBasePlayerController* Controller)
+void UDDInventoryWidget::InitInventory(APlayerController* Controller)
 {
 	if (Controller == nullptr)
 	{
 		//로그
 		return;
 	}
+	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(Controller);
+	if (DDPC == nullptr) return;
 	
-	UDDInventoryComponent* DDInventoryComponent = Controller->FindComponentByClass<UDDInventoryComponent>();
+	UDDInventoryComponent* DDInventoryComponent = DDPC->FindComponentByClass<UDDInventoryComponent>();
 	if (DDInventoryComponent == nullptr) return;
 	
 	Columns = InventoryComponent->ViewItemDatas.Num();

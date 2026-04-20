@@ -31,7 +31,7 @@ public:
 protected:
 	void GenerationGrid();
 	
-	void InitInventory(ADDBasePlayerController* Controller);
+	void InitInventory(APlayerController* Controller);
 	
 private:
 	/* 인벤토리 그리기에 필요한 데이터 */
