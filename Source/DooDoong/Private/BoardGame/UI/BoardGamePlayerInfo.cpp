@@ -2,6 +2,7 @@
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 #include "AbilitySystem/Attributes/DDPointSet.h"
 #include "Base/Player/DDBasePlayerState.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 
 void UBoardGamePlayerInfo::NativeConstruct()
@@ -37,6 +38,16 @@ void UBoardGamePlayerInfo::InitializePlayerInfo(APlayerState* PlayerState)
 		PointSet->OnTrophyChanged.AddUObject(this, &ThisClass::UpdateTrophyCount);
 		UpdateTrophyCount(PointSet->GetTrophy());
 	}
+	
+	if (BackgroundImage)
+	{
+		BackgroundDynMat = BackgroundImage->GetDynamicMaterial();
+		if (BackgroundDynMat)
+		{
+			BackgroundDynMat->SetVectorParameterValue(TEXT("Color"), FLinearColor(PlayerColor));
+		}
+	}
+	
 	
 	CurrentPlayerState->OnRankChanged.AddUObject(this, &ThisClass::UpdateCurrentRank);
     UpdateCurrentRank(CurrentPlayerState->PlayerGameData.CurrentRank);

@@ -5,6 +5,10 @@
 #include "FinalResultWidget.generated.h"
 
 class UTextBlock;
+class UVerticalBox;
+class UBoardGamePlayerInfo; 
+class UButton; 
+class ADDBasePlayerState;
 
 UCLASS()
 class DOODOONG_API UFinalResultWidget : public UUserWidget
@@ -12,47 +16,29 @@ class DOODOONG_API UFinalResultWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeOnInitialized() override;
+	
 	virtual void NativeConstruct() override;
 	
 	virtual void NativeDestruct() override;
 	
 protected:
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> PlayerName1;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> TrophyCount1;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> CoinCount1;
-	
-protected:	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> PlayerName2;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> TrophyCount2;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> CoinCount2;
+	void CreatePlayerInfoWidgets(const TArray<ADDBasePlayerState*>& WidgetInfos);
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> PlayerName3;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> TrophyCount3;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> CoinCount3;
+	TObjectPtr<UButton> ExitButton;
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> PlayerName4;
+	TObjectPtr<UVerticalBox> PlayerInfoContainer; // 플레이어 정보들 
 	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> TrophyCount4;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UBoardGamePlayerInfo> PlayerInfoWidgetClass; 
 	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> CoinCount4;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	float PlayerInfoWidth = 200.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	float PlayerInfoHeight = 120.f;
 };

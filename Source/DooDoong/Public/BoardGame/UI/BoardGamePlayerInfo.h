@@ -6,6 +6,7 @@
 
 class UTextBlock; 
 class ADDBasePlayerState;
+class UImage; 
 
 UCLASS()
 class DOODOONG_API UBoardGamePlayerInfo : public UUserWidget
@@ -34,6 +35,9 @@ protected:
 
 protected:
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> RankText; 
+	
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> PlayerNameText; 
 	
 	UPROPERTY(meta = (BindWidget))
@@ -50,6 +54,12 @@ protected:
 	
 	UPROPERTY()
 	FLinearColor PlayerColor = FLinearColor::White;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> BackgroundImage; 
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UMaterialInstanceDynamic> BackgroundDynMat;
 	
 protected:
 	UPROPERTY()
