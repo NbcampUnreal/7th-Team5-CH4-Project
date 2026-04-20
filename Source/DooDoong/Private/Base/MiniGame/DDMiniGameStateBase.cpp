@@ -3,6 +3,7 @@
 #include "Base/Player/DDBasePlayerState.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "System/DDSoundManager.h"
 
 ADDMiniGameStateBase::ADDMiniGameStateBase()
 {
@@ -14,6 +15,8 @@ void ADDMiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// 진행 상태와 점수판은 모든 클라이언트가 동일하게 봐야하기 때문에 복제
+	DOREPLIFETIME(ADDMiniGameStateBase, MiniGameSetup);
+	DOREPLIFETIME(ADDMiniGameStateBase, bMiniGameSetupReady);
 	DOREPLIFETIME(ADDMiniGameStateBase, CurrentState);
 	DOREPLIFETIME(ADDMiniGameStateBase, RemainingTimeSeconds);
 	DOREPLIFETIME(ADDMiniGameStateBase, Participants);
@@ -26,8 +29,36 @@ void ADDMiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
 {
 	// 현재 진행 단계를 갱신할 때 사용
+	if (CurrentState == NewState)
+	{
+		return;
+	}
+	
 	CurrentState = NewState;
 	OnMiniGameStateTagChanged.Broadcast(CurrentState); 
+	
+	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		PlayMiniGameBGM();
+	}
+}
+
+void ADDMiniGameStateBase::SetMiniGameSetup(const FMiniGameSetup& Setup)
+{
+	MiniGameSetup = Setup;
+	bMiniGameSetupReady = false;
+	bHasBroadcastMiniGameSetup = false;
+}
+
+void ADDMiniGameStateBase::NotifyMiniGameSetupReady()
+{
+	bMiniGameSetupReady = true;
+	BroadcastMiniGameSetupChanged();
+	
+	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		PlayMiniGameBGM();
+	}
 }
 
 void ADDMiniGameStateBase::SetRemainingTimeSeconds(float NewRemainingTimeSeconds)
@@ -122,6 +153,29 @@ int32 ADDMiniGameStateBase::GetScore(APlayerState* PlayerState) const
 	return ExistingEntry != nullptr ? ExistingEntry->Score : 0;
 }
 
+void ADDMiniGameStateBase::OnRep_MiniGameSetup()
+{
+	BroadcastMiniGameSetupChanged();
+}
+
+void ADDMiniGameStateBase::OnRep_MiniGameSetupReady()
+{
+	BroadcastMiniGameSetupChanged();
+	
+	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		PlayMiniGameBGM();
+	}
+}
+
+void ADDMiniGameStateBase::OnRep_CurrentState()
+{
+	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		PlayMiniGameBGM();
+	}
+}
+
 void ADDMiniGameStateBase::OnRep_ReadyPlayerCount()
 {
 	BroadcastReadyStateChanged();
@@ -147,6 +201,17 @@ void ADDMiniGameStateBase::OnRep_RemainingTimeSeconds()
 	OnRemainingTimeChanged.Broadcast(RemainingTimeSeconds);
 }
 
+void ADDMiniGameStateBase::BroadcastMiniGameSetupChanged()
+{
+	if (!bMiniGameSetupReady || bHasBroadcastMiniGameSetup || MiniGameSetup.MiniGameID.IsNone())
+	{
+		return;
+	}
+
+	bHasBroadcastMiniGameSetup = true;
+	OnMiniGameSetupChanged.Broadcast(MiniGameSetup);
+}
+
 void ADDMiniGameStateBase::BroadcastScoreBoardChanged()
 {
 	OnMiniGameScoreBoardChanged.Broadcast();
@@ -160,4 +225,17 @@ void ADDMiniGameStateBase::BroadcastReadyStateChanged()
 void ADDMiniGameStateBase::BroadcastReadyEntriesChanged()
 {
 	OnMiniGameReadyEntriesChanged.Broadcast(ReadyEntries);
+}
+
+void ADDMiniGameStateBase::PlayMiniGameBGM()
+{
+	if (GetNetMode() == NM_DedicatedServer || MiniGameSetup.BGM.IsNone())
+	{
+		return;
+	}
+
+	if (UDDSoundManager* SoundManager = UDDSoundManager::Get(this))
+	{
+		SoundManager->PlayBGM(MiniGameSetup.BGM, 0.5f);
+	}
 }

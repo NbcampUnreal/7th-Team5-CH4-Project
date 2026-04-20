@@ -102,9 +102,6 @@ void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 	
 	// 준비 위젯 띄우기 
 	BroadcastOpenPopUp(DDGameplayTags::MiniGame_UI_ReadyPopUp);
-	
-	// TODO 추후에 UI로 준비완료 로직이 추가되면 삭제해야할 로직.
-	// SetPlayerReady(PlayerController->PlayerState, true);
 }
 
 AActor* ADDMiniGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -187,6 +184,7 @@ void ADDMiniGameModeBase::InitializeMiniGame(
 	if (ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
 		// 클라이언트가 확인할 초기 상태는 GameState에 복제 가능한 형태로 저장
+		MiniGameState->SetMiniGameSetup(ActiveSetup);
 		MiniGameState->SetParticipants(ActiveParticipants);
 		MiniGameState->SetRemainingTimeSeconds(ActiveSetup.TimeLimitSeconds);
 		MiniGameState->SetReadyPlayerCount(0);
@@ -194,6 +192,7 @@ void ADDMiniGameModeBase::InitializeMiniGame(
 		MiniGameState->SetReadyEntries(TArray<FMiniGameReadyEntry>());
 		MiniGameState->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 		MiniGameState->SetScoreBoard(TArray<FMiniGameScoreEntry>());
+		MiniGameState->NotifyMiniGameSetupReady();
 	}
 }
 

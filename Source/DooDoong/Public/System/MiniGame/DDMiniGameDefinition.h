@@ -58,5 +58,7 @@ public:
 	/** 선택 지정 : 따로 미니게임 RuleSet이 있다면 RuleSet */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
 	TSubclassOf<UDDMiniGameRuleSet> RuleSetClass;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame|Sound")
+	FName BGM;
 };

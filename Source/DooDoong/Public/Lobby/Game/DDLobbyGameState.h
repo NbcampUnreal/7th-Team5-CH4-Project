@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
+#include "System/DDSoundManager.h"
 #include "DDLobbyGameState.generated.h"
 
 class ADDLobbyPlayerController;
@@ -19,6 +20,8 @@ class DOODOONG_API ADDLobbyGameState : public AGameStateBase
 public:
 	ADDLobbyGameState();
 	
+	virtual void BeginPlay() override;
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	UFUNCTION()
@@ -29,6 +32,10 @@ public:
 	
 	UFUNCTION()
 	void OnRep_CountDown();
+	
+public:
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_StopLobbyBGM();
 	
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Lobby")
@@ -54,10 +61,6 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnCountDownChanged OnCountDownChanged;
-
-
-	
-	
 };
 
 

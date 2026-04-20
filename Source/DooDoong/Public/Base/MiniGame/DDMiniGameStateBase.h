@@ -5,6 +5,7 @@
 #include "Base/Game/DDGameStateBase.h"
 #include "DDMiniGameStateBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMinigameSetupChanged, const FMiniGameSetup&, Setup);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMiniGameReadyStateChanged, int32, ReadyPlayerCount, int32, TotalParticipantCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGameReadyEntriesChanged, const TArray<FMiniGameReadyEntry>&, ReadyEntries);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMiniGameScoreBoardChanged);
@@ -37,6 +38,18 @@ public:
 	bool IsMiniGameState(FGameplayTag StateTag) const { return CurrentState == StateTag; }
 
 public:
+	
+	UFUNCTION(BlueprintPure, Category="MiniGame")
+	const FMiniGameSetup& GetMiniGameSetup() const { return MiniGameSetup; };
+	
+	UFUNCTION(BlueprintCallable, Category="MiniGame")
+	void SetMiniGameSetup(const FMiniGameSetup& Setup);
+
+	UFUNCTION(BlueprintPure, Category="MiniGame")
+	bool IsMiniGameSetupReady() const { return bMiniGameSetupReady; }
+
+	void NotifyMiniGameSetupReady();
+	
 	/** 남은 시간 Get */
 	UFUNCTION(BlueprintPure, Category="MiniGame")
 	float GetRemainingTimeSeconds() const { return RemainingTimeSeconds; }
@@ -93,6 +106,9 @@ public:
 	int32 GetScore(APlayerState* PlayerState) const;
 
 public:
+	UPROPERTY(BlueprintAssignable, Category = "MiniGame|Setup")
+	FOnMinigameSetupChanged OnMiniGameSetupChanged;
+	
 	/** 준비 상태 UI 갱신을 위한 델리게이트 */
 	UPROPERTY(BlueprintAssignable, Category="MiniGame|Ready")
 	FOnMiniGameReadyStateChanged OnMiniGameReadyStateChanged;
@@ -106,6 +122,15 @@ public:
 	FOnMiniGameScoreBoardChanged OnMiniGameScoreBoardChanged;
 
 public:
+	UFUNCTION()
+	void OnRep_MiniGameSetup();
+	
+	UFUNCTION()
+	void OnRep_MiniGameSetupReady();
+	
+	UFUNCTION()
+	void OnRep_CurrentState();
+	
 	/** 준비 인원 수가 클라이언트에 동기화되면 UI를 갱신하기 위해 호출 */
 	UFUNCTION()
 	void OnRep_ReadyPlayerCount();
@@ -126,6 +151,8 @@ public:
 	void OnRep_RemainingTimeSeconds(); 
 
 public:
+	void BroadcastMiniGameSetupChanged();
+	
 	/** 준비상태 변화 헬퍼 */
 	void BroadcastReadyStateChanged();
 	
@@ -134,10 +161,21 @@ public:
 	
 	/** ScoreBoard 변화 헬퍼 */
 	void BroadcastScoreBoardChanged();
+	
+protected:
+	void PlayMiniGameBGM();
 
 protected:
+	UPROPERTY(ReplicatedUsing=OnRep_MiniGameSetup, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
+	FMiniGameSetup MiniGameSetup;
+
+	UPROPERTY(ReplicatedUsing=OnRep_MiniGameSetupReady, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
+	bool bMiniGameSetupReady = false;
+
+	bool bHasBroadcastMiniGameSetup = false;
+	
 	/** 현재 게임 상태 */
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.State"))
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentState, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.State"))
 	FGameplayTag CurrentState = DDGameplayTags::State_MiniGame_Idle;
 	
 	/** 남은 시간 */

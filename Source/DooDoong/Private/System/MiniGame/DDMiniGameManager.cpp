@@ -326,10 +326,14 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 
 	ActiveSetup = FMiniGameSetup();
 	ActiveSetup.MiniGameID = Definition->MiniGameID;
+	ActiveSetup.DisplayName = Definition->DisplayName;
+	ActiveSetup.Description = Definition->Description;
+	ActiveSetup.MiniGameThumbnail = Definition->MiniGameThumbnail;
 	ActiveSetup.Genre = Definition->Genre;
 	ActiveSetup.TimeLimitSeconds = Definition->DefaultTimeLimitSeconds;
 	ActiveSetup.MiniGameTags = Definition->MiniGameTags;
 	ActiveSetup.MiniGameMap = Definition->MiniGameMap;
+	ActiveSetup.BGM = Definition->BGM;
 	ActiveParticipants.Reset();
 
 	for (int32 Index = 0; Index < Players.Num(); ++Index)
