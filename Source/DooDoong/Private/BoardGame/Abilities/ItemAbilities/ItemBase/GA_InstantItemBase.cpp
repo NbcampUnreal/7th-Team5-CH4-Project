@@ -7,6 +7,7 @@ void UGA_InstantItemBase::ActivateAbility(FGameplayAbilitySpecHandle Handle, con
 
 	if (!HasAuthority(&ActivationInfo))
 	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		return;
 	}
 	

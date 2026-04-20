@@ -1,6 +1,7 @@
 #include "AbilitySystem/Attributes/DDPointSet.h"
 
 #include "GameplayEffectExtension.h"
+#include "BoardGame/Game/DDBoardGameMode.h"
 
 UDDPointSet::UDDPointSet()
 {
@@ -33,7 +34,12 @@ void UDDPointSet::PostAttributeChange(const FGameplayAttribute& Attribute, float
 	}
 	else if (Attribute == GetTrophyAttribute())
 	{
-		OnTrophyChanged.Broadcast(NewValue);	
+		OnTrophyChanged.Broadcast(NewValue);
+	}
+	
+	if (ADDBoardGameMode* BM = Cast<ADDBoardGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+	    BM->RequestRankUpdate();
 	}
 	
 }

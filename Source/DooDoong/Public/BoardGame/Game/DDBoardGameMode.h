@@ -82,6 +82,15 @@ protected:
 
     /** 이동 연출이나 아이템 사용이 완전히 끝난 후, 약간의 대기 시간을 거쳐 실제로 다음 플레이어에게 턴을 넘기는 딜레이용 함수 */
     void ExecuteNextTurnTransition();
+	
+public:
+	/** 점수 변동 시 AttributeSet에서 호출할 랭킹 갱신 요청 함수 */
+	UFUNCTION(BlueprintCallable, Category = "GameLoop|Ranking")
+    void RequestRankUpdate();
+	
+protected:
+	/** 타이머에 의해 실제 랭킹 갱신을 수행하는 내부 함수 */
+	void ExecuteRankUpdate();
 
     
     // ==========================================
@@ -108,6 +117,7 @@ protected:
 	FTimerHandle MainTimerHandle;
 	FTimerHandle TurnTransitionTimerHandle;
 	FTimerHandle ReturnToLobbyTimerHandle;
+	FTimerHandle RankUpdateTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "GameData", meta=(DisplayName="게임 엔딩 시 돌아갈 로비 맵"))
     FString LobbyMapPath = TEXT("/Game/DooDoong/Map/L_Park?listen");
