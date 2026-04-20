@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerState.h"
 #include "DDBasePlayerState.generated.h"
 
+class UDDInventoryComponent;
 class UDDPointSet;
 class UDDAbilitySystemComponent;
 class UDDHealthSet;
@@ -128,6 +129,7 @@ protected:
 	/* 민재 :인벤토리 로직*/
 public:
 	UDDInventoryComponent* GetInventoryComponent() const {return InventoryComponent;}
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TObjectPtr<UDDInventoryComponent> InventoryComponent;
