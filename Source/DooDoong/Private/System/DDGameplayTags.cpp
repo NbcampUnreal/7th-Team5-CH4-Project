@@ -111,6 +111,7 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_GiveBomb, "Item.Ability.GiveBomb", "폭탄 넘기기 아이템 어빌리티");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_Magnet, "Item.Ability.Magnet", "자석 아이템 어빌리티");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_MeleeDamage, "Item.Ability.MeleeDamage", "근거리공격 아이템 어빌리티");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Item_Ability_Portal, "Item.Ability.Portal", "포탈 아이템 어빌리티");
 	
 	// 아이템 액션 상태 태그
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_ItemAction_Targeting, "State.ItemAction.Targeting", "아이템 타겟 선택 중");
@@ -122,6 +123,10 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_TargetingItem_GiveBomb_Target, "GameplayCue.TargetingItem.GiveBomb.Target", "폭탄보내기 게임플레이 큐 : Target 시점");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_RangeItem_Magnet_Confrim, "GameplayCue.RangeItem.Magnet.Confirm", "자석 게임플레이 큐 : Confirm 시점");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_RangeItem_Magnet_Target, "GameplayCue.RangeItem.Magnet.Target", "자석 게임플레이 큐 : Target 시점");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_RangeItem_MeleeDamage_Target, "GameplayCue.RangeItem.MeleeDamage.Target", "근거리공격 게임플레이 큐 : Target 시점");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_RangeItem_MeleeDamage_Confrim, "GameplayCue.RangeItem.MeleeDamage.Confirm", "근거리 공격 게임플레이 큐 : Confirm 시점");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_TargetingItem_Portal_Target, "GameplayCue.TargetingItem.Portal.Target", "포탈 게임플레이 큐 : Target 시점");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_TargetingItem_Portal_Confrim, "GameplayCue.TargetingItem.Portal.Confirm", "포탈 게임플레이 큐 : Confirm 시점");
 	
 	
 	// UI 태그 

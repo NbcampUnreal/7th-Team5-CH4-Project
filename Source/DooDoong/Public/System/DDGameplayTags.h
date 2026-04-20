@@ -114,6 +114,7 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_GiveBomb);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_Magnet);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_MeleeDamage);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Item_Ability_Portal);
 	
 	// 아이템 액션 상태 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ItemAction_Targeting);
@@ -125,6 +126,10 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_TargetingItem_GiveBomb_Target);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_RangeItem_Magnet_Confirm);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_RangeItem_Magnet_Target);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_RangeItem_MeleeDamage_Confirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_RangeItem_MeleeDamage_Target);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_TargetingItem_Portal_Confirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_TargetingItem_Portal_Target);
 	
 	// UI 태그 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoardGame_UI_PlayerTurn); 
