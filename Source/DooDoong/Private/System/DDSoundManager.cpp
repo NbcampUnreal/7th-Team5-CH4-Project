@@ -23,7 +23,6 @@ void UDDSoundManager::Initialize(FSubsystemCollectionBase& Collection)
 	CategoryVolumes.Add(EDDSoundCategory::BGM, 1.f);
 	CategoryVolumes.Add(EDDSoundCategory::SFX, 1.f);
 	CategoryVolumes.Add(EDDSoundCategory::UI, 1.f);
-	CategoryVolumes.Add(EDDSoundCategory::GameplayCue, 1.f);
 
 	if (const UDDGameInstance* DDGameInstance = Cast<UDDGameInstance>(GetGameInstance()))
 	{

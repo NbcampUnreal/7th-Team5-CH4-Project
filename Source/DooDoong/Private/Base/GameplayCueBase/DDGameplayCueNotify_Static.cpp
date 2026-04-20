@@ -1,11 +1,11 @@
-#include "BoardGame/Abilities/ItemCueBase/DDItemGameplayCueNotify_Static.h"
+#include "Base/GameplayCueBase/DDGameplayCueNotify_Static.h"
 
 #include "Animation/AnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "System/DDSoundManager.h"
 
-bool UDDItemGameplayCueNotify_Static::OnExecute_Implementation(
+bool UDDGameplayCueNotify_Static::OnExecute_Implementation(
 	AActor* MyTarget,
 	const FGameplayCueParameters& Parameters) const
 {
@@ -18,7 +18,7 @@ bool UDDItemGameplayCueNotify_Static::OnExecute_Implementation(
 	return true;
 }
 
-void UDDItemGameplayCueNotify_Static::PlayAnimation(const FGameplayCueParameters& Parameters) const
+void UDDGameplayCueNotify_Static::PlayAnimation(const FGameplayCueParameters& Parameters) const
 {
 	if (!Montage)
 	{
@@ -55,7 +55,7 @@ void UDDItemGameplayCueNotify_Static::PlayAnimation(const FGameplayCueParameters
 	}
 }
 
-void UDDItemGameplayCueNotify_Static::PlaySound(
+void UDDGameplayCueNotify_Static::PlaySound(
 	const UObject* WorldContextObject,
 	const FGameplayCueParameters& Parameters) const
 {
@@ -73,7 +73,7 @@ void UDDItemGameplayCueNotify_Static::PlaySound(
 	SoundManager->PlaySoundAtLocation(SoundID, Parameters.Location);
 }
 
-void UDDItemGameplayCueNotify_Static::SpawnEffect(
+void UDDGameplayCueNotify_Static::SpawnEffect(
 	const UObject* WorldContextObject,
 	const FGameplayCueParameters& Parameters) const
 {

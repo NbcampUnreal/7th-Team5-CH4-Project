@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "GameplayCueNotify_Static.h"
-#include "DDItemGameplayCueNotify_Static.generated.h"
+#include "DDGameplayCueNotify_Static.generated.h"
 
 class UNiagaraSystem;
 class UAnimMontage;
 
 UCLASS(Blueprintable)
-class DOODOONG_API UDDItemGameplayCueNotify_Static : public UGameplayCueNotify_Static
+class DOODOONG_API UDDGameplayCueNotify_Static : public UGameplayCueNotify_Static
 {
 	GENERATED_BODY()
 

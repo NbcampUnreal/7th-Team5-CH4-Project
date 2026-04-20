@@ -13,8 +13,7 @@ enum class EDDSoundCategory : uint8
 {
 	BGM,
 	SFX,
-	UI,
-	GameplayCue
+	UI
 };
 
 USTRUCT(BlueprintType)
