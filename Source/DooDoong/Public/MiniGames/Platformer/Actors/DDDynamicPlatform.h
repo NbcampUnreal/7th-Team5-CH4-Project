@@ -16,15 +16,17 @@ class DOODOONG_API ADDDynamicPlatform : public AActor
 
 public:
 	ADDDynamicPlatform();
-
+	
+	virtual void Tick(float DeltaSeconds) override;
+	
 protected:
 	virtual void BeginPlay() override;
-	
+
 public:
 	UFUNCTION()
-	void MovingPlatform();
+	void MovingPlatform(float DeltaSeconds);
 	UFUNCTION()
-	void RotatingPlatform();
+	void RotatingPlatform(float DeltaSeconds);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Components", meta = (AllowPrivateAccess = "true"))
@@ -46,8 +48,4 @@ protected:
 private:
 	FVector StartLocation;
 	FVector MoveDirection;
-	
-	float TimerRate;
-	
-	FTimerHandle DynamicPlatformTimerHandle;
 };
