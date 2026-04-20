@@ -27,6 +27,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnRep_PlayerState() override;
 	virtual void SetupInputComponent() override;
 
 protected:
@@ -131,13 +132,18 @@ protected:
 	
 	/*민재 : 인벤토리 코드*/
 
+public:
+	UDDInventoryComponent* GetInventoryComponent() const {return InventoryComponent;}
 	
 protected:
 	void Input_ToggleInventoryMenu();
 	
 	UFUNCTION(Server, Reliable)
 	void Server_RequestInventory();
-	
+
 private:
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TObjectPtr<UDDInventoryComponent> InventoryComponent;
+	
 	bool bInventoryOpen;
 };
