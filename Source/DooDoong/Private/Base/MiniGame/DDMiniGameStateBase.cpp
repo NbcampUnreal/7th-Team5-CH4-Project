@@ -27,6 +27,7 @@ void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
 {
 	// 현재 진행 단계를 갱신할 때 사용
 	CurrentState = NewState;
+	OnMiniGameStateTagChanged.Broadcast(CurrentState); 
 }
 
 void ADDMiniGameStateBase::SetRemainingTimeSeconds(float NewRemainingTimeSeconds)

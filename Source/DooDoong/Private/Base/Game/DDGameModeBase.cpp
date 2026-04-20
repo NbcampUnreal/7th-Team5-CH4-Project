@@ -203,3 +203,60 @@ void ADDGameModeBase::BroadcastToAllPlayers(TFunctionRef<void(ADDBasePlayerContr
 		}
 	}
 }
+
+void ADDGameModeBase::BroadcastGameLayer(const FGameplayTag NewGameTag)
+{
+	if (!NewGameTag.IsValid()) return;
+	
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC);
+		if (IsValid(DDPC))
+		{
+			DDPC->Client_SwitchGameLayer(NewGameTag);
+		}
+	}
+}
+
+void ADDGameModeBase::BroadcastErrorMessage(const FString& ErrorMessage)
+{
+	LOG_KMS(Error, TEXT("%s"), *ErrorMessage);
+	
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC);
+		if (IsValid(DDPC))
+		{
+			DDPC->Client_DrawErrorMessage(ErrorMessage);
+		}
+	}
+}
+
+void ADDGameModeBase::BroadcastOpenPopUp(FGameplayTag Tag)
+{
+	if (!Tag.IsValid()) return;
+	
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC);
+		if (IsValid(DDPC))
+		{
+			
+			DDPC->Client_OpenPopUp(Tag);
+		}
+	}
+}
+
+void ADDGameModeBase::BroadcastClosePopUp(FGameplayTag Tag)
+{
+	if (!Tag.IsValid()) return;
+	
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC);
+		if (IsValid(DDPC))
+		{
+			DDPC->Client_ClosePopUp(Tag);
+		}
+	}
+}

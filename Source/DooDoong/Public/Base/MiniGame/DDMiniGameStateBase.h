@@ -166,4 +166,6 @@ protected:
 	
 public:
 	FRemainingTimeChanged OnRemainingTimeChanged;
+	
+	FOnMiniGameStateTagChanged OnMiniGameStateTagChanged;
 };
