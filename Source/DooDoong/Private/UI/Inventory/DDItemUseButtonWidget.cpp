@@ -2,6 +2,9 @@
 
 
 #include "UI/Inventory/DDItemUseButtonWidget.h"
+
+#include "Base/Player/DDBasePlayerController.h"
+#include "Common/DDLogManager.h"
 #include "UI/Inventory/DDInventoryComponent.h"
 #include "UI/Inventory/DDInventoryWidget.h"
 #include "Components/Button.h"
@@ -10,7 +13,7 @@
 void UDDItemUseButtonWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	InventoryComponent = GetOwningLocalPlayer()->GetPlayerController(GetWorld())->FindComponentByClass<UDDInventoryComponent>();
+	
 }
 
 void UDDItemUseButtonWidget::NativeConstruct()
@@ -28,28 +31,31 @@ void UDDItemUseButtonWidget::NativeConstruct()
 	}
 }
 
-
-
 void UDDItemUseButtonWidget::UseButton()
 {
-	if (GetOwningLocalPlayer())
+	ADDBasePlayerController* PC = Cast<ADDBasePlayerController>(GetOwningPlayer());
+	if (PC == nullptr) return;
+	ADDBasePlayerState* PS = PC->GetPlayerState<ADDBasePlayerState>();
+	if (PS == nullptr) return;
+	UDDInventoryComponent* InventoryComponent = Cast<UDDInventoryComponent>(PS->GetInventoryComponent());
+	if (InventoryComponent == nullptr)
 	{
-		InventoryComponent->Server_UseItem(CurrentItemSlotName);
-		this->SetVisibility(ESlateVisibility::Collapsed);
+		LOG_PMJ(Error, TEXT(" UseButtonWidget : 인벤토리 컴포넌트 없어요"));
+		return;
 	}
+	InventoryComponent->Server_UseItem(CurrentItemSlotName);
+	this->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UDDItemUseButtonWidget::CancelButton()
 {
-	if (GetOwningLocalPlayer())
+	
+	UDDInvenGridSlot* ParentGridSlot = Cast<UDDInvenGridSlot>(GetParent());
+	if (ParentGridSlot != nullptr)
 	{
-		UDDInvenGridSlot* ParentGridSlot = Cast<UDDInvenGridSlot>(GetParent());
-		if (ParentGridSlot != nullptr)
-		{
-			ParentGridSlot->BT_ClickItem->SetIsEnabled(true);
-		}
-		this->SetVisibility(ESlateVisibility::Collapsed);
+		ParentGridSlot->BT_ClickItem->SetIsEnabled(true);
 	}
+	this->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UDDItemUseButtonWidget::InitializeGridSlotData(const FName& SlotItemName)
