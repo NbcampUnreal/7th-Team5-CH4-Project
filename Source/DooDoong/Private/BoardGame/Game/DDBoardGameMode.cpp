@@ -335,7 +335,8 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 	// 서버 측 이펙트 적용
 	ApplyTurnEffectsToPlayers();
 	SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
-
+	
+	
 	// PC들에게 반응 지시
 	for (int32 i = 0; i < AlivePlayerControllers.Num(); ++i)
 	{

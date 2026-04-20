@@ -193,6 +193,8 @@ void ADDPlatformerGameMode::PlayerRanking()
 			break;
 		case 4 : AddScore(EnteredPlayer.Value.PlayerState.Get(), 40);
 			break;
+		default: LOG_PMJ(Error, TEXT("=== GAMEMODE : 플레이어의 랭킹 없음 ==="));
+			break;
 		}
 	}
 	

@@ -7,6 +7,7 @@
 #include "DDInventoryWidget.generated.h"
 
 
+class ADDBasePlayerController;
 class UDDInventoryComponent;
 class UCanvasPanel;
 class UDDInvenGridSlot;
@@ -29,6 +30,8 @@ public:
 	
 protected:
 	void GenerationGrid();
+	
+	void InitInventory(ADDBasePlayerController* Controller);
 	
 private:
 	/* 인벤토리 그리기에 필요한 데이터 */
