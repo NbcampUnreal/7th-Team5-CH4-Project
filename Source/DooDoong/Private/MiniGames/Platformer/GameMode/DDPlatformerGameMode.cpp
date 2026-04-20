@@ -166,20 +166,36 @@ void ADDPlatformerGameMode::PlayerRanking()
 			});
 			
 			/* 정렬된 순서대로 높은 등수 부여 */
-			for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerNoGoalArrays)
+			for (TPair<int32, FPlatformerPlayerData>& EnteredPlayerNoGoal : PlayerNoGoalArrays)
 			{
-				EnteredPlayer.Value.PlayerRank = Rank;
+				EnteredPlayerNoGoal.Value.PlayerRank = Rank;
 				Rank++;
-				PlayerRankingArrays.Add(EnteredPlayer);
+				PlayerRankingArrays.Add(EnteredPlayerNoGoal);
 			}
 		}
 	}
-	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerRankingArrays)
+	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayerRanking : PlayerRankingArrays)
 	{
-		LOG_PMJ(Warning, TEXT("PlayerID : %d PlayerRank : %d"), EnteredPlayer.Value.PlayerSlotIndex, EnteredPlayer.Value.PlayerRank);
+		LOG_PMJ(Warning, TEXT("PlayerID : %d PlayerRank : %d"), EnteredPlayerRanking.Value.PlayerSlotIndex, EnteredPlayerRanking.Value.PlayerRank);
 	}
 	
 	//TODO_@Minjae : AddScore 로직 필요
+	
+	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
+	{
+		switch (EnteredPlayer.Value.PlayerRank)
+		{
+		case 1 : AddScore(EnteredPlayer.Value.PlayerState.Get(), 100);
+			break;
+		case 2 : AddScore(EnteredPlayer.Value.PlayerState.Get(), 80);
+			break;
+		case 3 : AddScore(EnteredPlayer.Value.PlayerState.Get(), 60);
+			break;
+		case 4 : AddScore(EnteredPlayer.Value.PlayerState.Get(), 40);
+			break;
+		}
+	}
+	
 }
 
 void ADDPlatformerGameMode::WaitingTimerStart()
