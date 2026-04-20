@@ -3,6 +3,7 @@
 #include "Base/Player/DDBasePlayerState.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "System/DDSoundManager.h"
 
 ADDMiniGameStateBase::ADDMiniGameStateBase()
 {
@@ -28,8 +29,18 @@ void ADDMiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
 {
 	// 현재 진행 단계를 갱신할 때 사용
+	if (CurrentState == NewState)
+	{
+		return;
+	}
+	
 	CurrentState = NewState;
 	OnMiniGameStateTagChanged.Broadcast(CurrentState); 
+	
+	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		PlayMiniGameBGM();
+	}
 }
 
 void ADDMiniGameStateBase::SetMiniGameSetup(const FMiniGameSetup& Setup)
@@ -43,6 +54,11 @@ void ADDMiniGameStateBase::NotifyMiniGameSetupReady()
 {
 	bMiniGameSetupReady = true;
 	BroadcastMiniGameSetupChanged();
+	
+	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		PlayMiniGameBGM();
+	}
 }
 
 void ADDMiniGameStateBase::SetRemainingTimeSeconds(float NewRemainingTimeSeconds)
@@ -145,6 +161,19 @@ void ADDMiniGameStateBase::OnRep_MiniGameSetup()
 void ADDMiniGameStateBase::OnRep_MiniGameSetupReady()
 {
 	BroadcastMiniGameSetupChanged();
+	
+	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		PlayMiniGameBGM();
+	}
+}
+
+void ADDMiniGameStateBase::OnRep_CurrentState()
+{
+	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		PlayMiniGameBGM();
+	}
 }
 
 void ADDMiniGameStateBase::OnRep_ReadyPlayerCount()
@@ -196,4 +225,17 @@ void ADDMiniGameStateBase::BroadcastReadyStateChanged()
 void ADDMiniGameStateBase::BroadcastReadyEntriesChanged()
 {
 	OnMiniGameReadyEntriesChanged.Broadcast(ReadyEntries);
+}
+
+void ADDMiniGameStateBase::PlayMiniGameBGM()
+{
+	if (GetNetMode() == NM_DedicatedServer || MiniGameSetup.BGM.IsNone())
+	{
+		return;
+	}
+
+	if (UDDSoundManager* SoundManager = UDDSoundManager::Get(this))
+	{
+		SoundManager->PlayBGM(MiniGameSetup.BGM, 0.5f);
+	}
 }

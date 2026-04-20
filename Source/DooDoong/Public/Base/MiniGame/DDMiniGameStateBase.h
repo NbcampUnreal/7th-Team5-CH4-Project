@@ -124,9 +124,12 @@ public:
 public:
 	UFUNCTION()
 	void OnRep_MiniGameSetup();
-
+	
 	UFUNCTION()
 	void OnRep_MiniGameSetupReady();
+	
+	UFUNCTION()
+	void OnRep_CurrentState();
 	
 	/** 준비 인원 수가 클라이언트에 동기화되면 UI를 갱신하기 위해 호출 */
 	UFUNCTION()
@@ -158,6 +161,9 @@ public:
 	
 	/** ScoreBoard 변화 헬퍼 */
 	void BroadcastScoreBoardChanged();
+	
+protected:
+	void PlayMiniGameBGM();
 
 protected:
 	UPROPERTY(ReplicatedUsing=OnRep_MiniGameSetup, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
@@ -169,7 +175,7 @@ protected:
 	bool bHasBroadcastMiniGameSetup = false;
 	
 	/** 현재 게임 상태 */
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.State"))
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentState, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.State"))
 	FGameplayTag CurrentState = DDGameplayTags::State_MiniGame_Idle;
 	
 	/** 남은 시간 */
