@@ -18,25 +18,45 @@
 void UDDInventoryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
-	
 }
 
 void UDDInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	
+	LOG_KMS(Warning, TEXT("[NativeConstruct] ")); 
 	ADDBoardGameState* DDGS = GetWorld()->GetGameState<ADDBoardGameState>();
-	if (DDGS == nullptr) return;
+	if (!DDGS)
+	{
+		LOG_KMS(Warning, TEXT("[NativeConstruct] : GameState is Null.")); 
+		return;
+	}
 	
 	for (const auto& PlayerState : DDGS->PlayerArray)
 	{
+		
 		ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(PlayerState);
-		if (DDPS == nullptr) continue;
+		if (DDPS == nullptr)
+		{
+			LOG_KMS(Warning, TEXT("[NativeConstruct] : PlayerState is Null.")); 
+			continue;
+		}
+		
 		UAbilitySystemComponent* ASC = DDPS->GetAbilitySystemComponent();
-		if (ASC == nullptr) return;
+		if (ASC == nullptr)
+		{
+			LOG_KMS(Warning, TEXT("[NativeConstruct] : ASC is Null.")); 
+			continue; 
+		}
+		
 		if (ASC->HasMatchingGameplayTag(DDGameplayTags::State_BoardGame_TurnActive))
 		{
-			InitInventory(DDPS->GetPlayerController());
+			LOG_KMS(Warning, TEXT("Matching Tag Found.")); 
+			ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(DDPS->GetPlayerController()); 
+			if (!DDPC) continue;
+			
+			InitInventory(DDPC->GetInventoryComponent()); 
+			break; 
 		}
 	}
 }
@@ -44,12 +64,21 @@ void UDDInventoryWidget::NativeConstruct()
 void UDDInventoryWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
-	InventoryComponent->OnInventoryChanged.RemoveAll(this);
+	
+	if (InventoryComponent)
+		InventoryComponent->OnInventoryChanged.RemoveAll(this);
 }
 
-void UDDInventoryWidget::GenerationGrid()
+void UDDInventoryWidget::GenerateGrid()
 {
-	if (InventoryComponent.IsValid() == false) return;
+	LOG_KMS(Warning, TEXT("GenerateGrid"));
+	
+	if (!InventoryComponent)
+	{
+		LOG_KMS(Warning, TEXT("[GenerationGrid] : Inventory is null."));
+		return;
+	}
+	
 	for (int32 j = 0; j < Rows; ++j)
 	{
 		for (int32 i = 0; i < Columns; ++i)
@@ -57,9 +86,11 @@ void UDDInventoryWidget::GenerationGrid()
 			if (InventoryComponent->ViewItemDatas.IsEmpty())
 			{
 				LOG_PMJ(Error, TEXT("===== UI출력용 아이템 데이터가 존재하지 않습니다! ====="));
-				return;
+				continue;
 			}
+			
 			int32 Index = i + j * Columns;
+			
 			UDDInvenGridSlot* GridSlot = CreateWidget<UDDInvenGridSlot>(this, GridSlotClass);
 			UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(CanvasPanel->AddChild(GridSlot));
 			
@@ -75,31 +106,30 @@ void UDDInventoryWidget::GenerationGrid()
 					j * (SlotSizeX) + 50.f
 					));
 			}
+			
 			GridSlot->SetItemInfo(InventoryComponent->ViewItemDatas[Index]);
 			GridSlots.Add(GridSlot);
 		}
 	}
 }
 
-void UDDInventoryWidget::InitInventory(APlayerController* Controller)
+void UDDInventoryWidget::InitInventory(UDDInventoryComponent* Inventory)
 {
-	if (Controller == nullptr)
-	{
-		//로그
-		return;
-	}
-	ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(Controller);
-	if (DDPC == nullptr) return;
+	LOG_KMS(Warning, TEXT("인벤토리 초기화"));
+	if (!Inventory) return; 
 	
-	UDDInventoryComponent* DDInventoryComponent = DDPC->FindComponentByClass<UDDInventoryComponent>();
-	if (DDInventoryComponent == nullptr) return;
+	InventoryComponent = Inventory; 
 	
 	Columns = InventoryComponent->ViewItemDatas.Num();
 	Rows = 1;
-	GenerationGrid();
+	GenerateGrid();
+	
 	InventoryComponent->OnInventoryChanged.AddDynamic(this, &UDDInventoryWidget::UpdateGrid);
 	UpdateGrid();
 }
+
+
+
 
 void UDDInventoryWidget::UpdateGrid()
 {

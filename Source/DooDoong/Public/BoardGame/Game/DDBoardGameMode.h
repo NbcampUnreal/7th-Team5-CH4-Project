@@ -108,9 +108,11 @@ protected:
 	
 public:
 	
-	void HandleInventoryRequest(ADDBasePlayerController* Requester);
+	void HandleInventoryOpenRequest(ADDBasePlayerController* Requester);
 	
+	void HandleInventoryClose();
 
+	
 protected:
 	// 캐싱 최적화
 	UPROPERTY()

@@ -22,10 +22,13 @@ struct FInventoryItemData
 	
 	UPROPERTY()
 	FName ItemName;
+	
 	UPROPERTY()
 	int32 ItemCount;
+	
 	UPROPERTY()
 	bool bCanUse;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UTexture2D> Icon;
 };
@@ -37,13 +40,15 @@ struct FViewItemData
 	
 	UPROPERTY()
 	FName ViewItemName;
+	
 	UPROPERTY()
 	int32 ViewItemCount;
+	
 	UPROPERTY()
 	bool bCanUse;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UTexture2D> Icon;
-	
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)

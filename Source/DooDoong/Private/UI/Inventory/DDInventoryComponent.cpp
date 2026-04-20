@@ -135,19 +135,23 @@ void UDDInventoryComponent::Server_AddItem_Implementation(FName ItemName)
 void UDDInventoryComponent::Server_UseItem_Implementation(const FName& ItemSlotName)
 {
 	if (ItemSlotName.IsNone()) return;
-	for (FInventoryItemData& ItemDatas : InventoryItemDatas)
+	for (FInventoryItemData& ItemData : InventoryItemDatas)
 	{
-		if (ItemDatas.ItemName == ItemSlotName)
+		if (ItemData.ItemName == ItemSlotName)
 		{
 			LOG_PMJ(Error, TEXT("====== 사용아이템존재 ======"));
 			
 			ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(OwningController->GetCharacter());
 			if (!IsValid(Character)) return;
+			
 			UItemActionComponent* IAC = Character->FindComponentByClass<UItemActionComponent>();
 			if (!IsValid(IAC)) return;
-			FItemTableRow& CurrentItemDataRow = *GetItemData(ItemDatas.ItemName);
-			IAC->BeginItemAction(CurrentItemDataRow);
-			ItemDatas.ItemCount--;
+			
+			FItemTableRow* CurrentItemDataRow = GetItemData(ItemData.ItemName);  // ← 포인터로 받기
+			if (!CurrentItemDataRow) return; 
+			
+			IAC->BeginItemAction(*CurrentItemDataRow);
+			ItemData.ItemCount--;
 			RefreshInventory();
 		}
 	}

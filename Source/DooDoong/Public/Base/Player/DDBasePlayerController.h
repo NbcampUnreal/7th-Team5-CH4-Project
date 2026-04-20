@@ -130,13 +130,14 @@ protected:
 	TObjectPtr<UInputMappingContext> BoardGameIMC;
 	
 	/*민재 : 인벤토리 코드*/
-	
 public:
-	UPROPERTY(VisibleAnywhere, Category = "Inventory")
-	TObjectPtr<UDDInventoryWidget> InventoryWidget;
+	UDDInventoryComponent* GetInventoryComponent() const {return InventoryComponent;}
 	
 protected:
-	void ToggleInventoryMenu();
+	void Input_ToggleInventoryMenu();
+	
+	UFUNCTION(Server, Reliable)
+	void Server_RequestInventory();
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Inventory")

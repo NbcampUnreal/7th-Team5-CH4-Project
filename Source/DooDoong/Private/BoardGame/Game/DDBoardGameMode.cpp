@@ -643,20 +643,18 @@ void ADDBoardGameMode::TravelToLobby()
     }
 }
 
-void ADDBoardGameMode::HandleInventoryRequest(ADDBasePlayerController* Requester)
+void ADDBoardGameMode::HandleInventoryOpenRequest(ADDBasePlayerController* Requester)
 {
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(Requester);
-	if (ASC == nullptr)
-	{
-		//로그
-		return;
-	}
-	
-	if (ASC->HasMatchingGameplayTag(DDGameplayTags::State_BoardGame_TurnActive))
-	{
-		BroadcastOpenPopUp(DDGameplayTags::BoardGame_UI_Inventory);
-	}
-	
+	if (!ASC || !ASC->HasMatchingGameplayTag(DDGameplayTags::State_BoardGame_TurnActive)) return; 
+
+	BroadcastOpenPopUp(DDGameplayTags::BoardGame_UI_Inventory);
+}
+
+void ADDBoardGameMode::HandleInventoryClose()
+{
+	LOG_KMS(Warning, TEXT("인벤토리 닫기 실행"));
+	BroadcastClosePopUp(DDGameplayTags::BoardGame_UI_Inventory); 
 }
 
 void ADDBoardGameMode::SetTurnPhase(FGameplayTag NewPhaseTag)
