@@ -2,6 +2,7 @@
 
 #include "AbilitySystemInterface.h"
 #include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
 #include "AbilitySystem/DDAbilitySystemComponent.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "Base/Player/DDBasePlayerState.h"
@@ -190,9 +191,20 @@ void ADDBasePlayerController::Client_ApplyState_Implementation(FGameplayTag Stat
 	}
 }
 
-void ADDBasePlayerController::Client_ApplyInput_Implementation(UInputMappingContext* NewIMC)
+void ADDBasePlayerController::Client_ApplyInputByPath_Implementation(const FSoftObjectPath& InMappingContextPath)
 {
-	SetInputMappingContext(NewIMC);
+	if (!InMappingContextPath.IsValid())
+	{
+		return;
+	}
+
+	UInputMappingContext* LoadedIMC = Cast<UInputMappingContext>(InMappingContextPath.TryLoad());
+	if (!LoadedIMC)
+	{
+		return;
+	}
+
+	SetInputMappingContext(LoadedIMC);
 }
 
 void ADDBasePlayerController::Server_SetMiniGameReady_Implementation(bool bReady)
