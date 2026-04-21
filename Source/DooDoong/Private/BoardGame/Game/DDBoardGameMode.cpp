@@ -318,6 +318,8 @@ void ADDBoardGameMode::HandleState_RoundEnd()
 void ADDBoardGameMode::HandleState_End()
 {
 	LOG_CJH(Log, TEXT("게임 종료. 10초 후 로비 이동."));
+	BroadcastErrorMessage(TEXT("게임 종료. 10초 후 로비 이동.")); 
+	
 	GetWorldTimerManager().SetTimer(
 		ReturnToLobbyTimerHandle,
 		this,
@@ -456,6 +458,8 @@ void ADDBoardGameMode::CalculateFinalWinner()
     
     CachedBoardGameState->SetFinalRankings(FinalResults);
     SetMatchState(DDGameplayTags::State_BoardGame_End);
+	
+	BroadcastOpenPopUp(DDGameplayTags::BoardGame_UI_Result);
 }
 
 void ADDBoardGameMode::RequestRankUpdate()
