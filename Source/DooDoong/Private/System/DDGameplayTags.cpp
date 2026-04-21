@@ -8,6 +8,8 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Look, "Input.Native.Look");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Click, "Input.Native.Click");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Inventory, "Input.Native.Inventory");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Native_Setting, "Input.Native.Setting");
+	
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_ItemNextTarget, "Input.Native.ItemNextTarget");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_ItemPreviousTarget, "Input.Native.ItemPreviousTarget");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Native_ItemConfirm, "Input.Native.ItemConfirm");
@@ -145,6 +147,8 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(MiniGame_UI_Main, "MiniGame.UI.Main");
 	
 	UE_DEFINE_GAMEPLAY_TAG(MiniGame_UI_Result, "MiniGame.UI.Result");
+	
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Settings_UI, "Settings.UI", "유저 세팅 UI");
 	
 	
 }

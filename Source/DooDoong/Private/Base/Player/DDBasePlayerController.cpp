@@ -112,6 +112,15 @@ void ADDBasePlayerController::SetupInputComponent()
 
 		DDInputComponent->BindNativeAction(
 			InputConfig,
+			DDGameplayTags::Input_Native_Setting,
+			ETriggerEvent::Started,
+			this,
+			&ThisClass::Input_SettingToggle,
+			true
+		);
+
+		DDInputComponent->BindNativeAction(
+			InputConfig,
 			DDGameplayTags::Input_Native_ItemNextTarget,
 			ETriggerEvent::Started,
 			this,
@@ -455,6 +464,31 @@ UItemActionComponent* ADDBasePlayerController::GetItemActionComponentFromPawn() 
 {
 	const APawn* ControlledPawn = GetPawn();
 	return ControlledPawn ? ControlledPawn->FindComponentByClass<UItemActionComponent>() : nullptr;
+}
+
+void ADDBasePlayerController::Input_SettingToggle()
+{
+	if (!IsLocalController())
+	{
+		return;
+	}
+
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!UIManager)
+	{
+		return;
+	}
+	
+	if (UIManager->IsPopupOpen(DDGameplayTags::Settings_UI))
+	{
+		UIManager->HidePopup(DDGameplayTags::Settings_UI);
+		Client_SetMouseCursorVisible(false);
+	}
+	else
+	{
+		Client_SetMouseCursorVisible(true);
+		UIManager->DrawPopup(DDGameplayTags::Settings_UI);
+	}
 }
 
 void ADDBasePlayerController::Input_ToggleInventoryMenu()

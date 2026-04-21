@@ -45,10 +45,20 @@ public:
 	
 public:
 	UFUNCTION(BlueprintCallable)
+	void SetMasterVolume(float Volume);
+
+	UFUNCTION(BlueprintPure)
+	float GetMasterVolume() const { return MasterVolume; }
+	
+	UFUNCTION(BlueprintCallable)
 	void SetCategoryVolume(EDDSoundCategory Category, float Volume);
 
 	UFUNCTION(BlueprintPure)
 	float GetCategoryVolume(EDDSoundCategory Category) const;
+	
+public:
+	void SaveAudioSettings();
+	void LoadAudioSettings();
 	
 private:
 	const FDDSoundDataTableRow* FindSoundRow(FName SoundID) const;
@@ -64,7 +74,16 @@ private:
 	
 	UPROPERTY()
 	FName CurrentBGMID = NAME_None;
+
+	UPROPERTY()
+	float MasterVolume = 1.f;
 	
 	UPROPERTY()
-	TMap<EDDSoundCategory, float> CategoryVolumes;
+	float BGMVolume = 1.f;
+	
+	UPROPERTY()
+	float SFXVolume = 1.f;
+	
+	UPROPERTY()
+	float InterfaceVolume = 1.f;
 };
