@@ -229,13 +229,13 @@ void ADDBoardGameMode::HandleState_Init()
 {
 	SortPlayersByTurnOrder();
 	LOG_CYS(Warning, TEXT("[GM] 보드게임 초기화 시작"));
-
+	
 	// 타일 매니저 초기화
-	for (TActorIterator<ADDTileManager> It(GetWorld()); It; ++It)
+	if (!IsValid(CachedBoardGameState->TileManager))
 	{
-		It->InitializeTiles();
-		break;
+		LOG_CYS(Error,TEXT("[GM] 타일 매니저 못 찾음"));
 	}
+	CachedBoardGameState->TileManager->InitializeTiles();
 
 	for (APlayerController* PC : AlivePlayerControllers)
 	{

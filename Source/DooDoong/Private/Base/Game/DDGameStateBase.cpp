@@ -10,9 +10,6 @@ ADDGameStateBase::ADDGameStateBase()
 void ADDGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
-	TileManager = Cast<ADDTileManager>(
-	UGameplayStatics::GetActorOfClass(GetWorld(), ADDTileManager::StaticClass())
-);
 }
 
 void ADDGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

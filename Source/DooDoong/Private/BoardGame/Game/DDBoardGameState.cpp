@@ -3,6 +3,7 @@
 #include "LevelSequencePlayer.h"
 #include "AbilitySystem/Attributes/DDPointSet.h"
 #include "Base/Player/DDBasePlayerState.h"
+#include "BoardGame/DDTileManager.h"
 #include "BoardGame/Game/DDBoardGameMode.h"
 #include "Common/DDLogManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -23,7 +24,7 @@ void ADDBoardGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ADDBoardGameState, MaxStateTimer);
 	DOREPLIFETIME(ADDBoardGameState, MaxTrophy);
 	DOREPLIFETIME(ADDBoardGameState, MaxRound);
-	
+
 	DOREPLIFETIME(ADDBoardGameState, BoardMatchStateTag);
 	DOREPLIFETIME(ADDBoardGameState, TurnPlayerIndex);
 	DOREPLIFETIME(ADDBoardGameState, StateTimer);
@@ -35,6 +36,10 @@ void ADDBoardGameState::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	TileManager = Cast<ADDTileManager>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), ADDTileManager::StaticClass())
+	);
+	
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsWithTag(
 		GetWorld(),
@@ -45,7 +50,7 @@ void ADDBoardGameState::BeginPlay()
 	if (FoundActors.Num() > 0)
 	{
 		LevelSequenceActor = Cast<ALevelSequenceActor>(FoundActors[0]);
-		LOG_CYS(Warning,TEXT("[GS] 인트로 시퀀서 찾음"));
+		LOG_CYS(Warning, TEXT("[GS] 인트로 시퀀서 찾음"));
 	}
 }
 
@@ -110,43 +115,43 @@ void ADDBoardGameState::PlayBoardBGMLocal()
 
 TArray<ADDBasePlayerState*> ADDBoardGameState::UpdateAndGetPlayerRanks()
 {
-    TArray<ADDBasePlayerState*> SortedPlayers;
-    for (APlayerState* PS : PlayerArray)
-    {
-        if (ADDBasePlayerState* BasePS = Cast<ADDBasePlayerState>(PS))
-        {
-            SortedPlayers.Add(BasePS);
-        }
-    }
+	TArray<ADDBasePlayerState*> SortedPlayers;
+	for (APlayerState* PS : PlayerArray)
+	{
+		if (ADDBasePlayerState* BasePS = Cast<ADDBasePlayerState>(PS))
+		{
+			SortedPlayers.Add(BasePS);
+		}
+	}
 
-    // 트로피 -> 코인 순으로 정렬
-    SortedPlayers.Sort([](const ADDBasePlayerState& A, const ADDBasePlayerState& B)
-    {
-        if (A.GetPointSet() && B.GetPointSet())
-        {
-            float TrophyA = A.GetPointSet()->GetTrophy();
-            float TrophyB = B.GetPointSet()->GetTrophy();
+	// 트로피 -> 코인 순으로 정렬
+	SortedPlayers.Sort([](const ADDBasePlayerState& A, const ADDBasePlayerState& B)
+	{
+		if (A.GetPointSet() && B.GetPointSet())
+		{
+			float TrophyA = A.GetPointSet()->GetTrophy();
+			float TrophyB = B.GetPointSet()->GetTrophy();
 
-            if (TrophyA != TrophyB) return TrophyA > TrophyB; 
-            return A.GetPointSet()->GetCoin() > B.GetPointSet()->GetCoin();
-        }
-        return false;
-    });
+			if (TrophyA != TrophyB) return TrophyA > TrophyB;
+			return A.GetPointSet()->GetCoin() > B.GetPointSet()->GetCoin();
+		}
+		return false;
+	});
 
-    // 정렬된 순서대로 각 PlayerState의 구조체 랭크 값 갱신
-    for (int32 i = 0; i < SortedPlayers.Num(); ++i)
-    {
-        // OnRep_PlayerGameData를 확실하게 트리거하기 위해 복사본을 만들어 재할당합니다.
-        FPlayerGameplayInfo TempInfo = SortedPlayers[i]->PlayerGameData;
-        int32 NewRank = i + 1;
-        
-        if (TempInfo.CurrentRank != NewRank)
-        {
-            SortedPlayers[i]->SetCurrentRank(NewRank);
-        }
-    }
+	// 정렬된 순서대로 각 PlayerState의 구조체 랭크 값 갱신
+	for (int32 i = 0; i < SortedPlayers.Num(); ++i)
+	{
+		// OnRep_PlayerGameData를 확실하게 트리거하기 위해 복사본을 만들어 재할당합니다.
+		FPlayerGameplayInfo TempInfo = SortedPlayers[i]->PlayerGameData;
+		int32 NewRank = i + 1;
 
-    return SortedPlayers;
+		if (TempInfo.CurrentRank != NewRank)
+		{
+			SortedPlayers[i]->SetCurrentRank(NewRank);
+		}
+	}
+
+	return SortedPlayers;
 }
 
 void ADDBoardGameState::OnRep_StateTimer()

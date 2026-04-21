@@ -5,8 +5,8 @@
 #include "AbilitySystem/Attributes/DDMovementSet.h"
 #include "Base/Character/DDBaseCharacter.h"
 #include "Net/UnrealNetwork.h"
-#include "Base/Game/DDGameStateBase.h"
 #include "BoardGame/DDTileManager.h"
+#include "BoardGame/Game/DDBoardGameState.h"
 #include "Common/DDLogManager.h"
 #include "UI/Inventory/DDInventoryComponent.h"
 
@@ -133,7 +133,7 @@ void ADDBasePlayerState::SetCurrentRank(int32 InRank)
 void ADDBasePlayerState::InitTile()
 {
 	LOG_CYS(Warning, TEXT("[PS]InitTile"));
-	ADDGameStateBase* GameState = GetWorld()->GetGameState<ADDGameStateBase>();
+	ADDBoardGameState* GameState = GetWorld()->GetGameState<ADDBoardGameState>();
 	if (!GameState || !GameState->TileManager) return;
 
 	CurrentTile = GameState->TileManager->FindTile(StartTileName);
