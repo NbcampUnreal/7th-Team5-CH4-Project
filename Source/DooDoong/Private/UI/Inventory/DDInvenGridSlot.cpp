@@ -3,9 +3,12 @@
 
 #include "UI/Inventory/DDInvenGridSlot.h"
 
+#include <string>
+
 #include "Common/DDLogManager.h"
 #include "UI/Inventory/DDItemUseButtonWidget.h"
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Data/DDItemDataTypes.h"
 #include "UI/Inventory/DDInventoryComponent.h"
@@ -40,12 +43,16 @@ void UDDInvenGridSlot::UpdateItemInfo(const FViewItemData& ViewItemData)
 {
 	// 인벤토리 열릴때마다 인벤토리내부 데이터 전달받아서 아이템이름확인하고 갯수맞춰주기
 	if (!ViewItemData.ViewItemName.IsValid()) return;
+	
+	if (!TextBlock_ItemCount) return;
+	
 	if (ViewItemData.ViewItemName == ItemName)
 	{
 		ItemCount = ViewItemData.ViewItemCount;
 	
 		if (ItemCount > 0)
 		{
+			TextBlock_ItemCount->SetText(FText::FromString(FString::FromInt(ItemCount)));
 			bCanUse = true;
 		}
 		else

@@ -19,19 +19,17 @@ UDDInventoryComponent::UDDInventoryComponent()
 	
 }
 
-void UDDInventoryComponent::BeginPlay()
+ADDBasePlayerState* UDDInventoryComponent::CashingPlayerState() const
 {
-	Super::BeginPlay();
+	ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
+	if (!IsValid(DDPS)) return nullptr;
+	
+	return DDPS;
 }
-
-
 
 void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 {
-	ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
-	if (DDPS == nullptr) return;
-	
-	if (GetOwner()->HasAuthority() && DDPS->bInitializeInventory == false)
+	if (GetOwner()->HasAuthority() && CashingPlayerState()->bInitializeInventory == false)
 	{
 		LOG_PMJ(Error, TEXT("인벤토리 초기화 호출"));
 		
@@ -62,7 +60,7 @@ void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 			InventoryItemData.ItemCount = 0;
 			InventoryItemData.bCanUse = false;
 			InventoryItemData.Icon = ItemDataRow->Icon;
-			DDPS->InventoryItemDatas.Add(InventoryItemData);
+			CashingPlayerState()->InventoryItemDatas.Add(InventoryItemData);
 			
 			FViewItemData ViewItemData;
 			ViewItemData.ViewItemName = AllItemNames[i];
@@ -71,35 +69,31 @@ void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 			ViewItemData.Icon = ItemDataRow->Icon;
 			ViewItemDatas.Add(ViewItemData);
 		}
-		DDPS->bInitializeInventory = true;
+		CashingPlayerState()->bInitializeInventory = true;
 	}
 	RefreshInventory();
 }
 
 void UDDInventoryComponent::RefreshInventory()
 {
-	ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
-	if (DDPS == nullptr) return;
 	
-	if (DDPS->InventoryItemDatas.IsEmpty())
+	if (CashingPlayerState()->InventoryItemDatas.IsEmpty())
 	{
 		LOG_PMJ(Error, TEXT("===== 원본 인벤토리 데이터가 비어있습니다 ====="));
 		return;
 	}
-	if (ViewItemDatas.Num() != DDPS->InventoryItemDatas.Num())
+	if (ViewItemDatas.Num() != CashingPlayerState()->InventoryItemDatas.Num())
 	{
-		ViewItemDatas.SetNum(DDPS->InventoryItemDatas.Num());
+		ViewItemDatas.SetNum(CashingPlayerState()->InventoryItemDatas.Num());
 	}
-	for (int32 i = 0; i < DDPS->InventoryItemDatas.Num(); ++i)
+	for (int32 i = 0; i < CashingPlayerState()->InventoryItemDatas.Num(); ++i)
 	{
-		ViewItemDatas[i].ViewItemName = DDPS->InventoryItemDatas[i].ItemName;
-		ViewItemDatas[i].ViewItemCount = DDPS->InventoryItemDatas[i].ItemCount;
-		ViewItemDatas[i].bCanUse = DDPS->InventoryItemDatas[i].bCanUse;
-		ViewItemDatas[i].Icon = DDPS->InventoryItemDatas[i].Icon;
+		ViewItemDatas[i].ViewItemName = CashingPlayerState()->InventoryItemDatas[i].ItemName;
+		ViewItemDatas[i].ViewItemCount = CashingPlayerState()->InventoryItemDatas[i].ItemCount;
+		ViewItemDatas[i].bCanUse = CashingPlayerState()->InventoryItemDatas[i].bCanUse;
+		ViewItemDatas[i].Icon = CashingPlayerState()->InventoryItemDatas[i].Icon;
 	}
 }
-
-
 
 void UDDInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -112,7 +106,6 @@ void UDDInventoryComponent::SetOwningController(ADDBasePlayerController* PC)
 {
 	OwningController = PC;
 }
-
 
 void UDDInventoryComponent::OnRep_ClientViewItemData()
 {
@@ -128,18 +121,17 @@ FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
 
 void UDDInventoryComponent::Server_AddItem_Implementation(FName ItemName)
 {
-	ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
-	if (DDPS == nullptr) return;
 	LOG_PMJ(Warning, TEXT("ServerRPCAddItem 진입"));
+	
 	if (!GetOwner()->HasAuthority()) return;
 	
-	if (DDPS->InventoryItemDatas.IsEmpty())
+	if (CashingPlayerState()->InventoryItemDatas.IsEmpty())
 	{
 		LOG_PMJ(Warning, TEXT("인벤데이터가 비어있습니다"));
 		return;
 	}
 	
-	for (FInventoryItemData& InventoryItemData : DDPS->InventoryItemDatas)
+	for (FInventoryItemData& InventoryItemData : CashingPlayerState()->InventoryItemDatas)
 	{
 		if (InventoryItemData.ItemName == ItemName)
 		{
@@ -152,19 +144,16 @@ void UDDInventoryComponent::Server_AddItem_Implementation(FName ItemName)
 
 void UDDInventoryComponent::Server_UseItem_Implementation(const FName& ItemSlotName)
 {
-	ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
-	if (DDPS == nullptr) return;
-	
 	if (ItemSlotName.IsNone())
 	{
 			LOG_PMJ(Error, TEXT("====== 아이템 이름 없음 ======"));
 	}
-	for (FInventoryItemData& ItemData : DDPS->InventoryItemDatas)
+	for (FInventoryItemData& ItemData : CashingPlayerState()->InventoryItemDatas)
 	{
 		if (ItemData.ItemName == ItemSlotName)
 		{
 			
-			ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(DDPS->GetPlayerController());
+			ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(CashingPlayerState()->GetPlayerController());
 			if (DDPC == nullptr)
 			{
 				LOG_PMJ(Error, TEXT(" UseItem: 컨트롤러 캐스팅 실패 "));
