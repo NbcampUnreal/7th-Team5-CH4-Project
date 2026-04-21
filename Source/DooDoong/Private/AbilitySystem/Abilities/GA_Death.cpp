@@ -40,7 +40,7 @@ void UGA_Death::ActivateAbility(
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
-	
+	LOG_CYS(Warning, TEXT("UGA_Death : ActivateAbility Started 실행!!!!!"));
 	ADDBaseCharacter* Character = Cast<ADDBaseCharacter>(GetAvatarActorFromActorInfo());
 	if (!Character) return; 
 	
@@ -67,6 +67,11 @@ void UGA_Death::OnMontageCompleted()
 	ADDBaseCharacter* Character = Cast<ADDBaseCharacter>(GetAvatarActorFromActorInfo());
 	if(Character && Character->HasAuthority()) 
 	{
+		if (bIsBoardGame) // 보드게임에서 로직 생략
+		{
+			RequestRespawn();
+			return;
+		}
 		// 1. 래그돌 
 		Character->MultiCast_HandleRagDoll(); 
 		
