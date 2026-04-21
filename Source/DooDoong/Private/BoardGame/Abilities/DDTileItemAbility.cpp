@@ -30,15 +30,15 @@ void UDDTileItemAbility::ActivateAbility(
 			return;
 		}
 
-		ADDBasePlayerController* Controller = Cast<ADDBasePlayerController>(Character->GetController());
-		if (!Controller)
+		ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(ActorInfo->OwnerActor.Get());
+		if (!PS) 
 		{
-			LOG_CYS(Warning, TEXT("Item Tile : 컨트롤러 없다"));
+			LOG_CYS(Warning, TEXT("Item Tile : PS 없다"));
 			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 			return;
 		}
 
-		UDDInventoryComponent* Inventory = Controller->FindComponentByClass<UDDInventoryComponent>();
+		UDDInventoryComponent* Inventory = PS->FindComponentByClass<UDDInventoryComponent>();
 		if (!Inventory)
 		{
 			LOG_CYS(Warning, TEXT("Item Tile : 인벤 없다"));
