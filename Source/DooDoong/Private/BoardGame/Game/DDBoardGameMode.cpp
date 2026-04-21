@@ -244,10 +244,12 @@ void ADDBoardGameMode::HandleState_Init()
 		
 		if (ADDBasePlayerState* PS = DDPC->GetCachedPlayerState()) PS->InitTile();
 		
+		
 		if (!DDPC->GetPawn()) RestartPlayer(DDPC);
 		if (auto Char = Cast<ADDBoardGameCharacter>(DDPC->GetPawn())) Char->InitLocation();
 		
 		DDPC->Client_ApplyState(DDGameplayTags::State_BoardGame_Init);
+		
 	}
 	
 	LOG_CYS(Warning, TEXT("[GM] 보드게임 전체 초기화 완료"));

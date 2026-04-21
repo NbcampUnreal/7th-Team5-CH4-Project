@@ -2,6 +2,7 @@
 #include "UI/Inventory/DDInventoryComponent.h"
 #include "Base/Character/DDBaseCharacter.h"
 #include "Base/Player/DDBasePlayerController.h"
+#include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "BoardGame/Character/Components/ItemActionComponent.h"
 #include "Common/DDLogManager.h"
@@ -27,9 +28,15 @@ void UDDInventoryComponent::BeginPlay()
 
 void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 {
-	if (GetOwner()->HasAuthority())
+	ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
+	if (DDPS == nullptr) return;
+	
+	if (GetOwner()->HasAuthority() && DDPS->bInitializeInventory == false)
 	{
+		LOG_PMJ(Error, TEXT("인벤토리 초기화 호출"));
+		
 		LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 1"));
+		
 		if (!UDDGameInstance::Get(GetWorld())->ItemDataTable)
 		{
 			LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 2"));
@@ -49,13 +56,14 @@ void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 				LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 4"));
 				continue;
 			}
+		
 			FInventoryItemData InventoryItemData;
 			InventoryItemData.ItemName = AllItemNames[i];
 			InventoryItemData.ItemCount = 0;
 			InventoryItemData.bCanUse = false;
 			InventoryItemData.Icon = ItemDataRow->Icon;
-			InventoryItemDatas.Add(InventoryItemData);
-		
+			DDPS->InventoryItemDatas.Add(InventoryItemData);
+			
 			FViewItemData ViewItemData;
 			ViewItemData.ViewItemName = AllItemNames[i];
 			ViewItemData.ViewItemCount = 0;
@@ -63,23 +71,31 @@ void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 			ViewItemData.Icon = ItemDataRow->Icon;
 			ViewItemDatas.Add(ViewItemData);
 		}
+		DDPS->bInitializeInventory = true;
 	}
-	
+	RefreshInventory();
 }
 
 void UDDInventoryComponent::RefreshInventory()
 {
-	if (InventoryItemDatas.IsEmpty())
+	ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
+	if (DDPS == nullptr) return;
+	
+	if (DDPS->InventoryItemDatas.IsEmpty())
 	{
 		LOG_PMJ(Error, TEXT("===== 원본 인벤토리 데이터가 비어있습니다 ====="));
 		return;
 	}
-	for (int32 i = 0; i < InventoryItemDatas.Num(); ++i)
+	if (ViewItemDatas.Num() != DDPS->InventoryItemDatas.Num())
 	{
-		//ViewItemDatas[i].ViewItemName = InventoryItemDatas[i].ItemName;
-		ViewItemDatas[i].ViewItemCount = InventoryItemDatas[i].ItemCount;
-		//ViewItemDatas[i].bCanUse = InventoryItemDatas[i].bCanUse;
-		//ViewItemDatas[i].Icon = InventoryItemDatas[i].Icon;
+		ViewItemDatas.SetNum(DDPS->InventoryItemDatas.Num());
+	}
+	for (int32 i = 0; i < DDPS->InventoryItemDatas.Num(); ++i)
+	{
+		ViewItemDatas[i].ViewItemName = DDPS->InventoryItemDatas[i].ItemName;
+		ViewItemDatas[i].ViewItemCount = DDPS->InventoryItemDatas[i].ItemCount;
+		ViewItemDatas[i].bCanUse = DDPS->InventoryItemDatas[i].bCanUse;
+		ViewItemDatas[i].Icon = DDPS->InventoryItemDatas[i].Icon;
 	}
 }
 
@@ -112,16 +128,18 @@ FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
 
 void UDDInventoryComponent::Server_AddItem_Implementation(FName ItemName)
 {
+	ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
+	if (DDPS == nullptr) return;
 	LOG_PMJ(Warning, TEXT("ServerRPCAddItem 진입"));
 	if (!GetOwner()->HasAuthority()) return;
 	
-	if (InventoryItemDatas.IsEmpty())
+	if (DDPS->InventoryItemDatas.IsEmpty())
 	{
 		LOG_PMJ(Warning, TEXT("인벤데이터가 비어있습니다"));
 		return;
 	}
 	
-	for (FInventoryItemData& InventoryItemData : InventoryItemDatas)
+	for (FInventoryItemData& InventoryItemData : DDPS->InventoryItemDatas)
 	{
 		if (InventoryItemData.ItemName == ItemName)
 		{
@@ -134,21 +152,18 @@ void UDDInventoryComponent::Server_AddItem_Implementation(FName ItemName)
 
 void UDDInventoryComponent::Server_UseItem_Implementation(const FName& ItemSlotName)
 {
+	ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
+	if (DDPS == nullptr) return;
+	
 	if (ItemSlotName.IsNone())
 	{
 			LOG_PMJ(Error, TEXT("====== 아이템 이름 없음 ======"));
 	}
-	for (FInventoryItemData& ItemData : InventoryItemDatas)
+	for (FInventoryItemData& ItemData : DDPS->InventoryItemDatas)
 	{
 		if (ItemData.ItemName == ItemSlotName)
 		{
-			ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
-			if (DDPS == nullptr)
-			{
-				LOG_PMJ(Error, TEXT("UseItem: DDPlayerState is null "));
-				return;
-			}
-				
+			
 			ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(DDPS->GetPlayerController());
 			if (DDPC == nullptr)
 			{

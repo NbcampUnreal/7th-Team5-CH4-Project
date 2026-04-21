@@ -16,24 +16,6 @@ class ADDBasePlayerController;
 class UDDInventoryBase;
 
 USTRUCT(BlueprintType)
-struct FInventoryItemData
-{
-	GENERATED_BODY()
-	
-	UPROPERTY()
-	FName ItemName;
-	
-	UPROPERTY()
-	int32 ItemCount;
-	
-	UPROPERTY()
-	bool bCanUse;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UTexture2D> Icon;
-};
-
-USTRUCT(BlueprintType)
 struct FViewItemData
 {
 	GENERATED_BODY()
@@ -83,10 +65,6 @@ public:
 	
 	/* 레플리케이티드가 된다면 서버에서 획득삭제시 클라에 동기화 */
 	FItemTableRow* GetItemData(FName RowName) const;
-	
-	/* 원본데이터 */
-	UPROPERTY()
-	TArray<FInventoryItemData> InventoryItemDatas;
 	
 	/* 복제데이터 */
 	UPROPERTY(ReplicatedUsing=OnRep_ClientViewItemData)

@@ -16,6 +16,24 @@ class ADDTileManager;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnRankChanged, int32 NewRank);
 
 USTRUCT(BlueprintType)
+struct FInventoryItemData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	FName ItemName;
+	
+	UPROPERTY()
+	int32 ItemCount;
+	
+	UPROPERTY()
+	bool bCanUse;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSoftObjectPtr<UTexture2D> Icon;
+};
+
+USTRUCT(BlueprintType)
 struct FPlayerGameplayInfo
 {
     GENERATED_BODY()
@@ -122,6 +140,8 @@ public:
 public:
 	FOnRankChanged OnRankChanged;
 	
+	
+	
 protected:
 	UFUNCTION()
     void OnRep_PlayerGameData();
@@ -130,7 +150,16 @@ protected:
 public:
 	UDDInventoryComponent* GetInventoryComponent() const {return InventoryComponent;}
 	
+	bool bInitializeInventory = false;
+	
+public:
+	UPROPERTY()
+	TArray<FInventoryItemData> InventoryItemDatas;
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TObjectPtr<UDDInventoryComponent> InventoryComponent;
+	
+	
+	
 };
