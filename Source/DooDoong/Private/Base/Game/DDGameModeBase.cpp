@@ -261,3 +261,15 @@ void ADDGameModeBase::BroadcastClosePopUp(FGameplayTag Tag)
 		}
 	}
 }
+
+void ADDGameModeBase::BroadcastCloseAllPopUps()
+{
+	for (APlayerController* PC : AlivePlayerControllers)
+	{
+		ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(PC);
+		if (IsValid(DDPC))
+		{
+			DDPC->Client_CloseAllPopUps();
+		}
+	}
+}

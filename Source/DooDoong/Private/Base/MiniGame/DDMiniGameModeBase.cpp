@@ -102,6 +102,7 @@ void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 	}
 	
 	// 준비 위젯 띄우기 
+	BroadcastCloseAllPopUps(); 
 	BroadcastOpenPopUp(DDGameplayTags::MiniGame_UI_ReadyPopUp);
 }
 
