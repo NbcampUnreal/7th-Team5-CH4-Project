@@ -1,19 +1,21 @@
 #include "UI/Widgets/MiniGameReadyWidget.h"
-#include "System/MiniGame/DDMiniGameManager.h"
 #include "Base/MiniGame/DDMiniGameStateBase.h"
+#include "Base/MiniGame/DDMiniGameTypes.h"
+#include "Base/Player/DDBasePlayerController.h"
 #include "Common/DDLogManager.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/MultiLineEditableTextBox.h"
-#include "System/MiniGame/DDMiniGameDefinition.h"
 #include "Components/TextBlock.h"
 
 void UMiniGameReadyWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
-	if (ReadyButton) 
+
+	if (ReadyButton)
+	{
 		ReadyButton->OnClicked.AddDynamic(this, &ThisClass::OnReadyButtonClicked);
+	}
 }
 
 void UMiniGameReadyWidget::NativeConstruct()
@@ -66,10 +68,10 @@ void UMiniGameReadyWidget::TryBindGameState()
 
 void UMiniGameReadyWidget::TryBindGameInfo()
 {
-	UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>();
-	if (!IsValid(MiniGameManager))
+	ADDMiniGameStateBase* MiniGameState = GetWorld()->GetGameState<ADDMiniGameStateBase>();
+	if (!MiniGameState)
 	{
-		LOG_KMS(Warning, TEXT("미니게임 매니저가 없어 다시 실행합니다."));
+		LOG_KMS(Warning, TEXT("미니게임 스테이트가 없습니다"));
 		GetWorld()->GetTimerManager().SetTimer(
 			GameInfoRetryHandle, 
 			this,
@@ -80,22 +82,26 @@ void UMiniGameReadyWidget::TryBindGameInfo()
 		
 		return;
 	}
-	
-	UDDMiniGameDefinition* Definition = MiniGameManager->GetActiveDefinition();
-	if (Definition)
+
+	const FMiniGameSetup& Setup = MiniGameState->GetMiniGameSetup();
+	if (Setup.MiniGameID.IsNone())
 	{
-		if (MiniGameTitle) 
-			MiniGameTitle->SetText(FText::FromName(Definition->MiniGameID));
-		
-		if (DescriptionText)
-			DescriptionText->SetText(Definition->Description);
-		
-		if (ThumbnailImage && Definition->MiniGameThumbnail) 
-			ThumbnailImage->SetBrushFromTexture(Definition->MiniGameThumbnail);
+		return;
 	}
-	else
+
+	if (MiniGameTitle)
 	{
-		LOG_KMS(Warning,TEXT("미니게임 정의가 없습니다.")); 
+		MiniGameTitle->SetText(Setup.DisplayName);
+	}
+
+	if (DescriptionText)
+	{
+		DescriptionText->SetText(Setup.Description);
+	}
+
+	if (ThumbnailImage && Setup.MiniGameThumbnail)
+	{
+		ThumbnailImage->SetBrushFromTexture(Setup.MiniGameThumbnail);
 	}
 }
 
@@ -113,18 +119,17 @@ void UMiniGameReadyWidget::OnReadyButtonClicked()
 	
 	if (ReadyButtonText)
 	{
-		FString ReadyString = FString(TEXT("준비 완료"));
+		const FString ReadyString = FString(TEXT("준비 완료"));
 		ReadyButtonText->SetText(FText::FromString(ReadyString));
 	}
 }
 
 void UMiniGameReadyWidget::OnReadyStateChanged(int32 ReadyCount, int32 TotalCount)
 {
-	FString NewReadyString = FString::Printf(TEXT("준비 인원 %d / %d"), ReadyCount, TotalCount);
+	const FString NewReadyString = FString::Printf(TEXT("준비 인원 %d / %d"), ReadyCount, TotalCount);
 	
 	if (ReadyStateText)
 	{
 		ReadyStateText->SetText(FText::FromString(NewReadyString));
 	}
 }
-
