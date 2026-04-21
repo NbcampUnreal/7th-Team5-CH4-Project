@@ -421,8 +421,13 @@ void ADDMiniGameModeBase::ApplyMiniGameInput(ADDBasePlayerController* PlayerCont
 		return;
 	}
 	
-	// Client RPC를 호출해서 Client에 적용
-	PlayerController->Client_ApplyInputByPath(FSoftObjectPath(Definition->MappingContextClass.Get()));
+	if (Definition->MappingContextClass.IsNull())
+	{
+		return;
+	}
+
+	// Client loads the mapping context locally to avoid NetGUID issues after repeated seamless travel.
+	PlayerController->Client_ApplyInputByPath(Definition->MappingContextClass.ToSoftObjectPath());
 }
 
 void ADDMiniGameModeBase::InitializeReadyStates()
