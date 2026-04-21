@@ -144,7 +144,7 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(MiniGame_UI_ReadyPopUp, "MiniGame.UI.ReadyPopUp");
 	UE_DEFINE_GAMEPLAY_TAG(MiniGame_UI_Main, "MiniGame.UI.Main");
 	
-	UE_DEFINE_GAMEPLAY_TAG(MiniGame_UI_Result, "MiniGame.UI.Main");
+	UE_DEFINE_GAMEPLAY_TAG(MiniGame_UI_Result, "MiniGame.UI.Result");
 	
 	
 }

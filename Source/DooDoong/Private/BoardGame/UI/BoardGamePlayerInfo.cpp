@@ -47,7 +47,6 @@ void UBoardGamePlayerInfo::InitializePlayerInfo(APlayerState* PlayerState)
 		}
 	}
 	
-	
 	CurrentPlayerState->OnRankChanged.AddUObject(this, &ThisClass::UpdateCurrentRank);
     UpdateCurrentRank(CurrentPlayerState->PlayerGameData.CurrentRank);
 }

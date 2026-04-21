@@ -392,6 +392,8 @@ void ADDMiniGameModeBase::FinishGame(FGameplayTag Reason)
 	// 게임 결과를 생성
 	FMiniGameResult Result = BuildMiniGameResult();
 	Result.FinishReason = Reason;
+	
+	BroadcastOpenPopUp(DDGameplayTags::MiniGame_UI_Result);
 
 	if (GetGameInstance() != nullptr)
 	{
