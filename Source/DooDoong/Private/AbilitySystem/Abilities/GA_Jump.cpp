@@ -6,7 +6,10 @@ UGA_Jump::UGA_Jump()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor; 
 	
-	AbilityTags.AddTag(DDGameplayTags::Input_Ability_Jump);
+	FGameplayTagContainer AssetTags;
+    AssetTags.AddTag(DDGameplayTags::Input_Ability_Jump);
+    SetAssetTags(AssetTags);
+	
 	ActivationBlockedTags.AddTag(DDGameplayTags::State_Character_Death); 
 }
 

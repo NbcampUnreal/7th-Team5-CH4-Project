@@ -14,8 +14,11 @@ UGA_Attack::UGA_Attack()
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
-
-	AbilityTags.AddTag(DDGameplayTags::Input_Ability_Attack);
+	
+	FGameplayTagContainer AssetTags;
+    AssetTags.AddTag(DDGameplayTags::Input_Ability_Attack);
+    SetAssetTags(AssetTags);
+	
 	ActivationOwnedTags.AddTag(DDGameplayTags::State_Character_Attacking);
 	ActivationBlockedTags.AddTag(DDGameplayTags::State_Character_Death); 
 }
