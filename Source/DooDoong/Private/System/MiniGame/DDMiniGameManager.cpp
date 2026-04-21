@@ -4,6 +4,7 @@
 #include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/DDTile.h"
+#include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 #include "TimerManager.h"
 #include "Common/DDLogManager.h"
@@ -165,17 +166,34 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 	SetCurrentState(DDGameplayTags::State_MiniGame_Finishing);
 	OnMiniGameFinished.Broadcast(Result);
 
+	AGameStateBase* GameState = GetWorld() != nullptr ? GetWorld()->GetGameState() : nullptr;
+	for (const FMiniGameScoreEntry& Rank : Result.ScoreBoard)
+	{
+		if (GameState == nullptr)
+		{
+			continue;
+		}
+
+		for (APlayerState* PlayerState : GameState->PlayerArray)
+		{
+			if (PlayerState == nullptr || PlayerState->GetPlayerId() != Rank.PlayerId)
+			{
+				continue;
+			}
+
+			if (ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(PlayerState))
+			{
+				PS->SetTurnOrder(Rank.Rank - 1);
+			}
+			break;
+		}
+	}
+
 	LastCommittedResult = Result;
 	bHasLastCommittedResult = true;
 
 	SetCurrentState(DDGameplayTags::State_MiniGame_Completed);
 	OnMiniGameResultCommitted.Broadcast(Result);
-	
-	for (const FMiniGameScoreEntry& Rank : Result.ScoreBoard)
-	{
-		ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(Rank.PlayerState);
-		PS->SetTurnOrder(Rank.Rank - 1);
-	}
 	
 	if (ReturnMapPackageName.IsEmpty())
 	{
@@ -344,7 +362,6 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 		}
 
 		FMiniGameParticipantInfo Participant;
-		Participant.PlayerState = Players[Index];
 		Participant.PlayerId = Players[Index]->GetPlayerId();
 		Participant.SlotIndex = Index;
 		Participant.Id = Index;

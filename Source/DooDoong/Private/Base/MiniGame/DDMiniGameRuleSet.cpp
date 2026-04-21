@@ -61,10 +61,6 @@ FMiniGameResult UDDMiniGameRuleSet::BuildMiniGameResult(const ADDMiniGameStateBa
 	}
 	// ResolveRanking보다 무조건 이후에 호출되기 때문에 GameState에 모인 점수판을 결과 구조체로 옮겨두고 그대로 사용
 	Result.ScoreBoard = GameState->GetScoreBoard();
-	for (const FMiniGameScoreEntry& Entry : Result.ScoreBoard)
-	{
-		Result.Ranking.Add(Entry.PlayerState);
-	}
 
 	return Result;
 }

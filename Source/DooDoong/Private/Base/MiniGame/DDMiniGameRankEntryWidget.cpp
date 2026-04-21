@@ -1,6 +1,10 @@
 #include "Base/MiniGame/DDMiniGameRankEntryWidget.h"
-#include "System/MiniGame/DDMiniGameDefinition.h"
+
+#include "Base/Player/DDBasePlayerState.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/PlayerState.h"
+#include "System/MiniGame/DDMiniGameDefinition.h"
 
 void UDDMiniGameRankEntryWidget::SetEntryData(const FMiniGameScoreEntry& Entry)
 {
@@ -18,10 +22,22 @@ void UDDMiniGameRankEntryWidget::SetEntryData(const FMiniGameScoreEntry& Entry)
 	if (NameText)
 	{
 		NameText->SetText(FText::FromName(Entry.DisplayName));
-		ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(Entry.PlayerState);
-		if (PS)
+		const AGameStateBase* GameState = GetWorld() != nullptr ? GetWorld()->GetGameState() : nullptr;
+		if (GameState != nullptr)
 		{
-			NameText->SetColorAndOpacity(PS->PlayerGameData.PlayerColor);
+			for (APlayerState* PlayerState : GameState->PlayerArray)
+			{
+				if (PlayerState == nullptr || PlayerState->GetPlayerId() != Entry.PlayerId)
+				{
+					continue;
+				}
+
+				if (const ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(PlayerState))
+				{
+					NameText->SetColorAndOpacity(PS->PlayerGameData.PlayerColor);
+				}
+				break;
+			}
 		}
 	}
 }

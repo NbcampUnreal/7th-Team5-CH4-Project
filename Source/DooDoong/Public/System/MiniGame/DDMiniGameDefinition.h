@@ -29,7 +29,7 @@ public:
 	
 	/** 표시될 미니게임 이미지 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
-	UTexture2D* MiniGameThumbnail;
+	TSoftObjectPtr<UTexture2D> MiniGameThumbnail;
 
 	/** 미니게임 장르 태그 : 기본값 None */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.Genre"))
@@ -53,12 +53,13 @@ public:
 	
 	/** 필수 지정 : 미니게임 IMC */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
-	TObjectPtr<UInputMappingContext> MappingContextClass;
+	TSoftObjectPtr<UInputMappingContext> MappingContextClass;
 
 	/** 선택 지정 : 따로 미니게임 RuleSet이 있다면 RuleSet */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
 	TSubclassOf<UDDMiniGameRuleSet> RuleSetClass;
 	
+	/** BGM */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame|Sound")
 	FName BGM;
 };

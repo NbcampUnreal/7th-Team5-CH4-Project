@@ -12,9 +12,6 @@ struct DOODOONG_API FMiniGameParticipantInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<APlayerState> PlayerState = nullptr;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 PlayerId = INDEX_NONE;
 
@@ -38,9 +35,6 @@ USTRUCT(BlueprintType)
 struct DOODOONG_API FMiniGameScoreEntry
 {
 	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<APlayerState> PlayerState = nullptr;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 PlayerId = INDEX_NONE;
@@ -75,7 +69,7 @@ struct DOODOONG_API FMiniGameSetup
 	FText Description;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> MiniGameThumbnail;
+	TSoftObjectPtr<UTexture2D> MiniGameThumbnail;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(Categories="MiniGame.Genre"))
 	FGameplayTag Genre;
@@ -115,8 +109,6 @@ struct DOODOONG_API FMiniGameResult
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FMiniGameScoreEntry> ScoreBoard;
 
-	UPROPERTY(BlueprintReadOnly)
-	TArray<TObjectPtr<APlayerState>> Ranking;
 };
 
 USTRUCT(BlueprintType)
