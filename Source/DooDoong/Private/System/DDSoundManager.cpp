@@ -3,6 +3,7 @@
 #include "Components/AudioComponent.h"
 #include "Engine/DataTable.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/ConfigCacheIni.h"
 #include "System/DDGameInstance.h"
 
 UDDSoundManager* UDDSoundManager::Get(const UObject* WorldContext)
@@ -20,21 +21,18 @@ void UDDSoundManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	CategoryVolumes.Add(EDDSoundCategory::BGM, 1.f);
-	CategoryVolumes.Add(EDDSoundCategory::SFX, 1.f);
-	CategoryVolumes.Add(EDDSoundCategory::UI, 1.f);
-
 	if (const UDDGameInstance* DDGameInstance = Cast<UDDGameInstance>(GetGameInstance()))
 	{
 		SoundDataTable = DDGameInstance->SoundDataTable;
 	}
+
+	LoadAudioSettings();
 }
 
 void UDDSoundManager::Deinitialize()
 {
 	StopBGM(0.f);
 	SoundDataTable = nullptr;
-	CategoryVolumes.Empty();
 
 	Super::Deinitialize();
 }
@@ -175,25 +173,100 @@ void UDDSoundManager::StopCategory(EDDSoundCategory Category, float FadeOut)
 	}
 }
 
+void UDDSoundManager::SetMasterVolume(float Volume)
+{
+	MasterVolume = FMath::Clamp(Volume, 0.f, 1.f);
+
+	if (CurrentBGM && !CurrentBGMID.IsNone())
+	{
+		if (const FDDSoundDataTableRow* SoundRow = FindSoundRow(CurrentBGMID))
+		{
+			CurrentBGM->SetVolumeMultiplier(GetFinalVolume(*SoundRow));
+		}
+	}
+}
+
 void UDDSoundManager::SetCategoryVolume(EDDSoundCategory Category, float Volume)
 {
 	const float ClampedVolume = FMath::Clamp(Volume, 0.f, 1.f);
-	CategoryVolumes.FindOrAdd(Category) = ClampedVolume;
+	switch (Category)
+	{
+	case EDDSoundCategory::BGM:
+		BGMVolume = ClampedVolume;
+		break;
+	case EDDSoundCategory::SFX:
+		SFXVolume = ClampedVolume;
+		break;
+	case EDDSoundCategory::UI:
+		InterfaceVolume = ClampedVolume;
+		break;
+	default:
+		break;
+	}
 
 	if (Category == EDDSoundCategory::BGM && CurrentBGM)
 	{
-		CurrentBGM->SetVolumeMultiplier(ClampedVolume);
+		if (const FDDSoundDataTableRow* SoundRow = FindSoundRow(CurrentBGMID))
+		{
+			CurrentBGM->SetVolumeMultiplier(GetFinalVolume(*SoundRow));
+		}
 	}
 }
 
 float UDDSoundManager::GetCategoryVolume(EDDSoundCategory Category) const
 {
-	if (const float* Volume = CategoryVolumes.Find(Category))
+	switch (Category)
 	{
-		return *Volume;
+	case EDDSoundCategory::BGM:
+		return BGMVolume;
+	case EDDSoundCategory::SFX:
+		return SFXVolume;
+	case EDDSoundCategory::UI:
+		return InterfaceVolume;
+	default:
+		return 1.f;
+	}
+}
+
+void UDDSoundManager::SaveAudioSettings()
+{
+	if (GConfig)
+	{
+		const FString Section = TEXT("/Script/DOODOONG.AudioSettings");
+		GConfig->SetFloat(*Section, TEXT("MasterVolume"), MasterVolume, GGameUserSettingsIni);
+		GConfig->SetFloat(*Section, TEXT("BGMVolume"), BGMVolume, GGameUserSettingsIni);
+		GConfig->SetFloat(*Section, TEXT("SFXVolume"), SFXVolume, GGameUserSettingsIni);
+		GConfig->SetFloat(*Section, TEXT("InterfaceVolume"), InterfaceVolume, GGameUserSettingsIni);
+		GConfig->Flush(false, GGameUserSettingsIni);
+	}
+}
+
+void UDDSoundManager::LoadAudioSettings()
+{
+	if (!GConfig)
+	{
+		return;
 	}
 
-	return 1.f;
+	const FString Section = TEXT("/Script/DOODOONG.AudioSettings");
+	float SavedVolume = 1.f;
+
+	if (GConfig->GetFloat(*Section, TEXT("MasterVolume"), SavedVolume, GGameUserSettingsIni))
+	{
+		SetMasterVolume(SavedVolume);
+	}
+	if (GConfig->GetFloat(*Section, TEXT("BGMVolume"), SavedVolume, GGameUserSettingsIni))
+	{
+		SetCategoryVolume(EDDSoundCategory::BGM, SavedVolume);
+	}
+	if (GConfig->GetFloat(*Section, TEXT("SFXVolume"), SavedVolume, GGameUserSettingsIni))
+	{
+		SetCategoryVolume(EDDSoundCategory::SFX, SavedVolume);
+	}
+	if (GConfig->GetFloat(*Section, TEXT("InterfaceVolume"), SavedVolume, GGameUserSettingsIni))
+	{
+		SetCategoryVolume(EDDSoundCategory::UI, SavedVolume);
+	}
 }
 
 const FDDSoundDataTableRow* UDDSoundManager::FindSoundRow(FName SoundID) const
@@ -208,7 +281,7 @@ const FDDSoundDataTableRow* UDDSoundManager::FindSoundRow(FName SoundID) const
 
 float UDDSoundManager::GetFinalVolume(const FDDSoundDataTableRow& SoundRow) const
 {
-	return SoundRow.Volume * GetCategoryVolume(SoundRow.Category);
+	return SoundRow.Volume * MasterVolume * GetCategoryVolume(SoundRow.Category);
 }
 
 float UDDSoundManager::ResolveFadeTime(float OverrideFadeTime, float DefaultFadeTime) const
