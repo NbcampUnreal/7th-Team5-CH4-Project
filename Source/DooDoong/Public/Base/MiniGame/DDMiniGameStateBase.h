@@ -164,6 +164,7 @@ public:
 	
 protected:
 	void PlayMiniGameBGM();
+	void PlayFinishWhistle();
 
 protected:
 	UPROPERTY(ReplicatedUsing=OnRep_MiniGameSetup, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
