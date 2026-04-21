@@ -10,6 +10,8 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Look);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Click);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Inventory);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_Setting);
+	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemNextTarget);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemPreviousTarget);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Native_ItemConfirm);
@@ -147,4 +149,6 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(MiniGame_UI_ReadyPopUp);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(MiniGame_UI_Main);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(MiniGame_UI_Result);
+	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Settings_UI);
 }
