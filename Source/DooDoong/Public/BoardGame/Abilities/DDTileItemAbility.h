@@ -21,13 +21,8 @@ public:
 	) override;
 	
 	UFUNCTION()
-	void OnMontageCompleted();
-	
-	UFUNCTION()
-	void OnMontageInterrupted();
-	
-	UPROPERTY(EditDefaultsOnly, Category = "UX")
-	UAnimMontage* MontageToPlay;
+	void OnCueFinished();
+
 	UPROPERTY(EditDefaultsOnly, Category = "UX")
 	AActor* ItemActor;
 };

@@ -1,6 +1,7 @@
 ﻿#include "BoardGame/Abilities/DDTileItemAbility.h"
 
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Abilities/Tasks/AbilityTask_WaitDelay.h"
 #include "Base/Player/DDBasePlayerController.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Common/DDLogManager.h"
@@ -9,7 +10,7 @@
 
 UDDTileItemAbility::UDDTileItemAbility()
 {
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 }
 
 void UDDTileItemAbility::ActivateAbility(
@@ -75,32 +76,14 @@ void UDDTileItemAbility::ActivateAbility(
 			TEXT("RightHand")
 		);
 	}
-	// Montage
-	if (!MontageToPlay)
-	{
-		LOG_CYS(Error, TEXT("MontageToPlay 없음"));
-		return;
-	}
-	if (!ActorInfo->GetAnimInstance())
-	{
-		LOG_CYS(Error, TEXT("AnimInstance 없음"));
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
-		return;
-	}
-
-	UAbilityTask_PlayMontageAndWait* Task =
-		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
-			this,
-			NAME_None,
-			MontageToPlay
-		);
-
-	Task->OnCompleted.AddDynamic(this, &UDDTileItemAbility::OnMontageCompleted);
-	Task->OnInterrupted.AddDynamic(this, &UDDTileItemAbility::OnMontageInterrupted);
-	Task->ReadyForActivation();
+	
+	// 딜레이 태스크
+	UAbilityTask_WaitDelay* DelayTask = UAbilityTask_WaitDelay::WaitDelay(this, 2.5f); // 이펙트 길이
+	DelayTask->OnFinish.AddDynamic(this, &UDDTileItemAbility::OnCueFinished);
+	DelayTask->ReadyForActivation();
 }
 
-void UDDTileItemAbility::OnMontageCompleted()
+void UDDTileItemAbility::OnCueFinished()
 {
 	// 손에 액터 제거
 	if (HasAuthority(&CurrentActivationInfo))
@@ -111,17 +94,4 @@ void UDDTileItemAbility::OnMontageCompleted()
 		}
 	}
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-}
-
-void UDDTileItemAbility::OnMontageInterrupted()
-{
-	// 손에 액터 제거
-	if (HasAuthority(&CurrentActivationInfo))
-	{
-		if (IsValid(ItemActor))
-		{
-			ItemActor->Destroy();
-		}
-	}
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }

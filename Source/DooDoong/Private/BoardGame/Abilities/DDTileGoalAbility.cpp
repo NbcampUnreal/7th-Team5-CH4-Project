@@ -7,7 +7,7 @@
 
 UDDTileGoalAbility::UDDTileGoalAbility()
 {
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 }
 
 void UDDTileGoalAbility::ActivateAbility(
@@ -15,7 +15,7 @@ void UDDTileGoalAbility::ActivateAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-	)
+)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -24,7 +24,7 @@ void UDDTileGoalAbility::ActivateAbility(
 	// 플레이어 스테이트 
 	ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(ActorInfo->OwnerActor.Get());
 	if (!PS) return;
-	
+
 	if (HasAuthority(&ActivationInfo))
 	{
 		UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
@@ -39,44 +39,11 @@ void UDDTileGoalAbility::ActivateAbility(
 			FGameplayTag::RequestGameplayTag("Data.Point.Trophy"),
 			1
 		);
-	
+
 		// 적용
 		ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
-	
+
 		LOG_CYS(Warning, TEXT("Trophy + %.0f"), ASC->GetNumericAttribute(UDDPointSet::GetTrophyAttribute()));
 	}
-	
-	// Montage
-	if (!MontageToPlay)
-	{
-		LOG_CYS(Error, TEXT("MontageToPlay 없음"));
-		return;
-	}
-	if (!ActorInfo->GetAnimInstance())
-	{
-		LOG_CYS(Error, TEXT("AnimInstance 없음"));
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
-		return;
-	}
-
-	UAbilityTask_PlayMontageAndWait* Task =
-	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
-		this,
-		NAME_None,
-		MontageToPlay
-	);
-
-	Task->OnCompleted.AddDynamic(this, &UDDTileGoalAbility::OnMontageCompleted);
-	Task->OnInterrupted.AddDynamic(this, &UDDTileGoalAbility::OnMontageInterrupted);
-	Task->ReadyForActivation();
-	
-}
-void UDDTileGoalAbility::OnMontageCompleted()
-{
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-}
-
-void UDDTileGoalAbility::OnMontageInterrupted()
-{
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
