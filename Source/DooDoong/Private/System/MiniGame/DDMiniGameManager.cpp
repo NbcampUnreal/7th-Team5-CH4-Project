@@ -7,13 +7,14 @@
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 #include "TimerManager.h"
+#include "AbilitySystem/Attributes/DDPointSet.h"
 #include "Common/DDLogManager.h"
 #include "System/MiniGame/DDMiniGameDefinition.h"
 
 void UDDMiniGameManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-	
+
 	// 시작지점에서 미니게임 정의 목록을 한 번 런타임 캐싱
 	CacheAvailableDefinitions();
 	// 마지막 진행 흔적을 초기화
@@ -33,7 +34,7 @@ void UDDMiniGameManager::Deinitialize()
 	// 마지막 진행 정보들을 정리
 	ClearLastCommittedResult();
 	ClearActiveSession();
-	
+
 	Super::Deinitialize();
 }
 
@@ -43,12 +44,13 @@ bool UDDMiniGameManager::RequestStartMiniGame(FName MiniGameId, const TArray<APl
 	{
 		return false;
 	}
-	
+
 	UDDMiniGameDefinition* Definition = FindMiniGameDefinition(MiniGameId);
 	UWorld* World = GetWorld();
-	
+
 	// World->GetNetMode() == NM_Client 인 경우에 false를 return 하므로 클라이언트에서 사용할 수 없음. 반드시 서버에서 사용
-	if (Definition == nullptr || Definition->GameModeClass == nullptr || World == nullptr || World->GetNetMode() == NM_Client)
+	if (Definition == nullptr || Definition->GameModeClass == nullptr || World == nullptr || World->GetNetMode() ==
+		NM_Client)
 	{
 		return false;
 	}
@@ -66,7 +68,7 @@ bool UDDMiniGameManager::RequestStartMiniGame(FName MiniGameId, const TArray<APl
 	ReturnMapPackageName = World->GetPackage()->GetName();
 	// 미니게임 종료 후 되돌아올 타일 이름을 저장해둠.
 	SaveReturnTileInfo(Players);
-	
+
 	// 상태를 준비 상태로 갱신
 	SetCurrentState(DDGameplayTags::State_MiniGame_Preparing);
 	OnMiniGamePreparing.Broadcast(ActiveSetup);
@@ -114,7 +116,7 @@ bool UDDMiniGameManager::RequestFinishMiniGame()
 	{
 		return false;
 	}
-	
+
 	// 실제 게임 종료 판정은 현재 미니게임의 GameMode에 위임
 	if (UWorld* World = GetWorld())
 	{
@@ -184,6 +186,35 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 			if (ADDBasePlayerState* PS = Cast<ADDBasePlayerState>(PlayerState))
 			{
 				PS->SetTurnOrder(Rank.Rank - 1);
+
+				int32 RewardCoin = 0;
+				switch (Rank.Rank)
+				{
+				case 1: RewardCoin = 30;
+					if (UDDPointSet* PointSet = PS->GetPointSet())
+					{
+						PointSet->SetCoin(PointSet->GetCoin() + RewardCoin);
+					}
+					break;
+				case 2: RewardCoin = 20;
+					if (UDDPointSet* PointSet = PS->GetPointSet())
+					{
+						PointSet->SetCoin(PointSet->GetCoin() + RewardCoin);
+					}
+					break;
+				case 3: RewardCoin = 10;
+					if (UDDPointSet* PointSet = PS->GetPointSet())
+					{
+						PointSet->SetCoin(PointSet->GetCoin() + RewardCoin);
+					}
+					break;
+				default: RewardCoin = 5;
+					if (UDDPointSet* PointSet = PS->GetPointSet())
+					{
+						PointSet->SetCoin(PointSet->GetCoin() + RewardCoin);
+					}
+					break;
+				}
 			}
 			break;
 		}
@@ -194,7 +225,7 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 
 	SetCurrentState(DDGameplayTags::State_MiniGame_Completed);
 	OnMiniGameResultCommitted.Broadcast(Result);
-	
+
 	if (ReturnMapPackageName.IsEmpty())
 	{
 		ClearActiveSession();
@@ -218,9 +249,8 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 
 void UDDMiniGameManager::HandleMiniGameResultDisplayFinished()
 {
-	
 	LOG_JJH(Warning, TEXT("결과UI호출 타이머 종료"));
-	
+
 	const FString SavedReturnMapPackageName = ReturnMapPackageName;
 	ClearActiveSession();
 
@@ -245,7 +275,8 @@ void UDDMiniGameManager::HandleMiniGameResultDisplayFinished()
 void UDDMiniGameManager::NotifyMiniGameStarted()
 {
 	// 맵 이동 후에만 Playing 상태로 진입할 수 있어야 하기 때문에 Preparing, Traveling 상태가 아니라면 return
-	if (CurrentState != DDGameplayTags::State_MiniGame_Preparing && CurrentState != DDGameplayTags::State_MiniGame_Traveling)
+	if (CurrentState != DDGameplayTags::State_MiniGame_Preparing && CurrentState !=
+		DDGameplayTags::State_MiniGame_Traveling)
 	{
 		return;
 	}
@@ -267,13 +298,13 @@ UDDMiniGameDefinition* UDDMiniGameManager::FindMiniGameDefinition(FName MiniGame
 	{
 		return nullptr;
 	}
-	
+
 	// 우선 캐시된 정의에서 찾고
 	if (TObjectPtr<UDDMiniGameDefinition>* CachedDefinition = CachedDefinitions.Find(MiniGameId))
 	{
 		return CachedDefinition->Get();
 	}
-	
+
 	// 없으면 에셋 목록을 다시 스캔
 	CacheAvailableDefinitions();
 
@@ -293,7 +324,8 @@ bool UDDMiniGameManager::IsActiveMiniGameWorld(const UWorld* World) const
 	}
 
 	// 현재 월드가 선택된 미니게임 맵과 같은지 확인
-	const FString ActiveMiniGamePackageName = FPackageName::ObjectPathToPackageName(ActiveSetup.MiniGameMap.ToSoftObjectPath().ToString());
+	const FString ActiveMiniGamePackageName = FPackageName::ObjectPathToPackageName(
+		ActiveSetup.MiniGameMap.ToSoftObjectPath().ToString());
 	return !ActiveMiniGamePackageName.IsEmpty() && World->GetPackage()->GetName() == ActiveMiniGamePackageName;
 }
 
@@ -307,7 +339,7 @@ FName UDDMiniGameManager::GetReturnTileRowName(int32 PlayerId) const
 			return ReturnTileInfo.TileRowName;
 		}
 	}
-	
+
 	// 찾지못하면 None을 Return
 	return NAME_None;
 }
@@ -318,7 +350,7 @@ FName UDDMiniGameManager::GetReturnTileRowNameForPlayerState(const APlayerState*
 	{
 		return NAME_None;
 	}
-	
+
 	return GetReturnTileRowName(PlayerState->GetPlayerId());
 }
 
@@ -328,14 +360,14 @@ void UDDMiniGameManager::SetCurrentState(FGameplayTag NewState)
 	{
 		return;
 	}
-	
+
 	CurrentState = NewState;
 	// 상태가 바뀔 때만 브로드캐스트해서 UI나 로직이 중복 반응하지 않게 함.
 	OnMiniGameStateChanged.Broadcast(CurrentState);
 }
 
 bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* Definition,
-	const TArray<APlayerState*>& Players)
+                                                  const TArray<APlayerState*>& Players)
 {
 	if (Definition == nullptr)
 	{
@@ -371,7 +403,7 @@ bool UDDMiniGameManager::BuildSetupFromDefinition(const UDDMiniGameDefinition* D
 		{
 			Participant.DisplayName = DDPlayerState->PlayerGameData.PlayerDisplayName;
 		}
-		
+
 		// 참가자 정보는 맵 이동 후 GameMode와 GameState를 초기화할 때 재사용
 		ActiveParticipants.Add(Participant);
 	}
@@ -426,10 +458,12 @@ void UDDMiniGameManager::CacheAvailableDefinitions()
 
 	// AssetRegistry를 쓴 이유 : UMiniGameDefinition 데이터 에셋들을 프로젝트 전체에서 자동으로 찾아오기 위함
 	// 데이터 에셋을 계속 추가하면서 미니게임을 수를 꽤 확장해나가야하는 구조상 자동으로 가져오는 것이 적합하다고 판단
-	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<
+		FAssetRegistryModule>("AssetRegistry");
 	TArray<FAssetData> DefinitionAssets;
 	// 프로젝트에 존재하는 모든 미니게임 정의 에셋을 찾아서 저장함.
-	AssetRegistryModule.Get().GetAssetsByClass(UDDMiniGameDefinition::StaticClass()->GetClassPathName(), DefinitionAssets, true);
+	AssetRegistryModule.Get().GetAssetsByClass(UDDMiniGameDefinition::StaticClass()->GetClassPathName(),
+	                                           DefinitionAssets, true);
 
 	for (const FAssetData& AssetData : DefinitionAssets)
 	{
@@ -448,7 +482,7 @@ void UDDMiniGameManager::SaveReturnTileInfo(const TArray<APlayerState*>& Players
 {
 	// 일단 한 번 초기화
 	SavedReturnTileInfo.Reset();
-	
+
 	for (APlayerState* PlayerState : Players)
 	{
 		ADDBasePlayerState* BasePlayerState = Cast<ADDBasePlayerState>(PlayerState);
@@ -467,7 +501,7 @@ void UDDMiniGameManager::SaveReturnTileInfo(const TArray<APlayerState*>& Players
 		FMiniGameReturnTileInfo ReturnTileInfo;
 		ReturnTileInfo.PlayerId = PlayerState->GetPlayerId();
 		ReturnTileInfo.TileRowName = TileRowName;
-		
+
 		SavedReturnTileInfo.Add(ReturnTileInfo);
 	}
 }
