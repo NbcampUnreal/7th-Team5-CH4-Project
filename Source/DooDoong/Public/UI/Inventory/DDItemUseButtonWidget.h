@@ -10,6 +10,7 @@ struct FItemTableRow;
 class UMultiLineEditableTextBox;
 class UDDInventoryComponent;
 class UButton;
+class UDDInvenGridSlot;
 
 UCLASS()
 class DOODOONG_API UDDItemUseButtonWidget : public UUserWidget
@@ -28,7 +29,7 @@ public:
 	void CancelButton();
 	
 	UFUNCTION()
-	void InitializeGridSlotData(const FName SlotItemName);
+	void InitializeGridSlotData(const FName& SlotItemName, UDDInvenGridSlot* InParentSlot);
 	
 private:
 	UPROPERTY(meta=(BindWidget))
@@ -44,4 +45,7 @@ private:
 	TObjectPtr<UMultiLineEditableTextBox> ET_ItemName;
 	
 	FName CurrentItemSlotName;
+	
+	UPROPERTY()
+    TObjectPtr<UDDInvenGridSlot> OwningGridSlot;
 };
