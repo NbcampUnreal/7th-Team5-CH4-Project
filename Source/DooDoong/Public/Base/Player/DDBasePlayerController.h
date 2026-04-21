@@ -52,7 +52,7 @@ public:
 
 	/** 주현 : GameMode에서 곧바로 Set을 호출하는 것이 불가능해서 추가한 Client RPC */
 	UFUNCTION(Client, Reliable)
-	void Client_ApplyInput(UInputMappingContext* NewIMC);
+	void Client_ApplyInputByPath(const FSoftObjectPath& InMappingContextPath);
 
 	/** 준혁 : BoardGameMode에서 플레이어 턴에 맞는 InputMode를 적용하기 위한 Client RPC */
 	UFUNCTION(Client, Reliable)

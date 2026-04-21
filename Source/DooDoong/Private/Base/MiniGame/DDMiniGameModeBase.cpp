@@ -10,6 +10,7 @@
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "TimerManager.h"
 #include "Common/DDLogManager.h"
+#include "InputMappingContext.h"
 #include "GameFramework/PlayerState.h"
 
 static const TArray<FName> MiniGameSpawnTags =
@@ -418,7 +419,7 @@ void ADDMiniGameModeBase::ApplyMiniGameInput(ADDBasePlayerController* PlayerCont
 	}
 	
 	// Client RPC를 호출해서 Client에 적용
-	PlayerController->Client_ApplyInput(Definition->MappingContextClass);
+	PlayerController->Client_ApplyInputByPath(FSoftObjectPath(Definition->MappingContextClass.Get()));
 }
 
 void ADDMiniGameModeBase::InitializeReadyStates()

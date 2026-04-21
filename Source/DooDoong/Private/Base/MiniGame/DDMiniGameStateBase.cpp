@@ -41,6 +41,10 @@ void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
 	{
 		PlayMiniGameBGM();
 	}
+	if (CurrentState == DDGameplayTags::State_MiniGame_Completed)
+	{
+		PlayFinishWhistle();
+	}
 }
 
 void ADDMiniGameStateBase::SetMiniGameSetup(const FMiniGameSetup& Setup)
@@ -174,6 +178,10 @@ void ADDMiniGameStateBase::OnRep_CurrentState()
 	{
 		PlayMiniGameBGM();
 	}
+	else if (CurrentState == DDGameplayTags::State_MiniGame_Completed)
+	{
+		PlayFinishWhistle();
+	}
 }
 
 void ADDMiniGameStateBase::OnRep_ReadyPlayerCount()
@@ -237,5 +245,19 @@ void ADDMiniGameStateBase::PlayMiniGameBGM()
 	if (UDDSoundManager* SoundManager = UDDSoundManager::Get(this))
 	{
 		SoundManager->PlayBGM(MiniGameSetup.BGM, 0.5f);
+	}
+}
+
+void ADDMiniGameStateBase::PlayFinishWhistle()
+{
+	if (GetNetMode() == NM_DedicatedServer || MiniGameSetup.BGM.IsNone())
+	{
+		return;
+	}
+
+	if (UDDSoundManager* SoundManager = UDDSoundManager::Get(this))
+	{
+		SoundManager->StopBGM(1);
+		SoundManager->PlaySound2D("SFX_FinishWhistle");
 	}
 }
