@@ -4,6 +4,7 @@
 #include "Engine/GameInstance.h"
 #include "DDGameInstance.generated.h"
 
+class UGameplayAbility;
 class UDataTable;
 
 UCLASS()
@@ -12,6 +13,8 @@ class DOODOONG_API UDDGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	virtual void Init() override;
+	
 	// ==========================================
 	// 글로벌 장기 데이터 (맵 전환 시에도 유지됨)
 	// ==========================================
@@ -33,4 +36,7 @@ public:
 	// 로비에 있던 총 인원 수
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GameData")
     int32 ExpectedPlayerCount = 0;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Preload")
+	TArray<TSubclassOf<UGameplayAbility>> PreloadedAbilityClasses;
 };
