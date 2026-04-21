@@ -102,6 +102,7 @@ void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 	}
 	
 	// 준비 위젯 띄우기 
+	BroadcastCloseAllPopUps(); 
 	BroadcastOpenPopUp(DDGameplayTags::MiniGame_UI_ReadyPopUp);
 }
 
@@ -392,6 +393,8 @@ void ADDMiniGameModeBase::FinishGame(FGameplayTag Reason)
 	// 게임 결과를 생성
 	FMiniGameResult Result = BuildMiniGameResult();
 	Result.FinishReason = Reason;
+	
+	BroadcastOpenPopUp(DDGameplayTags::MiniGame_UI_Result);
 
 	if (GetGameInstance() != nullptr)
 	{

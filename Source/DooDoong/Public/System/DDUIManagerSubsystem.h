@@ -22,6 +22,7 @@ public:
 	void ShowOverlay(TSubclassOf<UUserWidget> WidgetClass);
 	void HideOverlay();
 	
+	bool IsPopupOpen(const FGameplayTag PopupTag);
 	void DrawPopup(FGameplayTag PopupTag);
 	void DrawPopupForDuration(FGameplayTag PopupTag, float Duration);
 	
