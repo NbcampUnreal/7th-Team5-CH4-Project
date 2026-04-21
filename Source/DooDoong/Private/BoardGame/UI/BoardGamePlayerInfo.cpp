@@ -20,7 +20,6 @@ void UBoardGamePlayerInfo::InitializePlayerInfo(APlayerState* PlayerState)
 		PlayerNameText->SetText(FText::FromName(CurrentPlayerState->GetPlayerDisplayName()));
 		
 		PlayerColor = CurrentPlayerState->PlayerGameData.PlayerColor; 
-		PlayerNameText->SetColorAndOpacity(PlayerColor);
 	}
 	
 	if (UDDHealthSet* HealthSet = CurrentPlayerState->GetHealthSet())
