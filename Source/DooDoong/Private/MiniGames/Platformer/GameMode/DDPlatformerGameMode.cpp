@@ -97,6 +97,11 @@ void ADDPlatformerGameMode::GameEnd()
 	
 }
 
+void ADDPlatformerGameMode::CallFinishGameTimer()
+{
+	FinishMiniGame();
+}
+
 void ADDPlatformerGameMode::PlayGameTimer()
 {
 	UE_LOG(LogPMJ, Log, TEXT("PlayGameTimer"));
@@ -198,6 +203,13 @@ void ADDPlatformerGameMode::PlayerRanking()
 		}
 	}
 	
+	GetWorldTimerManager().SetTimer(
+		FinishGameTimerHandle,
+		this,
+		&ADDPlatformerGameMode::CallFinishGameTimer,
+		15.f,
+		false
+		);
 }
 
 void ADDPlatformerGameMode::WaitingTimerStart()

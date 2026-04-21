@@ -72,7 +72,9 @@ public:
 	/* 대기시간 타이머 종료 게임시작 */
 	void GameStart();
 	
-	void GameEnd();	
+	void GameEnd();
+	
+	void CallFinishGameTimer();
 	
 	/* 초기화 함수 */
 	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
@@ -109,6 +111,7 @@ private:
 	FTimerHandle FinishedWaitingTimerHandle;
 	FTimerHandle DistanceTimerHandle;
 	FTimerHandle PlatformerPlayTimerHandle;
+	FTimerHandle FinishGameTimerHandle;
 	
 	/* 게임중인 플레이어 관련 변수 */
 	FVector StartLocation;
