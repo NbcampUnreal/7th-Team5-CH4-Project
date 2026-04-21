@@ -303,13 +303,6 @@ FMiniGameResult ADDMiniGameModeBase::BuildMiniGameResult() const
 	if (const ADDMiniGameStateBase* MiniGameState = GetMiniGameState())
 	{
 		Result.ScoreBoard = MiniGameState->GetScoreBoard();
-		if (Result.Ranking.Num() == 0)
-		{
-			for (const FMiniGameScoreEntry& Entry : Result.ScoreBoard)
-			{
-				Result.Ranking.Add(Entry.PlayerState);
-			}
-		}
 	}
 
 	return Result;

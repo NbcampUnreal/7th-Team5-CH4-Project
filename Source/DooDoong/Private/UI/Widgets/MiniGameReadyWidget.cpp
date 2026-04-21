@@ -99,9 +99,12 @@ void UMiniGameReadyWidget::TryBindGameInfo()
 		DescriptionText->SetText(Setup.Description);
 	}
 
-	if (ThumbnailImage && Setup.MiniGameThumbnail)
+	if (ThumbnailImage && !Setup.MiniGameThumbnail.IsNull())
 	{
-		ThumbnailImage->SetBrushFromTexture(Setup.MiniGameThumbnail);
+		if (UTexture2D* Thumbnail = Setup.MiniGameThumbnail.LoadSynchronous())
+		{
+			ThumbnailImage->SetBrushFromTexture(Thumbnail);
+		}
 	}
 }
 

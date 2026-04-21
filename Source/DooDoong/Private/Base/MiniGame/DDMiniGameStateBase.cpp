@@ -116,18 +116,19 @@ void ADDMiniGameStateBase::AddScore(APlayerState* PlayerState, int32 DeltaScore)
 		DisplayName = DDPlayerState->PlayerGameData.PlayerDisplayName;
 	}
 
+	const int32 PlayerId = PlayerState->GetPlayerId();
+
 	// 플레이어의 기존 점수 기록이 이미 ScoreBoard에 있는지 확인하는 작업.
-	FMiniGameScoreEntry* ExistingEntry = ScoreBoard.FindByPredicate([PlayerState](const FMiniGameScoreEntry& Entry)
+	FMiniGameScoreEntry* ExistingEntry = ScoreBoard.FindByPredicate([PlayerId](const FMiniGameScoreEntry& Entry)
 	{
-		return Entry.PlayerState == PlayerState;
+		return Entry.PlayerId == PlayerId;
 	});
 
 	// 만약 스코어 보드에 없다면, 즉 플레이어가 처음으로 득점했다면 점수판 엔트리를 새로 만들어서 추가
 	if (ExistingEntry == nullptr)
 	{
 		FMiniGameScoreEntry NewEntry;
-		NewEntry.PlayerState = PlayerState;
-		NewEntry.PlayerId = PlayerState->GetPlayerId();
+		NewEntry.PlayerId = PlayerId;
 		NewEntry.DisplayName = DisplayName;
 		NewEntry.Score = DeltaScore;
 		ScoreBoard.Add(NewEntry);
@@ -135,7 +136,7 @@ void ADDMiniGameStateBase::AddScore(APlayerState* PlayerState, int32 DeltaScore)
 	}
 	
 	// 이미 점수를 획득했던 플레이어는 해당하는 점수판에 점수를 계속 누적하는 방식
-	ExistingEntry->PlayerId = PlayerState->GetPlayerId();
+	ExistingEntry->PlayerId = PlayerId;
 	ExistingEntry->DisplayName = DisplayName;
 	ExistingEntry->Score += DeltaScore;
 }
@@ -148,9 +149,10 @@ int32 ADDMiniGameStateBase::GetScore(APlayerState* PlayerState) const
 	}
 	
 	// 플레이어의 기존 점수 기록이 이미 ScoreBoard에 있는지 확인하는 작업.
-	const FMiniGameScoreEntry* ExistingEntry = ScoreBoard.FindByPredicate([PlayerState](const FMiniGameScoreEntry& Entry)
+	const int32 PlayerId = PlayerState->GetPlayerId();
+	const FMiniGameScoreEntry* ExistingEntry = ScoreBoard.FindByPredicate([PlayerId](const FMiniGameScoreEntry& Entry)
 	{
-		return Entry.PlayerState == PlayerState;
+		return Entry.PlayerId == PlayerId;
 	});
 
 	// 플레이어의 기록이 있다면 return, 없다면 0을 return

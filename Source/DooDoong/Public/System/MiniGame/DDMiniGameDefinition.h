@@ -29,7 +29,7 @@ public:
 	
 	/** 표시될 미니게임 이미지 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
-	UTexture2D* MiniGameThumbnail;
+	TSoftObjectPtr<UTexture2D> MiniGameThumbnail;
 
 	/** 미니게임 장르 태그 : 기본값 None */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.Genre"))
@@ -59,6 +59,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame")
 	TSubclassOf<UDDMiniGameRuleSet> RuleSetClass;
 	
+	/** BGM */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MiniGame|Sound")
 	FName BGM;
 };
