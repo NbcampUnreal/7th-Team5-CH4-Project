@@ -55,7 +55,7 @@ void UDDItemUseButtonWidget::CancelButton()
 	if (OwningGridSlot != nullptr)
     {
         OwningGridSlot->BT_ClickItem->SetIsEnabled(true);
-    }5
+    }
 	this->SetVisibility(ESlateVisibility::Collapsed);
 }
 
