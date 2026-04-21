@@ -2,6 +2,7 @@
 
 #include "GameplayEffectExtension.h"
 #include "BoardGame/Game/DDBoardGameMode.h"
+#include "Net/Core/Connection/NetConnectionFaultRecoveryBase.h"
 
 UDDPointSet::UDDPointSet()
 {
@@ -30,7 +31,7 @@ void UDDPointSet::PostAttributeChange(const FGameplayAttribute& Attribute, float
 	
 	if (Attribute == GetCoinAttribute())
 	{
-		OnPointChanged.Broadcast(NewValue);
+		OnCoinChanged.Broadcast(NewValue);
 	}
 	else if (Attribute == GetTrophyAttribute())
 	{
@@ -61,9 +62,11 @@ void UDDPointSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallb
 void UDDPointSet::OnRep_Trophy(const FGameplayAttributeData& OldTrophy)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UDDPointSet, Trophy, OldTrophy);
+	OnTrophyChanged.Broadcast(FMath::FloorToInt32(GetTrophy()));
 }
 
 void UDDPointSet::OnRep_Coin(const FGameplayAttributeData& OldCoin)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UDDPointSet, Coin, OldCoin);
+	OnCoinChanged.Broadcast(FMath::FloorToInt32(GetCoin()));
 }
