@@ -53,8 +53,6 @@ void ADDBasePlayerController::OnRep_PlayerState()
 		InventoryComponent = CachedPlayerState->GetInventoryComponent();
 		InventoryComponent->SetOwningController(this);
 		InventoryComponent->Server_InitializeInventoryData();
-		InventoryComponent->Server_AddItem("HealingKit");
-		InventoryComponent->Server_AddItem("GiveBomb");
 	}
 	else
 	{

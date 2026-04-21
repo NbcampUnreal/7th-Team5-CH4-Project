@@ -27,8 +27,10 @@ void UDDInventoryComponent::BeginPlay()
 
 void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 {
-	if (GetOwner()->HasAuthority())
+	if (GetOwner()->HasAuthority() || bInventoryInitialized == true)
 	{
+		LOG_PMJ(Error, TEXT("인벤토리 초기화 호출"));
+		
 		LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 1"));
 		if (!UDDGameInstance::Get(GetWorld())->ItemDataTable)
 		{
@@ -63,6 +65,7 @@ void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 			ViewItemData.Icon = ItemDataRow->Icon;
 			ViewItemDatas.Add(ViewItemData);
 		}
+		bInventoryInitialized = false;
 	}
 	
 }

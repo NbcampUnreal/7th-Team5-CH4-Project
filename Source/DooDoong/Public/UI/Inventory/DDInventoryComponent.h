@@ -107,4 +107,6 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, Category = "OwningController")
 	TObjectPtr<ADDBasePlayerController> OwningController;
+	
+	bool bInventoryInitialized = false;
 };
