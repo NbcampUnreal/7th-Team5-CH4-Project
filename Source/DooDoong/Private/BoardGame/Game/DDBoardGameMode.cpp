@@ -173,6 +173,14 @@ void ADDBoardGameMode::TickState_RoundEnd()
 			
 			LOG_CJH(Log, TEXT("[Travel] 미니게임 참여 인원: %d명"), AlivePlayerControllers.Num());
 			
+			for (APlayerState* PS : GameState->PlayerArray)
+		    {
+		        if (ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(PS))
+		        {
+		            DDPS->CurrentTile = nullptr; // 트래블 전에 연결고리 끊기
+		        }
+		    }
+			
 			if (UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>())
 			{
 				LOG_CJH(Log, TEXT("[Travel] 미니게임에 진입합니다."));
