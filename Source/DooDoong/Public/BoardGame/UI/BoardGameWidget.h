@@ -8,7 +8,7 @@ class ADDBoardGameState;
 class UBoardGamePlayerInfo;
 class UTextBlock;
 class UVerticalBox; 
-
+class USizeBox;
 class ADDBasePlayerState; 
 
 UCLASS()
@@ -35,6 +35,13 @@ public:
 	void OnPlayerArrayChanged();
 	
 	void RefreshPlayerInfoWidgets(); 
+	
+	void SortPlayerInfoWidgets();
+	
+	void ClearPlayerInfoWidgets();
+	
+	UPROPERTY()
+	TArray<TObjectPtr<USizeBox>> PlayerInfoSizeBoxes;
 
 protected:
 	UPROPERTY(meta =(BindWidget))

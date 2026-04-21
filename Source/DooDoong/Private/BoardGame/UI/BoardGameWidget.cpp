@@ -1,5 +1,4 @@
 #include "BoardGame/UI/BoardGameWidget.h"
-
 #include "Base/Player/DDBasePlayerState.h"
 #include "Blueprint/WidgetTree.h"
 #include "BoardGame/Game/DDBoardGameState.h"
@@ -21,10 +20,12 @@ void UBoardGameWidget::NativeDestruct()
 {
 	if (CurrentGameState)
 	{
-		CurrentGameState->OnStateTimerChanged.RemoveDynamic(this, &ThisClass::UpdateTimeText);
-		CurrentGameState->OnRoundChanged.RemoveDynamic(this, &ThisClass::UpdateRemainingRound);
-		CurrentGameState->OnPlayerArrayChanged.RemoveDynamic(this, &ThisClass::OnPlayerArrayChanged);
+		CurrentGameState->OnStateTimerChanged.RemoveAll(this); 
+		CurrentGameState->OnRoundChanged.RemoveAll(this);
+		CurrentGameState->OnPlayerArrayChanged.RemoveAll(this);
 	}
+	
+	ClearPlayerInfoWidgets();
 	
 	Super::NativeDestruct();
 }
@@ -147,5 +148,82 @@ void UBoardGameWidget::RefreshPlayerInfoWidgets()
 			PlayerStates.Add(DDPS);
 	}
 
+	PlayerStates.Sort([](const ADDBasePlayerState& A, const ADDBasePlayerState& B)
+   {
+	   const int32 RankA = A.PlayerGameData.CurrentRank > 0 ? A.PlayerGameData.CurrentRank : INT_MAX;
+	   const int32 RankB = B.PlayerGameData.CurrentRank > 0 ? B.PlayerGameData.CurrentRank : INT_MAX;
+	   return RankA < RankB;
+   });
+	
 	CreatePlayerInfoWidgets(PlayerStates);
+}
+
+void UBoardGameWidget::SortPlayerInfoWidgets()
+{
+	if (!PlayerInfoContainer || PlayerInfoWidgets.Num() != PlayerInfoSizeBoxes.Num()) return;
+
+	// PlayerInfoWidgets + SizeBoxes를 함께 랭크 기준으로 정렬
+	// 두 배열을 인덱스 기준으로 묶어서 정렬
+	TArray<int32> Indices;
+	Indices.Reserve(PlayerInfoWidgets.Num());
+	for (int32 i = 0; i < PlayerInfoWidgets.Num(); ++i)
+		Indices.Add(i);
+
+	Indices.Sort([this](int32 A, int32 B)
+	{
+		const UBoardGamePlayerInfo* WidgetA = PlayerInfoWidgets[A];
+		const UBoardGamePlayerInfo* WidgetB = PlayerInfoWidgets[B];
+
+		const ADDBasePlayerState* PSA = WidgetA ? WidgetA->GetPlayerState() : nullptr;
+		const ADDBasePlayerState* PSB = WidgetB ? WidgetB->GetPlayerState() : nullptr;
+
+		const int32 RankA = (PSA && PSA->PlayerGameData.CurrentRank > 0)
+			? PSA->PlayerGameData.CurrentRank : INT_MAX;
+		const int32 RankB = (PSB && PSB->PlayerGameData.CurrentRank > 0)
+			? PSB->PlayerGameData.CurrentRank : INT_MAX;
+
+		return RankA < RankB;
+	});
+
+	// 정렬 인덱스 기준으로 두 배열 재배치
+	TArray<TObjectPtr<UBoardGamePlayerInfo>> SortedWidgets;
+	TArray<TObjectPtr<USizeBox>> SortedSizeBoxes;
+
+	for (int32 i : Indices)
+	{
+		SortedWidgets.Add(PlayerInfoWidgets[i]);
+		SortedSizeBoxes.Add(PlayerInfoSizeBoxes[i]);
+	}
+
+	PlayerInfoWidgets  = MoveTemp(SortedWidgets);
+	PlayerInfoSizeBoxes = MoveTemp(SortedSizeBoxes);
+
+	// 컨테이너를 비우고 정렬된 순서로 재추가 (위젯 파괴 없음)
+	PlayerInfoContainer->ClearChildren();
+	for (USizeBox* SizeBox : PlayerInfoSizeBoxes)
+	{
+		if (!SizeBox) continue;
+		if (UVerticalBoxSlot* BoxSlot = PlayerInfoContainer->AddChildToVerticalBox(SizeBox))
+		{
+			BoxSlot->SetPadding(FMargin(4.f, 0.f));
+			BoxSlot->SetVerticalAlignment(VAlign_Center);
+		}
+	}
+}
+
+void UBoardGameWidget::ClearPlayerInfoWidgets()
+{ 
+	for (UBoardGamePlayerInfo* Widget : PlayerInfoWidgets)
+	{
+		if (Widget && Widget->GetPlayerState())
+		{
+			Widget->GetPlayerState()->OnRankChanged.RemoveAll(this);
+		}
+	}
+
+	if (PlayerInfoContainer)
+		PlayerInfoContainer->ClearChildren();
+
+	PlayerInfoWidgets.Empty();
+	PlayerInfoSizeBoxes.Empty();
 }
