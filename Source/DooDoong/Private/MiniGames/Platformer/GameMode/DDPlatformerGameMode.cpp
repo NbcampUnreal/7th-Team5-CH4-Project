@@ -150,7 +150,7 @@ void ADDPlatformerGameMode::PlayerRanking()
 	if (PlayerRankingArrays.Num() != MaxPlayer)
 	{
 		/* 골인을 하지 못한 플레이어가 존재한다면 */
-		if (PlayerNoGoalArrays.IsEmpty() == false)
+		if (!PlayerNoGoalArrays.IsEmpty())
 		{
 			/* 골인 못한 플레이어들 최대 이동거리별로 정렬 */
 			PlayerNoGoalArrays.ValueSort([](
