@@ -14,13 +14,9 @@ void ADDPlatformerGameMode::HandleSeamlessTravelPlayer(AController*& C)
 	ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(C);
 	if (IsValid(BasePlayerController) == true)
 	{
-		ADDBasePlayerState* BasePlayerState = C->GetPlayerState<ADDBasePlayerState>();
+		ADDBasePlayerState* BasePlayerState = BasePlayerController->GetPlayerState<ADDBasePlayerState>();
 		if (IsValid(BasePlayerState) == true)
 		{
-			BasePlayerState->PlayerGameData.SlotIndex = PlayerIndex;
-			PlayerIndex++;
-			//플레이어 게임설명UI창 열어주기
-			//PlatformerEnteredPlayer->OpenReadyUI();
 			FPlatformerPlayerData PlayerData;
 			PlayerData.PlayerController = BasePlayerController;
 			PlayerData.PlayerState = BasePlayerState;
@@ -30,6 +26,7 @@ void ADDPlatformerGameMode::HandleSeamlessTravelPlayer(AController*& C)
 			PlayerData.PlayerSlotIndex = BasePlayerState->PlayerGameData.SlotIndex;
 			PlayerData.PlayerDisplayName = BasePlayerState->PlayerGameData.PlayerDisplayName.ToString();
 			PlayerData.PlayerColor = BasePlayerState->PlayerGameData.PlayerColor;
+			PlayerData.bIsGoalIn = false;
 			LOG_PMJ(Warning, TEXT("PlayerSlotIndex : %d"), PlayerData.PlayerSlotIndex);
 			PlayerDatas.Add(PlayerData.PlayerSlotIndex, PlayerData);
 		}
@@ -40,9 +37,6 @@ void ADDPlatformerGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	LOG_PMJ(Warning, TEXT("BeginPlayServer"));
-	/* 게임모드 일시정지 */
-	//UGameplayStatics::SetGamePaused(GetWorld(), true);
-	
 	/* 시작지점 초기화 각 캐릭터가 시작지점을 기준으로 얼마나 멀리갔는지 최고기록 체크를위함 */
 	StartLocation = FVector(0.0f, 0.0f, 0.0f);
 	
@@ -52,16 +46,16 @@ void ADDPlatformerGameMode::BeginPlay()
 		PlatformerGameStateBase = Cast<ADDPlatformerGameState>(GameStateBase);
 	}
 	MaxPlayer = PlayerDatas.Num();
-	WaitingTimerStart();
+}
+
+void ADDPlatformerGameMode::StartMiniGame()
+{
+	Super::StartMiniGame();
+	GameStart();
 }
 
 void ADDPlatformerGameMode::GameStart()
 {
-	UE_LOG(LogPMJ, Log, TEXT("GameStart"));
-	/* 게임모드일시정지 해제*/
-	//UGameplayStatics::SetGamePaused(GetWorld(), false);
-	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Playing);
-	GetWorldTimerManager().ClearTimer(FinishedWaitingTimerHandle);
 	GetWorldTimerManager().SetTimer(
 		PlatformerPlayTimerHandle,
 		this,
@@ -77,6 +71,21 @@ void ADDPlatformerGameMode::GameStart()
 		1.f,
 		true
 		);
+}
+
+void ADDPlatformerGameMode::PlayGameTimer()
+{
+	UE_LOG(LogPMJ, Log, TEXT("PlayGameTimer"));
+	/* 게임플레이 타이머함수가 호출될때마다 각 플레이어의 최고 거리를 기록 */
+	for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
+	{
+		FVector PlayerLocation = EnteredPlayer.Value.PlayerController->GetCharacter()->GetActorLocation();
+		float CurrentPlayerDistance = FVector::Dist(StartLocation, PlayerLocation);
+		if (EnteredPlayer.Value.PlayerMaxDistance < CurrentPlayerDistance)
+		{
+			EnteredPlayer.Value.PlayerMaxDistance = CurrentPlayerDistance;
+		}
+	}
 }
 
 void ADDPlatformerGameMode::GameEnd()
@@ -95,26 +104,6 @@ void ADDPlatformerGameMode::GameEnd()
 	
 	PlayerRanking();
 	
-}
-
-void ADDPlatformerGameMode::CallFinishGameTimer()
-{
-	FinishMiniGame();
-}
-
-void ADDPlatformerGameMode::PlayGameTimer()
-{
-	UE_LOG(LogPMJ, Log, TEXT("PlayGameTimer"));
-	/* 게임플레이 타이머함수가 호출될때마다 각 플레이어의 최고 거리를 기록 */
-	for (TPair<int32, FPlatformerPlayerData>& EnteredPlayer : PlayerDatas)
-	{
-		FVector PlayerLocation = EnteredPlayer.Value.PlayerController->GetCharacter()->GetActorLocation();
-		float CurrentPlayerDistance = FVector::Dist(StartLocation, PlayerLocation);
-		if (EnteredPlayer.Value.PlayerMaxDistance < CurrentPlayerDistance)
-		{
-			EnteredPlayer.Value.PlayerMaxDistance = CurrentPlayerDistance;
-		}
-	}
 }
 
 void ADDPlatformerGameMode::CheckGoalPlayerCharacter(AActor* GoalActor)
@@ -160,7 +149,7 @@ void ADDPlatformerGameMode::PlayerRanking()
 	/* 랭킹배열 돌았는데 인원이 맞지 않고 */
 	if (PlayerRankingArrays.Num() != MaxPlayer)
 	{
-		/* 점수산정해야하는 플레이어가 비어있지않다면 */
+		/* 골인을 하지 못한 플레이어가 존재한다면 */
 		if (PlayerNoGoalArrays.IsEmpty() == false)
 		{
 			/* 골인 못한 플레이어들 최대 이동거리별로 정렬 */
@@ -179,6 +168,7 @@ void ADDPlatformerGameMode::PlayerRanking()
 			}
 		}
 	}
+	
 	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayerRanking : PlayerRankingArrays)
 	{
 		LOG_PMJ(Warning, TEXT("PlayerID : %d PlayerRank : %d"), EnteredPlayerRanking.Value.PlayerSlotIndex, EnteredPlayerRanking.Value.PlayerRank);
@@ -191,12 +181,16 @@ void ADDPlatformerGameMode::PlayerRanking()
 		switch (EnteredPlayer.Value.PlayerRank)
 		{
 		case 1 : AddScore(EnteredPlayer.Value.PlayerState.Get(), 100);
+			LOG_PMJ(Error, TEXT("=== GAMEMODE : %d Player, AddScore : 100, Rank : %d ==="), EnteredPlayer.Value.PlayerSlotIndex, EnteredPlayer.Value.PlayerRank);
 			break;
 		case 2 : AddScore(EnteredPlayer.Value.PlayerState.Get(), 80);
+			LOG_PMJ(Error, TEXT("=== GAMEMODE : %d Player, AddScore : 80, Rank : %d ==="), EnteredPlayer.Value.PlayerSlotIndex, EnteredPlayer.Value.PlayerRank);
 			break;
 		case 3 : AddScore(EnteredPlayer.Value.PlayerState.Get(), 60);
+			LOG_PMJ(Error, TEXT("=== GAMEMODE : %d Player, AddScore : 60, Rank : %d ==="), EnteredPlayer.Value.PlayerSlotIndex, EnteredPlayer.Value.PlayerRank);
 			break;
 		case 4 : AddScore(EnteredPlayer.Value.PlayerState.Get(), 40);
+			LOG_PMJ(Error, TEXT("=== GAMEMODE : %d Player, AddScore : 40, Rank : %d ==="), EnteredPlayer.Value.PlayerSlotIndex, EnteredPlayer.Value.PlayerRank);
 			break;
 		default: LOG_PMJ(Error, TEXT("=== GAMEMODE : 플레이어의 랭킹 없음 ==="));
 			break;
@@ -212,7 +206,12 @@ void ADDPlatformerGameMode::PlayerRanking()
 		);
 }
 
-void ADDPlatformerGameMode::WaitingTimerStart()
+void ADDPlatformerGameMode::CallFinishGameTimer()
+{
+	FinishMiniGame();
+}
+
+/*void ADDPlatformerGameMode::WaitingTimerStart()
 {
 	PlatformerGameStateBase->SetMiniGameState(DDGameplayTags::State_MiniGame_Preparing);
 	
@@ -229,9 +228,9 @@ void ADDPlatformerGameMode::WaitingTimerStart()
 	&ADDPlatformerGameMode::GameStart,
 	10.f,
 	false);
-}
+}*/
 
-void ADDPlatformerGameMode::CheckReadyPlayers()
+/*void ADDPlatformerGameMode::CheckReadyPlayers()
 {
 	//TODO_@Minjae : 플레이어들이 준비되었는지 확인하는 로직 구현 
 	//플레이어쪽에서 대기화면이 나타났을때 준비완료 버튼을 누를때마다 이벤트 함수 호출
@@ -255,5 +254,5 @@ void ADDPlatformerGameMode::CheckReadyPlayers()
 	{
 		WaitingTimerStart();
 	}
-}
+}*/
 

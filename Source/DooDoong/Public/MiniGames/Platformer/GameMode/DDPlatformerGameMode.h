@@ -55,13 +55,9 @@ class DOODOONG_API ADDPlatformerGameMode : public ADDMiniGameModeBase
 public:
 	virtual void BeginPlay() override;
 	
+	virtual void StartMiniGame() override;
+	
 public:
-	/*플레이어 준비완료 체크*/
-	void CheckReadyPlayers();
-	
-	/*대기시간 타이머 호출 함수*/
-	void WaitingTimerStart();
-	
 	/* 플레이어 이동거리 체크 타이머 함수 */
 	void PlayGameTimer();
 	
@@ -117,8 +113,5 @@ private:
 	FVector StartLocation;
 	int32 Rank = 1;
 	int32 MaxPlayer;
-	
-	/* 테스트용 임시변수 */
-	int32 PlayerIndex = 1;
 	
 };
