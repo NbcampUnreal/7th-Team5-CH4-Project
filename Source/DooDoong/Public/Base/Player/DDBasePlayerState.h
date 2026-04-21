@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerState.h"
 #include "DDBasePlayerState.generated.h"
 
+class UDDInventoryComponent;
 class UDDPointSet;
 class UDDAbilitySystemComponent;
 class UDDHealthSet;
@@ -33,6 +34,9 @@ struct FPlayerGameplayInfo
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     int32 TurnOrder = -1;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsPlayerTurn = false;
 	
 	// 게임 진행 중에는 false, 게임 종료 후 true
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -121,4 +125,12 @@ public:
 protected:
 	UFUNCTION()
     void OnRep_PlayerGameData();
+	
+	/* 민재 :인벤토리 로직*/
+public:
+	UDDInventoryComponent* GetInventoryComponent() const {return InventoryComponent;}
+	
+private:
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TObjectPtr<UDDInventoryComponent> InventoryComponent;
 };

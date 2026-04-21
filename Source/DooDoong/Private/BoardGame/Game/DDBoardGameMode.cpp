@@ -335,7 +335,8 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 	// 서버 측 이펙트 적용
 	ApplyTurnEffectsToPlayers();
 	SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
-
+	
+	
 	// PC들에게 반응 지시
 	for (int32 i = 0; i < AlivePlayerControllers.Num(); ++i)
 	{
@@ -640,6 +641,20 @@ void ADDBoardGameMode::TravelToLobby()
         LOG_CJH(Log, TEXT("로비로 ServerTravel을 시작합니다."));
         GetWorld()->ServerTravel(LobbyMapPath);
     }
+}
+
+void ADDBoardGameMode::HandleInventoryOpenRequest(ADDBasePlayerController* Requester)
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromPlayer(Requester);
+	if (!ASC || !ASC->HasMatchingGameplayTag(DDGameplayTags::State_BoardGame_TurnActive)) return; 
+
+	BroadcastOpenPopUp(DDGameplayTags::BoardGame_UI_Inventory);
+}
+
+void ADDBoardGameMode::HandleInventoryClose()
+{
+	LOG_KMS(Warning, TEXT("인벤토리 닫기 실행"));
+	BroadcastClosePopUp(DDGameplayTags::BoardGame_UI_Inventory); 
 }
 
 void ADDBoardGameMode::SetTurnPhase(FGameplayTag NewPhaseTag)

@@ -9,8 +9,8 @@
 #include "BoardGame/Abilities/DDMoveTileStepTask.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "BoardGame/Character/Components/ItemActionComponent.h"
+#include "BoardGame/Game/DDBoardGameMode.h"
 #include "Common/DDLogManager.h"
-#include "Components/SlateWrapperTypes.h"
 #include "Input/DDInputComponent.h"
 #include "System/DDGameplayTags.h"
 #include "System/DDUIManagerSubsystem.h"
@@ -20,13 +20,11 @@
 
 ADDBasePlayerController::ADDBasePlayerController()
 {
-	InventoryComponent = CreateDefaultSubobject<UDDInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 void ADDBasePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	CachedPlayerState = GetPlayerState<ADDBasePlayerState>();
 	
 	FInputModeGameAndUI Mode;
 	SetInputMode(Mode);
@@ -41,6 +39,25 @@ void ADDBasePlayerController::BeginPlay()
 	if (IsLocalController())
 	{
 		Server_NotifyClientLoaded();
+	}
+}
+
+void ADDBasePlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	
+	CachedPlayerState = GetPlayerState<ADDBasePlayerState>();
+	if (CachedPlayerState)
+	{
+		InventoryComponent = CachedPlayerState->GetInventoryComponent();
+		InventoryComponent->SetOwningController(this);
+		InventoryComponent->Server_InitializeInventoryData();
+		InventoryComponent->Server_AddItem("HealingKit");
+		InventoryComponent->Server_AddItem("GiveBomb");
+	}
+	else
+	{
+		LOG_PMJ(Error, TEXT("PlayerState is null"));
 	}
 }
 
@@ -89,7 +106,7 @@ void ADDBasePlayerController::SetupInputComponent()
 			DDGameplayTags::Input_Native_Inventory,
 			ETriggerEvent::Started,
 			this,
-			&ThisClass::ToggleInventoryMenu,
+			&ThisClass::Input_ToggleInventoryMenu,
 			true
 		);
 
@@ -408,17 +425,30 @@ UItemActionComponent* ADDBasePlayerController::GetItemActionComponentFromPawn() 
 	return ControlledPawn ? ControlledPawn->FindComponentByClass<UItemActionComponent>() : nullptr;
 }
 
-void ADDBasePlayerController::ToggleInventoryMenu()
+void ADDBasePlayerController::Input_ToggleInventoryMenu()
 {
-	if (!InventoryComponent || !IsLocalController()) return;
+	if (!IsLocalController()) return;
+	
+	Server_RequestInventory();
+}
+
+void ADDBasePlayerController::Server_RequestInventory_Implementation()
+{
+	if (!HasAuthority()) return;
+	
+	ADDBoardGameMode* GM = Cast<ADDBoardGameMode>(GetWorld()->GetAuthGameMode());
+	if (!GM) return;
+	
 	if (bInventoryOpen)
 	{
-		Client_ClosePopUp(DDGameplayTags::BoardGame_UI_Inventory);
-		bInventoryOpen = false;
+		LOG_KMS(Warning, TEXT("인벤토리 닫기 요청"));
+		GM->HandleInventoryClose(); 
 	}
 	else
 	{
-		Client_OpenPopUp(DDGameplayTags::BoardGame_UI_Inventory);
-		bInventoryOpen = true;
+		LOG_KMS(Warning, TEXT("인벤토리 열기 요청"));
+		GM->HandleInventoryOpenRequest(this); 
 	}
+	
+	bInventoryOpen = !bInventoryOpen;
 }

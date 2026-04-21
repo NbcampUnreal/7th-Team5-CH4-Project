@@ -7,6 +7,7 @@
 #include "Common/DDLogManager.h"
 #include "Data/DDItemDataTypes.h"
 #include "Net/UnrealNetwork.h"
+#include "System/DDGameInstance.h"
 #include "System/DDGameplayTags.h"
 
 
@@ -17,60 +18,53 @@ UDDInventoryComponent::UDDInventoryComponent()
 	
 }
 
-
 void UDDInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GetOwner()->HasAuthority())
-	{
-		Server_InitializeInventoryData();
-		Server_AddItem("HealingKit");
-		Server_AddItem("Magnet");
-	}
-	
-	OwningController = Cast<ADDBasePlayerController>(GetOwner());
 }
+
+
 
 void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 {
-	if (!(GetOwner()->HasAuthority()))
+	if (GetOwner()->HasAuthority())
 	{
 		LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 1"));
-		return;	
-	}
-	if (!ItemDataTable)
-	{
-		LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 2"));
-		return;
-	}
-	const TArray<FName>& AllItemNames = ItemDataTable->GetRowNames();
-	if (AllItemNames.IsEmpty())
-	{
-		LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 3"));
-		return;
-	}
-	for (int32 i = 0; i < AllItemNames.Num(); ++i)
-	{
-		FItemTableRow* ItemDataRow = ItemDataTable->FindRow<FItemTableRow>(AllItemNames[i], TEXT("FindItem"));
-		if (!ItemDataRow)
+		if (!UDDGameInstance::Get(GetWorld())->ItemDataTable)
 		{
-			LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 4"));
-			continue;
+			LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 2"));
+			return;
 		}
-		FInventoryItemData InventoryItemData;
-		InventoryItemData.ItemName = AllItemNames[i];
-		InventoryItemData.ItemCount = 0;
-		InventoryItemData.bCanUse = false;
-		InventoryItemData.Icon = ItemDataRow->Icon;
-		InventoryItemDatas.Add(InventoryItemData);
+		const TArray<FName>& AllItemNames = UDDGameInstance::Get(GetWorld())->ItemDataTable->GetRowNames();
+		if (AllItemNames.IsEmpty())
+		{
+			LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 3"));
+			return;
+		}
+		for (int32 i = 0; i < AllItemNames.Num(); ++i)
+		{
+			FItemTableRow* ItemDataRow = UDDGameInstance::Get(GetWorld())->ItemDataTable->FindRow<FItemTableRow>(AllItemNames[i], TEXT("FindItem"));
+			if (!ItemDataRow)
+			{
+				LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 4"));
+				continue;
+			}
+			FInventoryItemData InventoryItemData;
+			InventoryItemData.ItemName = AllItemNames[i];
+			InventoryItemData.ItemCount = 0;
+			InventoryItemData.bCanUse = false;
+			InventoryItemData.Icon = ItemDataRow->Icon;
+			InventoryItemDatas.Add(InventoryItemData);
 		
-		FViewItemData ViewItemData;
-		ViewItemData.ViewItemName = AllItemNames[i];
-		ViewItemData.ViewItemCount = 0;
-		ViewItemData.bCanUse = false;
-		ViewItemData.Icon = ItemDataRow->Icon;
-		ViewItemDatas.Add(ViewItemData);
+			FViewItemData ViewItemData;
+			ViewItemData.ViewItemName = AllItemNames[i];
+			ViewItemData.ViewItemCount = 0;
+			ViewItemData.bCanUse = false;
+			ViewItemData.Icon = ItemDataRow->Icon;
+			ViewItemDatas.Add(ViewItemData);
+		}
 	}
+	
 }
 
 void UDDInventoryComponent::RefreshInventory()
@@ -98,6 +92,12 @@ void UDDInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	DOREPLIFETIME(ThisClass, ViewItemDatas);
 }
 
+void UDDInventoryComponent::SetOwningController(ADDBasePlayerController* PC)
+{
+	OwningController = PC;
+}
+
+
 void UDDInventoryComponent::OnRep_ClientViewItemData()
 {
 	OnInventoryChanged.Broadcast();
@@ -106,8 +106,8 @@ void UDDInventoryComponent::OnRep_ClientViewItemData()
 
 FItemTableRow* UDDInventoryComponent::GetItemData(FName RowName) const
 {
-	if (!ItemDataTable) return nullptr;
-	return ItemDataTable->FindRow<FItemTableRow>(RowName, TEXT("Item"));
+	if (!UDDGameInstance::Get(GetWorld())->ItemDataTable) return nullptr;
+	return UDDGameInstance::Get(GetWorld())->ItemDataTable->FindRow<FItemTableRow>(RowName, TEXT("Item"));
 }
 
 void UDDInventoryComponent::Server_AddItem_Implementation(FName ItemName)
@@ -134,32 +134,61 @@ void UDDInventoryComponent::Server_AddItem_Implementation(FName ItemName)
 
 void UDDInventoryComponent::Server_UseItem_Implementation(const FName& ItemSlotName)
 {
-	if (ItemSlotName.IsNone()) return;
-	for (FInventoryItemData& ItemDatas : InventoryItemDatas)
+	if (ItemSlotName.IsNone())
 	{
-		if (ItemDatas.ItemName == ItemSlotName)
+			LOG_PMJ(Error, TEXT("====== 아이템 이름 없음 ======"));
+	}
+	for (FInventoryItemData& ItemData : InventoryItemDatas)
+	{
+		if (ItemData.ItemName == ItemSlotName)
 		{
-			LOG_PMJ(Error, TEXT("====== 사용아이템존재 ======"));
+			ADDBasePlayerState* DDPS = Cast<ADDBasePlayerState>(GetOwner());
+			if (DDPS == nullptr)
+			{
+				LOG_PMJ(Error, TEXT("UseItem: DDPlayerState is null "));
+				return;
+			}
+				
+			ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(DDPS->GetPlayerController());
+			if (DDPC == nullptr)
+			{
+				LOG_PMJ(Error, TEXT(" UseItem: 컨트롤러 캐스팅 실패 "));
+			}
 			
-			ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(OwningController->GetCharacter());
-			if (!IsValid(Character)) return;
-			UItemActionComponent* IAC = Character->FindComponentByClass<UItemActionComponent>();
-			if (!IsValid(IAC)) return;
-			FItemTableRow& CurrentItemDataRow = *GetItemData(ItemDatas.ItemName);
-			IAC->BeginItemAction(CurrentItemDataRow);
-			ItemDatas.ItemCount--;
+			ADDBaseCharacter* DDCharacter = Cast<ADDBaseCharacter>(DDPC->GetCharacter());
+			if (DDCharacter == nullptr)
+			{
+				LOG_PMJ(Error, TEXT(" UseItem: 캐릭터 캐스팅 실패 "));
+			}
+			
+			UItemActionComponent* IAC = DDCharacter->FindComponentByClass<UItemActionComponent>();
+			if (!IsValid(IAC))
+			{
+				LOG_PMJ(Error, TEXT(" UseItem: 아이템 엑션 컴포넌트 찾기 실패 "));
+				return;
+			}
+			
+			FItemTableRow* CurrentItemDataRow = GetItemData(ItemData.ItemName);  // ← 포인터로 받기
+			if (!CurrentItemDataRow)
+			{
+				LOG_PMJ(Error, TEXT(" UseItem: 아이템 데이터 불러오기 실패 "));
+				return;
+			}
+			
+			IAC->BeginItemAction(*CurrentItemDataRow);
+			ItemData.ItemCount--;
 			RefreshInventory();
 		}
 	}
-	OwningController->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_Inventory);
+	//OwningController->Client_ClosePopUp(DDGameplayTags::BoardGame_UI_Inventory);
 }
 
 FName UDDInventoryComponent::AddRandomItem()
 {
 	if (!GetOwner()->HasAuthority()) return NAME_None;
-	if (!ItemDataTable) return NAME_None;
+	if (!UDDGameInstance::Get(GetWorld())->ItemDataTable) return NAME_None;
 
-	const TArray<FName> RowNames = ItemDataTable->GetRowNames();
+	const TArray<FName> RowNames = UDDGameInstance::Get(GetWorld())->ItemDataTable->GetRowNames();
 	if (RowNames.Num() == 0) return NAME_None;
 
 	int32 Index = FMath::RandRange(0, RowNames.Num() - 1);

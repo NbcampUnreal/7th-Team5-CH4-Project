@@ -25,6 +25,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
 	TObjectPtr<UDataTable> SoundDataTable;
 	
+	/* 민재 : ItemDataTable */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	TObjectPtr<UDataTable> ItemDataTable;
+	
+	
 	// 로비에 있던 총 인원 수
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GameData")
     int32 ExpectedPlayerCount = 0;

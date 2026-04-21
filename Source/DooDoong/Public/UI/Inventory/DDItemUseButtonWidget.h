@@ -36,7 +36,5 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UButton> BT_Cancel;
 	
-	TWeakObjectPtr<UDDInventoryComponent> InventoryComponent;
-	
 	FName CurrentItemSlotName;
 };

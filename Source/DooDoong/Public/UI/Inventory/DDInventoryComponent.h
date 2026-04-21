@@ -22,10 +22,13 @@ struct FInventoryItemData
 	
 	UPROPERTY()
 	FName ItemName;
+	
 	UPROPERTY()
 	int32 ItemCount;
+	
 	UPROPERTY()
 	bool bCanUse;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UTexture2D> Icon;
 };
@@ -37,13 +40,15 @@ struct FViewItemData
 	
 	UPROPERTY()
 	FName ViewItemName;
+	
 	UPROPERTY()
 	int32 ViewItemCount;
+	
 	UPROPERTY()
 	bool bCanUse;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UTexture2D> Icon;
-	
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
@@ -60,11 +65,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:
-	/** 주현 : 인벤토리 Open이 Private이라 한 번 감싸서 호출가능하게 요청하는 함수 */
-	void RequestOpenInventory();
-
-	/** 주현 : 인벤토리 Close도 Private이라 한 번 감싸서 호출가능하게 요청하는 함수 */
-	void RequestCloseInventory();
+	void SetOwningController(ADDBasePlayerController* PC);
 	
 	/* 인벤토리 새로고침 */
 	void RefreshInventory();
@@ -100,7 +101,7 @@ public:
 	FName AddRandomItem();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category= "Inventory|Data")
+	UPROPERTY(VisibleAnywhere, Category= "Inventory|Data")
 	TObjectPtr<UDataTable> ItemDataTable;
 	
 private:

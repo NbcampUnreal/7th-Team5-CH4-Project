@@ -8,9 +8,12 @@
 #include "Base/Game/DDGameStateBase.h"
 #include "BoardGame/DDTileManager.h"
 #include "Common/DDLogManager.h"
+#include "UI/Inventory/DDInventoryComponent.h"
 
 ADDBasePlayerState::ADDBasePlayerState()
 {
+	InventoryComponent = CreateDefaultSubobject<UDDInventoryComponent>(TEXT("InventoryComponent"));
+	
 	AbilitySystemComponent = CreateDefaultSubobject<UDDAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
@@ -63,6 +66,7 @@ void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 
 		NewPlayerState->bIsParticipant = this->bIsParticipant;
 		NewPlayerState->PlayerGameData.bIsGameFinished = this->PlayerGameData.bIsGameFinished;
+		NewPlayerState->InventoryComponent = this->InventoryComponent;
 
 
 		// 미니게임과 보드게임을 오가는 중
@@ -155,3 +159,4 @@ if (ADDBaseCharacter* BaseCharacter = Cast<ADDBaseCharacter>(GetPawn()))
 		BaseCharacter->ApplyColorFromPlayerState(PlayerGameData.PlayerColor);
 	}
 }
+

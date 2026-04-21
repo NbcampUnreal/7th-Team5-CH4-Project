@@ -5,18 +5,26 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Common/DDLogManager.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Microsoft/AllowMicrosoftPlatformTypes.h"
 
 ADDDynamicPlatform::ADDDynamicPlatform()
-	: TimerRate(0.016f)
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 	
 	RootScene = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SetRootComponent(RootScene);
 	
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	MeshComponent->SetupAttachment(RootScene);
+	
+}
+
+void ADDDynamicPlatform::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	MovingPlatform(DeltaSeconds);
 }
 
 void ADDDynamicPlatform::BeginPlay()
@@ -25,33 +33,12 @@ void ADDDynamicPlatform::BeginPlay()
 	
 	StartLocation = GetActorLocation();
 	MoveDirection = PlatformVelocity.GetSafeNormal();
-	
-	if (PlatformVelocity != FVector::ZeroVector)
-	{
-		GetWorldTimerManager().SetTimer(
-			DynamicPlatformTimerHandle,
-			this,
-			&ADDDynamicPlatform::MovingPlatform,
-			TimerRate,
-			true
-		);
-	}
-	else if (RotationValue != FRotator::ZeroRotator)
-	{
-		GetWorldTimerManager().SetTimer(
-			DynamicPlatformTimerHandle,
-			this,
-			&ADDDynamicPlatform::RotatingPlatform,
-			TimerRate,
-			true
-		);
-	}
 }
 
-void ADDDynamicPlatform::MovingPlatform()
+void ADDDynamicPlatform::MovingPlatform(float DeltaSeconds)
 {
 	FVector CurrentLocation = GetActorLocation();
-	CurrentLocation += MoveDirection * PlatformVelocity * TimerRate;
+	CurrentLocation += MoveDirection * (PlatformVelocity * DeltaSeconds);
 	SetActorLocation(CurrentLocation);
 	float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation);
 	
@@ -63,10 +50,10 @@ void ADDDynamicPlatform::MovingPlatform()
 	}
 }
 
-void ADDDynamicPlatform::RotatingPlatform()
+void ADDDynamicPlatform::RotatingPlatform(float DeltaSeconds)
 {
 	FRotator CurrentRotation = GetActorRotation();
-	AddActorLocalRotation(RotationValue * TimerRate);
+	SetActorRelativeRotation(RotationValue * DeltaSeconds);
 }
 
 
