@@ -122,6 +122,10 @@ protected:
 
 	/** 아이템 액션 컴포넌트를 매번 가져올 때 방어코드 작성하는게 코드를 지저분하게 만들어서 만든 헬퍼 */
 	UItemActionComponent* GetItemActionComponentFromPawn() const;
+	
+protected:
+	/** 세팅 UI 띄우는 Input */
+	void Input_SettingToggle();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
