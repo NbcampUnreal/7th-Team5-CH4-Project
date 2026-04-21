@@ -621,6 +621,7 @@ void ADDBoardGameMode::HandleRespawn(AController* TargetController)
 	if (!PS) return;
 	PS->StartTileName = FName("Tile01");
 	PS->InitTile();
+	LOG_CYS(Error,TEXT("리스폰 성공"));
 }
 
 void ADDBoardGameMode::ExecuteNextTurnTransition()
