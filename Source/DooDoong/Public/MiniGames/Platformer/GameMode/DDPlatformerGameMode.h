@@ -20,13 +20,13 @@ struct FPlatformerPlayerData
 	GENERATED_BODY()
 	/*BasePlayerState에서 넘겨받을 정보*/
 	UPROPERTY()
-	FLinearColor PlayerColor; 
+	FLinearColor PlayerColor = FLinearColor::White; 
 
 	UPROPERTY()
-	FString PlayerDisplayName;
+	FString PlayerDisplayName = TEXT("");
 	
 	UPROPERTY()
-	int32 PlayerSlotIndex;
+	int32 PlayerSlotIndex = 0;
 	
 	/* 미니게임 에서 필요한 추가 정보 */
 	UPROPERTY()
@@ -45,7 +45,7 @@ struct FPlatformerPlayerData
 	bool bIsGoalIn = false;
 	
 	UPROPERTY()
-	FVector SavePointLocation;
+	FVector SavePointLocation = FVector(0, 0, 0);
 };
 
 UCLASS()

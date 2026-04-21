@@ -10,7 +10,7 @@ struct FTestPlayerData
     GENERATED_BODY()
 
     UPROPERTY(BlueprintReadWrite)
-    FString Name;
+    FString Name = TEXT("");
 
     UPROPERTY(BlueprintReadWrite)
     int32 Gold = 0;
@@ -19,7 +19,7 @@ struct FTestPlayerData
     int32 Health = 100;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UTexture2D* ProfileImage;
+    UTexture2D* ProfileImage = nullptr;
 };
 
 UCLASS(Blueprintable)

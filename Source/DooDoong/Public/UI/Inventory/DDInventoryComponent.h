@@ -22,16 +22,16 @@ struct FViewItemData
 	GENERATED_BODY()
 	
 	UPROPERTY()
-	FName ViewItemName;
+	FName ViewItemName = FName("");
 	
 	UPROPERTY()
-	int32 ViewItemCount;
+	int32 ViewItemCount = 0;
 	
 	UPROPERTY()
-	bool bCanUse;
+	bool bCanUse = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UTexture2D> Icon;
+	TSoftObjectPtr<UTexture2D> Icon = nullptr;
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
