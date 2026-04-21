@@ -68,6 +68,13 @@ void UDDUIManagerSubsystem::HideOverlay()
 	}
 }
 
+bool UDDUIManagerSubsystem::IsPopupOpen(const FGameplayTag PopupTag)
+{
+	const TObjectPtr<UUserWidget>* Widget = PopupWidgets.Find(PopupTag);
+
+	return Widget && IsValid(Widget->Get());
+}
+
 void UDDUIManagerSubsystem::DrawPopup(FGameplayTag PopupTag)
 {
 	if (!UIConfig)

@@ -68,7 +68,6 @@ bool ADDLobbyPlayerController::Server_RequestReady_Validate(bool bIsReady)
 	return true; 
 }
 
-
 void ADDLobbyPlayerController::Server_RequestReady_Implementation(bool bIsReady)
 {
 	// 서버에다가 Ready 요청 
@@ -83,8 +82,11 @@ void ADDLobbyPlayerController::OnCountdownChanged(int32 NewCountdown)
 	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
 	if (!UIManager) return;
 	
-	if (NewCountdown > 0)
-		UIManager->DrawPopup(DDGameplayTags::Lobby_UI_CountDown);
+	if (NewCountdown > 0 )
+	{
+		if (!UIManager->IsPopupOpen(DDGameplayTags::Lobby_UI_CountDown))
+			UIManager->DrawPopup(DDGameplayTags::Lobby_UI_CountDown);
+	}
 	else
 		UIManager->HidePopup(DDGameplayTags::Lobby_UI_CountDown);
 }
