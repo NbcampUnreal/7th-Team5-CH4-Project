@@ -5,8 +5,6 @@
 #include "GameplayTagContainer.h"
 #include "DDGameStateBase.generated.h"
 
-class ADDTileManager;
-
 UCLASS()
 class DOODOONG_API ADDGameStateBase : public AGameStateBase
 {
@@ -16,9 +14,6 @@ public:
 	ADDGameStateBase();
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
-	UPROPERTY()
-	ADDTileManager* TileManager;
 	
 public:
 	UPROPERTY(EditAnywhere, Category = "UI")

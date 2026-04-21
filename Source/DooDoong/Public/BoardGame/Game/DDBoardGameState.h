@@ -4,6 +4,8 @@
 #include "Base/Game/DDGameStateBase.h"
 #include "DDBoardGameState.generated.h"
 
+class ADDTileManager;
+
 // 결과 전달 구조체: 탈주, 동점자 UI에러 방지 목적
 USTRUCT(BlueprintType)
 struct FFinalRankData
@@ -142,4 +144,7 @@ public:
 	/** 실시간 랭킹을 갱신하고, 정렬된 플레이어 배열을 반환하는 공통 함수 */
 	UFUNCTION(BlueprintCallable, Category = "Ranking")
     TArray<class ADDBasePlayerState*> UpdateAndGetPlayerRanks();
+
+	UPROPERTY()
+	ADDTileManager* TileManager;
 };
