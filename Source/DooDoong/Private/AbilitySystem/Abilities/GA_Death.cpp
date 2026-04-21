@@ -1,14 +1,9 @@
 #include "AbilitySystem/Abilities/GA_Death.h"
-
-#include "AbilitySystemComponent.h"
-#include "GameFramework/Character.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Base/Character/DDBaseCharacter.h"
 #include "Base/Game/DDGameModeBase.h"
 #include "Common/DDLogManager.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "System/DDGameplayTags.h"
 
 UGA_Death::UGA_Death()
