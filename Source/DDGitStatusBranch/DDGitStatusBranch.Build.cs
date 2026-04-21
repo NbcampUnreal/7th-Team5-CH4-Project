@@ -9,19 +9,23 @@ public class DDGitStatusBranch : ModuleRules
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                "Core"
+                "Core",
+                "CoreUObject",
+                "Engine",
             }
         );
 
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
-                "CoreUObject",
-                "Engine",
                 "Slate",
                 "SlateCore",
-                "UnrealEd"
             }
         );
+        
+        if (Target.Type == TargetType.Editor)
+        {
+            PublicDependencyModuleNames.Add("UnrealEd");
+        }
     }
 }
