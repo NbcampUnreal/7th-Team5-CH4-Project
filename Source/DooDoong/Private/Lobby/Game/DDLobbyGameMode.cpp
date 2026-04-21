@@ -4,6 +4,7 @@
 #include "GameFramework/SpectatorPawn.h"
 #include "Common/DDLogManager.h"
 #include "Algo/Count.h"
+#include "Data/DDUIConfig.h"
 #include "System/DDGameInstance.h"
 #include "System/DDGameplayTags.h"
 
@@ -55,7 +56,7 @@ void ADDLobbyGameMode::GenericPlayerInitialization(AController* C)
 
 	// 초기 UI 초기화 
 	// UIConfig 전달 → 클라이언트 UIManager 초기화
-	LobbyPC->Client_SetUIConfig(LobbyUIConfig);
+	LobbyPC->Client_SetUIConfigByPath(FSoftObjectPath(LobbyUIConfig.Get()));
 
 	// 닉네임 입력창 팝업
 	LobbyPC->Client_OpenPopUp(DDGameplayTags::Lobby_UI_NicknamePopup);

@@ -77,6 +77,9 @@ public:
 	// UI 및 팝업 관련 RPC들
 	UFUNCTION(Client, Reliable)
 	void Client_SetUIConfig(UDDUIConfig* InConfig);
+
+	UFUNCTION(Client, Reliable)
+	void Client_SetUIConfigByPath(const FSoftObjectPath& InConfigPath);
 	
 	UFUNCTION(Client, Reliable)
 	void Client_SwitchGameLayer(FGameplayTag Tag);

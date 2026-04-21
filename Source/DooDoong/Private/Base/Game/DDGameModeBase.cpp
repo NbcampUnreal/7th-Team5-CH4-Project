@@ -7,6 +7,7 @@
 #include "Base/Player/DDBasePlayerController.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "Common/DDLogManager.h"
+#include "Data/DDUIConfig.h"
 #include "System/DDGameplayTags.h"
 
 ADDGameModeBase::ADDGameModeBase()
@@ -81,7 +82,7 @@ void ADDGameModeBase::GenericPlayerInitialization(AController* C)
 	{
 		if (ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(C))
 		{
-			DDPC->Client_SetUIConfig(CurrentUIConfig); 
+			DDPC->Client_SetUIConfigByPath(FSoftObjectPath(CurrentUIConfig.Get())); 
 		}
 	}
 }

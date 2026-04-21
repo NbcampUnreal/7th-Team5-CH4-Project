@@ -70,12 +70,21 @@ void UDDUIManagerSubsystem::HideOverlay()
 
 void UDDUIManagerSubsystem::DrawPopup(FGameplayTag PopupTag)
 {
-	if (!UIConfig) return;
+	if (!UIConfig)
+	{
+		return;
+	}
 	
-	if (PopupWidgets.Contains(PopupTag)) return;
+	if (PopupWidgets.Contains(PopupTag))
+	{
+		return;
+	}
 
 	TSubclassOf<UUserWidget>* WidgetClass = UIConfig->PopupWidgetMap.Find(PopupTag);
-	if (!WidgetClass) return;
+	if (!WidgetClass || !*WidgetClass)
+	{
+		return;
+	}
 	
 	UUserWidget* NewWidget = CreateUIWidget(*WidgetClass);
 	if (NewWidget)
@@ -103,7 +112,10 @@ void UDDUIManagerSubsystem::HidePopup(FGameplayTag PopupTag)
 {
 	if (TObjectPtr<UUserWidget>* Widget = PopupWidgets.Find(PopupTag))
 	{
-		(*Widget)->RemoveFromParent();
+		if (IsValid(Widget->Get()))
+		{
+			Widget->Get()->RemoveFromParent();
+		}
 		PopupWidgets.Remove(PopupTag);
 	}
 }
@@ -112,8 +124,10 @@ void UDDUIManagerSubsystem::HideAllPopups()
 {
 	for (auto& Pair : PopupWidgets)
 	{
-		if (Pair.Value)
+		if (IsValid(Pair.Value))
+		{
 			Pair.Value->RemoveFromParent();
+		}
 	}
 	
 	PopupWidgets.Empty();
@@ -123,6 +137,7 @@ void UDDUIManagerSubsystem::SetUIConfig(UDDUIConfig* InUIConfig)
 {
 	if (!InUIConfig) return;
 	
+	HideAllPopups();
 	UIConfig = InUIConfig;
 	
 	if (UIConfig->DefaultOverlayClass)

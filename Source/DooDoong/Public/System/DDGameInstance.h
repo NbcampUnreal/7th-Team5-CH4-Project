@@ -6,6 +6,7 @@
 
 class UGameplayAbility;
 class UDataTable;
+class UDDUIConfig;
 
 UCLASS()
 class DOODOONG_API UDDGameInstance : public UGameInstance
@@ -21,6 +22,7 @@ public:
 
 	/** 주현 : DDGameInstance Getter */
 	static UDDGameInstance* Get(const UObject* WorldContext);
+	UDDUIConfig* GetOrLoadUIConfig(const FSoftObjectPath& UIConfigPath);
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Global Data", meta=(DisplayName = "현재 보드판 라운드 진행도"))
 	int32 CurrentRound = 0;
@@ -36,6 +38,10 @@ public:
 	// 로비에 있던 총 인원 수
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GameData")
     int32 ExpectedPlayerCount = 0;
+
+private:
+	UPROPERTY()
+	TMap<FString, TObjectPtr<UDDUIConfig>> CachedUIConfigs;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Preload")
 	TArray<TSubclassOf<UGameplayAbility>> PreloadedAbilityClasses;
