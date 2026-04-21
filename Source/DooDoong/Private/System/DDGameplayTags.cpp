@@ -127,6 +127,11 @@ namespace DDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_RangeItem_MeleeDamage_Confrim, "GameplayCue.RangeItem.MeleeDamage.Confirm", "근거리 공격 게임플레이 큐 : Confirm 시점");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_TargetingItem_Portal_Target, "GameplayCue.TargetingItem.Portal.Target", "포탈 게임플레이 큐 : Target 시점");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_TargetingItem_Portal_Confrim, "GameplayCue.TargetingItem.Portal.Confirm", "포탈 게임플레이 큐 : Confirm 시점");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Tile_Coin, "GameplayCue.Tile.Coin", "코인 타일 게임플레이 큐");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Tile_Goal, "GameplayCue.Tile.Goal", "목표 타일 게임플레이 큐");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Tile_Item, "GameplayCue.Tile.Item", "아이템 타일 게임플레이 큐");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Tile_Move, "GameplayCue.Tile.Move", "이동 타일 게임플레이 큐");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Tile_Damage, "GameplayCue.Tile.Damage", "데미지 타일 게임플레이 큐");
 	
 	
 	// UI 태그 

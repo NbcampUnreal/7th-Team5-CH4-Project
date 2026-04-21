@@ -130,6 +130,11 @@ namespace DDGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_RangeItem_MeleeDamage_Target);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_TargetingItem_Portal_Confirm);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_TargetingItem_Portal_Target);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Tile_Coin);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Tile_Goal);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Tile_Item);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Tile_Move);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Tile_Damage);
 	
 	// UI 태그 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoardGame_UI_PlayerTurn); 
