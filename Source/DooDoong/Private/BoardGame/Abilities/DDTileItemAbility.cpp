@@ -9,7 +9,7 @@
 
 UDDTileItemAbility::UDDTileItemAbility()
 {
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 }
 
 void UDDTileItemAbility::ActivateAbility(
@@ -75,53 +75,5 @@ void UDDTileItemAbility::ActivateAbility(
 			TEXT("RightHand")
 		);
 	}
-	// Montage
-	if (!MontageToPlay)
-	{
-		LOG_CYS(Error, TEXT("MontageToPlay 없음"));
-		return;
-	}
-	if (!ActorInfo->GetAnimInstance())
-	{
-		LOG_CYS(Error, TEXT("AnimInstance 없음"));
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
-		return;
-	}
-
-	UAbilityTask_PlayMontageAndWait* Task =
-		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
-			this,
-			NAME_None,
-			MontageToPlay
-		);
-
-	Task->OnCompleted.AddDynamic(this, &UDDTileItemAbility::OnMontageCompleted);
-	Task->OnInterrupted.AddDynamic(this, &UDDTileItemAbility::OnMontageInterrupted);
-	Task->ReadyForActivation();
-}
-
-void UDDTileItemAbility::OnMontageCompleted()
-{
-	// 손에 액터 제거
-	if (HasAuthority(&CurrentActivationInfo))
-	{
-		if (IsValid(ItemActor))
-		{
-			ItemActor->Destroy();
-		}
-	}
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-}
-
-void UDDTileItemAbility::OnMontageInterrupted()
-{
-	// 손에 액터 제거
-	if (HasAuthority(&CurrentActivationInfo))
-	{
-		if (IsValid(ItemActor))
-		{
-			ItemActor->Destroy();
-		}
-	}
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }

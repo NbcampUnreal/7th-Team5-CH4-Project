@@ -20,14 +20,6 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 	
-	UFUNCTION()
-	void OnMontageCompleted();
-	
-	UFUNCTION()
-	void OnMontageInterrupted();
-	
-	UPROPERTY(EditDefaultsOnly, Category = "UX")
-	UAnimMontage* MontageToPlay;
 	UPROPERTY(EditDefaultsOnly, Category = "UX")
 	AActor* ItemActor;
 };

@@ -19,15 +19,6 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 	
-	UFUNCTION()
-	void OnMontageCompleted();
-	
-	UFUNCTION()
-	void OnMontageInterrupted();
-
 	UPROPERTY(EditDefaultsOnly, Category = "GAS")
 	TSubclassOf<UGameplayEffect> GE_Trophy;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UX")
-	UAnimMontage* MontageToPlay;
 };
