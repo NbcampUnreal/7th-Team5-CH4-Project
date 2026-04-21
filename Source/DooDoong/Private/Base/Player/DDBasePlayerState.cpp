@@ -68,6 +68,7 @@ void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 		NewPlayerState->PlayerGameData.bIsGameFinished = this->PlayerGameData.bIsGameFinished;
 		NewPlayerState->InventoryComponent = this->InventoryComponent;
 
+		NewPlayerState->CurrentTile = nullptr;
 
 		// 미니게임과 보드게임을 오가는 중
 		if (NewPlayerState->PlayerGameData.bIsGameFinished == false)
