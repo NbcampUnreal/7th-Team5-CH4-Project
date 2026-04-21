@@ -75,13 +75,9 @@ void UDDUIManagerSubsystem::DrawPopup(FGameplayTag PopupTag)
 		return;
 	}
 	
-	if (TObjectPtr<UUserWidget>* ExistingWidget = PopupWidgets.Find(PopupTag))
+	if (PopupWidgets.Contains(PopupTag))
 	{
-		if (IsValid(ExistingWidget->Get()))
-		{
-			ExistingWidget->Get()->RemoveFromParent();
-		}
-		PopupWidgets.Remove(PopupTag);
+		return;
 	}
 
 	TSubclassOf<UUserWidget>* WidgetClass = UIConfig->PopupWidgetMap.Find(PopupTag);
