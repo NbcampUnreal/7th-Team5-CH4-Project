@@ -18,8 +18,11 @@ public:
 	
 	void InitializePlayerInfo(APlayerState* PlayerState);
 	
+	void ClearPlayerInfo(); 
+	
 	virtual void NativeDestruct() override;
 	
+	FORCEINLINE ADDBasePlayerState* GetPlayerState() const { return CurrentPlayerState; }
 protected:
 	UFUNCTION()
 	void UpdateHealth(int32 Cur, int32 Max);
@@ -61,5 +64,8 @@ protected:
 protected:
 	UPROPERTY()
 	TObjectPtr<ADDBasePlayerState> CurrentPlayerState;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FLinearColor> RankColors; 
 	
 };
