@@ -36,4 +36,7 @@ protected:
 	float RespawnDelay = 3.f; 
 	
 	FTimerHandle ResponseTimerHandle;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Game")
+	bool bIsBoardGame = false;	
 };
