@@ -10,7 +10,6 @@
 #include "System/MiniGame/DDMiniGameManager.h"
 #include "TimerManager.h"
 #include "Common/DDLogManager.h"
-#include "InputMappingContext.h"
 #include "GameFramework/PlayerState.h"
 
 static const TArray<FName> MiniGameSpawnTags =
@@ -96,11 +95,6 @@ void ADDMiniGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 		RestartPlayer(PlayerController);
 	}
 
-	if (ADDBasePlayerController* BasePlayerController = Cast<ADDBasePlayerController>(PlayerController))
-	{
-		ApplyMiniGameInput(BasePlayerController);
-	}
-	
 	// 준비 위젯 띄우기 
 	BroadcastCloseAllPopUps(); 
 	BroadcastOpenPopUp(DDGameplayTags::MiniGame_UI_ReadyPopUp);
@@ -397,30 +391,6 @@ void ADDMiniGameModeBase::FinishGame(FGameplayTag Reason)
 			MiniGameManager->CommitMiniGameResult(Result);
 		}
 	}
-}
-
-void ADDMiniGameModeBase::ApplyMiniGameInput(ADDBasePlayerController* PlayerController)
-{
-	if (PlayerController == nullptr || GetGameInstance() == nullptr)
-	{
-		return;
-	}
-	
-	const UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>();
-	const UDDMiniGameDefinition* Definition = MiniGameManager != nullptr ? MiniGameManager->GetActiveDefinition() : nullptr;
-	
-	if (Definition == nullptr)
-	{
-		return;
-	}
-	
-	if (Definition->MappingContextClass.IsNull())
-	{
-		return;
-	}
-
-	// Client loads the mapping context locally to avoid NetGUID issues after repeated seamless travel.
-	PlayerController->Client_ApplyInputByPath(Definition->MappingContextClass.ToSoftObjectPath());
 }
 
 void ADDMiniGameModeBase::InitializeReadyStates()

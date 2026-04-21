@@ -75,9 +75,6 @@ protected:
 	/** 현재 점수판 기준으로 랭킹을 다시 계산하는 헬퍼 */
 	void RefreshRanking(ADDMiniGameStateBase* MiniGameState) const;
 	
-	/** 미니게임에서 사용할 Input을 적용하는 헬퍼 */
-	void ApplyMiniGameInput(ADDBasePlayerController* PlayerController);
-
 	/** 준비 단계에서 참가자별 ready 상태를 초기화 */
 	void InitializeReadyStates();
 

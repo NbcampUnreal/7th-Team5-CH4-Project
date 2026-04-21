@@ -1,9 +1,14 @@
 ﻿#include "Base/MiniGame/DDMiniGameStateBase.h"
 
+#include "Base/Player/DDBasePlayerController.h"
 #include "Base/Player/DDBasePlayerState.h"
+#include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
+#include "InputMappingContext.h"
 #include "Net/UnrealNetwork.h"
 #include "System/DDSoundManager.h"
+#include "System/MiniGame/DDMiniGameDefinition.h"
+#include "System/MiniGame/DDMiniGameManager.h"
 
 ADDMiniGameStateBase::ADDMiniGameStateBase()
 {
@@ -37,6 +42,11 @@ void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
 	CurrentState = NewState;
 	OnMiniGameStateTagChanged.Broadcast(CurrentState); 
 	
+	if (CurrentState == DDGameplayTags::State_MiniGame_Preparing ||
+		CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		ApplyMiniGameInputLocally();
+	}
 	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
 	{
 		PlayMiniGameBGM();
@@ -52,6 +62,7 @@ void ADDMiniGameStateBase::SetMiniGameSetup(const FMiniGameSetup& Setup)
 	MiniGameSetup = Setup;
 	bMiniGameSetupReady = false;
 	bHasBroadcastMiniGameSetup = false;
+	bHasAppliedMiniGameInput = false;
 }
 
 void ADDMiniGameStateBase::NotifyMiniGameSetupReady()
@@ -62,6 +73,11 @@ void ADDMiniGameStateBase::NotifyMiniGameSetupReady()
 	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
 	{
 		PlayMiniGameBGM();
+	}
+	if (CurrentState == DDGameplayTags::State_MiniGame_Preparing ||
+		CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		ApplyMiniGameInputLocally();
 	}
 }
 
@@ -172,10 +188,20 @@ void ADDMiniGameStateBase::OnRep_MiniGameSetupReady()
 	{
 		PlayMiniGameBGM();
 	}
+	if (CurrentState == DDGameplayTags::State_MiniGame_Preparing ||
+		CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		ApplyMiniGameInputLocally();
+	}
 }
 
 void ADDMiniGameStateBase::OnRep_CurrentState()
 {
+	if (CurrentState == DDGameplayTags::State_MiniGame_Preparing ||
+		CurrentState == DDGameplayTags::State_MiniGame_Playing)
+	{
+		ApplyMiniGameInputLocally();
+	}
 	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
 	{
 		PlayMiniGameBGM();
@@ -262,4 +288,39 @@ void ADDMiniGameStateBase::PlayFinishWhistle()
 		SoundManager->StopBGM(1);
 		SoundManager->PlaySound2D("SFX_FinishWhistle");
 	}
+}
+
+void ADDMiniGameStateBase::ApplyMiniGameInputLocally()
+{
+	if (bHasAppliedMiniGameInput || GetNetMode() == NM_DedicatedServer || MiniGameSetup.MiniGameID.IsNone())
+	{
+		return;
+	}
+
+	UWorld* World = GetWorld();
+	ADDBasePlayerController* PlayerController = World != nullptr
+		                                           ? Cast<ADDBasePlayerController>(World->GetFirstPlayerController())
+		                                           : nullptr;
+	if (PlayerController == nullptr || GetGameInstance() == nullptr)
+	{
+		return;
+	}
+
+	UDDMiniGameManager* MiniGameManager = GetGameInstance()->GetSubsystem<UDDMiniGameManager>();
+	const UDDMiniGameDefinition* Definition = MiniGameManager != nullptr
+		                                          ? MiniGameManager->FindMiniGameDefinition(MiniGameSetup.MiniGameID)
+		                                          : nullptr;
+	if (Definition == nullptr || Definition->MappingContextClass.IsNull())
+	{
+		return;
+	}
+
+	UInputMappingContext* MappingContext = Definition->MappingContextClass.LoadSynchronous();
+	if (MappingContext == nullptr)
+	{
+		return;
+	}
+
+	PlayerController->SetInputMappingContext(MappingContext);
+	bHasAppliedMiniGameInput = true;
 }

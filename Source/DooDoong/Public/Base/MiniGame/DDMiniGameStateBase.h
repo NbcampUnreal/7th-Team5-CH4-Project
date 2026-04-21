@@ -165,6 +165,7 @@ public:
 protected:
 	void PlayMiniGameBGM();
 	void PlayFinishWhistle();
+	void ApplyMiniGameInputLocally();
 
 protected:
 	UPROPERTY(ReplicatedUsing=OnRep_MiniGameSetup, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame")
@@ -174,6 +175,7 @@ protected:
 	bool bMiniGameSetupReady = false;
 
 	bool bHasBroadcastMiniGameSetup = false;
+	bool bHasAppliedMiniGameInput = false;
 	
 	/** 현재 게임 상태 */
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentState, VisibleAnywhere, BlueprintReadOnly, Category="MiniGame", meta=(Categories="MiniGame.State"))
