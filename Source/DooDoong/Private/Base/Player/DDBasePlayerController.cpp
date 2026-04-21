@@ -12,6 +12,7 @@
 #include "BoardGame/Game/DDBoardGameMode.h"
 #include "Common/DDLogManager.h"
 #include "Input/DDInputComponent.h"
+#include "System/DDGameInstance.h"
 #include "System/DDGameplayTags.h"
 #include "System/DDUIManagerSubsystem.h"
 #include "UI/Inventory/DDInventoryComponent.h"
@@ -262,6 +263,24 @@ void ADDBasePlayerController::Client_SetUIConfig_Implementation(UDDUIConfig* InC
 	UIManager->SetUIConfig(InConfig);
 }
 
+void ADDBasePlayerController::Client_SetUIConfigByPath_Implementation(const FSoftObjectPath& InConfigPath)
+{
+	UDDGameInstance* DDGameInstance = UDDGameInstance::Get(this);
+	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
+	if (!DDGameInstance || !UIManager)
+	{
+		return;
+	}
+
+	UDDUIConfig* LoadedConfig = DDGameInstance->GetOrLoadUIConfig(InConfigPath);
+	if (!LoadedConfig)
+	{
+		return;
+	}
+
+	UIManager->SetUIConfig(LoadedConfig);
+}
+
 void ADDBasePlayerController::Server_SelectTile_Implementation(ADDSelectableTileActor* SelectableTileActor)
 {
 	if (!SelectableTileActor) return;
@@ -290,7 +309,10 @@ void ADDBasePlayerController::Server_RequestPlayerReady_Implementation()
 void ADDBasePlayerController::Client_OpenPopUp_Implementation(FGameplayTag Tag)
 {
 	UDDUIManagerSubsystem* UIManager = GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>();
-	if (!UIManager || !Tag.IsValid()) return;
+	if (!UIManager || !Tag.IsValid())
+	{
+		return;
+	}
 	
 	Client_SetMouseCursorVisible(true); 
 	UIManager->DrawPopup(Tag); 
