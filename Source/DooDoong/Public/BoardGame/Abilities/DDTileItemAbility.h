@@ -20,6 +20,9 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 	
+	UFUNCTION()
+	void OnCueFinished();
+
 	UPROPERTY(EditDefaultsOnly, Category = "UX")
 	AActor* ItemActor;
 };

@@ -1,6 +1,7 @@
 ﻿#include "BoardGame/Abilities/DDTileItemAbility.h"
 
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Abilities/Tasks/AbilityTask_WaitDelay.h"
 #include "Base/Player/DDBasePlayerController.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Common/DDLogManager.h"
@@ -74,6 +75,23 @@ void UDDTileItemAbility::ActivateAbility(
 			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 			TEXT("RightHand")
 		);
+	}
+	
+	// 딜레이 태스크
+	UAbilityTask_WaitDelay* DelayTask = UAbilityTask_WaitDelay::WaitDelay(this, 2.5f); // 이펙트 길이
+	DelayTask->OnFinish.AddDynamic(this, &UDDTileItemAbility::OnCueFinished);
+	DelayTask->ReadyForActivation();
+}
+
+void UDDTileItemAbility::OnCueFinished()
+{
+	// 손에 액터 제거
+	if (HasAuthority(&CurrentActivationInfo))
+	{
+		if (IsValid(ItemActor))
+		{
+			ItemActor->Destroy();
+		}
 	}
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
