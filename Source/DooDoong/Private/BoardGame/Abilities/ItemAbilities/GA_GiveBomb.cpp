@@ -6,7 +6,9 @@
 
 UGA_GiveBomb::UGA_GiveBomb()
 {
-	AbilityTags.AddTag(DDGameplayTags::Item_Ability_GiveBomb);
+	FGameplayTagContainer AssetTags;
+    AssetTags.AddTag(DDGameplayTags::Item_Ability_GiveBomb);
+    SetAssetTags(AssetTags);
 }
 
 bool UGA_GiveBomb::ExecuteTargetingItem(AActor* TargetActor)

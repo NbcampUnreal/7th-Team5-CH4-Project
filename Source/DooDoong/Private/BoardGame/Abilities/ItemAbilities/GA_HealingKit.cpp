@@ -6,7 +6,9 @@
 
 UGA_HealingKit::UGA_HealingKit()
 {
-	AbilityTags.AddTag(DDGameplayTags::Item_Ability_HealingKit);
+	FGameplayTagContainer AssetTags;
+    AssetTags.AddTag(DDGameplayTags::Item_Ability_HealingKit);
+    SetAssetTags(AssetTags);
 }
 
 bool UGA_HealingKit::ExecuteInstantItem(const FGameplayEventData* TriggerEventData)

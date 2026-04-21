@@ -7,7 +7,7 @@ void UDDAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Input
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTagExact(InputTag))
+			if (AbilitySpec.Ability && AbilitySpec.Ability->GetAssetTags().HasTagExact(InputTag))
 			{
 				InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
             	InputHeldSpecHandles.AddUnique(AbilitySpec.Handle);
@@ -22,7 +22,7 @@ void UDDAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inpu
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTagExact(InputTag))
+			if (AbilitySpec.Ability && AbilitySpec.Ability->GetAssetTags().HasTagExact(InputTag))
 			{
 				InputReleasedSpecHandles.AddUnique(AbilitySpec.Handle);
 				InputHeldSpecHandles.Remove(AbilitySpec.Handle);

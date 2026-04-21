@@ -13,7 +13,10 @@ UGA_Shot::UGA_Shot()
 	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 
-	AbilityTags.AddTag(DDGameplayTags::Input_Ability_Shot);
+	FGameplayTagContainer AssetTags;
+    AssetTags.AddTag(DDGameplayTags::Input_Ability_Shot);
+    SetAssetTags(AssetTags);
+	
 	ActivationBlockedTags.AddTag(DDGameplayTags::State_Character_Death);
 }
 

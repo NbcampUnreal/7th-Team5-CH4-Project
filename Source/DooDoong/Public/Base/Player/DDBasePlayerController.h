@@ -32,10 +32,10 @@ protected:
 
 protected:
 	UPROPERTY()
-	ADDBasePlayerState* CachedPlayerState;
+	mutable ADDBasePlayerState* CachedPlayerState;
 
 public:
-	FORCEINLINE ADDBasePlayerState* GetCachedPlayerState() 
+	FORCEINLINE ADDBasePlayerState* GetCachedPlayerState() const
 	{
 		if (!CachedPlayerState) CachedPlayerState = GetPlayerState<ADDBasePlayerState>();
 		return CachedPlayerState;

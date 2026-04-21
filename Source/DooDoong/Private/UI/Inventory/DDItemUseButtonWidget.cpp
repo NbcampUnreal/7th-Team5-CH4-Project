@@ -31,8 +31,6 @@ void UDDItemUseButtonWidget::NativeConstruct()
 	{
 		BT_Cancel->OnClicked.AddDynamic(this, &UDDItemUseButtonWidget::CancelButton);
 	}
-	
-	
 }
 
 void UDDItemUseButtonWidget::UseButton()
@@ -54,15 +52,14 @@ void UDDItemUseButtonWidget::UseButton()
 void UDDItemUseButtonWidget::CancelButton()
 {
 	
-	UDDInvenGridSlot* ParentGridSlot = Cast<UDDInvenGridSlot>(GetParent());
-	if (ParentGridSlot != nullptr)
-	{
-		ParentGridSlot->BT_ClickItem->SetIsEnabled(true);
-	}
+	if (OwningGridSlot != nullptr)
+    {
+        OwningGridSlot->BT_ClickItem->SetIsEnabled(true);
+    }
 	this->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UDDItemUseButtonWidget::InitializeGridSlotData(const FName SlotItemName)
+void UDDItemUseButtonWidget::InitializeGridSlotData(const FName& SlotItemName, UDDInvenGridSlot* InParentSlot)
 {
 	if (SlotItemName.IsNone()) return;
 	CurrentItemSlotName = SlotItemName;
