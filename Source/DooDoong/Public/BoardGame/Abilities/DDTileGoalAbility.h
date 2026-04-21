@@ -1,11 +1,12 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "DDTileBaseAbility.h"
 #include "Abilities/GameplayAbility.h"
 #include "DDTileGoalAbility.generated.h"
 
 UCLASS()
-class DOODOONG_API UDDTileGoalAbility : public UGameplayAbility
+class DOODOONG_API UDDTileGoalAbility : public UDDTileBaseAbility
 {
 	GENERATED_BODY()
 
