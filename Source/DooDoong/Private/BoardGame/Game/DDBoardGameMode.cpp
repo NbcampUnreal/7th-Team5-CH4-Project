@@ -708,15 +708,25 @@ void ADDBoardGameMode::SortPlayersByTurnOrder()
 		}
 	}
 
-	AlivePlayerControllers.Sort([](const TObjectPtr<APlayerController>& A, const TObjectPtr<APlayerController>& B)
-	{
-		ADDBasePlayerController* PCA = Cast<ADDBasePlayerController>(A);
-		ADDBasePlayerController* PCB = Cast<ADDBasePlayerController>(B);
-		if (PCA && PCB && PCA->GetCachedPlayerState() && PCB->GetCachedPlayerState())
-		{
-			return PCA->GetCachedPlayerState()->GetTurnOrder() < PCB->GetCachedPlayerState()->GetTurnOrder();
-		}
-		return false;
+	AlivePlayerControllers.Sort([](const APlayerController& A, const APlayerController& B)
+{
+    // 1. 역참조된 객체의 주소를 가져와 포인터로 변환
+    const ADDBasePlayerController* PCA = Cast<ADDBasePlayerController>(&A);
+    const ADDBasePlayerController* PCB = Cast<ADDBasePlayerController>(&B);
+
+    // 2. 유효성 검사 및 정렬 기준 비교
+    if (PCA && PCB)
+    {
+        const ADDBasePlayerState* PSA = PCA->GetCachedPlayerState();
+        const ADDBasePlayerState* PSB = PCB->GetCachedPlayerState();
+
+        if (PSA && PSB)
+        {
+            return PSA->GetTurnOrder() < PSB->GetTurnOrder();
+        }
+    }
+
+    return false;
 	});
 
 	LOG_CJH(Log, TEXT("====================================="));

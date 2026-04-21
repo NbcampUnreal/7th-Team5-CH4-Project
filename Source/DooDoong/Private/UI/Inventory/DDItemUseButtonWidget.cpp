@@ -31,8 +31,6 @@ void UDDItemUseButtonWidget::NativeConstruct()
 	{
 		BT_Cancel->OnClicked.AddDynamic(this, &UDDItemUseButtonWidget::CancelButton);
 	}
-	
-	
 }
 
 void UDDItemUseButtonWidget::UseButton()

@@ -21,16 +21,16 @@ struct FInventoryItemData
 	GENERATED_BODY()
 	
 	UPROPERTY()
-	FName ItemName;
+	FName ItemName = FName("");
 	
 	UPROPERTY()
-	int32 ItemCount;
+	int32 ItemCount = 0;
 	
 	UPROPERTY()
-	bool bCanUse;
+	bool bCanUse = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UTexture2D> Icon;
+	TSoftObjectPtr<UTexture2D> Icon = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -120,7 +120,7 @@ private:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	ADDTile* CurrentTile;
+	TObjectPtr<ADDTile> CurrentTile;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FName StartTileName;
