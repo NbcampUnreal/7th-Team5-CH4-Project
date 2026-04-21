@@ -51,7 +51,7 @@ void ADDPlatformerGameMode::BeginPlay()
 	{
 		PlatformerGameStateBase = Cast<ADDPlatformerGameState>(GameStateBase);
 	}
-	
+	MaxPlayer = PlayerDatas.Num();
 	WaitingTimerStart();
 }
 

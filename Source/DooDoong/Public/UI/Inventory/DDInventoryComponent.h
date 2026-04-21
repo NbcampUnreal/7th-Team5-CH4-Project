@@ -5,6 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "DDInventoryComponent.generated.h"
 
+class ADDBasePlayerState;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
 
 class UItemActionComponent;
@@ -42,12 +43,12 @@ public:
 	UDDInventoryComponent();
 
 public:
-	virtual void BeginPlay() override;
-	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:
 	void SetOwningController(ADDBasePlayerController* PC);
+	
+	ADDBasePlayerState* CashingPlayerState() const;
 	
 	/* 인벤토리 새로고침 */
 	void RefreshInventory();
@@ -85,4 +86,7 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, Category = "OwningController")
 	TObjectPtr<ADDBasePlayerController> OwningController;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Owner")
+	TObjectPtr<ADDBasePlayerState> CashedPlayerState;
 };

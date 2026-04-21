@@ -14,7 +14,7 @@
 ADDShooterCharacter::ADDShooterCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	bUseControllerRotationYaw = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");

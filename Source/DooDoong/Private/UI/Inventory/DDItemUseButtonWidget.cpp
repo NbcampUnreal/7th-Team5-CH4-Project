@@ -2,12 +2,14 @@
 
 
 #include "UI/Inventory/DDItemUseButtonWidget.h"
-
+#include "Components/MultiLineEditableTextBox.h"
 #include "Base/Player/DDBasePlayerController.h"
 #include "Common/DDLogManager.h"
 #include "UI/Inventory/DDInventoryComponent.h"
 #include "UI/Inventory/DDInventoryWidget.h"
 #include "Components/Button.h"
+#include "Data/DDItemDataTypes.h"
+#include "System/DDGameInstance.h"
 #include "UI/Inventory/DDInvenGridSlot.h"
 
 void UDDItemUseButtonWidget::NativeOnInitialized()
@@ -29,6 +31,8 @@ void UDDItemUseButtonWidget::NativeConstruct()
 	{
 		BT_Cancel->OnClicked.AddDynamic(this, &UDDItemUseButtonWidget::CancelButton);
 	}
+	
+	
 }
 
 void UDDItemUseButtonWidget::UseButton()
@@ -58,8 +62,23 @@ void UDDItemUseButtonWidget::CancelButton()
 	this->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UDDItemUseButtonWidget::InitializeGridSlotData(const FName& SlotItemName)
+void UDDItemUseButtonWidget::InitializeGridSlotData(const FName SlotItemName)
 {
 	if (SlotItemName.IsNone()) return;
 	CurrentItemSlotName = SlotItemName;
+	
+	if (CurrentItemSlotName.IsNone()) return;
+	
+	FItemTableRow* ItemTableRow = UDDGameInstance::Get(GetWorld())->ItemDataTable->FindRow<FItemTableRow>(CurrentItemSlotName, TEXT("GetItemData"));
+	if (ItemTableRow == nullptr) return;
+	
+	if (ET_ItemDescription)
+	{
+		ET_ItemDescription->SetText(FText(ItemTableRow->Description));
+	}
+	
+	if (ET_ItemName)
+	{
+		ET_ItemName->SetText(FText(ItemTableRow->DisplayName));
+	}
 }
