@@ -334,7 +334,7 @@ void ADDBasePlayerController::Client_ClosePopUp_Implementation(FGameplayTag Tag)
 	if (!UIManager || !Tag.IsValid()) return;
 	
 	UIManager->HidePopup(Tag);
-	Client_SetMouseCursorVisible(false); 
+	// Client_SetMouseCursorVisible(false); 
 }
 
 void ADDBasePlayerController::Client_CloseAllPopUps_Implementation()
@@ -343,7 +343,7 @@ void ADDBasePlayerController::Client_CloseAllPopUps_Implementation()
 	if (!UIManager) return;
 	
 	UIManager->HideAllPopups();
-	Client_SetMouseCursorVisible(false); 
+	// Client_SetMouseCursorVisible(false); 
 }
 
 void ADDBasePlayerController::Client_DrawErrorMessage_Implementation(const FString& ErrorMessage, float Duration)
