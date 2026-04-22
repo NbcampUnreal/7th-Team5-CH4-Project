@@ -5,7 +5,6 @@
 #include "BoardGame/DDTile.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
 #include "Common/DDLogManager.h"
-#include "System/DDGameplayTags.h"
 
 UDDTileCoinAbility::UDDTileCoinAbility()
 {

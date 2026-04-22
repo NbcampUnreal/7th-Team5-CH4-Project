@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "UI/Inventory/DDItemUseButtonWidget.h"
+﻿#include "UI/Inventory/DDItemUseButtonWidget.h"
 #include "Components/MultiLineEditableTextBox.h"
 #include "Base/Player/DDBasePlayerController.h"
 #include "Common/DDLogManager.h"

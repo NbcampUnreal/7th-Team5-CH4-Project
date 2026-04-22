@@ -1,8 +1,5 @@
 ﻿#include "MiniGames/Platformer/Actors/DDPlatformerSavePoint.h"
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
-#include "MiniGames/Platformer/Character/DDPlatformerCharacter.h"
-#include "Base/Player/DDBasePlayerState.h"
-#include "Common/DDLogManager.h"
 #include "Components/BoxComponent.h"
 
 ADDPlatformerSavePoint::ADDPlatformerSavePoint()

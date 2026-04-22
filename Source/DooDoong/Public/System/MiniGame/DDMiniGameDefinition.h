@@ -4,7 +4,6 @@
 #include "Base/MiniGame/DDMiniGameTypes.h"
 #include "Base/MiniGame/DDMiniGameRuleSet.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
-#include "Base/Player/DDBasePlayerController.h"
 #include "Engine/DataAsset.h"
 #include "Input/DDInputConfig.h"
 #include "DDMiniGameDefinition.generated.h"

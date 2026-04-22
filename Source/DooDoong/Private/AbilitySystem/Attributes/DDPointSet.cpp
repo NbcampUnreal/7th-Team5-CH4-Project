@@ -2,7 +2,6 @@
 
 #include "GameplayEffectExtension.h"
 #include "BoardGame/Game/DDBoardGameMode.h"
-#include "Net/Core/Connection/NetConnectionFaultRecoveryBase.h"
 
 UDDPointSet::UDDPointSet()
 {

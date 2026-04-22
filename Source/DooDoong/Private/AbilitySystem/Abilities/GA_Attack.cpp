@@ -1,12 +1,9 @@
 #include "AbilitySystem/Abilities/GA_Attack.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayTag.h"
-#include "AbilitySystem/Attributes/DDHealthSet.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "System/DDGameplayTags.h"
 
 UGA_Attack::UGA_Attack()

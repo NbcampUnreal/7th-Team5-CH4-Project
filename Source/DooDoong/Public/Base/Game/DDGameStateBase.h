@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
-#include "GameplayTagContainer.h"
 #include "DDGameStateBase.generated.h"
 
 UCLASS()

@@ -11,10 +11,6 @@ class ADDBasePlayerController;
 class UInputMappingContext;
 class UDDInputConfig;
 
-/**
- * 
- */
-
 USTRUCT(BlueprintType)
 struct FPlatformerPlayerData
 {

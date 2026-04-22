@@ -1,6 +1,5 @@
 ﻿#include "MiniGames/Catch/GameState/DDCatchGameState.h"
 #include "Common/DDLogManager.h"
-#include "Kismet/GameplayStatics.h"
 
 ADDCatchGameState::ADDCatchGameState()
 {

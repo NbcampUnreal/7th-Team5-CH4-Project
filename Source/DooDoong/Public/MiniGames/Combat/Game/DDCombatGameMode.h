@@ -4,9 +4,6 @@
 #include "Base/Game/DDGameModeBase.h"
 #include "DDCombatGameMode.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class DOODOONG_API ADDCombatGameMode : public ADDGameModeBase
 {

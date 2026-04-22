@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
+﻿
 #include "UI/Inventory/DDInventoryWidget.h"
 
 #include "AbilitySystemComponent.h"
@@ -12,7 +10,6 @@
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Common/DDLogManager.h"
-#include "Data/DDItemDataTypes.h"
 #include "MiniGames/Platformer/GameState/DDPlatformerGameState.h"
 
 void UDDInventoryWidget::NativeOnInitialized()

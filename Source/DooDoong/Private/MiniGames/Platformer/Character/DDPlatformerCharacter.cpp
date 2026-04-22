@@ -4,7 +4,6 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
 
 
 ADDPlatformerCharacter::ADDPlatformerCharacter()

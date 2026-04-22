@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "MiniGames/Platformer/GameState/DDPlatformerGameState.h"
+﻿#include "MiniGames/Platformer/GameState/DDPlatformerGameState.h"
 
 #include "Base/Player/DDBasePlayerController.h"
 
