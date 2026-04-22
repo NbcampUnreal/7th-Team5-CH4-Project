@@ -5,6 +5,7 @@
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
+#include "MiniGames/Base/UI/DDMiniGamePlayerInfo.h"
 
 void UMiniGameBaseWidget::NativeConstruct()
 {
@@ -14,14 +15,15 @@ void UMiniGameBaseWidget::NativeConstruct()
 	CachedMiniGameState = GetWorld()->GetGameState<ADDMiniGameStateBase>();
 	if (!CachedMiniGameState) return; 
 	
-	CachedMiniGameState->OnRemainingTimeChanged.AddDynamic(this, &ThisClass::OnRemainingTimeChanged);
+	CachedMiniGameState->OnRemainingTimeChanged.AddDynamic(
+		this, &ThisClass::OnRemainingTimeChanged);
 }
 
 void UMiniGameBaseWidget::NativeDestruct()
 {
+	// 바인딩 해제 
 	if (CachedMiniGameState)
 	{
-		// 바인딩 해제 
 		CachedMiniGameState->OnRemainingTimeChanged.RemoveAll(this);
 	}
 	
@@ -30,16 +32,19 @@ void UMiniGameBaseWidget::NativeDestruct()
 
 void UMiniGameBaseWidget::CreatePlayerInfos()
 {
-	if (!CachedMiniGameState || !PlayerInfoContainer) return;
+	if (!CachedMiniGameState || !PlayerInfoContainer || !PlayerInfoWidgetClass) return;
 	
 	PlayerInfoContainer->ClearChildren();
+	PlayerInfoWidgets.Empty();
+	
 	for (auto PS : CachedMiniGameState->PlayerArray)
 	{
 		if (!PS) continue;
 		
 		// 위젯 생성 
-		UUserWidget* InfoWidget = 
-			CreateWidget<UUserWidget>(PlayerInfoContainer, PlayerInfoWidgetClass);
+		UDDMiniGamePlayerInfo* InfoWidget = 
+			CreateWidget<UDDMiniGamePlayerInfo>(PlayerInfoContainer, PlayerInfoWidgetClass);
+		if (!InfoWidget) continue;
 		
 		// 초기화 ( 자식 클래스에서 정의 )  
 		InitializePlayerInfoWidget(InfoWidget); 
@@ -61,10 +66,6 @@ void UMiniGameBaseWidget::CreatePlayerInfos()
 	}
 }
 
-void UMiniGameBaseWidget::InitializePlayerInfoWidget(UUserWidget* PlayerInfoWidget)
-{
-}
-
 void UMiniGameBaseWidget::OnRemainingTimeChanged(const float RemainingTime)
 {
 	FString TimeString = FString::Printf(TEXT("남은 시간 : %.2f"), RemainingTime);
@@ -74,3 +75,5 @@ void UMiniGameBaseWidget::OnRemainingTimeChanged(const float RemainingTime)
 		RemainingTimeText->SetText(FText::FromString(TimeString));
 	}
 }
+
+

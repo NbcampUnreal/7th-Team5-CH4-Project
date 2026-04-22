@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MiniGameBaseWidget.generated.h"
 
+class UDDMiniGamePlayerInfo;
 class ADDMiniGameStateBase;
 class UHorizontalBox;
 class UTextBlock;
@@ -20,12 +21,12 @@ public:
 	
 	virtual void CreatePlayerInfos(); 
 	
-	virtual void InitializePlayerInfoWidget(UUserWidget* PlayerInfoWidget);
+	virtual void InitializePlayerInfoWidget(UUserWidget* PlayerInfoWidget) {} 
 	
 protected:
 	UFUNCTION()
 	void OnRemainingTimeChanged(const float RemainingTime);
-	
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> RemainingTimeText; 
@@ -34,10 +35,10 @@ protected:
 	TObjectPtr<UHorizontalBox> PlayerInfoContainer;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "UI")
-	TSubclassOf<UUserWidget> PlayerInfoWidgetClass;
+	TSubclassOf<UDDMiniGamePlayerInfo> PlayerInfoWidgetClass;
 	
 	UPROPERTY()
-	TArray<TObjectPtr<UUserWidget>> PlayerInfoWidgets;
+	TArray<TObjectPtr<UDDMiniGamePlayerInfo>> PlayerInfoWidgets;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="UI")
