@@ -248,6 +248,16 @@ void ADDMiniGameModeBase::StartMiniGame()
 	// UI 세팅 
 	BroadcastGameLayer(DDGameplayTags::MiniGame_UI_Main);
 
+	// 미니게임 시작 시 커서 비활성화
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ADDBasePlayerController* PC = Cast<ADDBasePlayerController>(It->Get());
+		if (PC)
+		{
+			PC->Client_SetMouseCursorVisible(false);
+		}
+	}
+	
 	// 플레이 시작 및 시작 시점을 기록
 	bIsMiniGameStarted = true;
 	ElapsedTimeSeconds = 0.0f;

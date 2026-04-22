@@ -360,7 +360,7 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 		}
 		else
 		{
-			DDPC->Client_SetMouseCursorVisible(false);
+			// DDPC->Client_SetMouseCursorVisible(false); 턴 넘어가도 커서 안숨김
 		}
 	}
 
