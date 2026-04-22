@@ -46,6 +46,4 @@ private:
 	void SpawnSelectableActors(const TArray<ADDTile*>& Tiles);
 
 	void ClearSelectableActors();
-
-public:
 };
