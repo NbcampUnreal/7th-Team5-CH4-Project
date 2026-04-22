@@ -14,7 +14,7 @@ class DOODOONG_API APooledActor : public AActor
 public:
 	APooledActor();
 
-	void SetInUse(bool _InUse);
+	void SetInUse(bool InUse);
 	bool IsInUse() const;
 
 	UPROPERTY(VisibleAnywhere)
