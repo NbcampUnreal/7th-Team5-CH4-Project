@@ -108,5 +108,5 @@ public:
 
 	UFUNCTION()
 	void OnRep_IsAiming();
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

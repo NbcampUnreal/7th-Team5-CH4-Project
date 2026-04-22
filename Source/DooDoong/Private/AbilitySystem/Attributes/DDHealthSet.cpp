@@ -12,7 +12,7 @@ UDDHealthSet::UDDHealthSet()
 	InitMaxHealth(30.0f);
 }
 
-void UDDHealthSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void UDDHealthSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	

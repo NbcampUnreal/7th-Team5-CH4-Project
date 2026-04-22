@@ -153,7 +153,7 @@ void ADDBoardGameCharacter::OnRep_IsAiming()
 {
 }
 
-void ADDBoardGameCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void ADDBoardGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ADDBoardGameCharacter, bShowRangeIndicator);

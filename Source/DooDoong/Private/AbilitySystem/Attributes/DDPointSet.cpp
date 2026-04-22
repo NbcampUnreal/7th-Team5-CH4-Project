@@ -10,7 +10,7 @@ UDDPointSet::UDDPointSet()
 	InitTrophy(0.f);
 }
 
-void UDDPointSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void UDDPointSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
