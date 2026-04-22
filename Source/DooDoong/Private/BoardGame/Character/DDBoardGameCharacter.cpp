@@ -261,14 +261,17 @@ void ADDBoardGameCharacter::Multicast_ShowTileContentAboveHead_Implementation(FG
 	LOG_CYS(Warning, TEXT("Spawn: %s"), *EventActor->GetName());
 
 	// (임시) 2초 후 파괴
+	TWeakObjectPtr<ADDBoardGameCharacter> WeakThis(this);
 	World->GetTimerManager().SetTimer(
 		EventDestroyTimerHandle,
-		[this]()
+		[WeakThis]()
 		{
-			if (EventActor && IsValid(EventActor))
+			if (!WeakThis.IsValid()) return; 
+			
+			if (IsValid(WeakThis->EventActor))
 			{
-				EventActor->Destroy();
-				EventActor = nullptr;
+				WeakThis->EventActor->Destroy();
+				WeakThis->EventActor = nullptr;
 			}
 		},
 		2.0f,

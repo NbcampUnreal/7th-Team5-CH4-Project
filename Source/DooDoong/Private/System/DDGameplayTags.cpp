@@ -139,6 +139,8 @@ namespace DDGameplayTags
 	// UI 태그 
 	UE_DEFINE_GAMEPLAY_TAG(BoardGame_UI_PlayerTurn, "BoardGame.UI.PlayerTurn"); 
 	UE_DEFINE_GAMEPLAY_TAG(BoardGame_UI_Inventory, "BoardGame.UI.Inventory"); 
+	UE_DEFINE_GAMEPLAY_TAG(BoardGame_UI_Result, "BoardGame.UI.Result");
+	
 	UE_DEFINE_GAMEPLAY_TAG(Lobby_UI_NicknamePopup, "Lobby.UI.NicknamePopup"); 
 	UE_DEFINE_GAMEPLAY_TAG(Lobby_UI_Main, "Lobby.UI.Main"); 
 	UE_DEFINE_GAMEPLAY_TAG(Lobby_UI_CountDown, "Lobby.UI.CountDown");

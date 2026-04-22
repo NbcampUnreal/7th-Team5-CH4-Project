@@ -318,6 +318,8 @@ void ADDBoardGameMode::HandleState_RoundEnd()
 void ADDBoardGameMode::HandleState_End()
 {
 	LOG_CJH(Log, TEXT("게임 종료. 10초 후 로비 이동."));
+	BroadcastErrorMessage(TEXT("게임 종료. 10초 후 로비 이동.")); 
+	
 	GetWorldTimerManager().SetTimer(
 		ReturnToLobbyTimerHandle,
 		this,
@@ -435,26 +437,29 @@ void ADDBoardGameMode::CalculateFinalWinner()
     TArray<FFinalRankData> FinalResults;
     for (ADDBasePlayerState* PS : SortedPlayers)
     {
-       PS->SetIsGameFinished(true);
+		PS->SetIsGameFinished(true);
+		
+		FFinalRankData Data;
+        // 이미 갱신된 순위(CurrentRank)를 그대로 사용
+        Data.Rank = PS->PlayerGameData.CurrentRank;
+        Data.PlayerName = PS->GetPlayerDisplayName();
+        Data.Trophy = (int32)PS->GetPointSet()->GetTrophy();
+        Data.Coin = (int32)PS->GetPointSet()->GetCoin();
+    	Data.PlayerColor = PS->PlayerGameData.PlayerColor;
+        FinalResults.Add(Data);
        
-       FFinalRankData Data;
-       // 이미 갱신된 순위(CurrentRank)를 그대로 사용
-       Data.Rank = PS->PlayerGameData.CurrentRank;
-       Data.PlayerName = PS->GetPlayerDisplayName();
-       Data.Trophy = (int32)PS->GetPointSet()->GetTrophy();
-       Data.Coin = (int32)PS->GetPointSet()->GetCoin();
-       FinalResults.Add(Data);
-       
-       LOG_CJH(Log, TEXT("%d등 플레이어: %s | 트로피 개수: %d, 코인 개수: %d"),
+		LOG_CJH(Log, TEXT("%d등 플레이어: %s | 트로피 개수: %d, 코인 개수: %d"),
           Data.Rank,
           *Data.PlayerName.ToString(),
           Data.Trophy,
           Data.Coin
-       );
+		);
     }
     
     CachedBoardGameState->SetFinalRankings(FinalResults);
     SetMatchState(DDGameplayTags::State_BoardGame_End);
+	
+	BroadcastOpenPopUp(DDGameplayTags::BoardGame_UI_Result);
 }
 
 void ADDBoardGameMode::RequestRankUpdate()

@@ -23,6 +23,9 @@ struct FFinalRankData
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RankData")
 	int32 Coin = 0;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RankData")
+	FLinearColor PlayerColor = FLinearColor::White;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFinalRankingsUpdated, const TArray<FFinalRankData>&, Rankings);
@@ -63,6 +66,8 @@ public:
 	FORCEINLINE void SetFinalRankings(const TArray<FFinalRankData>& InRankings) { FinalRankings = InRankings; }
 
 	FORCEINLINE int32 GetMinPlayerCount() const { return MinPlayerCount; }
+	
+	FORCEINLINE TArray<FFinalRankData> GetFinalRankings() const { return FinalRankings; }
 public:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void RemovePlayerState(APlayerState* PlayerState) override;

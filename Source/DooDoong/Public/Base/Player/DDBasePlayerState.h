@@ -160,6 +160,4 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TObjectPtr<UDDInventoryComponent> InventoryComponent;
 	
-	
-	
 };

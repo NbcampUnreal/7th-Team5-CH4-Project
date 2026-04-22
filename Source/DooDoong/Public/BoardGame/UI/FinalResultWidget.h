@@ -4,9 +4,11 @@
 #include "Blueprint/UserWidget.h"
 #include "FinalResultWidget.generated.h"
 
+struct FFinalRankData;
+class ADDBoardGameState;
 class UTextBlock;
 class UVerticalBox;
-class UBoardGamePlayerInfo; 
+class UFinalResultPlayerInfo; 
 class UButton; 
 class ADDBasePlayerState;
 
@@ -23,22 +25,32 @@ public:
 	virtual void NativeDestruct() override;
 	
 protected:
-	void CreatePlayerInfoWidgets(const TArray<ADDBasePlayerState*>& WidgetInfos);
+	void CreatePlayerInfoWidgets(const TArray<FFinalRankData>& Rankings);
+	
+	UFUNCTION()
+	void OnFinalRankingsReceived(const TArray<FFinalRankData>& Rankings);
+	
+	UFUNCTION()
+	void OnCloseButtonClicked();
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> ExitButton;
+	TObjectPtr<UButton> CloseButton;
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UVerticalBox> PlayerInfoContainer; // 플레이어 정보들 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UBoardGamePlayerInfo> PlayerInfoWidgetClass; 
+	TSubclassOf<UFinalResultPlayerInfo> PlayerInfoWidgetClass; 
 	
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	float PlayerInfoWidth = 200.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	float PlayerInfoHeight = 120.f;
+	
+private:
+	UPROPERTY()
+	TObjectPtr<ADDBoardGameState> CachedBoardGameState; 
 };

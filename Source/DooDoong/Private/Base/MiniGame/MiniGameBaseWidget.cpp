@@ -5,6 +5,7 @@
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
+#include "MiniGames/Base/UI/DDMiniGamePlayerInfo.h"
 
 void UMiniGameBaseWidget::NativeConstruct()
 {
@@ -14,14 +15,17 @@ void UMiniGameBaseWidget::NativeConstruct()
 	CachedMiniGameState = GetWorld()->GetGameState<ADDMiniGameStateBase>();
 	if (!CachedMiniGameState) return; 
 	
-	CachedMiniGameState->OnRemainingTimeChanged.AddDynamic(this, &ThisClass::OnRemainingTimeChanged);
+	CachedMiniGameState->OnRemainingTimeChanged.AddDynamic(
+		this, &ThisClass::OnRemainingTimeChanged);
+	
+	CreatePlayerInfos(); 
 }
 
 void UMiniGameBaseWidget::NativeDestruct()
 {
+	// 바인딩 해제 
 	if (CachedMiniGameState)
 	{
-		// 바인딩 해제 
 		CachedMiniGameState->OnRemainingTimeChanged.RemoveAll(this);
 	}
 	
@@ -30,17 +34,23 @@ void UMiniGameBaseWidget::NativeDestruct()
 
 void UMiniGameBaseWidget::CreatePlayerInfos()
 {
-	if (!CachedMiniGameState || !PlayerInfoContainer) return;
+	if (!CachedMiniGameState || !PlayerInfoContainer || !PlayerInfoWidgetClass) return;
 	
 	PlayerInfoContainer->ClearChildren();
+	PlayerInfoWidgets.Empty();
+	
+
+	
 	for (auto PS : CachedMiniGameState->PlayerArray)
 	{
 		if (!PS) continue;
 		
 		// 위젯 생성 
-		UUserWidget* InfoWidget = 
-			CreateWidget<UUserWidget>(PlayerInfoContainer, PlayerInfoWidgetClass);
+		UDDMiniGamePlayerInfo* InfoWidget = 
+			CreateWidget<UDDMiniGamePlayerInfo>(PlayerInfoContainer, PlayerInfoWidgetClass);
+		if (!InfoWidget) continue;
 		
+		InfoWidget->InitializePlayerInfo(PS); 
 		// 초기화 ( 자식 클래스에서 정의 )  
 		InitializePlayerInfoWidget(InfoWidget); 
 		
@@ -49,20 +59,16 @@ void UMiniGameBaseWidget::CreatePlayerInfos()
 		SizeBox->SetHeightOverride(PlayerInfoHeight);
 		SizeBox->AddChild(InfoWidget);
 		
-		UHorizontalBoxSlot* BoxSlot = PlayerInfoContainer->AddChildToHorizontalBox(SizeBox);
-		if (BoxSlot)
+		if (UHorizontalBoxSlot* SlotBox = PlayerInfoContainer->AddChildToHorizontalBox(InfoWidget))
 		{
-			// 위젯 간 간격
-			BoxSlot->SetPadding(FMargin(4.f, 0.f));
-			BoxSlot->SetVerticalAlignment(VAlign_Center);
+			SlotBox->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+			SlotBox->SetPadding(FMargin(4.f, 0.f));
+			SlotBox->SetHorizontalAlignment(HAlign_Fill);
+			SlotBox->SetVerticalAlignment(VAlign_Fill);
 		}
 		
 		PlayerInfoWidgets.Add(InfoWidget);
 	}
-}
-
-void UMiniGameBaseWidget::InitializePlayerInfoWidget(UUserWidget* PlayerInfoWidget)
-{
 }
 
 void UMiniGameBaseWidget::OnRemainingTimeChanged(const float RemainingTime)
@@ -74,3 +80,5 @@ void UMiniGameBaseWidget::OnRemainingTimeChanged(const float RemainingTime)
 		RemainingTimeText->SetText(FText::FromString(TimeString));
 	}
 }
+
+

@@ -5,7 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "DDPointSet.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnPointChanged, int32);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCoinChanged, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTrophyChanged, int32);
 
 UCLASS()
@@ -41,7 +41,7 @@ private:
 	FGameplayAttributeData Coin; 
 	
 public:
-	FOnPointChanged OnPointChanged;
+	FOnCoinChanged OnCoinChanged;
 	
 	FOnTrophyChanged OnTrophyChanged;
 	

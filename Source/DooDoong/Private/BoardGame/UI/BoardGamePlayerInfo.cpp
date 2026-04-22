@@ -33,7 +33,7 @@ void UBoardGamePlayerInfo::InitializePlayerInfo(APlayerState* PlayerState)
 	
 	if (UDDPointSet* PointSet = CurrentPlayerState->GetPointSet())
 	{
-		PointSet->OnPointChanged.AddUObject(this, &ThisClass::UpdateCoinCount);
+		PointSet->OnCoinChanged.AddUObject(this, &ThisClass::UpdateCoinCount);
 		UpdateCoinCount(PointSet->GetCoin());
 		
 		PointSet->OnTrophyChanged.AddUObject(this, &ThisClass::UpdateTrophyCount);
@@ -64,7 +64,7 @@ void UBoardGamePlayerInfo::ClearPlayerInfo()
 		
 		if (UDDPointSet* PointSet = CurrentPlayerState->GetPointSet())
 		{
-			PointSet->OnPointChanged.RemoveAll(this);
+			PointSet->OnCoinChanged.RemoveAll(this);
 			PointSet->OnTrophyChanged.RemoveAll(this);
 		}
 		

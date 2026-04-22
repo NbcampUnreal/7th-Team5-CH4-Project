@@ -141,6 +141,7 @@ namespace DDGameplayTags
 	// UI 태그 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoardGame_UI_PlayerTurn); 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoardGame_UI_Inventory); 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoardGame_UI_Result);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lobby_UI_NicknamePopup);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lobby_UI_Main);
