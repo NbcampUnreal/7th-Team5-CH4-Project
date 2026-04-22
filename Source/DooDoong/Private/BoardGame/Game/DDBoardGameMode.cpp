@@ -627,6 +627,31 @@ void ADDBoardGameMode::HandleRespawn(AController* TargetController)
 	PS->StartTileName = FName("Tile01");
 	PS->InitTile();
 	LOG_CYS(Error,TEXT("리스폰 성공"));
+	
+	// 풀피
+	IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(PS);
+	if (!ASCInterface) return;
+	
+	UAbilitySystemComponent* ASC = ASCInterface->GetAbilitySystemComponent();
+
+	if (!ASC) return;
+
+	FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
+
+	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(HealingEffect, 1.f, ContextHandle);
+
+	if (!SpecHandle.IsValid())
+	{
+		return;
+	}
+
+	SpecHandle.Data->SetSetByCallerMagnitude(
+		DDGameplayTags::Data_Health_Heal,
+		30.0f
+	);
+
+	ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 }
 
 void ADDBoardGameMode::ExecuteNextTurnTransition()
