@@ -32,7 +32,7 @@ class DOODOONG_API UItemActionComponent : public UActorComponent
 public:
 	UItemActionComponent();
 
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:
 	/** 아이템 사용 시작지점 */

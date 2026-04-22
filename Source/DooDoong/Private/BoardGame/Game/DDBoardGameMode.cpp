@@ -1,6 +1,5 @@
 #include "BoardGame/Game/DDBoardGameMode.h"
 #include "AbilitySystemComponent.h"
-#include "EngineUtils.h"
 #include "Base/Game/DDGameStateBase.h"
 #include "System/DDGameInstance.h"
 #include "TimerManager.h"
@@ -15,8 +14,6 @@
 #include "GameplayEffect.h"
 #include "BoardGame/DDTile.h"
 #include "BoardGame/Game/DDBoardGameState.h"
-#include "System/DDSoundManager.h"
-#include "UI/Inventory/DDInventoryComponent.h"
 
 ADDBoardGameMode::ADDBoardGameMode() {}
 
@@ -455,6 +452,12 @@ void ADDBoardGameMode::CalculateFinalWinner()
           Data.Coin
 		);
     }
+	
+	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());  
+    if (GameInstance)  
+    {        
+	    CachedBoardGameState->SetCurrentRound(0);  
+    }    
     
     CachedBoardGameState->SetFinalRankings(FinalResults);
     SetMatchState(DDGameplayTags::State_BoardGame_End);

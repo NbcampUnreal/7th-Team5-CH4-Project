@@ -6,7 +6,7 @@ UDDMovementSet::UDDMovementSet()
 	InitJumpSpeed(420.f);
 }
 
-void UDDMovementSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void UDDMovementSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }

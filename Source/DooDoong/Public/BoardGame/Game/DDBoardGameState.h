@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Base/Game/DDGameStateBase.h"
 #include "DDBoardGameState.generated.h"
 

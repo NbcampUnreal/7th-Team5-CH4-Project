@@ -1,6 +1,4 @@
 #include "Base/Game/DDGameStateBase.h"
-#include "BoardGame/DDTileManager.h"
-#include "Kismet/GameplayStatics.h"
 
 ADDGameStateBase::ADDGameStateBase()
 {

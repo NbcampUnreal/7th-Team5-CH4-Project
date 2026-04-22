@@ -56,7 +56,7 @@ void UItemActionComponent::BeginItemAction(const FItemTableRow& ItemRow)
 }
 
 // 컨펌 입력 액션
-void UItemActionComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void UItemActionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 

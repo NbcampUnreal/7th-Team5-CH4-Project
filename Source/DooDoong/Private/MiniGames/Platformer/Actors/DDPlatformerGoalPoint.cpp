@@ -1,9 +1,6 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
+﻿
 #include "MiniGames/Platformer/Actors/DDPlatformerGoalPoint.h"
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
-#include "Common/DDLogManager.h"
 #include "Components/BoxComponent.h"
 
 

@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Base/MiniGame/DDMiniGameStateBase.h"
@@ -8,9 +6,6 @@
 
 class DDPlatformerPlayerController;
 
-/**
- * 
- */
 UCLASS()
 class DOODOONG_API ADDPlatformerGameState : public ADDMiniGameStateBase
 {

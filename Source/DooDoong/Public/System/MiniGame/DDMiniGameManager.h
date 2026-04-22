@@ -14,9 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGamePreparing, const FMiniGam
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMiniGameStarted);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGameFinished, const FMiniGameResult&, Result);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMiniGameResultCommitted, const FMiniGameResult&, Result);
-/**
- * 
- */
+
 UCLASS()
 class DOODOONG_API UDDMiniGameManager : public UGameInstanceSubsystem
 {

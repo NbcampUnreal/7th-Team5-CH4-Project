@@ -43,7 +43,7 @@ public:
 	UDDInventoryComponent();
 
 public:
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:
 	void SetOwningController(ADDBasePlayerController* PC);

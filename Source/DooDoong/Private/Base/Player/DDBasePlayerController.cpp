@@ -18,8 +18,6 @@
 #include "System/DDGameplayTags.h"
 #include "System/DDUIManagerSubsystem.h"
 #include "UI/Inventory/DDInventoryComponent.h"
-#include "UI/Inventory/DDInventoryWidget.h"
-#include "System/MiniGame/DDMiniGameManager.h"
 
 ADDBasePlayerController::ADDBasePlayerController()
 {

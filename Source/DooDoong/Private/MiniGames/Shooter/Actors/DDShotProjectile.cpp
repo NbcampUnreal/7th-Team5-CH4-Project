@@ -12,7 +12,6 @@ ADDShotProjectile::ADDShotProjectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-	SetReplicateMovement(true);
 
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	SetRootComponent(CollisionComp);
@@ -36,6 +35,7 @@ void ADDShotProjectile::BeginPlay()
 	Super::BeginPlay();
 
 	SetLifeSpan(LifeSeconds);
+	SetReplicateMovement(true);
 }
 
 void ADDShotProjectile::InitializeShot(AActor* InOwnerActor, APawn* InInstigatorPawn, const FVector& ShotDirection)

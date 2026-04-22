@@ -1,5 +1,4 @@
 ﻿#include "Common/DDLogManager.h"
-#include "Logging/LogSuppressionInterface.h"
 
 // 카테고리 정의
 DEFINE_LOG_CATEGORY(LogJJH);

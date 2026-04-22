@@ -6,7 +6,7 @@
 
 ADDBatterGameMode::ADDBatterGameMode()
 {
-	GameStateClass = ADDBatterGameMode::StaticClass();
+	GameStateClass = AGameStateBase::StaticClass();
 }
 
 void ADDBatterGameMode::StartMiniGame()

@@ -16,10 +16,14 @@ class DOODOONG_API ADDSelectableTileActor : public AActor
 public:
 	ADDSelectableTileActor();
 	
+	virtual void BeginPlay() override;
+	
 	UPROPERTY(BlueprintAssignable)
 	FOnTileSelected OnTileSelected;
 	
-	ADDTile* TargetTile;
+	UPROPERTY()
+    TObjectPtr<ADDTile> TargetTile;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;

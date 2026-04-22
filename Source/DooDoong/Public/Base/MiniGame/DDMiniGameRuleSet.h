@@ -6,9 +6,6 @@
 #include "DDMiniGameRuleSet.generated.h"
 
 class ADDMiniGameStateBase;
-/**
- * 
- */
 UCLASS()
 class DOODOONG_API UDDMiniGameRuleSet : public UObject
 {

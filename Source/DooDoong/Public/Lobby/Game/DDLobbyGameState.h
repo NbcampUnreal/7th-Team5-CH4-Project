@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
-#include "System/DDSoundManager.h"
 #include "DDLobbyGameState.generated.h"
 
 class ADDLobbyPlayerController;

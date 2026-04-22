@@ -1,11 +1,7 @@
 ﻿#include "MiniGames/Platformer/Actors/DDPlatformerDeadZone.h"
 
-#include "Base/Player/DDBasePlayerState.h"
-#include "Common/DDLogManager.h"
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
 #include "Components/BoxComponent.h"
-#include "Interfaces/IPluginManager.h"
-#include "MiniGames/Platformer/Character/DDPlatformerCharacter.h"
 
 ADDPlatformerDeadZone::ADDPlatformerDeadZone()
 {

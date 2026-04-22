@@ -34,7 +34,9 @@ protected:
 	TObjectPtr<UTextBlock> ScoreText; 
 	
 private:
+	UPROPERTY(Transient)
 	TObjectPtr<ADDMiniGameStateBase> CachedGameState;
 	
+	UPROPERTY(Transient)
 	TObjectPtr<ADDBasePlayerState> CachedPlayerState;
 };

@@ -187,33 +187,26 @@ void UDDMiniGameManager::CommitMiniGameResult(const FMiniGameResult& Result)
 			{
 				PS->SetTurnOrder(Rank.Rank - 1);
 
-				int32 RewardCoin = 0;
+				int32 RewardCoin;
 				switch (Rank.Rank)
 				{
-				case 1: RewardCoin = 30;
-					if (UDDPointSet* PointSet = PS->GetPointSet())
-					{
-						PointSet->SetCoin(PointSet->GetCoin() + RewardCoin);
-					}
-					break;
-				case 2: RewardCoin = 20;
-					if (UDDPointSet* PointSet = PS->GetPointSet())
-					{
-						PointSet->SetCoin(PointSet->GetCoin() + RewardCoin);
-					}
-					break;
-				case 3: RewardCoin = 10;
-					if (UDDPointSet* PointSet = PS->GetPointSet())
-					{
-						PointSet->SetCoin(PointSet->GetCoin() + RewardCoin);
-					}
-					break;
-				default: RewardCoin = 5;
-					if (UDDPointSet* PointSet = PS->GetPointSet())
-					{
-						PointSet->SetCoin(PointSet->GetCoin() + RewardCoin);
-					}
-					break;
+				    case 1: 
+				        RewardCoin = 30; 
+				        break;
+				    case 2: 
+				        RewardCoin = 20; 
+				        break;
+				    case 3: 
+				        RewardCoin = 10; 
+				        break;
+				    default: 
+				        RewardCoin = 5; 
+				        break;
+				}
+				
+				if (UDDPointSet* PointSet = PS->GetPointSet())
+				{
+				    PointSet->SetCoin(PointSet->GetCoin() + RewardCoin);
 				}
 			}
 			break;

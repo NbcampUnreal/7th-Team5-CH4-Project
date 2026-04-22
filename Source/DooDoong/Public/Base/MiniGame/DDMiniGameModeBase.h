@@ -9,9 +9,7 @@
 class ADDBasePlayerController;
 class UDDMiniGameRuleSet;
 struct FTimerHandle;
-/**
- * 
- */
+
 UCLASS()
 class DOODOONG_API ADDMiniGameModeBase : public ADDGameModeBase
 {

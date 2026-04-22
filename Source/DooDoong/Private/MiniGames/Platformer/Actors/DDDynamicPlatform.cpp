@@ -1,11 +1,6 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "MiniGames/Platformer/Actors/DDDynamicPlatform.h"
+﻿#include "MiniGames/Platformer/Actors/DDDynamicPlatform.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
-#include "Common/DDLogManager.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Microsoft/AllowMicrosoftPlatformTypes.h"
 
 ADDDynamicPlatform::ADDDynamicPlatform()

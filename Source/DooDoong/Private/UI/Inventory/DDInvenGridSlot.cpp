@@ -1,18 +1,11 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "UI/Inventory/DDInvenGridSlot.h"
-
-#include <string>
+﻿#include "UI/Inventory/DDInvenGridSlot.h"
 
 #include "Common/DDLogManager.h"
 #include "UI/Inventory/DDItemUseButtonWidget.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
-#include "Data/DDItemDataTypes.h"
 #include "UI/Inventory/DDInventoryComponent.h"
-#include "UI/Inventory/DDInventoryWidget.h"
 
 void UDDInvenGridSlot::NativeConstruct()
 {

@@ -2,7 +2,6 @@
 
 #include "GameplayEffectExtension.h"
 #include "BoardGame/Game/DDBoardGameMode.h"
-#include "Net/Core/Connection/NetConnectionFaultRecoveryBase.h"
 
 UDDPointSet::UDDPointSet()
 {
@@ -10,7 +9,7 @@ UDDPointSet::UDDPointSet()
 	InitTrophy(0.f);
 }
 
-void UDDPointSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void UDDPointSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
