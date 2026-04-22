@@ -13,7 +13,6 @@ ADDShooterTarget::ADDShooterTarget()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-	SetReplicateMovement(true);
 
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComp"));
 	SetRootComponent(CollisionComp);
@@ -38,6 +37,8 @@ ADDShooterTarget::ADDShooterTarget()
 void ADDShooterTarget::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	SetReplicateMovement(true);
 }
 
 void ADDShooterTarget::LaunchTarget(const FVector& LaunchDirection, float Speed)
