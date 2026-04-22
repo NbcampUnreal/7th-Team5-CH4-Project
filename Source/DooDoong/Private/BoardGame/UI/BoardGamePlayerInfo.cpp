@@ -118,14 +118,13 @@ void UBoardGamePlayerInfo::UpdateCurrentRank(int32 CurrentRank)
 		FString RankString = FString::Printf(TEXT("%d%s"), CurrentRank, *Suffix);
 		CurrentRankText->SetText(FText::FromString(RankString));
 		
-		if (RankColors.Num() > 0)
+		if(RankColors.Num() <= 0) return;  
+		
+		const int32 ColorIndex = RankColors.IsValidIndex(CurrentRank - 1) ? CurrentRank - 1 : 0;
+		if (RankColors.IsValidIndex(ColorIndex))
 		{
-			FLinearColor RankColor = (RankColors.Num() < CurrentRank) ? 
-				RankColors[0] : RankColors[CurrentRank];
-			
-			CurrentRankText->SetColorAndOpacity(RankColor);
+			CurrentRankText->SetColorAndOpacity(RankColors[ColorIndex]);
 		}
-	
 	}
 	
 }
