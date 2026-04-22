@@ -50,6 +50,7 @@ void UMiniGameBaseWidget::CreatePlayerInfos()
 			CreateWidget<UDDMiniGamePlayerInfo>(PlayerInfoContainer, PlayerInfoWidgetClass);
 		if (!InfoWidget) continue;
 		
+		InfoWidget->InitializePlayerInfo(PS); 
 		// 초기화 ( 자식 클래스에서 정의 )  
 		InitializePlayerInfoWidget(InfoWidget); 
 		
