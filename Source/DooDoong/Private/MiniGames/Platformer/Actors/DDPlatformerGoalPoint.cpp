@@ -23,16 +23,6 @@ ADDPlatformerGoalPoint::ADDPlatformerGoalPoint()
 void ADDPlatformerGoalPoint::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (HasAuthority() == true)
-	{
-		ServerNotifyGoalReached();
-	}
-}
-
-void ADDPlatformerGoalPoint::ServerNotifyGoalReached_Implementation()
-{
-	UE_LOG(LogPMJ, Log, TEXT("ServerFunctionCalled"));
 }
 
 void ADDPlatformerGoalPoint::OnComponentBeginOverlap(
@@ -43,22 +33,14 @@ void ADDPlatformerGoalPoint::OnComponentBeginOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (HasAuthority() == true && OtherActor == nullptr)
-	{
-		return;
-	}
+	if (!HasAuthority()) return;
+	
+	if (OtherActor == nullptr) return;
 	
 	ADDPlatformerGameMode* CurrentGameMode = Cast<ADDPlatformerGameMode>(GetWorld()->GetAuthGameMode());
-	if (IsValid(CurrentGameMode) == false)
-	{
-		LOG_PMJ(Error, TEXT("=== GOALPOINT : 게임모드 캐스팅 실패 ==="));
-		return;
-	}
-	
-	if (CurrentGameMode != nullptr)
+	if (IsValid(CurrentGameMode))
 	{
 		CurrentGameMode->CheckGoalPlayerCharacter(OtherActor);
-		UE_LOG(LogPMJ, Log, TEXT("=== 점수 전달 성공! ==="));
 	}
 	
 }
