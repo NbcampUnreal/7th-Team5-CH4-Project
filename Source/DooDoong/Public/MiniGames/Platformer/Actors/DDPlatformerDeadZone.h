@@ -34,6 +34,5 @@ protected:
 	TObjectPtr<class UBoxComponent> BoxCollision;
 
 private:
-	
 	FVector StartLocation;
 };

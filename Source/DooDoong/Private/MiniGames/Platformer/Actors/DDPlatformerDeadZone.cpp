@@ -5,6 +5,7 @@
 #include "MiniGames/Platformer/GameMode/DDPlatformerGameMode.h"
 #include "Components/BoxComponent.h"
 #include "Interfaces/IPluginManager.h"
+#include "MiniGames/Platformer/Character/DDPlatformerCharacter.h"
 
 ADDPlatformerDeadZone::ADDPlatformerDeadZone()
 {
@@ -33,40 +34,15 @@ void ADDPlatformerDeadZone::OnComponentBeginOverlap(
 	const FHitResult& SweepResult
 	)
 {
-	if (OtherActor == nullptr)
-	{
-		return;
-	}
+	if (!HasAuthority()) return;
 	
-	APawn* OverlapPawn = Cast<APawn>(OtherActor);
-	if (IsValid(OverlapPawn) == false)
-	{
-		LOG_PMJ(Error, TEXT("=== DEADZONE : 폰 캐스팅 실패 ==="));
-		return;
-	}
-	
-	ADDBasePlayerState* DDPlayerState = OverlapPawn->GetPlayerState<ADDBasePlayerState>();
-	if (DDPlayerState == nullptr)
-	{
-		LOG_PMJ(Error, TEXT("=== DEADZONE : 플레이어 스테이트 캐스팅 실패 ==="));
-		return;
-	}
+	if (OtherActor == nullptr) return;
 	
 	ADDPlatformerGameMode* CurrentGameMode = Cast<ADDPlatformerGameMode>(GetWorld()->GetAuthGameMode());
-	if (IsValid(CurrentGameMode) == false)
+	if (IsValid(CurrentGameMode))
 	{
-		LOG_PMJ(Error, TEXT("=== DEADZONE : 게임모드 캐스팅 실패 ==="));
-		return;
+		CurrentGameMode->ReturnToSavePoint(OtherActor);
 	}
-	
-	for (const TPair<int32, FPlatformerPlayerData>& EnteredPlayer : CurrentGameMode->PlayerDatas)
-	{
-		if (DDPlayerState->PlayerGameData.SlotIndex == EnteredPlayer.Value.PlayerSlotIndex)
-		{
-			OtherActor->SetActorLocation(EnteredPlayer.Value.SavePointLocation);
-		}
-	}
-	
 }
 
 

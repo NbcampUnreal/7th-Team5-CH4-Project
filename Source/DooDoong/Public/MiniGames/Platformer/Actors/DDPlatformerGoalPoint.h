@@ -13,12 +13,7 @@ public:
 	ADDPlatformerGoalPoint();
 
 public:
-	
 	virtual void BeginPlay() override;
-	
-	UFUNCTION(Server, Reliable)
-	void ServerNotifyGoalReached();
-
 	
 	UFUNCTION()
 	void OnComponentBeginOverlap(
