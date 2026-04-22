@@ -186,7 +186,11 @@ void ADDTile::OnConstruction(const FTransform& Transform)
 	// TileRowName 자동 셋팅!!!
 	Super::OnConstruction(Transform);
 
+#if WITH_EDITOR
 	FString Name = GetActorLabel();
+#else
+	FString Name = GetName();
+#endif
 
 	FString NumberPart;
 	for (int32 i = Name.Len() - 1; i >= 0; i--)

@@ -1,6 +1,5 @@
 #include "Lobby/UI/DDLobbyWidget.h"
 
-#include "AssetDefinitionAssetInfo.h"
 #include "Common/DDLogManager.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
