@@ -17,6 +17,8 @@ void UMiniGameBaseWidget::NativeConstruct()
 	
 	CachedMiniGameState->OnRemainingTimeChanged.AddDynamic(
 		this, &ThisClass::OnRemainingTimeChanged);
+	
+	CreatePlayerInfos(); 
 }
 
 void UMiniGameBaseWidget::NativeDestruct()
@@ -37,6 +39,8 @@ void UMiniGameBaseWidget::CreatePlayerInfos()
 	PlayerInfoContainer->ClearChildren();
 	PlayerInfoWidgets.Empty();
 	
+
+	
 	for (auto PS : CachedMiniGameState->PlayerArray)
 	{
 		if (!PS) continue;
@@ -54,12 +58,12 @@ void UMiniGameBaseWidget::CreatePlayerInfos()
 		SizeBox->SetHeightOverride(PlayerInfoHeight);
 		SizeBox->AddChild(InfoWidget);
 		
-		UHorizontalBoxSlot* BoxSlot = PlayerInfoContainer->AddChildToHorizontalBox(SizeBox);
-		if (BoxSlot)
+		if (UHorizontalBoxSlot* SlotBox = PlayerInfoContainer->AddChildToHorizontalBox(InfoWidget))
 		{
-			// 위젯 간 간격
-			BoxSlot->SetPadding(FMargin(4.f, 0.f));
-			BoxSlot->SetVerticalAlignment(VAlign_Center);
+			SlotBox->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+			SlotBox->SetPadding(FMargin(4.f, 0.f));
+			SlotBox->SetHorizontalAlignment(HAlign_Fill);
+			SlotBox->SetVerticalAlignment(VAlign_Fill);
 		}
 		
 		PlayerInfoWidgets.Add(InfoWidget);
