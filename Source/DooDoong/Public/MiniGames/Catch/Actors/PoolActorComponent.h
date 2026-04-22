@@ -28,5 +28,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ObjectPooling")
 	int32 PoolSize;
 
-	TArray<APooledActor*> ObjectPool;
+	UPROPERTY()
+    TArray<TObjectPtr<APooledActor>> ObjectPool;
 };

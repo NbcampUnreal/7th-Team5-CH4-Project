@@ -52,7 +52,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float AngleDeg = 60.f;
 
-	TArray<ADDBoardGameCharacter*> CachedTargets;
+	UPROPERTY()
+    TArray<TObjectPtr<class ADDBoardGameCharacter>> CachedTargets;
+	
 	FTimerHandle UpdateTimer;
 
 	UPROPERTY(EditDefaultsOnly, Category = "GAS")
