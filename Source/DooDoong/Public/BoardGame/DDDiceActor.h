@@ -12,6 +12,7 @@ class DOODOONG_API ADDDiceActor : public AActor
 	GENERATED_BODY()
 public:
 	ADDDiceActor();
+	virtual void BeginPlay() override;
 	void StartRoll(int32 InValue);
 
 protected:

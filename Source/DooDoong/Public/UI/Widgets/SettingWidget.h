@@ -22,7 +22,7 @@ class DOODOONG_API USettingWidget : public UUserWidget
 	GENERATED_BODY()
 	
 protected:
-	virtual void NativeConstruct();
+	virtual void NativeConstruct() override;
 	
 protected:
 	UFUNCTION()
