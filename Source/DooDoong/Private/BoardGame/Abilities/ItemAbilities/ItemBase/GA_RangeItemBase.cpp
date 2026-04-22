@@ -36,15 +36,15 @@ void UGA_RangeItemBase::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			MyChar->OnRep_RangeIndicator(); // 서버에서도 즉시 반영
 		}
 	}
-	
-	// 타겟 업데이트
-	GetWorld()->GetTimerManager().SetTimer(
-		UpdateTimer,
-		this,
-		&UGA_RangeItemBase::UpdateDebug,
-		0.1f,
-		true
-	);
+
+	// // 디버그 라인 그리기
+	// GetWorld()->GetTimerManager().SetTimer(
+	// 	UpdateTimer,
+	// 	this,
+	// 	&UGA_RangeItemBase::UpdateDebug,
+	// 	0.1f,
+	// 	true
+	// );
 
 	UAbilityTask_WaitGameplayEvent* ConfirmTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
 		this,
