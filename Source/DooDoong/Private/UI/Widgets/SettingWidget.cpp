@@ -109,6 +109,8 @@ void USettingWidget::OnApplyClicked()
 			case 2:
 				GameSettings->SetFullscreenMode(EWindowMode::Windowed);
 				break;
+			default:
+				break;
 			}
 		}
 		
@@ -220,6 +222,8 @@ void USettingWidget::LoadCurrentSettings()
 				break;
 			case EWindowMode::Windowed:
 				WindowModeComboBox->SetSelectedIndex(2);
+				break;
+			default:
 				break;
 			}
 		}
