@@ -42,7 +42,7 @@ public:
 	}
 
 public:
-	void SetInputMappingContext(UInputMappingContext* NewIMC);
+	bool SetInputMappingContext(UInputMappingContext* NewIMC);
 
 	// GameMode가 상태 변경을 클라이언트에게 전달하는 RPC들
 	
@@ -136,6 +136,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> BoardGameIMC;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UInputMappingContext> CurrentIMC;
 	
 	/*민재 : 인벤토리 코드*/
 

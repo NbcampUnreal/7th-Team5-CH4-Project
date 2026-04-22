@@ -21,6 +21,8 @@ class DOODOONG_API ADDMiniGameStateBase : public ADDGameStateBase
 public:
 	ADDMiniGameStateBase();
 
+	virtual void BeginPlay() override;
+
 	/** 복제 설정 */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -104,6 +106,8 @@ public:
 	/** 점수 Get */
 	UFUNCTION(BlueprintPure, Category="MiniGame")
 	int32 GetScore(APlayerState* PlayerState) const;
+
+	void TryApplyMiniGameInputLocally();
 
 public:
 	UPROPERTY(BlueprintAssignable, Category = "MiniGame|Setup")
