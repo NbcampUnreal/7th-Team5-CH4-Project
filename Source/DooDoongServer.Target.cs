@@ -11,5 +11,10 @@ public class DooDoongServerTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_6;
 		ExtraModuleNames.Add("DooDoong");
+
+		GlobalDefinitions.Add("UE_PROJECT_STEAMPRODUCTNAME=\"480\"");
+		GlobalDefinitions.Add("UE_PROJECT_STEAMGAMEDIR=\"DooDoong\"");
+		GlobalDefinitions.Add("UE_PROJECT_STEAMGAMEDESC=\"DooDoong\"");
+		GlobalDefinitions.Add("UE_PROJECT_STEAMSHIPPINGID=480");
 	}
 }
