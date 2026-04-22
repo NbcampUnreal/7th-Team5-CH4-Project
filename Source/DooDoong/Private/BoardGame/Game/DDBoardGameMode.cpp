@@ -455,6 +455,12 @@ void ADDBoardGameMode::CalculateFinalWinner()
           Data.Coin
 		);
     }
+	
+	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());  
+    if (GameInstance)  
+    {        
+	    CachedBoardGameState->SetCurrentRound(0);  
+    }    
     
     CachedBoardGameState->SetFinalRankings(FinalResults);
     SetMatchState(DDGameplayTags::State_BoardGame_End);
