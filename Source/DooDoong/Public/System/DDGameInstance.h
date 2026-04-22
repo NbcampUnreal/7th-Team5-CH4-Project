@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AdvancedFriendsGameInstance.h"
 #include "Engine/GameInstance.h"
 #include "DDGameInstance.generated.h"
 
@@ -9,7 +10,7 @@ class UDataTable;
 class UDDUIConfig;
 
 UCLASS()
-class DOODOONG_API UDDGameInstance : public UGameInstance
+class DOODOONG_API UDDGameInstance : public UAdvancedFriendsGameInstance
 {
 	GENERATED_BODY()
 

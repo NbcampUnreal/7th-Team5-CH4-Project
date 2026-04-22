@@ -21,7 +21,9 @@ public class DooDoong : ModuleRules
 			/* 레벨 시퀀서 */
 			"LevelSequence", "MovieScene",
 			/* 나이아가라 */
-			"Niagara"
+			"Niagara",
+			/* AdvancedSession 종속성 */
+			"OnlineSubsystem", "OnlineSubsystemUtils", "AdvancedSessions"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

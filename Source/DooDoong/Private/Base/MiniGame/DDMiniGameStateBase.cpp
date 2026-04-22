@@ -15,6 +15,13 @@ ADDMiniGameStateBase::ADDMiniGameStateBase()
 	bReplicates = true;
 }
 
+void ADDMiniGameStateBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	TryApplyMiniGameInputLocally();
+}
+
 void ADDMiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -42,11 +49,7 @@ void ADDMiniGameStateBase::SetMiniGameState(FGameplayTag NewState)
 	CurrentState = NewState;
 	OnMiniGameStateTagChanged.Broadcast(CurrentState); 
 	
-	if (CurrentState == DDGameplayTags::State_MiniGame_Preparing ||
-		CurrentState == DDGameplayTags::State_MiniGame_Playing)
-	{
-		ApplyMiniGameInputLocally();
-	}
+	TryApplyMiniGameInputLocally();
 	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
 	{
 		PlayMiniGameBGM();
@@ -74,11 +77,7 @@ void ADDMiniGameStateBase::NotifyMiniGameSetupReady()
 	{
 		PlayMiniGameBGM();
 	}
-	if (CurrentState == DDGameplayTags::State_MiniGame_Preparing ||
-		CurrentState == DDGameplayTags::State_MiniGame_Playing)
-	{
-		ApplyMiniGameInputLocally();
-	}
+	TryApplyMiniGameInputLocally();
 }
 
 void ADDMiniGameStateBase::SetRemainingTimeSeconds(float NewRemainingTimeSeconds)
@@ -188,20 +187,12 @@ void ADDMiniGameStateBase::OnRep_MiniGameSetupReady()
 	{
 		PlayMiniGameBGM();
 	}
-	if (CurrentState == DDGameplayTags::State_MiniGame_Preparing ||
-		CurrentState == DDGameplayTags::State_MiniGame_Playing)
-	{
-		ApplyMiniGameInputLocally();
-	}
+	TryApplyMiniGameInputLocally();
 }
 
 void ADDMiniGameStateBase::OnRep_CurrentState()
 {
-	if (CurrentState == DDGameplayTags::State_MiniGame_Preparing ||
-		CurrentState == DDGameplayTags::State_MiniGame_Playing)
-	{
-		ApplyMiniGameInputLocally();
-	}
+	TryApplyMiniGameInputLocally();
 	if (CurrentState == DDGameplayTags::State_MiniGame_Playing)
 	{
 		PlayMiniGameBGM();
@@ -263,6 +254,18 @@ void ADDMiniGameStateBase::BroadcastReadyEntriesChanged()
 	OnMiniGameReadyEntriesChanged.Broadcast(ReadyEntries);
 }
 
+void ADDMiniGameStateBase::TryApplyMiniGameInputLocally()
+{
+	if (!bMiniGameSetupReady ||
+		(CurrentState != DDGameplayTags::State_MiniGame_Preparing &&
+		 CurrentState != DDGameplayTags::State_MiniGame_Playing))
+	{
+		return;
+	}
+
+	ApplyMiniGameInputLocally();
+}
+
 void ADDMiniGameStateBase::PlayMiniGameBGM()
 {
 	if (GetNetMode() == NM_DedicatedServer || MiniGameSetup.BGM.IsNone())
@@ -321,6 +324,8 @@ void ADDMiniGameStateBase::ApplyMiniGameInputLocally()
 		return;
 	}
 
-	PlayerController->SetInputMappingContext(MappingContext);
-	bHasAppliedMiniGameInput = true;
+	if (PlayerController->SetInputMappingContext(MappingContext))
+	{
+		bHasAppliedMiniGameInput = true;
+	}
 }

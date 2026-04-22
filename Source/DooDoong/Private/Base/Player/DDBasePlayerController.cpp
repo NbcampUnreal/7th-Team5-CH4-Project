@@ -5,6 +5,7 @@
 #include "InputMappingContext.h"
 #include "AbilitySystem/DDAbilitySystemComponent.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
+#include "Base/MiniGame/DDMiniGameStateBase.h"
 #include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/DDSelectableTileActor.h"
 #include "BoardGame/Abilities/DDMoveTileStepTask.h"
@@ -32,10 +33,11 @@ void ADDBasePlayerController::BeginPlay()
 	SetInputMode(Mode);
 	bShowMouseCursor = true;
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem 
-		= ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	SetInputMappingContext(DefaultIMC);
+
+	if (ADDMiniGameStateBase* MiniGameState = GetWorld() ? GetWorld()->GetGameState<ADDMiniGameStateBase>() : nullptr)
 	{
-		Subsystem->AddMappingContext(DefaultIMC, 0);
+		MiniGameState->TryApplyMiniGameInputLocally();
 	}
 	
 	if (IsLocalController())
@@ -168,21 +170,37 @@ void ADDBasePlayerController::SetupInputComponent()
 }
 
 
-void ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIMC)
+bool ADDBasePlayerController::SetInputMappingContext(UInputMappingContext* NewIMC)
 {
-	if (auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	if (!IsLocalController())
 	{
-		if (DefaultIMC)
-		{
-			Subsystem->RemoveMappingContext(DefaultIMC);
-		}
-
-		DefaultIMC = NewIMC;
-		if (DefaultIMC)
-		{
-			Subsystem->AddMappingContext(DefaultIMC, 0);
-		}
+		return false;
 	}
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem =
+		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if (Subsystem == nullptr)
+	{
+		return false;
+	}
+
+	if (CurrentIMC == NewIMC)
+	{
+		return true;
+	}
+
+	if (CurrentIMC)
+	{
+		Subsystem->RemoveMappingContext(CurrentIMC);
+	}
+
+	CurrentIMC = NewIMC;
+	if (CurrentIMC)
+	{
+		Subsystem->AddMappingContext(CurrentIMC, 0);
+	}
+
+	return true;
 }
 
 void ADDBasePlayerController::Client_ApplyState_Implementation(FGameplayTag StateTag)
