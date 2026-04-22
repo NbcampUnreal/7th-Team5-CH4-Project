@@ -26,5 +26,5 @@ void ADDSelectableTileActor::BeginPlay()
 	Super::BeginPlay();
 	
 	SetReplicateMovement(true);
-	LOG_CYS(Error, TEXT("화살표 생성"));
+	LOG_CYS(Warning, TEXT("화살표 생성"));
 }

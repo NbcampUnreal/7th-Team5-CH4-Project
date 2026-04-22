@@ -482,7 +482,7 @@ void ADDMiniGameModeBase::TryStartMiniGame()
 	}
 	else
 	{
-		LOG_KMS(Error, TEXT("Failed to start mini-game mode"));
+		LOG_KMS(Warning, TEXT("Failed to start mini-game mode"));
 	}
 }
 

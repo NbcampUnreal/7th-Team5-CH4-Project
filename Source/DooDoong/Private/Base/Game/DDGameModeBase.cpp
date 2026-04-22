@@ -221,7 +221,7 @@ void ADDGameModeBase::BroadcastGameLayer(const FGameplayTag NewGameTag)
 
 void ADDGameModeBase::BroadcastErrorMessage(const FString& ErrorMessage)
 {
-	LOG_KMS(Error, TEXT("%s"), *ErrorMessage);
+	LOG_KMS(Warning, TEXT("%s"), *ErrorMessage);
 	
 	for (APlayerController* PC : AlivePlayerControllers)
 	{

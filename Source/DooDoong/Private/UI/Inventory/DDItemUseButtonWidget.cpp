@@ -39,7 +39,7 @@ void UDDItemUseButtonWidget::UseButton()
 	UDDInventoryComponent* InventoryComponent = Cast<UDDInventoryComponent>(PS->GetInventoryComponent());
 	if (InventoryComponent == nullptr)
 	{
-		LOG_PMJ(Error, TEXT(" UseButtonWidget : 인벤토리 컴포넌트 없어요"));
+		LOG_PMJ(Warning, TEXT(" UseButtonWidget : 인벤토리 컴포넌트 없어요"));
 		return;
 	}
 	InventoryComponent->Server_UseItem(CurrentItemSlotName);

@@ -89,7 +89,7 @@ void ADDBoardGameCharacter::UpdateMove()
 			// 소켓에서 Detach
 			Dice->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
-			LOG_CYS(Error, TEXT("Dice->DetachFromActor: %s"), *Dice->GetName());
+			LOG_CYS(Warning, TEXT("Dice->DetachFromActor: %s"), *Dice->GetName());
 			// 삭제
 			Dice->Destroy();
 			Dice = nullptr;
@@ -111,7 +111,7 @@ void ADDBoardGameCharacter::PlayDice(int32 DiceValue)
 	// 서버에서 Dice 스폰, 클라이언트는 복제된 actor을 봄
 	if (!DiceClass)
 	{
-		LOG_CYS(Error, TEXT("DiceClass is NULL"));
+		LOG_CYS(Warning, TEXT("DiceClass is NULL"));
 		return;
 	}
 
@@ -163,7 +163,7 @@ void ADDBoardGameCharacter::Multicast_PlayDiceAnimation_Implementation()
 {
 	if (!DiceMontage)
 	{
-		LOG_CYS(Error, TEXT("DiceMontage is NULL"));
+		LOG_CYS(Warning, TEXT("DiceMontage is NULL"));
 		return;
 	}
 
@@ -195,12 +195,12 @@ void ADDBoardGameCharacter::Multicast_ShowTileContentAboveHead_Implementation(FG
 	if (TileTag.MatchesTag(DDGameplayTags::Tile_Ability_Coin))
 	{
 		// 코인 
-		LOG_CYS(Error, TEXT("코인 머리 위!"));
+		LOG_CYS(Warning, TEXT("코인 머리 위!"));
 		SpawnClass = CoinClass;
 	}
 	else if (TileTag.MatchesTag(DDGameplayTags::Tile_Ability_Item))
 	{
-		LOG_CYS(Error, TEXT("아이템 머리 위!"));
+		LOG_CYS(Warning, TEXT("아이템 머리 위!"));
 		// 택 1
 		// 1. 아이템 랜덤 반환: 아이템 스폰해서 오버랩 이벤트로 아이템 획득 
 		// 2. 가방보여주고 아이템이 그 안에 있는 느낌: 아이템은 따로 UI로 알려줌 
@@ -208,19 +208,19 @@ void ADDBoardGameCharacter::Multicast_ShowTileContentAboveHead_Implementation(FG
 	else if (TileTag.MatchesTag(DDGameplayTags::Tile_Ability_Move))
 	{
 		// 무브
-		LOG_CYS(Error, TEXT("무브 머리 위!"));
+		LOG_CYS(Warning, TEXT("무브 머리 위!"));
 		SpawnClass = MoveClass;
 	}
 	else if (TileTag.MatchesTag(DDGameplayTags::Tile_Ability_Damage))
 	{
 		// 데미지
-		LOG_CYS(Error, TEXT("데미지 머리 위!"));
+		LOG_CYS(Warning, TEXT("데미지 머리 위!"));
 		SpawnClass = DamageClass;
 	}
 
 	if (!SpawnClass)
 	{
-		LOG_CYS(Error, TEXT("No Spawn Class"));
+		LOG_CYS(Warning, TEXT("No Spawn Class"));
 		return;
 	}
 
@@ -249,7 +249,7 @@ void ADDBoardGameCharacter::Multicast_ShowTileContentAboveHead_Implementation(FG
 
 	if (!EventActor)
 	{
-		LOG_CYS(Error, TEXT("EventActor 스폰 실패"));
+		LOG_CYS(Warning, TEXT("EventActor 스폰 실패"));
 		return;
 	}
 

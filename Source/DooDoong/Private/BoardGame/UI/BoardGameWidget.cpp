@@ -37,7 +37,7 @@ void UBoardGameWidget::BindToGameState()
 	if (!CurrentGameState)
 	{
 		// 3. GameState 찾기 재시도
-		UE_LOG(LogTemp, Error, TEXT("[UI] GameState가 아직 Null입니다. 0.1초 뒤 재시도합니다..."));
+		UE_LOG(LogTemp, Warning, TEXT("[UI] GameState가 아직 Null입니다. 0.1초 뒤 재시도합니다..."));
 		
 		FTimerHandle RetryHandle;
 		GetWorld()->GetTimerManager().SetTimer(

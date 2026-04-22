@@ -184,7 +184,7 @@ void ADDPlatformerGameMode::PlayerRanking()
 		case 4 : AddScore(DDPlayer->GetPlayerState(), 40);
 			LOG_PMJ(Error, TEXT("=== GAMEMODE : %d Player, AddScore : 40, Rank : %d ==="), DDPlayer->GetPlayerState()->GetPlayerId(), DDPlayer->PlayerRank);
 			break;
-		default: LOG_PMJ(Error, TEXT("=== GAMEMODE : 플레이어의 랭킹 없음 ==="));
+		default: LOG_PMJ(Warning, TEXT("=== GAMEMODE : 플레이어의 랭킹 없음 ==="));
 			break;
 		}
 	}

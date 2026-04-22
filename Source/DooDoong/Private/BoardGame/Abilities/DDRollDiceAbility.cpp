@@ -44,7 +44,7 @@ void UDDRollDiceAbility::ActivateAbility(
 
 	if (!Character)
 	{
-		LOG_CYS(Error, TEXT("Character NULL"));
+		LOG_CYS(Warning, TEXT("Character NULL"));
 
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;

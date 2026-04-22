@@ -35,7 +35,7 @@ void UDDMoveTileStepTask::MoveNext()
 	ADDBoardGameCharacter* Character = Cast<ADDBoardGameCharacter>(GetAvatarActor());
 	if (!Character)
 	{
-		LOG_CYS(Error, TEXT("[MoveTask] NoCharacter"));
+		LOG_CYS(Warning, TEXT("[MoveTask] NoCharacter"));
 		return;
 	}
 
@@ -46,7 +46,7 @@ void UDDMoveTileStepTask::MoveNext()
 	ADDTile* CurrentTile = PlayerState->CurrentTile;
 	if (!CurrentTile)
 	{
-		LOG_CYS(Error, TEXT("[MoveTask] NoCurrentTile"));
+		LOG_CYS(Warning, TEXT("[MoveTask] NoCurrentTile"));
 		EndTask();
 		return;
 	}
@@ -64,7 +64,7 @@ void UDDMoveTileStepTask::MoveNext()
 	const TArray<ADDTile*>& NextTiles = CurrentTile->NextTiles;
 	if (NextTiles.Num() == 0)
 	{
-		LOG_CYS(Error, TEXT("[MoveTask] NoNEXT"));
+		LOG_CYS(Warning, TEXT("[MoveTask] NoNEXT"));
 		EndTask();
 	}
 	else if (NextTiles.Num() == 1)
@@ -75,7 +75,7 @@ void UDDMoveTileStepTask::MoveNext()
 	{
 		// 분기
 		SpawnSelectableActors(NextTiles);
-		LOG_CYS(Error, TEXT("[MoveTask] 갈림길"));
+		LOG_CYS(Warning, TEXT("[MoveTask] 갈림길"));
 	}
 }
 

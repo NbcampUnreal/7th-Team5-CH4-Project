@@ -13,14 +13,14 @@ void UPoolActorComponent::BeginPlay()
 	if (GetOwner()->HasAuthority()) // 서버에서만 생성
 	{
 		InitializePool();
-		LOG_CYS(Error, TEXT("[Pool] PoolSize: %d"), PoolSize);
+		LOG_CYS(Warning, TEXT("[Pool] PoolSize: %d"), PoolSize);
 	}
 }
 
 void UPoolActorComponent::InitializePool()
 {
 	if (!PooledActorClass) return;
-	LOG_CYS(Error, TEXT("[Pool] InitializePool 시작"));
+	LOG_CYS(Warning, TEXT("[Pool] InitializePool 시작"));
 	UWorld* World = GetWorld();
 	if (!World) return;
 
@@ -46,7 +46,7 @@ void UPoolActorComponent::InitializePool()
 		}
 		else if (!PooledActor)
 		{
-			LOG_CYS(Error, TEXT("[Pool] SpawnActor 실패!!! Class: %s"), *GetNameSafe(PooledActorClass));
+			LOG_CYS(Warning, TEXT("[Pool] SpawnActor 실패!!! Class: %s"), *GetNameSafe(PooledActorClass));
 		}
 	}
 }

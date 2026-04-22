@@ -8,6 +8,8 @@
 void UDDGameInstance::Init()
 {
 	Super::Init();
+	
+	FDDLogManager::Get().ToggleAll(false);
 
 	int32 ValidCount = 0;
 	for (const TSubclassOf<UGameplayAbility>& AbilityClass : PreloadedAbilityClasses)

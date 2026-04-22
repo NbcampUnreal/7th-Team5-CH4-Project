@@ -230,7 +230,7 @@ void ADDBoardGameMode::HandleState_Init()
 	// 타일 매니저 초기화
 	if (!IsValid(CachedBoardGameState->TileManager))
 	{
-		LOG_CYS(Error,TEXT("[GM] 타일 매니저 못 찾음"));
+		LOG_CYS(Warning,TEXT("[GM] 타일 매니저 못 찾음"));
 	}
 	CachedBoardGameState->TileManager->InitializeTiles();
 
@@ -306,7 +306,7 @@ void ADDBoardGameMode::HandleState_RoundEnd()
 			}
 			else
 			{
-				LOG_CYS(Error, TEXT("[RoundEnd] CurrentTile INVALID"));
+				LOG_CYS(Warning, TEXT("[RoundEnd] CurrentTile INVALID"));
 			}
 		}
 	}
@@ -629,7 +629,7 @@ void ADDBoardGameMode::HandleRespawn(AController* TargetController)
 	if (!PS) return;
 	PS->StartTileName = FName("Tile01");
 	PS->InitTile();
-	LOG_CYS(Error,TEXT("리스폰 성공"));
+	LOG_CYS(Warning,TEXT("리스폰 성공"));
 	
 	// 풀피
 	IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(PS);

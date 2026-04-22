@@ -19,14 +19,14 @@ void ADDTileManager::InitializeTiles()
 		// 이름없는 타일 체크
 		if (Tile->TileRowName.IsNone())
 		{
-			LOG_CYS(Error, TEXT("[TM]TileRowName not set on %s"), *Tile->GetName());
+			LOG_CYS(Warning, TEXT("[TM]TileRowName not set on %s"), *Tile->GetName());
 			continue;
 		}
 		
 		// 중복 타일 체크
 		if (TileMap.Contains(Tile->TileRowName))
 		{
-			LOG_CYS(Error, TEXT("[TM]Duplicate TileRowName: %s"), *Tile->TileRowName.ToString());
+			LOG_CYS(Warning, TEXT("[TM]Duplicate TileRowName: %s"), *Tile->TileRowName.ToString());
 			continue;
 		}
 		
