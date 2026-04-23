@@ -11,7 +11,7 @@ void UDDGameInstance::Init()
 {
 	Super::Init();
 	
-	FDDLogManager::Get().ToggleAll(true);
+	FDDLogManager::Get().ToggleAll(false);
 
 	int32 ValidCount = 0;
 	for (const TSubclassOf<UGameplayAbility>& AbilityClass : PreloadedAbilityClasses)
@@ -67,19 +67,11 @@ void UDDGameInstance::ConnectToDedicatedServer(APlayerController* PlayerControll
 	if (!IsValid(PlayerController))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[DedicatedServer] Connect failed: invalid PlayerController"));
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Connect failed: invalid PlayerController"));
-		}
 		return;
 	}
 
 	const FString TravelURL = GetDedicatedServerTravelURL();
 	UE_LOG(LogTemp, Warning, TEXT("[DedicatedServer] ClientTravel URL: %s"), *TravelURL);
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("ClientTravel: %s"), *TravelURL));
-	}
 
 	PlayerController->ClientTravel(TravelURL, TRAVEL_Absolute);
 }
