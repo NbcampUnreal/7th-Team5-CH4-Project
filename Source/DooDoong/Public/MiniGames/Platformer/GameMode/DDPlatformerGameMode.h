@@ -97,7 +97,7 @@ protected:
 	
 	/* 게임 진행시간 */
 	UPROPERTY(EditAnywhere, Category = "PlatformerData")
-	float PlatformerPlayTime = 30.f;
+	float PlatformerPlayTime = 120.f;
 	
 	/* 게임스테이트 변수 */
 	UPROPERTY(VisibleAnywhere, Category = "PlatformerData")
