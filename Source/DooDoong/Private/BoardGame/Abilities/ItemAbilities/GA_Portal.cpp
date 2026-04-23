@@ -3,6 +3,7 @@
 #include "Base/Player/DDBasePlayerState.h"
 #include "BoardGame/DDTile.h"
 #include "BoardGame/Character/DDBoardGameCharacter.h"
+#include "BoardGame/Game/DDBoardGameMode.h"
 #include "Common/DDLogManager.h"
 
 bool UGA_Portal::ExecuteTargetingItem(AActor* TargetActor)
@@ -42,3 +43,16 @@ bool UGA_Portal::ExecuteTargetingItem(AActor* TargetActor)
 	
 	return true;
 }
+
+void UGA_Portal::EndAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	// 주사위 생략하기
+	if (ADDBoardGameMode* GM = Cast<ADDBoardGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GM->NotifyDiceRolled();
+		GM->NotifyMovementFinished();
+	}
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
