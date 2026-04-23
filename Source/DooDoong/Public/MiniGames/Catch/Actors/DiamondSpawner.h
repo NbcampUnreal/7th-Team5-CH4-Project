@@ -23,10 +23,10 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UPoolActorComponent* Pool;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="ObjectPooling")
 	int32 SpawnCount = 5;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="ObjectPooling")
 	float SpawnInterval = 10.f;
 
 	FTimerHandle SpawnTimer;
