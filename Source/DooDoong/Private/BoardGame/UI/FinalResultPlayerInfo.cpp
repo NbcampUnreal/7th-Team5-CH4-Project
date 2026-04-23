@@ -18,7 +18,7 @@ void UFinalResultPlayerInfo::InitializePlayerInfo(const FFinalRankData& RankData
 		if (RankColors.Num() > 0)
 		{
 			FLinearColor RankColor = (RankColors.Num() < Rank) ? 
-				RankColors[0] : RankColors[Rank];
+				RankColors[0] : RankColors[Rank % RankColors.Num()];
 			
 			RankText->SetColorAndOpacity(RankColor);
 		}
