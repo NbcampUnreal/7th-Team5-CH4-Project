@@ -146,4 +146,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GAS|Effects|Turn")
 	TSubclassOf<UGameplayEffect> TurnWaitingEffectClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|Effects")
+	TSubclassOf<UGameplayEffect> HealingEffect;
 };
