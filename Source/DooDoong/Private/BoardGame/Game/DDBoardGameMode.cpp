@@ -460,8 +460,9 @@ void ADDBoardGameMode::CalculateFinalWinner()
 	
 	UDDGameInstance* GameInstance = Cast<UDDGameInstance>(GetGameInstance());  
     if (GameInstance)  
-    {        
-	    CachedBoardGameState->SetCurrentRound(0);  
+    { 
+    	GameInstance->CurrentRound = 0;
+	    CachedBoardGameState->SetCurrentRound(0); 
     }    
     
     CachedBoardGameState->SetFinalRankings(FinalResults);

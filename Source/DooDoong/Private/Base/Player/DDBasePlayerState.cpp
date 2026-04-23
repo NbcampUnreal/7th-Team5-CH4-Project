@@ -99,6 +99,7 @@ void ADDBasePlayerState::CopyProperties(APlayerState* PlayerState)
 		// 게임이 끝나고 로비로 복귀함
 		else
 		{
+			NewPlayerState->PlayerGameData.PlayerDisplayName = FName("");
 			NewPlayerState->PlayerGameData.bIsGameFinished = false;
 			NewPlayerState->PlayerGameData.TurnOrder = -1;
 

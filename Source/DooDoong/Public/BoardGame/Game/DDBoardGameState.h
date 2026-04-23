@@ -18,7 +18,7 @@ struct FFinalRankData
 	int32 Rank = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RankData")
-	FName PlayerName = NAME_None;
+	FName PlayerName = FName("");
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RankData")
 	int32 Trophy = 0;
