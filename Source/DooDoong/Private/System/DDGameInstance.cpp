@@ -3,6 +3,7 @@
 #include "Common/DDLogManager.h"
 #include "Data/DDUIConfig.h"
 #include "Abilities/GameplayAbility.h"
+#include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 
@@ -65,10 +66,22 @@ void UDDGameInstance::ConnectToDedicatedServer(APlayerController* PlayerControll
 {
 	if (!IsValid(PlayerController))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[DedicatedServer] Connect failed: invalid PlayerController"));
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Connect failed: invalid PlayerController"));
+		}
 		return;
 	}
 
-	PlayerController->ClientTravel(GetDedicatedServerTravelURL(), TRAVEL_Absolute);
+	const FString TravelURL = GetDedicatedServerTravelURL();
+	UE_LOG(LogTemp, Warning, TEXT("[DedicatedServer] ClientTravel URL: %s"), *TravelURL);
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("ClientTravel: %s"), *TravelURL));
+	}
+
+	PlayerController->ClientTravel(TravelURL, TRAVEL_Absolute);
 }
 
 FString UDDGameInstance::GetDedicatedServerTravelURL() const
@@ -85,4 +98,14 @@ void UDDGameInstance::SetDedicatedServerEndpoint(const FString& InAddress, int32
 {
 	DedicatedServerAddress = InAddress.TrimStartAndEnd();
 	DedicatedServerPort = FMath::Max(0, InPort);
+
+	UE_LOG(LogTemp, Warning, TEXT("[DedicatedServer] Endpoint set: Address='%s', Port=%d, URL='%s'"),
+		*DedicatedServerAddress,
+		DedicatedServerPort,
+		*GetDedicatedServerTravelURL());
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,
+			FString::Printf(TEXT("Endpoint: %s"), *GetDedicatedServerTravelURL()));
+	}
 }
