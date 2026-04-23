@@ -19,7 +19,7 @@ FDDLogManager& FDDLogManager::Get()
 
 void FDDLogManager::Initialize()
 {
-	// 추가
+#if !NO_LOGGING
 	CategoryMap.Add(ELogOwner::JJH, {&LogJJH, ELogVerbosity::Log, true});
 	CategoryMap.Add(ELogOwner::LSY, {&LogLSY, ELogVerbosity::Log, true});
 	CategoryMap.Add(ELogOwner::KMS, {&LogKMS, ELogVerbosity::Log, true});
@@ -27,6 +27,15 @@ void FDDLogManager::Initialize()
 	CategoryMap.Add(ELogOwner::PMJ, {&LogPMJ, ELogVerbosity::Log, true});
 	CategoryMap.Add(ELogOwner::CYS, {&LogCYS, ELogVerbosity::Log, true});
 	CategoryMap.Add(ELogOwner::CJH, {&LogCJH, ELogVerbosity::Log, true});
+#else
+	CategoryMap.Add(ELogOwner::JJH, {ELogVerbosity::Log, true});
+	CategoryMap.Add(ELogOwner::LSY, {ELogVerbosity::Log, true});
+	CategoryMap.Add(ELogOwner::KMS, {ELogVerbosity::Log, true});
+	CategoryMap.Add(ELogOwner::KSH, {ELogVerbosity::Log, true});
+	CategoryMap.Add(ELogOwner::PMJ, {ELogVerbosity::Log, true});
+	CategoryMap.Add(ELogOwner::CYS, {ELogVerbosity::Log, true});
+	CategoryMap.Add(ELogOwner::CJH, {ELogVerbosity::Log, true});
+#endif
 
 	bInitialized = true;
 }
@@ -36,9 +45,11 @@ void FDDLogManager::SetEnabled(ELogOwner Owner, bool bEnable)
 	if (FLogCategoryEntry* Entry = CategoryMap.Find(Owner))
 	{
 		Entry->bEnabled = bEnable;
+#if !NO_LOGGING
 		Entry->Category->SetVerbosity(
 			bEnable ? Entry->DefaultVerbosity : ELogVerbosity::NoLogging
 		);
+#endif
 	}
 }
 
@@ -47,9 +58,11 @@ void FDDLogManager::ToggleAll(bool bEnable)
 	for (auto& [Owner, Entry] : CategoryMap)
 	{
 		Entry.bEnabled = bEnable;
+#if !NO_LOGGING
 		Entry.Category->SetVerbosity(
 			bEnable ? Entry.DefaultVerbosity : ELogVerbosity::NoLogging
 		);
+#endif
 	}
 }
 

@@ -30,7 +30,9 @@ enum class ELogOwner : uint8
 
 struct FLogCategoryEntry
 {
+#if !NO_LOGGING
     FLogCategoryBase* Category;
+#endif
     ELogVerbosity::Type DefaultVerbosity;
     bool bEnabled;
 };
