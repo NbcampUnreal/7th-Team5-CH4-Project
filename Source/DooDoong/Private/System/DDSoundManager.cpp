@@ -66,6 +66,7 @@ void UDDSoundManager::PlayBGM(FName SoundID, float FadeIn)
 	if (CurrentBGM)
 	{
 		CurrentBGMID = SoundID;
+		CurrentBGM->OnAudioFinished.AddUniqueDynamic(this, &UDDSoundManager::HandleBGMFinished);
 		
 		const float FadeInTime = ResolveFadeTime(FadeIn, SoundRow->FadeInTime);
 		if (FadeInTime > 0.f)
@@ -147,6 +148,7 @@ void UDDSoundManager::StopBGM(float FadeOut)
 	}
 
 	const float FadeOutTime = FMath::Max(0.f, FadeOut);
+	CurrentBGM->OnAudioFinished.RemoveAll(this);
 	if (FadeOutTime > 0.f)
 	{
 		CurrentBGM->FadeOut(FadeOutTime, 0.f);
@@ -163,6 +165,19 @@ void UDDSoundManager::StopBGM(float FadeOut)
 void UDDSoundManager::StopSound(FName SoundID, float FadeOut)
 {
 	// 1차 구현은 단발 SFX를 추적하지 않는다. BGM 정지만 지원한다.
+}
+
+void UDDSoundManager::HandleBGMFinished()
+{
+	const FName FinishedBGMID = CurrentBGMID;
+	CurrentBGM = nullptr;
+	CurrentBGMID = NAME_None;
+
+	const FDDSoundDataTableRow* SoundRow = FindSoundRow(FinishedBGMID);
+	if (SoundRow && SoundRow->bLoop)
+	{
+		PlayBGM(FinishedBGMID, 0.f);
+	}
 }
 
 void UDDSoundManager::StopCategory(EDDSoundCategory Category, float FadeOut)

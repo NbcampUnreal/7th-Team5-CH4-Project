@@ -61,6 +61,9 @@ public:
 	void LoadAudioSettings();
 	
 private:
+	UFUNCTION()
+	void HandleBGMFinished();
+
 	const FDDSoundDataTableRow* FindSoundRow(FName SoundID) const;
 	float GetFinalVolume(const FDDSoundDataTableRow& SoundRow) const;
 	float ResolveFadeTime(float OverrideFadeTime, float DefaultFadeTime) const;
