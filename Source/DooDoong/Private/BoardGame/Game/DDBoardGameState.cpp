@@ -67,31 +67,40 @@ void ADDBoardGameState::OnSequenceFinished()
 void ADDBoardGameState::Multicast_PlaySequence_Implementation()
 {
     ULevelSequence* LoadedSequence = BoardIntroSequenceAsset.LoadSynchronous();
-    
-    if (LoadedSequence)
+	
+    if (LoadedSequence == nullptr)
     {
-        ALevelSequenceActor* OutActor = nullptr;
-        FMovieSceneSequencePlaybackSettings Settings;
-    	
-        ULevelSequencePlayer* SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
-            GetWorld(), 
-            LoadedSequence, 
-            Settings, 
-            OutActor
-        );
-
-        if (SequencePlayer && OutActor)
+        if (HasAuthority())
         {
-            SpawnedSequenceActor = OutActor;
-        	
-            if (HasAuthority())
-            {
-                SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::OnSequenceFinished);
-            }
-        	
-            SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::PlayBoardBGMLocal);
-            SequencePlayer->Play();
+            OnSequenceFinished();
         }
+    	
+        PlayBoardBGMLocal();
+        
+        return;
+    }
+	
+    ALevelSequenceActor* OutActor = nullptr;
+    FMovieSceneSequencePlaybackSettings Settings;
+    
+    ULevelSequencePlayer* SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
+        GetWorld(), 
+        LoadedSequence, 
+        Settings, 
+        OutActor
+    );
+
+    if (SequencePlayer && OutActor)
+    {
+        SpawnedSequenceActor = OutActor;
+        
+        if (HasAuthority())
+        {
+            SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::OnSequenceFinished);
+        }
+        
+        SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::PlayBoardBGMLocal);
+        SequencePlayer->Play();
     }
 }
 
