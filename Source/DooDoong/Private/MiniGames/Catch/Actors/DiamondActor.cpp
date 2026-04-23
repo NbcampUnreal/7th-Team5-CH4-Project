@@ -1,4 +1,6 @@
 ﻿#include "MiniGames/Catch/Actors/DiamondActor.h"
+
+#include "Base/Character/DDBaseCharacter.h"
 #include "Common/DDLogManager.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
@@ -46,6 +48,11 @@ void ADiamondActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	ADDCatchGameMode* GM = Cast<ADDCatchGameMode>(GetWorld()->GetAuthGameMode());
 	if (!GM) return;
 
+	if (ADDBaseCharacter* DDCharacter = Cast<ADDBaseCharacter>(Character))
+	{
+		DDCharacter->Client_PlayLocalSound("SFX_GetDiamond");
+	}
+	
 	// 점수 추가
 	GM->AddScore(PS, 1);
 }

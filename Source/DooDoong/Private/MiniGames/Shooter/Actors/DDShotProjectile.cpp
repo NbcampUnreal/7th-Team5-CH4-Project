@@ -1,5 +1,6 @@
 #include "MiniGames/Shooter/Actors/DDShotProjectile.h"
 
+#include "Base/Character/DDBaseCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Controller.h"
@@ -78,6 +79,14 @@ void ADDShotProjectile::NotifyActorBeginOverlap(AActor* OtherActor)
 		return;
 	}
 
+	if (APawn* ShooterPawn = GetInstigator())
+	{
+		if (ADDBaseCharacter* DDCharacter = Cast<ADDBaseCharacter>(ShooterPawn))
+		{
+			DDCharacter->Client_PlayLocalSound("SFX_HitBread");
+		}
+	}
+	
 	if (ADDShooterTarget* ShooterTarget = Cast<ADDShooterTarget>(OtherActor))
 	{
 		ShooterTarget->HandleProjectileHit(this);

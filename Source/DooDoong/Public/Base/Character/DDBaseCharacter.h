@@ -44,6 +44,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCast_HandleRagDoll();
 	
+	UFUNCTION(Client, Reliable)
+	void Client_PlayLocalSound(FName SoundID);
+	
 protected:
 	void EnableRagDoll();
 	

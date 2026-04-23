@@ -8,6 +8,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "MiniGames/Shooter/Actors/DDShotProjectile.h"
 #include "MiniGames/Shooter/GameMode/DDShooterGameMode.h"
+#include "System/DDSoundManager.h"
 
 ADDShooterTarget::ADDShooterTarget()
 {
@@ -66,6 +67,7 @@ bool ADDShooterTarget::HandleProjectileHit(ADDShotProjectile* ShotProjectile)
 	bCanGetScore = false;
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ShooterGameMode->AddScore(ShooterPlayerState, ScoreValue);
+	
 	Destroy();
 
 	const ADDBasePlayerState* ShooterDDPlayerState = Cast<ADDBasePlayerState>(ShooterPlayerState);

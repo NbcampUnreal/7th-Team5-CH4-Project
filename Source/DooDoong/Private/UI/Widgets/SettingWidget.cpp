@@ -25,6 +25,10 @@ void USettingWidget::NativeConstruct()
 	{
 		SFXVolumeSlider->OnValueChanged.AddDynamic(this, &USettingWidget::OnSFXVolumeChanged);
 	}
+	if (InterfaceVolumeSlider)
+	{
+		InterfaceVolumeSlider->OnValueChanged.AddDynamic(this, &USettingWidget::OnInterfaceVolumeChanged);
+	}
 	
 	if (ApplyButton)
 	{
