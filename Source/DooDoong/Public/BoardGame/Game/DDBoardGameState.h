@@ -6,6 +6,7 @@
 #include "DDBoardGameState.generated.h"
 
 class ADDTileManager;
+class ULevelSequence;
 
 // 결과 전달 구조체: 탈주, 동점자 UI에러 방지 목적
 USTRUCT(BlueprintType)
@@ -131,8 +132,11 @@ protected:
 
 public:
 	// --- 레벨 시퀀스 --- 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ALevelSequenceActor* LevelSequenceActor;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sequence")
+    TSoftObjectPtr<ULevelSequence> BoardIntroSequenceAsset;
+	
+    UPROPERTY(Transient)
+    TObjectPtr<ALevelSequenceActor> SpawnedSequenceActor;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlaySequence();

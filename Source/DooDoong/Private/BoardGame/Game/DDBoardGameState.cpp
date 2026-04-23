@@ -39,19 +39,6 @@ void ADDBoardGameState::BeginPlay()
 	TileManager = Cast<ADDTileManager>(
 		UGameplayStatics::GetActorOfClass(GetWorld(), ADDTileManager::StaticClass())
 	);
-	
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsWithTag(
-		GetWorld(),
-		FName("IntroSequence"),
-		FoundActors
-	);
-
-	if (FoundActors.Num() > 0)
-	{
-		LevelSequenceActor = Cast<ALevelSequenceActor>(FoundActors[0]);
-		LOG_CYS(Warning, TEXT("[GS] 인트로 시퀀서 찾음"));
-	}
 }
 
 void ADDBoardGameState::AddPlayerState(APlayerState* PlayerState)
@@ -79,20 +66,33 @@ void ADDBoardGameState::OnSequenceFinished()
 
 void ADDBoardGameState::Multicast_PlaySequence_Implementation()
 {
-	if (LevelSequenceActor)
-	{
-		ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
-		if (SequencePlayer)
-		{
-			// 서버에서만 바인딩 (중요)
-			if (HasAuthority())
-			{
-				SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::OnSequenceFinished);
-			}
-			SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::PlayBoardBGMLocal);
-			SequencePlayer->Play();
-		}
-	}
+    ULevelSequence* LoadedSequence = BoardIntroSequenceAsset.LoadSynchronous();
+    
+    if (LoadedSequence)
+    {
+        ALevelSequenceActor* OutActor = nullptr;
+        FMovieSceneSequencePlaybackSettings Settings;
+    	
+        ULevelSequencePlayer* SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
+            GetWorld(), 
+            LoadedSequence, 
+            Settings, 
+            OutActor
+        );
+
+        if (SequencePlayer && OutActor)
+        {
+            SpawnedSequenceActor = OutActor;
+        	
+            if (HasAuthority())
+            {
+                SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::OnSequenceFinished);
+            }
+        	
+            SequencePlayer->OnFinished.AddUniqueDynamic(this, &ADDBoardGameState::PlayBoardBGMLocal);
+            SequencePlayer->Play();
+        }
+    }
 }
 
 void ADDBoardGameState::Multicast_PlayBoardBGM_Implementation()
