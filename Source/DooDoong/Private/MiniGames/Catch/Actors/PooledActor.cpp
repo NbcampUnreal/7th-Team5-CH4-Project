@@ -7,7 +7,8 @@ APooledActor::APooledActor()
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 	bInUse = true;
-
+	SetReplicateMovement(true);
+	
 	// Root
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SetRootComponent(CollisionComp);
@@ -50,7 +51,7 @@ bool APooledActor::IsInUse() const
 void APooledActor::OnRep_InUse()
 {
 	// Hidden만 처리, 콜리전 건드리지 않음
-	SetActorHiddenInGame(!bInUse);
+	// SetActorHiddenInGame(!bInUse);
 
 	// 클라이언트도 비활성 시 맵 밖으로
 	if (!bInUse)

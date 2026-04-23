@@ -48,19 +48,7 @@ void ADiamondSpawner::SpawnDiamonds()
 
 		Spawned++;
 	}
-
-	// 부족하면 남은 것 전부 활성화
-	if (Spawned < SpawnCount)
-	{
-		for (APooledActor* Actor : Pool->ObjectPool)
-		{
-			if (Actor && !Actor->IsInUse())
-			{
-				Actor->SetInUse(true);
-			}
-		}
-	}
-	LOG_CYS(Warning, TEXT("[스포너] Spawned %d Diamonds"), SpawnCount);
+	LOG_CYS(Warning, TEXT("[스포너] Spawned %d Diamonds"), Spawned);
 }
 
 FVector ADiamondSpawner::GetRandomPointInBox() const
