@@ -80,7 +80,7 @@ void UDDInventoryWidget::GenerateGrid()
 		{
 			if (InventoryComponent->ViewItemDatas.IsEmpty())
 			{
-				LOG_PMJ(Error, TEXT("===== UI출력용 아이템 데이터가 존재하지 않습니다! ====="));
+				LOG_PMJ(Warning, TEXT("===== UI출력용 아이템 데이터가 존재하지 않습니다! ====="));
 				continue;
 			}
 			

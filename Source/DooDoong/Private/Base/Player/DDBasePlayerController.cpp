@@ -57,7 +57,7 @@ void ADDBasePlayerController::OnRep_PlayerState()
 	}
 	else
 	{
-		LOG_PMJ(Error, TEXT("PlayerState is null"));
+		LOG_PMJ(Warning, TEXT("PlayerState is null"));
 	}
 }
 

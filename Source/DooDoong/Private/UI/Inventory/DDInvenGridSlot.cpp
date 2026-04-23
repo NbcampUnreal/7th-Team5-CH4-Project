@@ -22,7 +22,7 @@ void UDDInvenGridSlot::SetItemInfo(const FViewItemData& ViewItemData)
 	// ItemTable 가져와서 처음 아이콘 이랑 아이템ID 설정
 	if (ViewItemData.Icon.IsNull() || ViewItemData.ViewItemName.IsNone())
 	{
-		LOG_PMJ(Error, TEXT("===== 아이템의 정보를 참조할 수 없습니다 존재하지않습니다! ====="));
+		LOG_PMJ(Warning, TEXT("===== 아이템의 정보를 참조할 수 없습니다 존재하지않습니다! ====="));
 		return;
 	}
 	UTexture2D* ItemIcon = ViewItemData.Icon.LoadSynchronous();

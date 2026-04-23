@@ -52,7 +52,7 @@ void ADDTile::LoadTileData()
 	if (!HasAuthority()) return;
 	if (!TileDataTable || TileRowName.IsNone())
 	{
-		LOG_CYS(Error, TEXT("[Tile]TileDataTable or RowName missing"));
+		LOG_CYS(Warning, TEXT("[Tile]TileDataTable or RowName missing"));
 		return;
 	}
 
@@ -66,7 +66,7 @@ void ADDTile::LoadTileData()
 	}
 	else
 	{
-		LOG_CYS(Error, TEXT("[Tile]Row not found: %s"), *TileRowName.ToString());
+		LOG_CYS(Warning, TEXT("[Tile]Row not found: %s"), *TileRowName.ToString());
 	}
 }
 
@@ -96,7 +96,7 @@ void ADDTile::ResolveNextTiles(const TMap<FName, ADDTile*>& TileMap)
 		}
 		else
 		{
-			LOG_CYS(Error, TEXT("[Tile][%s] NextTile not found: %s"),
+			LOG_CYS(Warning, TEXT("[Tile][%s] NextTile not found: %s"),
 			        *TileRowName.ToString(),
 			        *NextName.ToString());
 		}

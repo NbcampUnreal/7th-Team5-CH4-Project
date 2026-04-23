@@ -5,7 +5,7 @@
 #include "Base/MiniGame/DDMiniGameRuleSet.h"
 #include "Base/MiniGame/DDMiniGameModeBase.h"
 #include "Engine/DataAsset.h"
-#include "Input/DDInputConfig.h"
+#include "InputMappingContext.h"
 #include "DDMiniGameDefinition.generated.h"
 
 UCLASS()

@@ -28,19 +28,19 @@ void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 {
 	if (GetOwner()->HasAuthority() && CashingPlayerState()->bInitializeInventory == false)
 	{
-		LOG_PMJ(Error, TEXT("인벤토리 초기화 호출"));
+		LOG_PMJ(Warning, TEXT("인벤토리 초기화 호출"));
 		
-		LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 1"));
+		LOG_PMJ(Warning, TEXT("Server_InitializeInventoryData_Implementation 1"));
 		
 		if (!UDDGameInstance::Get(GetWorld())->ItemDataTable)
 		{
-			LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 2"));
+			LOG_PMJ(Warning, TEXT("Server_InitializeInventoryData_Implementation 2"));
 			return;
 		}
 		const TArray<FName>& AllItemNames = UDDGameInstance::Get(GetWorld())->ItemDataTable->GetRowNames();
 		if (AllItemNames.IsEmpty())
 		{
-			LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 3"));
+			LOG_PMJ(Warning, TEXT("Server_InitializeInventoryData_Implementation 3"));
 			return;
 		}
 		for (int32 i = 0; i < AllItemNames.Num(); ++i)
@@ -48,7 +48,7 @@ void UDDInventoryComponent::Server_InitializeInventoryData_Implementation()
 			FItemTableRow* ItemDataRow = UDDGameInstance::Get(GetWorld())->ItemDataTable->FindRow<FItemTableRow>(AllItemNames[i], TEXT("FindItem"));
 			if (!ItemDataRow)
 			{
-				LOG_PMJ(Error, TEXT("Server_InitializeInventoryData_Implementation 4"));
+				LOG_PMJ(Warning, TEXT("Server_InitializeInventoryData_Implementation 4"));
 				continue;
 			}
 		
@@ -76,7 +76,7 @@ void UDDInventoryComponent::RefreshInventory()
 	
 	if (CashingPlayerState()->InventoryItemDatas.IsEmpty())
 	{
-		LOG_PMJ(Error, TEXT("===== 원본 인벤토리 데이터가 비어있습니다 ====="));
+		LOG_PMJ(Warning, TEXT("===== 원본 인벤토리 데이터가 비어있습니다 ====="));
 		return;
 	}
 	if (ViewItemDatas.Num() != CashingPlayerState()->InventoryItemDatas.Num())
@@ -143,7 +143,7 @@ void UDDInventoryComponent::Server_UseItem_Implementation(const FName& ItemSlotN
 {
 	if (ItemSlotName.IsNone())
 	{
-			LOG_PMJ(Error, TEXT("====== 아이템 이름 없음 ======"));
+			LOG_PMJ(Warning, TEXT("====== 아이템 이름 없음 ======"));
 	}
 	for (FInventoryItemData& ItemData : CashingPlayerState()->InventoryItemDatas)
 	{
@@ -153,26 +153,26 @@ void UDDInventoryComponent::Server_UseItem_Implementation(const FName& ItemSlotN
 			ADDBasePlayerController* DDPC = Cast<ADDBasePlayerController>(CashingPlayerState()->GetPlayerController());
 			if (DDPC == nullptr)
 			{
-				LOG_PMJ(Error, TEXT(" UseItem: 컨트롤러 캐스팅 실패 "));
+				LOG_PMJ(Warning, TEXT(" UseItem: 컨트롤러 캐스팅 실패 "));
 			}
 			
 			ADDBaseCharacter* DDCharacter = Cast<ADDBaseCharacter>(DDPC->GetCharacter());
 			if (DDCharacter == nullptr)
 			{
-				LOG_PMJ(Error, TEXT(" UseItem: 캐릭터 캐스팅 실패 "));
+				LOG_PMJ(Warning, TEXT(" UseItem: 캐릭터 캐스팅 실패 "));
 			}
 			
 			UItemActionComponent* IAC = DDCharacter->FindComponentByClass<UItemActionComponent>();
 			if (!IsValid(IAC))
 			{
-				LOG_PMJ(Error, TEXT(" UseItem: 아이템 엑션 컴포넌트 찾기 실패 "));
+				LOG_PMJ(Warning, TEXT(" UseItem: 아이템 엑션 컴포넌트 찾기 실패 "));
 				return;
 			}
 			
 			FItemTableRow* CurrentItemDataRow = GetItemData(ItemData.ItemName);  // ← 포인터로 받기
 			if (!CurrentItemDataRow)
 			{
-				LOG_PMJ(Error, TEXT(" UseItem: 아이템 데이터 불러오기 실패 "));
+				LOG_PMJ(Warning, TEXT(" UseItem: 아이템 데이터 불러오기 실패 "));
 				return;
 			}
 			

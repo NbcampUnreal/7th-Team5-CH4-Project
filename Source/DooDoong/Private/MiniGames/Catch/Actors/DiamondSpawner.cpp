@@ -42,7 +42,7 @@ void ADiamondSpawner::SpawnDiamonds()
 
 		if (!Actor)
 		{
-			LOG_CYS(Error, TEXT("[스포너] 풀 부족"));
+			LOG_CYS(Warning, TEXT("[스포너] 풀 부족"));
 			break; // 풀 부족
 		}
 
@@ -78,7 +78,7 @@ FVector ADiamondSpawner::GetRandomPointInBox() const
 void ADiamondSpawner::StartSpawn()
 {
 	if (!HasAuthority()) return;
-	LOG_CYS(Error, TEXT("[스포너] StartSpawn"));
+	LOG_CYS(Warning, TEXT("[스포너] StartSpawn"));
 
 	SpawnDiamonds();
 

@@ -20,7 +20,7 @@ void UGA_RangeItemBase::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		LOG_CYS(Error, TEXT("RangeItem CommitAbility FAILED"));
+		LOG_CYS(Warning, TEXT("RangeItem CommitAbility FAILED"));
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}

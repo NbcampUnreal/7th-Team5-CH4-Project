@@ -173,18 +173,18 @@ void ADDPlatformerGameMode::PlayerRanking()
 		switch (DDPlayer->PlayerRank)
 		{
 		case 1 : AddScore(DDPlayer->GetPlayerState(), 100);
-			LOG_PMJ(Error, TEXT("=== GAMEMODE : %d Player, AddScore : 100, Rank : %d ==="), DDPlayer->GetPlayerState()->GetPlayerId(), DDPlayer->PlayerRank);
+			LOG_PMJ(Log, TEXT("=== GAMEMODE : %d Player, AddScore : 100, Rank : %d ==="), DDPlayer->GetPlayerState()->GetPlayerId(), DDPlayer->PlayerRank);
 			break;
 		case 2 : AddScore(DDPlayer->GetPlayerState(), 80);
-			LOG_PMJ(Error, TEXT("=== GAMEMODE : %d Player, AddScore : 80, Rank : %d ==="), DDPlayer->GetPlayerState()->GetPlayerId(), DDPlayer->PlayerRank);
+			LOG_PMJ(Log, TEXT("=== GAMEMODE : %d Player, AddScore : 80, Rank : %d ==="), DDPlayer->GetPlayerState()->GetPlayerId(), DDPlayer->PlayerRank);
 			break;
 		case 3 : AddScore(DDPlayer->GetPlayerState(), 60);
-			LOG_PMJ(Error, TEXT("=== GAMEMODE : %d Player, AddScore : 60, Rank : %d ==="), DDPlayer->GetPlayerState()->GetPlayerId(), DDPlayer->PlayerRank);
+			LOG_PMJ(Log, TEXT("=== GAMEMODE : %d Player, AddScore : 60, Rank : %d ==="), DDPlayer->GetPlayerState()->GetPlayerId(), DDPlayer->PlayerRank);
 			break;
 		case 4 : AddScore(DDPlayer->GetPlayerState(), 40);
-			LOG_PMJ(Error, TEXT("=== GAMEMODE : %d Player, AddScore : 40, Rank : %d ==="), DDPlayer->GetPlayerState()->GetPlayerId(), DDPlayer->PlayerRank);
+			LOG_PMJ(Log, TEXT("=== GAMEMODE : %d Player, AddScore : 40, Rank : %d ==="), DDPlayer->GetPlayerState()->GetPlayerId(), DDPlayer->PlayerRank);
 			break;
-		default: LOG_PMJ(Error, TEXT("=== GAMEMODE : 플레이어의 랭킹 없음 ==="));
+		default: LOG_PMJ(Warning, TEXT("=== GAMEMODE : 플레이어의 랭킹 없음 ==="));
 			break;
 		}
 	}
