@@ -24,7 +24,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_AddScore();
 
-	UPROPERTY(BlueprintReadOnly)
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UFUNCTION(Server, Reliable)
+	void Server_SetPress(bool bNewPress);
+	
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool bPressing;
 	
 private:

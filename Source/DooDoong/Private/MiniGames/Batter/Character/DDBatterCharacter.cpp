@@ -1,6 +1,7 @@
 ﻿#include "MiniGames/Batter/Character/DDBatterCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "MiniGames/Batter/GameMode/DDBatterGameMode.h"
+#include "Net/UnrealNetwork.h"
 
 
 ADDBatterCharacter::ADDBatterCharacter()
@@ -11,9 +12,7 @@ ADDBatterCharacter::ADDBatterCharacter()
 void ADDBatterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
-
 
 void ADDBatterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -43,11 +42,22 @@ void ADDBatterCharacter::OnPressSpace()
 	
 	Server_AddScore();
 	
-	bPressing = true;
+	Server_SetPress(true);
 }
 
 void ADDBatterCharacter::OnReleaseSpace()
 {
-	bPressing = false;
+	Server_SetPress(false);
 }
 
+void ADDBatterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADDBatterCharacter, bPressing);
+}
+
+void ADDBatterCharacter::Server_SetPress_Implementation(bool bNewPress)
+{
+	bPressing = bNewPress;
+}
