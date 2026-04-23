@@ -149,4 +149,6 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|Effects")
 	TSubclassOf<UGameplayEffect> HealingEffect;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|Effects")
+	TSubclassOf<UGameplayEffect> CoinEffect;
 };

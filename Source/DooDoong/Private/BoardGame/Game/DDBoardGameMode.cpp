@@ -1,4 +1,7 @@
 #include "BoardGame/Game/DDBoardGameMode.h"
+
+#include <ThirdParty/hlslcc/hlslcc/src/hlslcc_lib/ir_hierarchical_visitor.h>
+
 #include "AbilitySystemComponent.h"
 #include "Base/Game/DDGameStateBase.h"
 #include "System/DDGameInstance.h"
@@ -653,19 +656,35 @@ void ADDBoardGameMode::HandleRespawn(AController* TargetController)
 	FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
 	ContextHandle.AddSourceObject(this);
 
-	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(HealingEffect, 1.f, ContextHandle);
+	FGameplayEffectSpecHandle SpecHealHandle = ASC->MakeOutgoingSpec(HealingEffect, 1.f, ContextHandle);
 
-	if (!SpecHandle.IsValid())
+	if (SpecHealHandle.IsValid())
 	{
-		return;
+		LOG_CYS(Warning,TEXT("SpecHealHandle"));
+		SpecHealHandle.Data->SetSetByCallerMagnitude(
+		DDGameplayTags::Data_Health_Heal,
+   30.0f
+		);
+
+		ASC->ApplyGameplayEffectSpecToSelf(* SpecHealHandle.Data);
 	}
 
-	SpecHandle.Data->SetSetByCallerMagnitude(
-		DDGameplayTags::Data_Health_Heal,
-		30.0f
-	);
 
-	ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+	
+	// 열쇠 20 뺏음
+	FGameplayEffectSpecHandle SpecCoinHandle = ASC->MakeOutgoingSpec(CoinEffect, 1.f, ContextHandle);
+	
+	if (SpecCoinHandle.IsValid())
+	{
+		LOG_CYS(Warning,TEXT("SpecCoinHandle"));
+		
+		SpecCoinHandle.Data->SetSetByCallerMagnitude(
+		DDGameplayTags::Data_Point_Coin,
+   -20.0f
+		);
+		
+		ASC->ApplyGameplayEffectSpecToSelf(* SpecCoinHandle.Data);
+	}
 }
 
 void ADDBoardGameMode::ExecuteNextTurnTransition()
