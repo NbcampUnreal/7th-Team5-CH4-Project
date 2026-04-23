@@ -120,7 +120,7 @@ void UBoardGamePlayerInfo::UpdateCurrentRank(int32 CurrentRank)
 		
 		if(RankColors.Num() <= 0) return;  
 		
-		const int32 ColorIndex = RankColors.IsValidIndex(CurrentRank - 1) ? CurrentRank - 1 : 0;
+		const int32 ColorIndex = RankColors.IsValidIndex(CurrentRank) ? CurrentRank : 0;
 		if (RankColors.IsValidIndex(ColorIndex))
 		{
 			CurrentRankText->SetColorAndOpacity(RankColors[ColorIndex]);
