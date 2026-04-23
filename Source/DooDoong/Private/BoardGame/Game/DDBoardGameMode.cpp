@@ -288,7 +288,9 @@ void ADDBoardGameMode::HandleState_RoundEnd()
 			}
 		}
 	}
-   
+
+	BroadcastClosePopUp(DDGameplayTags::BoardGame_UI_Inventory);
+	
 	// 2. 승자 없으면 대기 시간 설정 및 타일 정보 저장
 	CachedBoardGameState->SetStateTimer(3);
    
@@ -347,7 +349,6 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 	ApplyTurnEffectsToPlayers();
 	SetTurnPhase(DDGameplayTags::State_TurnPhase_BeforeDice);
 	
-	
 	// PC들에게 반응 지시
 	for (int32 i = 0; i < AlivePlayerControllers.Num(); ++i)
 	{
@@ -364,6 +365,8 @@ void ADDBoardGameMode::StartNextPlayerTurn()
 			// DDPC->Client_SetMouseCursorVisible(false); 턴 넘어가도 커서 안숨김
 		}
 	}
+	
+	BroadcastClosePopUp(DDGameplayTags::BoardGame_UI_Inventory);
 
 	APawn* ActivePawn = AlivePlayerControllers[NextIndex]->GetPawn();
 	Super::FocusAllCamerasOnTarget(ActivePawn);
