@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "Interfaces/OnlineSessionInterface.h"
 #include "DDGameInstance.generated.h"
 
 class APlayerController;
@@ -30,9 +29,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Network|Dedicated Server")
 	void ConnectToDedicatedServer(APlayerController* PlayerController) const;
 
-	UFUNCTION(BlueprintCallable, Category = "Network|Steam")
-	bool ShowSteamInviteOverlay(APlayerController* PlayerController) const;
-
 	UFUNCTION(BlueprintPure, Category = "Network|Dedicated Server")
 	FString GetDedicatedServerTravelURL() const;
 
@@ -55,10 +51,6 @@ public:
     int32 ExpectedPlayerCount = 0;
 
 private:
-	void TryCreateDedicatedServerSession();
-	void OnCreateDedicatedServerSessionComplete(FName SessionName, bool bWasSuccessful);
-	void OnSessionInviteAccepted(bool bWasSuccessful, int32 ControllerId, TSharedPtr<const FUniqueNetId> UserId, const FOnlineSessionSearchResult& InviteResult);
-
 	UPROPERTY()
 	TMap<FString, TObjectPtr<UDDUIConfig>> CachedUIConfigs;
 	
@@ -70,10 +62,4 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Network|Dedicated Server")
 	int32 DedicatedServerPort = 7777;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Network|Dedicated Server")
-	int32 DedicatedServerMaxPlayers = 4;
-
-	FDelegateHandle OnCreateSessionCompleteHandle;
-	FDelegateHandle OnSessionInviteAcceptedHandle;
 };
