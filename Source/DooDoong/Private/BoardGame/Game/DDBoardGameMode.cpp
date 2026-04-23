@@ -329,13 +329,15 @@ void ADDBoardGameMode::HandleState_End()
 void ADDBoardGameMode::StartNextPlayerTurn()
 {
 	int32 NextIndex = CachedBoardGameState->GetTurnPlayerIndex() + 1;
-
+	
 	// 라운드 종료 체크
 	if (NextIndex >= AlivePlayerControllers.Num())
 	{
 		ProcessRoundTransition();
 		return;
 	}
+	
+	CurrentTurnPhaseTag = FGameplayTag::EmptyTag;
 
 	// 데이터 갱신
 	CachedBoardGameState->SetTurnPlayerIndex(NextIndex);
@@ -522,6 +524,11 @@ void ADDBoardGameMode::ApplyTurnEffectsToPlayers()
 		TurnTagsToRemove.AddTag(DDGameplayTags::State_BoardGame_TurnWaiting);
 		TurnTagsToRemove.AddTag(DDGameplayTags::State_BoardGame_HasUsedItem);
 		ASC->RemoveActiveEffectsWithGrantedTags(TurnTagsToRemove);
+		
+		if (i != CachedBoardGameState->GetTurnPlayerIndex())
+        {
+            ASC->CancelAllAbilities(); 
+        }
 
 		TSubclassOf<UGameplayEffect> EffectClassPtr = (i == CachedBoardGameState->GetTurnPlayerIndex()) ? TurnActiveEffectClass : TurnWaitingEffectClass;
 		if (EffectClassPtr)
