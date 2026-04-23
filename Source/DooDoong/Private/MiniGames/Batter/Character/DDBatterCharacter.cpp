@@ -39,10 +39,8 @@ void ADDBatterCharacter::Server_AddScore_Implementation()
 void ADDBatterCharacter::OnPressSpace()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Space Pressed!"));
-	
-	Server_AddScore();
-	
 	Server_SetPress(true);
+	Server_AddScore();
 }
 
 void ADDBatterCharacter::OnReleaseSpace()
