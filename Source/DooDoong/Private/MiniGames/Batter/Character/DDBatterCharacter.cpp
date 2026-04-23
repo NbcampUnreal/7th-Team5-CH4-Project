@@ -1,6 +1,7 @@
 ﻿#include "MiniGames/Batter/Character/DDBatterCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "MiniGames/Batter/GameMode/DDBatterGameMode.h"
+#include "System/DDSoundManager.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -39,6 +40,12 @@ void ADDBatterCharacter::Server_AddScore_Implementation()
 void ADDBatterCharacter::OnPressSpace()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Space Pressed!"));
+	
+	if (UDDSoundManager* SoundManager = UDDSoundManager::Get(GetWorld()))
+	{
+		SoundManager->PlaySoundAtLocation("SFX_PressSpaceBar", GetActorLocation());
+	}
+	
 	Server_SetPress(true);
 	Server_AddScore();
 }

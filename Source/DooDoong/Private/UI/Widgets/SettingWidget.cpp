@@ -25,6 +25,10 @@ void USettingWidget::NativeConstruct()
 	{
 		SFXVolumeSlider->OnValueChanged.AddDynamic(this, &USettingWidget::OnSFXVolumeChanged);
 	}
+	if (InterfaceVolumeSlider)
+	{
+		InterfaceVolumeSlider->OnValueChanged.AddDynamic(this, &USettingWidget::OnInterfaceVolumeChanged);
+	}
 	
 	if (ApplyButton)
 	{
@@ -81,6 +85,7 @@ void USettingWidget::OnApplyClicked()
 	if (UDDSoundManager* SoundManager = UDDSoundManager::Get(this))
 	{
 		SoundManager->SaveAudioSettings();
+		SoundManager->PlaySound2D("UI_Click");
 	}
 	
 	UGameUserSettings* GameSettings = UGameUserSettings::GetGameUserSettings();
@@ -121,6 +126,11 @@ void USettingWidget::OnApplyClicked()
 
 void USettingWidget::OnBackClicked()
 {
+	if (UDDSoundManager* SoundManager = UDDSoundManager::Get(this))
+	{
+		SoundManager->PlaySound2D("UI_Click");
+	}
+	
 	if (UDDUIManagerSubsystem* UIManager = GetWorld()->GetFirstPlayerController()->GetLocalPlayer()->GetSubsystem<UDDUIManagerSubsystem>())
 	{
 		UIManager->HidePopup(DDGameplayTags::Settings_UI);

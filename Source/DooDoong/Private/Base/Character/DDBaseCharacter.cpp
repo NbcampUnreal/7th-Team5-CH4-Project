@@ -5,6 +5,7 @@
 #include "AbilitySystem/Attributes/DDHealthSet.h"
 #include "AbilitySystem/Attributes/DDMovementSet.h"
 #include "Components/CapsuleComponent.h"
+#include "System/DDSoundManager.h"
 
 ADDBaseCharacter::ADDBaseCharacter()
 {
@@ -131,6 +132,14 @@ void ADDBaseCharacter::OnJumpSpeedChanged(const FOnAttributeChangeData& Data)
 void ADDBaseCharacter::MultiCast_HandleRagDoll_Implementation()
 {
 	EnableRagDoll();
+}
+
+void ADDBaseCharacter::Client_PlayLocalSound_Implementation(FName SoundID)
+{
+	if (UDDSoundManager* SoundManager = UDDSoundManager::Get(this))
+	{
+		SoundManager->PlaySound2D(SoundID);
+	}
 }
 
 void ADDBaseCharacter::EnableRagDoll()
