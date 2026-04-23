@@ -21,14 +21,19 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Unreliable)
 	void Server_AddScore();
 
-	UPROPERTY(BlueprintReadOnly)
-	bool bPressing;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UFUNCTION(Server, Unreliable)
+	void Server_SetPress(bool bNewPress);
+	
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool bPressing = false;
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category="Input")
 	const UInputAction* IA_Bat;
 	
 	UFUNCTION()
@@ -36,5 +41,4 @@ private:
 	
 	UFUNCTION()
 	void OnReleaseSpace();
-	
 };
