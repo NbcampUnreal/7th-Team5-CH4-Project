@@ -1,0 +1,61 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "MiniGameReadyWidget.generated.h"
+
+struct FMiniGameReadyEntry;
+class UButton; 
+class UTextBlock; 
+class UImage;
+class UMultiLineEditableTextBox; 
+class ADDMiniGameStateBase;
+
+UCLASS()
+class DOODOONG_API UMiniGameReadyWidget : public UUserWidget
+{
+	GENERATED_BODY()
+	
+public:
+	virtual void NativeOnInitialized() override;
+	
+	virtual void NativeConstruct() override;
+	
+	virtual void NativeDestruct() override;
+	
+	void TryBindGameState(); 
+	
+	void TryBindGameInfo(); 
+	
+	UFUNCTION()
+	void OnReadyButtonClicked();
+	
+	UFUNCTION()
+	void OnReadyStateChanged(int32 ReadyCount, int32 TotalCount); 
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* MiniGameTitle;
+	
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* ReadyStateText;
+	
+	UPROPERTY(meta = (BindWidget))
+	UButton* ReadyButton;
+	
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* ReadyButtonText;
+	
+	UPROPERTY(meta = (BindWidget))
+	UImage* ThumbnailImage;
+	
+	UPROPERTY(meta = (BindWidget))
+	UMultiLineEditableTextBox* DescriptionText;
+	
+private:
+	UPROPERTY()
+	ADDMiniGameStateBase* CurrentGameState; 
+	
+	FTimerHandle GameStateRetryHandle; 
+	FTimerHandle GameInfoRetryHandle;
+};

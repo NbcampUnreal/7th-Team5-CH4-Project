@@ -10,9 +10,7 @@ public class DooDoong : ModuleRules
 		
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
-			"Core",
-			"CoreUObject",
-			"Engine",
+			"Core", "CoreUObject", "Engine",
 
 			"InputCore",
 			"EnhancedInput",
@@ -20,6 +18,10 @@ public class DooDoong : ModuleRules
 			"GameplayAbilities",
 			"GameplayTasks",
 			"GameplayTags",
+			/* 레벨 시퀀서 */
+			"LevelSequence", "MovieScene",
+			/* 나이아가라 */
+			"Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

@@ -1,0 +1,44 @@
+﻿#pragma once
+
+#include "CoreMinimal.h"
+#include "Base/Character/DDBaseCharacter.h"
+#include "DDBatterCharacter.generated.h"
+
+class UInputAction;
+
+UCLASS()
+class DOODOONG_API ADDBatterCharacter : public ADDBaseCharacter
+{
+	GENERATED_BODY()
+
+public:
+	ADDBatterCharacter();
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	UFUNCTION(Server, Unreliable)
+	void Server_AddScore();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UFUNCTION(Server, Unreliable)
+	void Server_SetPress(bool bNewPress);
+	
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool bPressing = false;
+	
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	const UInputAction* IA_Bat;
+	
+	UFUNCTION()
+	void OnPressSpace();
+	
+	UFUNCTION()
+	void OnReleaseSpace();
+};

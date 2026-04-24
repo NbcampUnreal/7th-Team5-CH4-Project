@@ -7,7 +7,14 @@
 		{
 			"Name": "DooDoong",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"EnhancedInput",
+				"GameplayAbilities",
+				"UMG",
+				"CoreUObject"
+			]
 		},
 		{
 			"Name": "DDGitStatusBranch",
